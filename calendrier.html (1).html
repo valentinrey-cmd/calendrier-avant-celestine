@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Calendrier de l'Avent Célestine ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@keyframes heartbeat {
+  0%,100%{transform:scale(1);}
+  25%{transform:scale(1.2);}
+  50%{transform:scale(1.4);}
+  75%{transform:scale(1.2);}
+}
+
+@keyframes snowFall {
+  0% { transform: translateY(-10px); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  background-color: pink;
+  overflow-x: hidden;
+  position: relative;
+}
+
+h1 {
+  font-size: 2em;
+  margin-top: 20px;
+  color: #8B0000;
+}
+
+h1 span.heart {
+  display: inline-block;
+  color: #8B0000;
+  animation: heartbeat 1.5s infinite;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-gap: 10px;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 0 10px;
+}
+
+.case {
+  background: linear-gradient(145deg,#ffb6b6,#ff5c5c);
+  border-radius: 15px;
+  aspect-ratio:1/1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:20px;
+  cursor:pointer;
+  box-shadow:0 4px 6px rgba(0,0,0,0.2);
+  transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s, color 0.3s;
+}
+
+.case:hover { transform:scale(1.15) rotate(-5deg); box-shadow:0 6px 10px rgba(0,0,0,0.4); }
+.case.opened { background: linear-gradient(145deg,#ffd6d6,#ff7b7b); }
+.locked { background-color:#e8baba; cursor:not-allowed; color:#555; } /* un peu plus grisé que les autres */
+
+.today { color: #00aa00; } /* vert pour le chiffre du jour */
+
+.popup {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-color:rgba(0,0,0,0.7);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.popup-content {
+  background-color:#fff0f5;
+  padding:25px;
+  border-radius:15px;
+  max-width:90%;
+  text-align:center;
+  box-shadow:0 8px 12px rgba(0,0,0,0.3);
+}
+
+.popup-content span { font-size:1.2em; color:#8B0000; }
+
+.close-btn {
+  margin-top:20px;
+  padding:8px 20px;
+  background-color:#d9534f;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.close-btn:hover { background-color:#c12e2a; }
+
+.snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  z-index: 9999;
+  pointer-events: none;
+  animation: snowFall linear infinite;
+}
+
+@media (max-width:500px){.grid{grid-template-columns:repeat(4,1fr)} .case{font-size:18px}}
+@media (max-width:350px){.grid{grid-template-columns:repeat(3,1fr)} .case{font-size:16px}}
+</style>
+</head>
+<body>
+
+<h1>Calendrier de l'Avent Célestine <span class="heart">❤️</span></h1>
+
+<div class="grid" id="grid"></div>
+
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <span id="popup-text"></span><br>
+    <button class="close-btn" id="close-btn">Fermer</button>
+  </div>
+</div>
+
+<!-- Musique de Noël -->
+<audio id="bg-music" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-snow.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Bruitage pop -->
+<audio id="pop-sound">
+  <source src="https://www.soundjay.com/button/sounds/button-16.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Flocons de neige
+for(let i=0;i<30;i++){
+  const flake=document.createElement('div');
+  flake.className='snowflake';
+  flake.style.left=Math.random()*100+'vw';
+  flake.style.fontSize=(Math.random()*10+10)+'px';
+  flake.style.animationDuration=(Math.random()*5+5)+'s';
+  flake.textContent='❄';
+  document.body.appendChild(flake);
+}
+
+// Indices
+const today=new Date();
+const day=today.getDate();
+
+const indices={
+1:"Indice du 1 : C’est doux comme toi ❤️",
+2:"Indice du 2 : Ça se porte… et c’est trop mignon 😘",
+3:"Indice du 3 : Ça sent bon 👀",
+4:"Indice du 4 : C’est super confortable 🛋️",
+5:"Indice du 5 : Tu vas t’en servir souvent ❤️",
+6:"Indice du 6 : Petit et adorable 🐾",
+7:"Indice du 7 : Ça brille ✨",
+8:"Indice du 8 : Tu vas sourire en le voyant 😄",
+9:"Indice du 9 : Très utile au quotidien 🛠️",
+10:"Indice du 10 : Style assuré 👗",
+11:"Indice du 11 : Je te connais trop bien 😉",
+12:"Indice du 12 : Tu vas adorer 😍",
+13:"Indice du 13 : Odeur surprise 👃",
+14:"Indice du 14 : Une petite douceur 🍫",
+15:"Indice du 15 : Pour te relaxer 🛀",
+16:"Indice du 16 : Tu vas faire 'oooh' 😲",
+17:"Indice du 17 : Te rend encore plus belle 🌸",
+18:"Indice du 18 : C’est chaud ❤️‍🔥",
+19:"Indice du 19 : Tu en rêvais 💖",
+20:"Indice du 20 : Tu vas le garder longtemps 🧸",
+21:"Indice du 21 : Ça te ressemble 🌟",
+22:"Indice du 22 : Trop choupi 🥰",
+23:"Indice du 23 : Prépare-toi 👀",
+24:"Indice du 24 : Le meilleur pour la fin ❤️🎁"
+};
+
+const grid=document.getElementById('grid');
+const popup=document.getElementById('popup');
+const popupText=document.getElementById('popup-text');
+const popSound=document.getElementById('pop-sound');
+const bgMusic=document.getElementById('bg-music');
+
+for(let i=1;i<=24;i++){
+  const box=document.createElement('div');
+  box.classList.add('case');
+  box.textContent=i;
+
+  // Case du jour en vert
+  if(i===day){
+    box.classList.add('today');
+  }
+
+  // Cases futures
+  if(i>day) box.classList.add('locked');
+
+  box.addEventListener('click',()=>{
+    if(!box.classList.contains('locked')){
+      popupText.textContent=indices[i];
+      popup.style.display='flex';
+      box.classList.add('opened');
+
+      // Bruitage
+      popSound.currentTime=0;
+      popSound.play();
+
+      // Musique Noël
+      bgMusic.volume=0.2;
+      bgMusic.play().catch(()=>console.log("Clique pour démarrer la musique"));
+    }
+  });
+
+  grid.appendChild(box);
+}
+
+// Popup fermeture
+document.getElementById('close-btn').addEventListener('click',()=>{
+  popup.style.display='none';
+});
+popup.addEventListener('click',(e)=>{
+  if(e.target===popup){ popup.style.display='none'; }
+});
+</script>
+
+</body>
+</html>
