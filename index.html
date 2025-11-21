@@ -1,125 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Calendrier de l'Avent Pour Célestine ❤️</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-@keyframes heartbeat {
-  0%,100%{transform:scale(1);}
-  25%{transform:scale(1.2);}
-  50%{transform:scale(1.4);}
-  75%{transform:scale(1.2);}
-}
-
-@keyframes snowFall {
-  0% { transform: translateY(-10px); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: translateY(110vh); opacity: 0; }
-}
-
-body {
-  font-family: 'Arial', sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  background-color: pink;
-  overflow-x: hidden;
-  position: relative;
-}
-
-h1 {
-  font-size: 2em;
-  margin-top: 20px;
-  color: #8B0000;
-}
-
-h1 span.heart {
-  display: inline-block;
-  color: #8B0000;
-  animation: heartbeat 1.5s infinite;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-gap: 10px;
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 0 10px;
-}
-
-.case {
-  background: linear-gradient(145deg,#ffb6b6,#ff5c5c);
-  border-radius: 15px;
-  aspect-ratio:1/1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  font-size:20px;
-  cursor:pointer;
-  box-shadow:0 4px 6px rgba(0,0,0,0.2);
-  transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s, color 0.3s;
-}
-
-.case:hover { transform:scale(1.15) rotate(-5deg); box-shadow:0 6px 10px rgba(0,0,0,0.4); }
-.case.opened { background: linear-gradient(145deg,#ffd6d6,#ff7b7b); }
-.locked { background-color:#e8baba; cursor:not-allowed; color:#555; } /* un peu plus grisé que les autres */
-
-.today { color: #00aa00; } /* vert pour le chiffre du jour */
-
-.popup {
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background-color:rgba(0,0,0,0.7);
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-
-.popup-content {
-  background-color:#fff0f5;
-  padding:25px;
-  border-radius:15px;
-  max-width:90%;
-  text-align:center;
-  box-shadow:0 8px 12px rgba(0,0,0,0.3);
-}
-
-.popup-content span { font-size:1.2em; color:#8B0000; }
-
-.close-btn {
-  margin-top:20px;
-  padding:8px 20px;
-  background-color:#d9534f;
-  color:white;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.close-btn:hover { background-color:#c12e2a; }
-
-.snowflake {
-  position: fixed;
-  top: -10px;
-  color: white;
-  font-size: 1em;
-  z-index: 9999;
-  pointer-events: none;
-  animation: snowFall linear infinite;
-}
-
-@media (max-width:500px){.grid{grid-template-columns:repeat(4,1fr)} .case{font-size:18px}}
-@media (max-width:350px){.grid{grid-template-columns:repeat(3,1fr)} .case{font-size:16px}}
-</style>
+  <meta charset="UTF-8">
+  <title>Calendrier de l'Avent Célestine ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @keyframes heartbeat {
+      0%,100%{transform:scale(1);}
+      25%{transform:scale(1.2);}
+      50%{transform:scale(1.4);}
+      75%{transform:scale(1.2);}
+    }
+    @keyframes snowFall {
+      0% { transform: translateY(-10px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: pink;
+      overflow-x: hidden;
+      position: relative;
+    }
+    h1 {
+      font-size: 2em;
+      margin-top: 20px;
+      color: #8B0000;
+    }
+    h1 span.heart {
+      display: inline-block;
+      color: #8B0000;
+      animation: heartbeat 1.5s infinite;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-gap: 10px;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 0 10px;
+    }
+    .case {
+      background: linear-gradient(145deg,#ffb6b6,#ff5c5c);
+      border-radius: 15px;
+      aspect-ratio:1/1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:bold;
+      font-size:20px;
+      cursor:pointer;
+      box-shadow:0 4px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s, color 0.3s;
+      flex-direction: column;
+    }
+    .case:hover { transform:scale(1.15) rotate(-5deg); box-shadow:0 6px 10px rgba(0,0,0,0.4); }
+    .case.opened { background: linear-gradient(145deg,#ffd6d6,#ff7b7b); }
+    .locked { background-color:#e8baba; cursor:not-allowed; color:#555; }
+    .today { color: #8B0000; }
+    .popup {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background-color:rgba(0,0,0,0.7);
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+    }
+    .popup-content {
+      background-color:#fff0f5;
+      padding:25px;
+      border-radius:15px;
+      max-width:90%;
+      text-align:center;
+      box-shadow:0 8px 12px rgba(0,0,0,0.3);
+    }
+    .popup-content span { font-size:1.2em; color:#8B0000; }
+    .close-btn {
+      margin-top:20px;
+      padding:8px 20px;
+      background-color:#d9534f;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    .close-btn:hover { background-color:#c12e2a; }
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: white;
+      font-size: 1em;
+      z-index: 9999;
+      pointer-events: none;
+      animation: snowFall linear infinite;
+    }
+    .case img {
+      width: 60%;
+      border-radius: 10px;
+      margin-top: 5px;
+    }
+    @media (max-width:500px){
+      .grid{grid-template-columns:repeat(4,1fr)}
+      .case{font-size:18px}
+    }
+    @media (max-width:350px){
+      .grid{grid-template-columns:repeat(3,1fr)}
+      .case{font-size:16px}
+    }
+  </style>
 </head>
 <body>
 
-<h1>Calendrier de l'Avent Pour Célestine <span class="heart">❤️</span></h1>
+<h1>Calendrier de l'Avent Célestine <span class="heart">❤️</span></h1>
 
 <div class="grid" id="grid"></div>
 
@@ -141,95 +139,95 @@ h1 span.heart {
 </audio>
 
 <script>
-// Flocons de neige
-for(let i=0;i<30;i++){
-  const flake=document.createElement('div');
-  flake.className='snowflake';
-  flake.style.left=Math.random()*100+'vw';
-  flake.style.fontSize=(Math.random()*10+10)+'px';
-  flake.style.animationDuration=(Math.random()*5+5)+'s';
-  flake.textContent='❄';
+// Flocons
+for (let i = 0; i < 30; i++) {
+  const flake = document.createElement('div');
+  flake.className = 'snowflake';
+  flake.style.left = Math.random() * 100 + 'vw';
+  flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+  flake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+  flake.textContent = '❄';
   document.body.appendChild(flake);
 }
 
 // Indices
-const today=new Date();
-const day=today.getDate();
-
-const indices={
-1:"Indice du 1 : Histoire de bien commencer les fetes 🎄 ",
-2:"Indice du 2 : Pour que tu tombes encore plus amoureuse de moi",
-3:"Indice du 3 : Pour revenir aux origines ",
-4:"Indice du 4 : 👧👨🎳👨👧",
-5:"Indice du 5 : Ça gliiiiiiisse",
-6:"Indice du 6 : Pour te détendre 😏",
-7:"Indice du 7 : C'est chaud ❤️‍🔥",
-8:"Indice du 8 : C'est chaud aussi ❤️‍🔥 ( tkt c'est pas une deuxième bouillote) ",
-9:"Indice du 9 : ? ",
-10:"Indice du 10 : Pour embellir ton super appart 🎊🪩",
-11:"Indice du 11 : Ta passion numéro 1",
-12:"Indice du 12 : Je vais essayer de ne pas t'empoisonner",
-13:"Indice du 13 : Pour figer nos plus beaux souvenirs",
-14:"Indice du 14 : Une petite douceur ",
-15:"Indice du 15 : La fameuse dead-line pour le bouquet de fleurs ",
-16:"Indice du 16 : On en revient à ta passion numéro 1 (ou plutôt celle d'Arthur)",
-17:"Indice du 17 : Alcooooooool, Dis donc 2 cadeaux, mais c'est qu'elle est gâtée . ",
-18:"Indice du 18 : L'orchidée et l'hibiscus commencent à se sentir seuls",
-19:"Indice du 19 : Pour reconstituer l'image parfaite 💖",
-20:"Indice du 20 : Tu vas devenir riche (ou pas) 💵💰",
-21:"Indice du 21 : Celui-ci n'as pas le gouts de poney 🐎 ",
-22:"Indice du 22 : Pour cacher ton,gros orteil ",
-23:"Indice du 23 : Pour te rendre encore plus belle (même si t'es déjà parfaite 👀)",
-24:"Indice du 24 : Le meilleur pour la fin ❤️🎁 Je t'aime "
+const today = new Date();
+const day = today.getDate();
+const indices = {
+  1: "Indice du 1 : Histoire de bien commencer les fêtes 🎄 ",
+  2: "Indice du 2 : Pour que tu tombes encore plus amoureuse de moi",
+  3: "Indice du 3 : Pour revenir aux origines ",
+  4: "Indice du 4 : 👧👨🎳👨👧",
+  5: "Indice du 5 : Ça gliiiiiiise",
+  6: "Indice du 6 : Pour te détendre 😏",
+  7: "Indice du 7 : C'est chaud ❤️‍🔥",
+  8: "Indice du 8 : C'est chaud aussi ❤️‍🔥 ( tkt c'est pas une deuxième bouillote) ",
+  9: "Indice du 9 : ? ",
+  10: "Indice du 10 : Pour embellir ton super appart 🎊🪩",
+  11: "Indice du 11 : Ta passion numéro 1",
+  12: "Indice du 12 : Je vais essayer de ne pas t'empoisonner",
+  13: "Indice du 13 : Pour figer nos plus beaux souvenirs",
+  14: "Indice du 14 : Une petite douceur ",
+  15: "Indice du 15 : La fameuse dead-line pour le bouquet de fleurs ",
+  16: "Indice du 16 : On en revient à ta passion numéro 1 (ou plutôt celle d'Arthur)",
+  17: "Indice du 17 : Alcooooooool, Dis donc 2 cadeaux, mais c'est qu'elle est gâtée . ",
+  18: "Indice du 18 : L'orchidée et l'hibiscus commencent à se sentir seuls",
+  19: "Indice du 19 : Pour reconstituer l'image parfaite 💖",
+  20: "Indice du 20 : Tu vas devenir riche (ou pas) 💵💰",
+  21: "Indice du 21 : Celui‑ci n'as pas le gouts de poney 🐎 ",
+  22: "Indice du 22 : Pour cacher ton,gros orteil ",
+  23: "Indice du 23 : Pour te rendre encore plus belle (même si t'es déjà parfaite 👀)",
+  24: "Indice du 24 : Le meilleur pour la fin ❤️🎁 Je t'aime "
 };
 
-const grid=document.getElementById('grid');
-const popup=document.getElementById('popup');
-const popupText=document.getElementById('popup-text');
-const popSound=document.getElementById('pop-sound');
-const bgMusic=document.getElementById('bg-music');
+const grid = document.getElementById('grid');
+const popup = document.getElementById('popup');
+const popupText = document.getElementById('popup-text');
+const popSound = document.getElementById('pop-sound');
+const bgMusic = document.getElementById('bg-music');
 
-for(let i=1;i<=24;i++){
-  const box=document.createElement('div');
+for (let i = 1; i <= 24; i++) {
+  const box = document.createElement('div');
   box.classList.add('case');
-  box.textContent=i;
 
-  // Case du jour en vert
-  if(i===day){
-    box.classList.add('today');
+  const num = document.createElement('span');
+  num.textContent = i;
+  box.appendChild(num);
+
+  if (i === 1) {
+    const img = document.createElement('img');
+    img.src = 'https://static.vecteezy.com/system/resources/thumbnails/057/068/323/small/single-fresh-red-strawberry-on-table-green-background-food-fruit-sweet-macro-plant-image-photo.jpg';
+    img.alt = 'Fraise';
+    box.appendChild(img);
   }
 
-  // Cases futures
-  if(i>day) box.classList.add('locked');
+  if (i === day) box.classList.add('today');
+  if (i > day) box.classList.add('locked');
 
-  box.addEventListener('click',()=>{
-    if(!box.classList.contains('locked')){
-      popupText.textContent=indices[i];
-      popup.style.display='flex';
+  box.addEventListener('click', () => {
+    if (!box.classList.contains('locked')) {
+      popupText.textContent = indices[i];
+      popup.style.display = 'flex';
       box.classList.add('opened');
 
-      // Bruitage
-      popSound.currentTime=0;
+      popSound.currentTime = 0;
       popSound.play();
 
-      // Musique Noël
-      bgMusic.volume=0.2;
-      bgMusic.play().catch(()=>console.log("Clique pour démarrer la musique"));
+      bgMusic.volume = 0.2;
+      bgMusic.play().catch(() => {});
     }
   });
 
   grid.appendChild(box);
 }
 
-// Popup fermeture
-document.getElementById('close-btn').addEventListener('click',()=>{
-  popup.style.display='none';
+document.getElementById('close-btn').addEventListener('click', () => {
+  popup.style.display = 'none';
 });
-popup.addEventListener('click',(e)=>{
-  if(e.target===popup){ popup.style.display='none'; }
+popup.addEventListener('click', (e) => {
+  if (e.target === popup) popup.style.display = 'none';
 });
 </script>
 
 </body>
 </html>
-
