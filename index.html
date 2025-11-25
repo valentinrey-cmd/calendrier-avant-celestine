@@ -65,9 +65,8 @@ h1 span.heart {
 
 .case:hover { transform:scale(1.15) rotate(-5deg); box-shadow:0 6px 10px rgba(0,0,0,0.4); }
 .case.opened { background: linear-gradient(145deg,#ffd6d6,#ff7b7b); }
-.locked { background-color:#e8baba; cursor:not-allowed; color:#555; } /* un peu plus grisé que les autres */
-
-.today { color: #00aa00; } /* vert pour le chiffre du jour */
+.locked { background-color:#e8baba; cursor:not-allowed; color:#555; }
+.today { color: #00aa00; }
 
 .popup {
   display:none;
@@ -153,9 +152,6 @@ for(let i=0;i<30;i++){
 }
 
 // Indices
-const today=new Date();
-const day=today.getDate();
-
 const indices={
 1:"Indice du 1 : Histoire de bien commencer les fêtes 🎄 ",
 2:"Indice du 2 : Pour que tu tombes encore plus amoureuse de moi",
@@ -178,10 +174,14 @@ const indices={
 19:"Indice du 19 : Pour reconstituer l'image parfaite 💖",
 20:"Indice du 20 : Tu vas devenir riche (ou pas) 💵💰",
 21:"Indice du 21 :Celui-ci n'as pas le gouts de poney 🐎 ",
-22:"Indice du 22 :Pour cacher ton,gros orteil ",
+22:"Indice du 22 :Pour cacher ton gros orteil ",
 23:"Indice du 23 : Pour te rendre encore plus belle (même si t'es déjà parfaite 👀)",
 24:"Indice du 24 : Le meilleur pour la fin ❤️🎁 Je t'aime "
 };
+
+const today=new Date();
+const month=today.getMonth(); // décembre = 11
+const day=today.getDate();
 
 const grid=document.getElementById('grid');
 const popup=document.getElementById('popup');
@@ -194,13 +194,18 @@ for(let i=1;i<=24;i++){
   box.classList.add('case');
   box.textContent=i;
 
-  // Case du jour en vert
-  if(i===day){
-    box.classList.add('today');
+  // Verrouillage AVANT décembre
+  if(month!==11){
+    box.classList.add('locked');
+  }else{
+    // En décembre, déverrouille jusqu'au jour courant
+    if(i===day){
+      box.classList.add('today');
+    }
+    if(i>day){
+      box.classList.add('locked');
+    }
   }
-
-  // Cases futures
-  if(i>day) box.classList.add('locked');
 
   box.addEventListener('click',()=>{
     if(!box.classList.contains('locked')){
@@ -208,11 +213,9 @@ for(let i=1;i<=24;i++){
       popup.style.display='flex';
       box.classList.add('opened');
 
-      // Bruitage
       popSound.currentTime=0;
       popSound.play();
 
-      // Musique Noël
       bgMusic.volume=0.2;
       bgMusic.play().catch(()=>console.log("Clique pour démarrer la musique"));
     }
@@ -232,3 +235,4 @@ popup.addEventListener('click',(e)=>{
 
 </body>
 </html>
+
