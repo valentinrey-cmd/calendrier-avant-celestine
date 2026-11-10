@@ -1161,15 +1161,15 @@ stack(p,el,win,fail){const id=RUN,W=300,H=560,BH=20,G0=H-58,
  el.innerHTML=`<p class="center" style="margin:0 0 4px">Étage <b id="stn">0</b> / ${p.goal}</p><div class="pgwrap"><canvas class="pcv" id="stc" style="aspect-ratio:300/560"></canvas></div><p class="center muted" style="font-size:.85rem">Touche l'écran pour lâcher le cadeau et monte jusqu'à la ligne rouge !</p>`;
  const cv=$('#stc'),x=cv.getContext('2d'),dpr=Math.min(3,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;x.scale(dpr,dpr);
  const yOf=l=>G0-(l+1)*BH,FIN=yOf(p.goal-1);
- let over=false,raf=0,T=[{x:75,w:150,c:0}],mv={x:-150,w:150,dir:1,c:1,v:1},falls=[],perf=0,flash=0,pops=[],last=performance.now(),tt=0;
+ let over=false,raf=0,T=[{x:77,w:146,c:0}],mv={x:-146,w:146,dir:1,c:1,v:1},falls=[],perf=0,flash=0,pops=[],last=performance.now(),tt=0;
  timer(p.time,()=>end(false,'le temps est écoulé ⏱️'),id);
  function end(ok,w){if(over)return;over=true;setTimeout(()=>{cancelAnimationFrame(raf);ok?win():fail(w)},ok?900:900)}
  function drop(){if(over)return;const top=T[T.length-1],a=Math.max(mv.x,top.x),b=Math.min(mv.x+mv.w,top.x+top.w);
   if(b-a<=0){SFX('bad');falls.push({x:mv.x,w:mv.w,y:0,lvl:T.length,c:mv.c,vy:0,r:0,vr:(mv.x<top.x?-1:1)*3});mv.w=0;return end(false,'le cadeau est tombé à côté de la tour 🎁')}
-  let nx=a,nw=b-a;if(Math.abs(mv.x-top.x)<4){nx=top.x;nw=top.w;perf++;flash=1;SFX('perfect');pops.push({t:0,txt:perf>=3?'PARFAIT ! ✨':'PARFAIT !'});if(perf>=3&&nw<150){nw=Math.min(150,nw+7);nx=Math.max(0,nx-3.5)}try{navigator.vibrate&&navigator.vibrate(20)}catch(_){}}
+  let nx=a,nw=b-a;if(Math.abs(mv.x-top.x)<4){nx=top.x;nw=top.w;perf++;flash=1;SFX('perfect');pops.push({t:0,txt:perf>=3?'PARFAIT ! ✨':'PARFAIT !'});if(perf>=3&&nw<146){nw=Math.min(146,nw+6);nx=Math.max(0,nx-3)}try{navigator.vibrate&&navigator.vibrate(20)}catch(_){}}
   else{perf=0;SFX('drop');if(mv.x<top.x)falls.push({x:mv.x,w:top.x-mv.x,y:0,lvl:T.length,c:mv.c,vy:0,r:0,vr:-2.5});if(mv.x+mv.w>top.x+top.w)falls.push({x:top.x+top.w,w:mv.x+mv.w-top.x-top.w,y:0,lvl:T.length,c:mv.c,vy:0,r:0,vr:2.5})}
   T.push({x:nx,w:nw,c:mv.c,t:tt});$('#stn').textContent=T.length-1;if(T.length-1>=p.goal){confetti();pops.push({t:0,txt:'ARRIVÉE ! 🎉'});return end(true)}
-  mv={x:Math.random()<.5?-nw:W,w:nw,dir:0,c:(mv.c+1)%COL.length,v:.9+Math.random()*.2};mv.dir=mv.x<0?1:-1}
+  mv={x:Math.random()<.5?-nw:W,w:nw,dir:0,c:(mv.c+1)%COL.length,v:.88+Math.random()*.26};mv.dir=mv.x<0?1:-1}
  cv.addEventListener('pointerdown',e=>{e.preventDefault();drop()});
  function rr(a,b,w,h,r){x.beginPath();if(x.roundRect)x.roundRect(a,b,w,h,r);else x.rect(a,b,w,h)}
  function gift(bx,by,bw,c,bow,glow){if(bw<=0)return;const[a,d,rb,pat]=COL[c],h=BH-1,r=Math.min(4,bw/3);
@@ -1188,7 +1188,7 @@ stack(p,el,win,fail){const id=RUN,W=300,H=560,BH=20,G0=H-58,
   g.fillStyle='#10294a';[[262,G0+6,40,150],[30,G0+6,26,110]].forEach(([cx,by,w2,h2])=>{for(let k=0;k<3;k++){const y0=by-k*h2/3.4;g.beginPath();g.moveTo(cx-w2+k*7,y0);g.lineTo(cx,y0-h2/2.2);g.lineTo(cx+w2-k*7,y0);g.fill()}});
   g.fillStyle='#e9f3fa';g.beginPath();g.moveTo(0,G0+4);g.quadraticCurveTo(W/2,G0-6,W,G0+4);g.lineTo(W,H);g.lineTo(0,H);g.fill();g.fillStyle='#d3e5f1';g.fillRect(0,G0+26,W,H)}
  function loop(now){if(id!=RUN)return;const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
-  const lv=T.length-1,sp=(138+lv*11)*(mv.v||1)*(lv>=15?1+.08*Math.sin(tt*2):1);if(!over){mv.x+=mv.dir*sp*dt;if(mv.x>W-mv.w*.2&&mv.dir>0)mv.dir=-1;if(mv.x<-mv.w*.8&&mv.dir<0)mv.dir=1}
+  const lv=T.length-1,sp=(143+lv*12)*(mv.v||1)*(lv>=14?1+.1*Math.sin(tt*2.1):1);if(!over){mv.x+=mv.dir*sp*dt;if(mv.x>W-mv.w*.2&&mv.dir>0)mv.dir=-1;if(mv.x<-mv.w*.8&&mv.dir<0)mv.dir=1}
   x.drawImage(sky,0,0,W,H);
   for(let k=0;k<8;k++){const tw=.5+.5*Math.sin(tt*3+k*1.7);x.fillStyle=['#ff4d6a','#ffd24a','#4ab3ff','#7ed957'][k%4];x.globalAlpha=.4+.6*tw;x.beginPath();x.arc(262+((k*13)%30-15)*(1-(k%3)*.25),G0-20-k*14,2.2,0,7);x.fill()}x.globalAlpha=1;
   x.fillStyle='rgba(255,255,255,.7)';for(let k=0;k<45;k++){const sx=(k*83+Math.sin(tt+k)*10+tt*6*(k%3+1))%W,sy=(k*131+tt*22*(k%4+1))%H;x.beginPath();x.arc(sx,sy,.7+(k%3)*.45,0,7);x.fill()}
