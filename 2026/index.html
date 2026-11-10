@@ -451,7 +451,7 @@ const CONTENU={
  quiz:[
   {q:"Quel est le nom de jeune fille de ma maman ?",a:["Charbotel"]},
   {q:"Quel est mon troisième prénom ?",a:["Alexis"]},
-  {q:"Quel était le 2ᵉ cadeau du calendrier de l'Avent de l'année dernière ?",a:[]},
+  {q:"Quel était le 2ᵉ cadeau du calendrier de l'Avent de l'année dernière ?",a:["Chocolat aphrodisiaque","Chocolat à étaler","aphrodisiaque","chocolat a tartiner"]},
   {q:"Quel est mon légume préféré ?",a:["Aubergine"]},
   {q:"Pierre qui roule n'amasse pas…",a:["Mousse"]}
  ],
@@ -722,7 +722,7 @@ fleche(p,el,win,fail){const id=RUN,F=FLECHE,H=F.h,Wd=F.w,sol={},clue={};
 quiz(p,el,win,fail){const id=RUN,qs=shuffle(CONTENU.quiz.filter(x=>x.a&&x.a.length)),need=Math.min(p.need,Math.max(1,qs.length-1));let i=0,good=0;G={qs};
  const nz=s=>(' '+String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[’'`-]/g,' ').replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ')+' ').replace(/^ (?:(?:le|la|l|les|de|du|des|un|une|c|est|cest) )+/,' ').trim();
  const lev=(a,b)=>{const d=Array.from({length:b.length+1},(_,k)=>k);for(let x=1;x<=a.length;x++){let pr=d[0];d[0]=x;for(let y=1;y<=b.length;y++){const t2=d[y];d[y]=Math.min(d[y]+1,d[y-1]+1,pr+(a[x-1]==b[y-1]?0:1));pr=t2}}return d[b.length]};
- const okA=(s,ans)=>{const u=nz(s);if(!u)return false;return ans.some(r=>{const v=nz(r),tol=v.length<=4?0:v.length<=7?1:2;return lev(u,v)<=tol||(' '+u+' ').includes(' '+v+' ')||u.split(' ').some(w=>w.length>3&&lev(w,v)<=tol)})};
+ const okA=(s,ans)=>{const u=nz(s);if(!u)return false;return ans.some(r=>{const v=nz(r),tol=v.length<=4?0:v.length<=7?1:v.length<=12?2:3;return lev(u,v)<=tol||(' '+u+' ').includes(' '+v+' ')||u.split(' ').some(w=>w.length>3&&lev(w,v)<=tol)})};
  const next=()=>{if(i>=qs.length)return good>=need?win():fail(`${good} bonnes réponses, il en fallait ${need}`);const q=qs[i];G.i=i;
   el.innerHTML=`<p class="muted">Question ${i+1}/${qs.length} · ✅ ${good}</p><h3>${esc(q.q)}</h3><input id="qzi" type="text" autocomplete="off" autocapitalize="sentences" placeholder="Ta réponse…" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:12px;border:2px solid #ffffff33;background:#0006;color:inherit;font:inherit;font-size:1.05rem"><p id="qzr" class="center" style="min-height:1.4em"></p><div class="row"><button id="qzv">Valider</button></div>`;
   const inp=$('#qzi'),bt=$('#qzv');setTimeout(()=>inp.focus(),80);
