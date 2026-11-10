@@ -133,6 +133,7 @@ textarea{min-height:120px}
 .ball.empty{background:#0005;box-shadow:inset 0 2px 4px #0009;border:1px dashed #ffffff40}.ball.hid{background:radial-gradient(circle at 35% 30%,#fff6,#666 45%,#222);color:#fff;display:inline-grid;place-items:center;font-weight:800}
 .mmb{max-width:360px;margin:auto;background:linear-gradient(#6b4528,#3b2414);border-radius:16px;padding:8px;box-shadow:inset 0 0 0 3px var(--o),0 6px 16px #0007}
 .mmrow{display:flex;gap:7px;align-items:center;justify-content:center;padding:5px;border-radius:10px}.mmrow.cur{background:#ffffff1c;box-shadow:0 0 0 2px var(--o)}.mmrow.secret{border-bottom:2px dashed var(--o);margin-bottom:4px}.mmrow.fut{opacity:.4}
+.simon{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:320px;margin:0 auto}.simon button{aspect-ratio:1;border-radius:28px;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 55%,#fff),var(--c) 60%,color-mix(in srgb,var(--c) 70%,#000));border:3px solid #ffffff55;box-shadow:0 8px 0 color-mix(in srgb,var(--c) 60%,#000),0 12px 20px #0008;opacity:.75;transition:transform .08s,opacity .1s,filter .1s;padding:0;min-height:0}.simon button span{font-size:3rem;filter:drop-shadow(0 3px 3px #0006)}.simon button:disabled{cursor:default}.simon button.on{opacity:1;transform:translateY(5px) scale(.97);filter:brightness(1.4);box-shadow:0 3px 0 color-mix(in srgb,var(--c) 60%,#000),0 0 30px var(--c)}.simon button.on span{animation:ring .3s ease}@keyframes ring{25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
 .pgtop{text-align:center;margin:0 0 6px;font-size:.95rem}.pglv{display:inline-block;background:#0005;border:1px solid #ffffff22;border-radius:999px;padding:4px 14px}.pglv b{color:var(--o)}
 .ptilt{display:flex;align-items:center;justify-content:center;gap:12px;margin:10px auto 0;max-width:340px}.ptilt .tb{width:64px;height:52px;min-height:0;padding:0;border-radius:16px;font-size:1.4rem;background:linear-gradient(#f5c542,#b07a20);color:#3b2400;border:2px solid #5c3500;box-shadow:0 4px 0 #5c3500;user-select:none;-webkit-user-select:none;touch-action:none}.ptilt .tb.on{transform:translateY(3px);box-shadow:0 1px 0 #5c3500}.ptilt .tg{flex:1;display:flex;align-items:center;gap:8px;justify-content:center;background:#0005;border-radius:14px;padding:6px 8px}.ptilt .tg i{font-style:normal;font-size:1.5rem;display:inline-block;transition:transform .1s}.ptilt .tg small{font-size:.72rem;line-height:1.2;opacity:.85}
 .pgwrap{position:relative}.pintro{position:absolute;inset:4px;border-radius:16px;background:#0b1f2ad9;display:flex;align-items:center;justify-content:center;padding:22px;z-index:4;text-align:center}.pintro[hidden]{display:none}.pintro>div{background:linear-gradient(160deg,#1d3f63,#102438);border:2px solid var(--o);border-radius:18px;padding:18px 16px;box-shadow:0 12px 30px #000a;animation:pop .3s ease}.pintro p{margin:0 0 14px;font-size:1rem;line-height:1.45}.pintro b{color:var(--o);font:700 1.15rem Georgia,serif}.pintro button{font-weight:800}.prot{position:fixed;inset:0;border-radius:0;background:#0b1f2af2;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:20px;font:700 1.1rem system-ui;z-index:80}.prot b{font-size:3rem;animation:gspin 2s linear infinite}.prot small{font:400 .82rem system-ui;opacity:.85}.prot[hidden]{display:none}
@@ -485,10 +486,10 @@ const DAYS={
  8:{t:"Le serpent gourmand",g:"snake",p:{n:12,goal:25,speed:190},tier:2},
  9:{t:"Flèches en fuite",g:"arrows",p:{n:11,min:3,max:7,time:240,err:3,locks:.3},tier:2},
  10:{t:"Picross : l'image cachée",g:"picross",p:{time:420,pics:["coeur","cloche","etoile"]},tier:2},
- 11:{t:"Rebranche les guirlandes",g:"pipes",p:{n:8,time:200},tier:2},
+ 11:{t:"Simon des clochettes",g:"simon",p:{goal:10,time:300},tier:2},
  12:{t:"Sudoku expert",g:"sudoku",p:{n:9,bh:3,bw:3,blanks:56,time:900,digits:1},tier:2,ev:"🎁",bonus:100},
  13:{t:"Souvenir d'aventure",g:"photo",p:{img:"IMG_CANYON",show:20,q:6,need:5,qs:[{"t": "Combien de personnes y avait-il sur la photo ?", "a": "7", "ch": ["5", "6", "7", "8"]}, {"t": "Combien de personnes portaient un casque rouge ?", "a": "6", "ch": ["4", "5", "6", "7"]}, {"t": "De quelle couleur était le t-shirt de la 2e personne en partant de la gauche ?", "a": "Vert fluo", "ch": ["Bleu", "Vert fluo", "Noir", "Orange"]}, {"t": "Où se trouvait la personne au casque blanc ?", "a": "Tout à droite", "ch": ["Tout à gauche", "Au milieu", "2e en partant de la gauche", "Tout à droite"]}, {"t": "Combien de personnes étaient en short ?", "a": "3", "ch": ["1", "2", "3", "4"]}, {"t": "Qu'y avait-il juste au-dessus du groupe ?", "a": "Une arche de roche", "ch": ["Une cascade", "Une arche de roche", "Un pont en bois", "Un tunnel éclairé"]}, {"t": "Que portait la personne tout à droite ?", "a": "Un haut à rayures", "ch": ["Un haut à rayures", "Un t-shirt bleu", "Un pull rouge", "Une veste noire"]}, {"t": "De quelle couleur était le t-shirt de la personne tout à gauche ?", "a": "Bleu", "ch": ["Bleu", "Blanc", "Vert", "Rouge"]}]},tier:2},
- 14:{t:"Les couronnes",g:"queens",p:{n:9,time:300},tier:2,ev:"🎰",unlock:"Le casino est ouvert"},
+ 14:{t:"La tour de cadeaux",g:"stack",p:{goal:18,time:180},tier:2,ev:"🎰",unlock:"Le casino est ouvert"},
  15:{t:"Block Blast de Noël",g:"blocks",p:{goal:1500},tier:2},
  16:{t:"Notre mot fléché 💕",g:"fleche",p:{time:480},tier:2},
  17:{t:"Libère le traîneau",g:"rush",p:{time:300},tier:3},
@@ -514,6 +515,8 @@ const RULES={
  snake:p=>`Mange ${p.goal} cadeaux 🎁 sans te cogner. Fais glisser ton doigt pour tourner. Le serpent accélère et change de tête à chaque cadeau !`,
  arrows:p=>`Fais s'envoler toutes les flèches, une par une. Chaque flèche file dans le sens de sa pointe, et elle est bloquée si une autre flèche se trouve sur sa route. Certaines ont un cadenas 🔒 : elles ne partent qu'après un certain nombre d'autres flèches. ${p.err} erreurs maximum, ${p.time} secondes.`,
  picross:p=>`Retrouve l'image cachée grâce aux nombres. 3 erreurs maximum, ${p.time/60} minutes.`,
+ simon:p=>`Les clochettes jouent une mélodie : répète-la dans le même ordre en les touchant. À chaque manche, une note de plus et ça va plus vite ! Atteins la manche ${p.goal} sans te tromper. Monte le son 🔔`,
+ stack:p=>`Empile ${p.goal} cadeaux ! Touche l'écran pour lâcher le cadeau qui glisse : la partie qui dépasse de la tour tombe et le cadeau suivant est plus petit. Pose-le pile dessus pour garder la même taille (3 parfaits d'affilée le font grandir). Ça accélère à chaque étage. ${p.time/60} minutes.`,
  pipes:p=>`Fais tourner les morceaux de guirlande pour allumer toutes les ampoules depuis l'étoile. ${p.time} secondes.`,
  sudoku:p=>`Un sudoku de niveau expert. Aucune aide pendant la partie : remplis toute la grille puis valide-la. Si elle est fausse, tes erreurs s'affichent et tu dois les corriger. 3 validations ratées maximum, ${p.time/60} minutes.`,
  scene:p=>`Une image va s'afficher ${p.show} secondes. Regarde-la très attentivement…`,
@@ -1153,6 +1156,47 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
   w.pins.forEach(s=>{if(!s.on&&s.out<1)s.out=Math.min(1,s.out+dt*3)});draw();check();raf=requestAnimationFrame(loop)}
  G={pins:{get w(){return w},get L(){return L},load}};
  load(L);if(L>0&&!pr)toast(`Tu reprends au niveau ${L+1} 💪`);raf=requestAnimationFrame(loop)},
+stack(p,el,win,fail){const id=RUN,W=300,H=480,BH=22,COL=[['#e0283f','#ffd24a'],['#2e9b4f','#fff'],['#2d6fe0','#ffd24a'],['#b04fd1','#fff'],['#ff8a1a','#2b1d16'],['#f2f2f2','#e0283f']];
+ el.innerHTML=`<p class="center" style="margin:0 0 4px">Étage <b id="stn">0</b> / ${p.goal}</p><div class="pgwrap"><canvas class="pcv" id="stc" style="aspect-ratio:300/480"></canvas></div><p class="center muted" style="font-size:.85rem">Touche l'écran pour lâcher le cadeau. Ce qui dépasse tombe !</p>`;
+ const cv=$('#stc'),x=cv.getContext('2d'),dpr=Math.min(3,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;x.scale(dpr,dpr);
+ let over=false,raf=0,T=[{x:70,w:160,c:0}],mv={x:0,w:160,dir:1,c:1},cam=0,falls=[],perf=0,flash=0,last=performance.now(),tt=0;
+ timer(p.time,()=>end(false,'le temps est écoulé ⏱️'),id);
+ function end(ok,w){if(over)return;over=true;cancelAnimationFrame(raf);setTimeout(()=>ok?win():fail(w),ok?600:900)}
+ function drop(){if(over)return;const top=T[T.length-1],a=Math.max(mv.x,top.x),b=Math.min(mv.x+mv.w,top.x+top.w);
+  if(b-a<=0){falls.push({x:mv.x,w:mv.w,y:0,lvl:T.length,c:mv.c,vy:0});mv.w=0;return end(false,'le cadeau est tombé à côté de la tour 🎁')}
+  let nx=a,nw=b-a;if(Math.abs(mv.x-top.x)<4){nx=top.x;nw=top.w;perf++;flash=1;if(perf>=3&&nw<160){nw=Math.min(160,nw+8);nx=Math.max(0,nx-4)}try{navigator.vibrate&&navigator.vibrate(20)}catch(_){}}
+  else{perf=0;if(mv.x<top.x)falls.push({x:mv.x,w:top.x-mv.x,y:0,lvl:T.length,c:mv.c,vy:0});if(mv.x+mv.w>top.x+top.w)falls.push({x:top.x+top.w,w:mv.x+mv.w-top.x-top.w,y:0,lvl:T.length,c:mv.c,vy:0})}
+  T.push({x:nx,w:nw,c:mv.c});$('#stn').textContent=T.length-1;if(T.length-1>=p.goal){confetti();return end(true)}
+  mv={x:Math.random()<.5?-nw:W,w:nw,dir:0,c:(mv.c+1)%COL.length};mv.dir=mv.x<0?1:-1}
+ cv.addEventListener('pointerdown',e=>{e.preventDefault();drop()});
+ function box(bx,by,bw,c,top){const[a,r]=COL[c];x.fillStyle=a;x.fillRect(bx,by,bw,BH-2);x.fillStyle='#ffffff30';x.fillRect(bx,by,bw,4);x.fillStyle='#0000002a';x.fillRect(bx,by+BH-6,bw,4);
+  x.fillStyle=r;if(bw>10)x.fillRect(bx+bw/2-3,by,6,BH-2);if(top&&bw>16){x.beginPath();x.ellipse(bx+bw/2-6,by-3,6,4,-.5,0,7);x.ellipse(bx+bw/2+6,by-3,6,4,.5,0,7);x.fill()}}
+ function loop(now){if(id!=RUN)return;const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+  const sp=130+(T.length-1)*11;if(!over){mv.x+=mv.dir*sp*dt;if(mv.x>W-mv.w*.2&&mv.dir>0)mv.dir=-1;if(mv.x<-mv.w*.8&&mv.dir<0)mv.dir=1}
+  const tgt=Math.max(0,(T.length-12)*BH);cam+=(tgt-cam)*Math.min(1,dt*5);
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a1730');g.addColorStop(1,'#1d4a6e');x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle='rgba(255,255,255,.6)';for(let k=0;k<40;k++){const sx=(k*83+tt*10*(k%3+1))%W,sy=(k*131+tt*25*(k%4+1))%H;x.beginPath();x.arc(sx,sy,.8+(k%3)*.4,0,7);x.fill()}
+  const yOf=l=>H-30-(l+1)*BH+cam;x.fillStyle='#e8f2f9';x.fillRect(0,yOf(-1),W,H);
+  T.forEach((b,i)=>box(b.x,yOf(i),b.w,b.c,i==T.length-1&&over));
+  falls=falls.filter(f=>f.y<H+cam+200);falls.forEach(f=>{f.vy+=900*dt;f.y+=f.vy*dt;x.globalAlpha=.85;box(f.x,yOf(f.lvl)+f.y,f.w,f.c);x.globalAlpha=1});
+  if(!over&&mv.w>0)box(mv.x,yOf(T.length),mv.w,mv.c,true);
+  if(flash>0){flash-=dt*2;x.fillStyle=`rgba(255,226,122,${flash*.6})`;const t2=T[T.length-1];x.fillRect(t2.x-4,yOf(T.length-1)-4,t2.w+8,BH+6);x.fillStyle=`rgba(255,255,255,${flash})`;x.font='800 18px system-ui';x.textAlign='center';x.fillText(perf>=3?'PARFAIT ! +':'PARFAIT !',W/2,90)}
+  raf=requestAnimationFrame(loop)}
+ raf=requestAnimationFrame(loop)},
+simon(p,el,win,fail){const id=RUN,B=[['#e0283f','Rouge',523.25],['#2e9b4f','Vert',659.25],['#f3c623','Or',783.99],['#2d6fe0','Bleu',1046.5]];
+ el.innerHTML=`<p class="center" style="margin:0 0 6px">Manche <b id="sir">1</b> / ${p.goal}</p><p class="center" id="sim" style="min-height:1.5em;margin:0 0 8px">Écoute bien…</p><div class="simon">${B.map((b,i)=>`<button data-i="${i}" style="--c:${b[0]}" aria-label="Clochette ${b[1]}" disabled><span>🔔</span></button>`).join('')}</div>`;
+ let seq=[],pos=0,listen=false,over=false,AC=null;try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}
+ timer(p.time,()=>end(false,'le temps est écoulé ⏱️'),id);
+ const btns=[...el.querySelectorAll('.simon button')];
+ function end(ok,w){if(over)return;over=true;btns.forEach(b=>b.disabled=true);setTimeout(()=>ok?win():fail(w),ok?500:700)}
+ function ring(i,d){const b=btns[i];b.classList.add('on');setTimeout(()=>b.classList.remove('on'),d*.85);if(!AC)return;try{const t=AC.currentTime,f=B[i][2];[[1,.32],[2.76,.08],[5.4,.03]].forEach(([m,v])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+Math.max(.35,d/1000*1.6));o.connect(g).connect(AC.destination);o.start(t);o.stop(t+1.2)})}catch(_){}}
+ function play(){listen=false;btns.forEach(b=>b.disabled=true);$('#sim').textContent='Écoute bien… 👂';const d=Math.max(300,620-seq.length*28);let k=0;
+  const nx=()=>{if(id!=RUN||over)return;if(k>=seq.length){listen=true;pos=0;btns.forEach(b=>b.disabled=false);$('#sim').textContent='À toi ! 🎵';return}ring(seq[k++],d);setTimeout(nx,d+90)};setTimeout(nx,650)}
+ function round(){seq.push(Math.floor(Math.random()*4));$('#sir').textContent=seq.length;play()}
+ btns.forEach((b,i)=>b.addEventListener('pointerdown',e=>{e.preventDefault();if(!listen||over)return;if(AC&&AC.state=='suspended')AC.resume();ring(i,260);
+  if(i!=seq[pos]){$('#sim').textContent='Oups… ❌';try{navigator.vibrate&&navigator.vibrate([60,40,60])}catch(_){}return end(false,`mauvaise clochette (manche ${seq.length})`)}
+  pos++;if(pos>=seq.length){listen=false;btns.forEach(b=>b.disabled=true);if(seq.length>=p.goal){$('#sim').textContent='Parfait ! 🎉';return end(true)}$('#sim').textContent='Bravo ! ✨';setTimeout(()=>{if(id==RUN&&!over)round()},700)}}));
+ if(AC&&AC.state=='suspended')AC.resume();round()},
 lights(p,el,win,fail){const id=RUN,n=p.n;let g,mv=0;const nbh=i=>{const r=Math.floor(i/n),c=i%n;return[[0,0],[1,0],[-1,0],[0,1],[0,-1]].map(([dr,dc])=>[r+dr,c+dc]).filter(([R,C])=>R>=0&&R<n&&C>=0&&C<n).map(([R,C])=>R*n+C)},tg=(a,i)=>nbh(i).forEach(j=>a[j]^=1);
  do{g=Array(n*n).fill(1);const s=new Set();while(s.size<p.k)s.add(Math.floor(Math.random()*n*n));s.forEach(i=>tg(g,i));G={sol:[...s]}}while(g.every(x=>x));
  timer(p.time,()=>fail('le temps est écoulé ⏱️'),id);const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.8 6.1 6.7.7-5 4.5 1.4 6.6L12 17l-5.9 3.4 1.4-6.6-5-4.5 6.7-.7z"/></svg>';
