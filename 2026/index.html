@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon.svg">
 <title>Calendrier de l&#39;Avent</title>
 <style>
 :root{--g:#12382b;--g2:#1c5240;--r:#7a1f33;--o:#d9b45f;--c:#fbf5e6;--t:#2b1d16;--ok:#2f8f5b;--ko:#b3263e}
@@ -194,7 +195,8 @@ html,body{overscroll-behavior-y:none}.panel{position:relative}#game{overflow-anc
 .ltube .lq b.top{box-shadow:inset 0 4px 0 #ffffff45}
 .lstream{position:fixed;z-index:26;width:6px;border-radius:3px;background:var(--c);pointer-events:none;box-shadow:0 0 6px var(--c)}
 .tubes.won .ltube{animation:winpulse .7s ease}@keyframes winpulse{50%{transform:translateY(-8px);box-shadow:0 0 22px #d9b45f}}
-html.gl,html.gl body{overflow:hidden;overscroll-behavior:none}html.gl body{position:fixed;left:0;right:0;width:100%}
+html.gl,html.gl body{overflow:hidden;overscroll-behavior:none}
+html.rotL #gwin,html.rotR #gwin{inset:auto;width:var(--vh);height:var(--vw);transform-origin:0 0;animation:none}html.rotL #gwin{left:0;top:var(--vh);transform:rotate(-90deg)}html.rotR #gwin{left:var(--vw);top:0;transform:rotate(90deg)}html.gl body{position:fixed;left:0;right:0;width:100%}
 #gwin{position:fixed;inset:0;z-index:15;background:#000c;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 8px) 8px calc(env(safe-area-inset-bottom,0px) + 8px);overscroll-behavior:contain;animation:gwi .22s ease}
 @keyframes gwi{from{opacity:0;transform:scale(.97)}}
 .gwbox{position:relative;width:min(560px,100%);max-height:100%;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,#1a3d30,#0f2a20);border:2px solid var(--o);border-radius:18px;padding:8px 12px 14px;box-shadow:0 10px 40px #000a}
@@ -494,7 +496,7 @@ const DAYS={
  19:{t:"2048 de tes têtes",g:"g2048",p:{goal:256},tier:3},
  20:{t:"Les 7 différences",g:"spot",p:{a:"IMG_BAR",b:"IMG_BAR2",d:[[0.5156, 0.7678, 0.0244], [0.4133, 0.0729, 0.0222], [0.5633, 0.5758, 0.0178], [0.4533, 0.5336, 0.0156], [0.74, 0.6065, 0.0167], [0.9667, 0.215, 0.02], [0.3289, 0.0384, 0.0144]],time:150},tier:3,ev:"💎",unlock:"Un bon exclusif dans la boutique"},
  21:{t:"Relie les points, niveau expert",g:"relier",p:{n:9,k:8,time:240},tier:3,ev:"✨",x2:true},
- 22:{t:"Sauve Célestine",g:"pins",p:{time:900},tier:3},
+ 22:{t:"Sauve Célestine",g:"pins",p:{time:1080},tier:3},
  23:{t:"Le grand quiz « Nous deux »",g:"quiz",p:{need:4},tier:3,ev:"🏆"},
  24:{t:"Le puzzle de nous deux",g:"jigsaw",p:{n:5,rot:1,time:480},tier:3,ev:"🎄",bonus:200,unlock:"Le bouton Résoudre du puzzle"}
 };
@@ -527,7 +529,7 @@ const RULES={
  relier:p=>`Relie les points de la même couleur en glissant le doigt, sans croiser les chemins. Toutes les cases doivent être remplies ! ${p.time/60} minutes.`,
  lights:p=>`Fais briller toutes les étoiles ! Toucher une étoile la retourne, ainsi que ses voisines. ${p.moves} coups et ${p.time} secondes maximum.`,
  quiz:p=>`Il faut au moins ${p.need} bonnes réponses sur ${CONTENU.quiz.length}.`,
- pins:p=>`Sauve Célestine ! Touche les épingles dorées pour les retirer et amène-la dans la hotte du Père Noël. La lave 🔥 la brûle, le Grinch 😈 l'attrape, et ni la lave ni le Grinch ne doivent tomber dans la hotte. L'eau 💧 transforme la lave en pierre. Le Grinch disparaît dans la lave ou sous un cadeau 🎁 qui lui tombe dessus. Attention, certains Grinchs font des rondes : il faudra du timing ! Les épingles avec un cadenas 🔒 ne s'ouvrent qu'après avoir retiré celle qui les bloque. Réfléchis avant de tirer. ${PIN.LV.length} niveaux, ${p.time/60} minutes. Si tu rates, tu reprends au dernier niveau atteint.`,
+ pins:p=>`Sauve Célestine ! Touche les épingles dorées pour les retirer et amène-la dans la hotte du Père Noël. La lave 🔥 la brûle, le Grinch 😈 l'attrape, et ni la lave ni le Grinch ne doivent tomber dans la hotte. L'eau 💧 transforme la lave en pierre. Le Grinch disparaît dans la lave ou sous un cadeau 🎁 qui lui tombe dessus. Attention, certains Grinchs font des rondes : il faudra du timing ! Dans les niveaux 📱, penche le téléphone (ou maintiens les flèches) : la gravité suit l'inclinaison. Les épingles avec un cadenas 🔒 ne s'ouvrent qu'après avoir retiré celle qui les bloque. Réfléchis avant de tirer. ${PIN.LV.length} niveaux, ${p.time/60} minutes. Si tu rates, tu reprends au dernier niveau atteint.`,
  jigsaw:p=>`Reconstitue la photo : ${p.n*p.n} pièces mélangées et tournées. Pose-les dans les cadres, touche-les pour les tourner. ${p.time/60} minutes.`
 };
 const LEVELS=[[0,"Célesteenager",14],[80,"Célestinhaler",2],[180,"Célestinégalable",16],[320,"Célestinestimable",5],[500,"Célestinattendue",18],[720,"Célestinachevable",8],[980,"Célestinoubliable",20],[1280,"Célestinévitable",11],[1620,"Célestinouïe",26],[2000,"Célestinarrêtable",30]];
@@ -1033,7 +1035,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
  function end(ok,why){if(over)return;over=true;cancelAnimationFrame(raf);ok?win():fail(why)}
  function load(i){L=i;w=pinWorld(i);banner={info:1,t:`Niveau ${i+1}`,s:PIN.LV[i].t};bannerT=tt;bg=paintBg(i);const T=!!PIN.LV[i].tilt;$('#pglv').innerHTML=`Niveau <b>${i+1}</b>/${NL} · ${T?'📱 ':''}${PIN.LV[i].t}`;$('#ptilt').hidden=!T;
   const needP=T&&!tiltOK&&typeof DeviceOrientationEvent!='undefined'&&typeof DeviceOrientationEvent.requestPermission=='function';$('#tperm').hidden=!needP;if(T&&!needP)toast('📱 Niveau à inclinaison : penche le téléphone !');if(T)setTimeout(()=>{if(id!=RUN||over||sensOn)return;const tx=$('#tgt');if(tx)tx.innerHTML=needP&&!tiltOK?'Touche « Activer » en dessous<br>ou maintiens une flèche':'Capteur non détecté ici :<br>maintiens les flèches ◀ ▶'},1800)}
- function tiltTarget(){if(btn)return btn;if(!sensOn)return 0;const o=((((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360)+360)%360;let gm=o==90?sensB:o==270?-sensB:o==180?-sens:sens;if(Math.abs(gm)<4)return 0;return Math.max(-32,Math.min(32,gm*1.7))}
+ function tiltTarget(){if(btn)return btn;if(!sensOn)return 0;const o=((((screen.orientation&&screen.orientation.angle)||window.orientation||0)%360)+360)%360,cr=document.documentElement.classList,fix=cr.contains('rotL')||cr.contains('rotR');let gm=fix?sens:o==90?sensB:o==270?-sensB:o==180?-sens:sens;if(Math.abs(gm)<4)return 0;return Math.max(-32,Math.min(32,gm*1.7))}
  const land=()=>matchMedia('(orientation: landscape)').matches&&Math.min(innerWidth,innerHeight)<560;let lockTry=false;
  function tryLock(){if(lockTry)return;lockTry=true;try{const d=document.documentElement,so=screen.orientation;if(so&&so.lock){const go=()=>so.lock('portrait').catch(()=>{});if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:'hide'}).then(go).catch(go);else go()}}catch(_){}}
  function wall(g,a){const[x1,y1,x2,y2]=a,dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy)||1,hor=Math.abs(dy)<Math.abs(dx)*.7;g.lineCap='round';
@@ -1129,7 +1131,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
    setTimeout(()=>{if(over||id!=RUN)return;if(L+1<NL)load(L+1);else end(true)},1400);return}
   const why={burn:"Célestine s'est brûlée dans la lave 🔥",grinch:'le Grinch a attrapé Célestine 😈',sack:'la lave a fait brûler la hotte 🔥',grinchsack:"le Grinch s'est caché dans la hotte 😈",lost:'Célestine est tombée hors du niveau'}[w.st];
   banner={ok:0,t:'Oh non !',s:why.replace(/^./,c=>c.toUpperCase())};setTimeout(()=>end(false,why),1500)}
- cv.addEventListener('pointerdown',e=>{if(over||!w||w.st)return;if(banner&&banner.info)banner=null;if(PIN.LV[L].tilt)tryLock();const b=cv.getBoundingClientRect(),mx=(e.clientX-b.left)*W/b.width,my=(e.clientY-b.top)*H/b.height;let best=null,bd=24;
+ cv.addEventListener('pointerdown',e=>{if(over||!w||w.st)return;if(banner&&banner.info)banner=null;if(PIN.LV[L].tilt)tryLock();const mx=e.offsetX*W/cv.clientWidth,my=e.offsetY*H/cv.clientHeight;let best=null,bd=24;
   w.pins.forEach(s=>{if(!s.on)return;const[x1,y1,x2,y2]=s.a,dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;let t=((mx-x1)*dx+(my-y1)*dy)/l;t=Math.max(0,Math.min(1,t));const hd=Math.hypot(mx-(s.hx||-99),my-(s.hy||-99)),d=hd<20?hd-30:Math.hypot(mx-x1-t*dx,my-y1-t*dy);if(d<bd){bd=d;best=s}});
   if(best&&best.lk.some(j=>w.pins[j].on)){best.shk=tt;toast('🔒 Bloquée : retire d\'abord l\'épingle qui la retient');try{navigator.vibrate&&navigator.vibrate([30,40,30])}catch(_){}return}
   if(best){best.on=false;e.preventDefault();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}}});
@@ -1138,7 +1140,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
  addEventListener('keydown',e=>{if(id!=RUN||over||!PIN.LV[L].tilt)return;if(e.key=='ArrowLeft'){btn=-30;e.preventDefault()}if(e.key=='ArrowRight'){btn=30;e.preventDefault()}});addEventListener('keyup',e=>{if(e.key=='ArrowLeft'||e.key=='ArrowRight')btn=0});
  $('#tperm').onclick=()=>{tryLock();try{DeviceOrientationEvent.requestPermission().then(r=>{if(r=='granted'){tiltOK=window.__tiltOK=true;$('#tperm').hidden=true;toast('Inclinaison activée 📱')}else toast('Inclinaison refusée : utilise les flèches ◀ ▶')}).catch(()=>toast('Inclinaison indisponible : utilise les flèches ◀ ▶'))}catch(_){toast('Utilise les flèches ◀ ▶')}};
  let last=performance.now();
- function loop(now){if(id!=RUN||over)return;const dt=Math.min(1/30,(now-last)/1000);last=now;tt+=dt;const paused=!!PIN.LV[L].tilt&&land();{const pe=$('#prot');if(pe&&pe.hidden==paused)pe.hidden=!paused}if(paused){draw();raf=requestAnimationFrame(loop);return}if(PIN.LV[L].tilt){const tg=tiltTarget();w.tilt+=(tg-w.tilt)*Math.min(1,dt*7);const ta=Math.round(w.tilt);if(ta!==lastTa){lastTa=ta;const a=$('#tga');if(a)a.style.transform=`rotate(${-ta}deg)`}}else w.tilt=0;if(!banner||banner.ok||banner.info)for(let k=0;k<3;k++)pinStep(w,dt/3);
+ function loop(now){if(id!=RUN||over)return;const dt=Math.min(1/30,(now-last)/1000);last=now;tt+=dt;const paused=!!PIN.LV[L].tilt&&land()&&!document.documentElement.classList.contains('rotL')&&!document.documentElement.classList.contains('rotR');{const pe=$('#prot');if(pe&&pe.hidden==paused)pe.hidden=!paused}if(paused){draw();raf=requestAnimationFrame(loop);return}if(PIN.LV[L].tilt){const tg=tiltTarget();w.tilt+=(tg-w.tilt)*Math.min(1,dt*7);const ta=Math.round(w.tilt);if(ta!==lastTa){lastTa=ta;const a=$('#tga');if(a)a.style.transform=`rotate(${-ta}deg)`}}else w.tilt=0;if(!banner||banner.ok||banner.info)for(let k=0;k<3;k++)pinStep(w,dt/3);
   w.pins.forEach(s=>{if(!s.on&&s.out<1)s.out=Math.min(1,s.out+dt*3)});draw();check();raf=requestAnimationFrame(loop)}
  G={pins:{get w(){return w},get L(){return L},load}};
  load(L);if(L>0&&!pr)toast(`Tu reprends au niveau ${L+1} 💪`);raf=requestAnimationFrame(loop)},
@@ -1446,22 +1448,30 @@ PIN.LV=[
   w:[[110,16,110,110],[190,16,190,110],[16,232,128,232],[172,232,284,232]],
   p:[[110,110,190,110,'b'],[128,232,172,232,'b']],
   h:[150,90],g:[[60,216,36,264,60]],f:[]},
+ {t:"Penche au bon moment",tilt:1,
+  w:[[150,16,150,120],[16,282,124,282],[124,282,124,188]],
+  p:[[16,120,150,120,'a']],
+  h:[112,98],g:[],f:[['l',22,236,118,278]]},
  {t:"Le cadeau-enclume",
   w:[[150,16,150,220],[217,16,217,110]],
   p:[[16,110,150,110,'a'],[150,110,217,110,'a'],[217,110,284,110,'b'],[16,220,150,220,'a'],[150,220,284,220,'b']],
   h:[250,90],g:[[184,204,168,266,40]],b:[[183,90]],f:[['w',22,30,144,104],['l',22,150,144,214]]},
- {t:"Le grand final",
-  w:[[100,16,100,100],[200,16,200,100],[16,210,120,210],[180,210,284,210],[200,226,200,300]],
-  p:[[16,100,100,100,'a'],[100,100,200,100,'a'],[200,100,284,100,'b'],[120,210,180,210,'b'],[200,300,284,300,'b'],[110,408,190,408,'a']],
-  h:[150,80],g:[[230,194,36,264,45],[150,392]],b:[[58,80]],f:[['l',206,24,278,94],['w',206,226,278,294]]},
  {t:"Deux Grinchs, un seul passage",
   w:[[120,16,120,100],[180,16,180,100],[16,180,128,180],[172,180,284,180],[16,290,128,290],[172,290,284,290]],
   p:[[120,100,180,100,'b'],[128,180,172,180,'b'],[128,290,172,290,'a']],
   h:[150,80],g:[[60,164,36,264,72],[240,274,36,264,47]],f:[]},
+ {t:"Le grand voyage",tilt:1,
+  w:[[60,16,60,100],[104,120,284,120],[16,222,236,222]],
+  p:[[16,100,60,100,'a'],[200,70,200,117,'a'],[100,408,200,408,'b']],
+  h:[245,100],g:[[72,206]],f:[['l',20,22,56,96],['w',22,290,278,330]]},
  {t:"Les verrous",
   w:[[120,16,120,152],[180,16,180,152]],
   p:[[16,120,120,120,'a'],[180,120,284,120,'b'],[120,152,180,152,'b',[1]],[16,240,284,240,'a',[0]]],
-  h:[150,132],g:[[90,224,36,264,50]],f:[['w',22,24,114,114],['l',186,62,278,114]]}
+  h:[150,132],g:[[90,224,36,264,50]],f:[['w',22,24,114,114],['l',186,62,278,114]]},
+ {t:"Le grand final",
+  w:[[100,16,100,100],[200,16,200,100],[16,210,120,210],[180,210,284,210],[200,226,200,300]],
+  p:[[16,100,100,100,'a'],[100,100,200,100,'a'],[200,100,284,100,'b'],[120,210,180,210,'b'],[200,300,284,300,'b'],[110,408,190,408,'a']],
+  h:[150,80],g:[[230,194,36,264,45],[150,392]],b:[[58,80]],f:[['l',206,24,278,94],['w',206,226,278,294]]}
 ];
 function pinWorld(i){const D=PIN.LV[i],P=[];
  const add=(k,x,y)=>P.push({k,x,y,px:x,py:y,r:PIN.R[k],m:PIN.M[k]});
@@ -1490,6 +1500,11 @@ function pinReact(w,a,b){const ks=a.k+b.k,has=k=>a.k==k||b.k==k;
  if(has('g')&&has('b')){const g=a.k=='g'?a:b,B=a.k=='b'?a:b,dt=w.dt||1/180,rv=Math.hypot((B.x-B.px)-(g.x-g.px),(B.y-B.py)-(g.y-g.py))/dt;if(rv>220&&B.y<g.y){g.dead=true;w.fx.push({x:g.x,y:g.y,t:0,c:'#7ed957',big:1});return true}return false}
  if(has('g')&&has('l')){const g=a.k=='g'?a:b;g.dead=true;w.fx.push({x:g.x,y:g.y,t:0,c:'#7ed957',big:1});return true}
  return false}
+/* Contre-rotation : si le téléphone pivote pendant un jeu, le jeu reste dans le sens du téléphone */
+function orientFix(){const R=document.documentElement,gw=document.getElementById('gwin');let a=screen.orientation&&typeof screen.orientation.angle=='number'?screen.orientation.angle:(typeof window.orientation=='number'?window.orientation:0);a=((a%360)+360)%360;
+ const land=innerWidth>innerHeight&&Math.min(innerWidth,innerHeight)<600&&(matchMedia('(pointer:coarse)').matches||'ontouchstart' in window),on=!!gw&&land&&(a==90||a==270);
+ R.style.setProperty('--vw',innerWidth+'px');R.style.setProperty('--vh',innerHeight+'px');R.classList.toggle('rotL',on&&a==90);R.classList.toggle('rotR',on&&a==270)}
+['resize','orientationchange'].forEach(e=>addEventListener(e,()=>{orientFix();setTimeout(orientFix,250)}));if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',()=>setTimeout(orientFix,50));setInterval(orientFix,700);
 /* ---------- Laboratoire ---------- */
 const HR=36e5,MN=6e4,CONSO=['hint','joker','dbl','early','jeton'];
 // Machines : jour d'ouverture (case à ouvrir), prix de réparation (🔩), durée de réparation (heures), niveau max
