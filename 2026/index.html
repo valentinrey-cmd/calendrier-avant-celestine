@@ -494,7 +494,7 @@ const DAYS={
  19:{t:"2048 de tes têtes",g:"g2048",p:{goal:256},tier:3},
  20:{t:"Les 7 différences",g:"spot",p:{a:"IMG_BAR",b:"IMG_BAR2",d:[[0.5156, 0.7678, 0.0244], [0.4133, 0.0729, 0.0222], [0.5633, 0.5758, 0.0178], [0.4533, 0.5336, 0.0156], [0.74, 0.6065, 0.0167], [0.9667, 0.215, 0.02], [0.3289, 0.0384, 0.0144]],time:150},tier:3,ev:"💎",unlock:"Un bon exclusif dans la boutique"},
  21:{t:"Relie les points, niveau expert",g:"relier",p:{n:9,k:8,time:240},tier:3,ev:"✨",x2:true},
- 22:{t:"Sauve Célestine",g:"pins",p:{time:600},tier:3},
+ 22:{t:"Sauve Célestine",g:"pins",p:{time:900},tier:3},
  23:{t:"Le grand quiz « Nous deux »",g:"quiz",p:{need:4},tier:3,ev:"🏆"},
  24:{t:"Le puzzle de nous deux",g:"jigsaw",p:{n:5,rot:1,time:480},tier:3,ev:"🎄",bonus:200,unlock:"Le bouton Résoudre du puzzle"}
 };
@@ -527,7 +527,7 @@ const RULES={
  relier:p=>`Relie les points de la même couleur en glissant le doigt, sans croiser les chemins. Toutes les cases doivent être remplies ! ${p.time/60} minutes.`,
  lights:p=>`Fais briller toutes les étoiles ! Toucher une étoile la retourne, ainsi que ses voisines. ${p.moves} coups et ${p.time} secondes maximum.`,
  quiz:p=>`Il faut au moins ${p.need} bonnes réponses sur ${CONTENU.quiz.length}.`,
- pins:p=>`Sauve Célestine ! Touche les épingles dorées pour les retirer et amène-la dans la hotte du Père Noël. La lave 🔥 la brûle, le Grinch 😈 l'attrape, et ni la lave ni le Grinch ne doivent tomber dans la hotte. L'eau 💧 transforme la lave en pierre. Le Grinch disparaît dans la lave ou sous un cadeau 🎁 qui lui tombe dessus. Attention, certains Grinchs font des rondes : il faudra du timing ! Réfléchis avant de tirer. ${PIN.LV.length} niveaux, ${p.time/60} minutes. Si tu rates, tu reprends au dernier niveau atteint.`,
+ pins:p=>`Sauve Célestine ! Touche les épingles dorées pour les retirer et amène-la dans la hotte du Père Noël. La lave 🔥 la brûle, le Grinch 😈 l'attrape, et ni la lave ni le Grinch ne doivent tomber dans la hotte. L'eau 💧 transforme la lave en pierre. Le Grinch disparaît dans la lave ou sous un cadeau 🎁 qui lui tombe dessus. Attention, certains Grinchs font des rondes : il faudra du timing ! Les épingles avec un cadenas 🔒 ne s'ouvrent qu'après avoir retiré celle qui les bloque. Réfléchis avant de tirer. ${PIN.LV.length} niveaux, ${p.time/60} minutes. Si tu rates, tu reprends au dernier niveau atteint.`,
  jigsaw:p=>`Reconstitue la photo : ${p.n*p.n} pièces mélangées et tournées. Pose-les dans les cadres, touche-les pour les tourner. ${p.time/60} minutes.`
 };
 const LEVELS=[[0,"Célesteenager",14],[80,"Célestinhaler",2],[180,"Célestinégalable",16],[320,"Célestinestimable",5],[500,"Célestinattendue",18],[720,"Célestinachevable",8],[980,"Célestinoubliable",20],[1280,"Célestinévitable",11],[1620,"Célestinouïe",26],[2000,"Célestinarrêtable",30]];
@@ -1063,7 +1063,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
   g.strokeStyle='#d9a43a';g.lineWidth=3;g.beginPath();g.moveTo(150,452);g.quadraticCurveTo(140,470,128,476);g.moveTo(150,452);g.quadraticCurveTo(162,470,174,476);g.stroke();g.fillStyle='#ffd24a';g.beginPath();g.arc(150,454,4,0,7);g.fill();
   PIN.BOX.slice(0,5).concat(PIN.LV[i].w).forEach(a=>wall(g,a));return c}
  function rod(s){const[x1,y1,x2,y2]=s.a,dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy),ux=dx/l,uy=dy/l,sg=s.side=='a'?-1:1,e=s.on?0:1-Math.pow(1-s.out,3),sh=sg*e*(l+60);
-  const ax=x1+ux*sh,ay=y1+uy*sh,bx=x2+ux*sh,by=y2+uy*sh,RR=10.5,ex=sg<0?ax:bx,ey=sg<0?ay:by,hx=ex+sg*ux*(RR+2),hy=ey+sg*uy*(RR+2),nx=-uy,ny=ux;
+  const sk=s.shk&&tt-s.shk<.4?Math.sin((tt-s.shk)*60)*3*(1-(tt-s.shk)/.4):0,ax=x1+ux*sh+uy*sk,ay=y1+uy*sh-ux*sk,bx=x2+ux*sh+uy*sk,by=y2+uy*sh-ux*sk,RR=10.5,ex=sg<0?ax:bx,ey=sg<0?ay:by,hx=ex+sg*ux*(RR+2),hy=ey+sg*uy*(RR+2),nx=-uy,ny=ux;
   x.save();x.globalAlpha=s.on?1:Math.max(0,1-s.out*1.15);x.lineCap='round';
   if(s.on){const pu=.5+.5*Math.sin(tt*4),gl=x.createRadialGradient(hx,hy,4,hx,hy,22+pu*4);gl.addColorStop(0,'rgba(255,220,110,.55)');gl.addColorStop(1,'rgba(255,220,110,0)');x.fillStyle=gl;x.beginPath();x.arc(hx,hy,26,0,7);x.fill()}
   x.strokeStyle='rgba(0,0,0,.3)';x.lineWidth=11;x.beginPath();x.moveTo(ax,ay+4);x.lineTo(bx,by+4);x.stroke();x.lineWidth=7;x.beginPath();x.arc(hx,hy+4,RR,0,7);x.stroke();
@@ -1075,6 +1075,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
   const rg=x.createLinearGradient(hx-RR,hy-RR,hx+RR,hy+RR);rg.addColorStop(0,'#fff4bf');rg.addColorStop(.35,'#f5c542');rg.addColorStop(.75,'#d48a10');rg.addColorStop(1,'#8a5200');
   x.strokeStyle=rg;x.lineWidth=7;x.beginPath();x.arc(hx,hy,RR,0,7);x.stroke();
   x.strokeStyle='rgba(255,255,240,.95)';x.lineWidth=1.8;x.beginPath();x.arc(hx,hy,RR+1.2,Math.PI*1.05,Math.PI*1.55);x.stroke();x.beginPath();x.arc(hx,hy,RR-2,Math.PI*.15,Math.PI*.45);x.strokeStyle='rgba(120,70,0,.5)';x.stroke();
+  if(s.on&&s.lk.some(j=>w.pins[j].on)){x.globalAlpha=1;x.fillStyle='#3a3f44';x.strokeStyle='#3a3f44';x.lineWidth=2.4;x.beginPath();x.arc(hx,hy-3,4,Math.PI,0);x.stroke();x.beginPath();x.roundRect?x.roundRect(hx-6,hy-3,12,10,2):x.rect(hx-6,hy-3,12,10);x.fill();x.fillStyle='#ffd24a';x.beginPath();x.arc(hx,hy+1.5,1.6,0,7);x.fill();x.fillRect(hx-.7,hy+1.5,1.4,3)}
   x.restore();s.hx=hx;s.hy=hy}
  function liquid(k){ox.clearRect(0,0,lw,lh);ox.globalCompositeOperation='lighter';let n=0;for(const q of w.P)if(q.k==k){ox.drawImage(blob,q.x/LR-6,q.y/LR-6);n++}ox.globalCompositeOperation='source-over';if(!n)return;
   const im=ox.getImageData(0,0,lw,lh),d=im.data,al=k=='w'?228:255,T=tt;
@@ -1129,7 +1130,8 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
   const why={burn:"Célestine s'est brûlée dans la lave 🔥",grinch:'le Grinch a attrapé Célestine 😈',sack:'la lave a fait brûler la hotte 🔥',grinchsack:"le Grinch s'est caché dans la hotte 😈",lost:'Célestine est tombée hors du niveau'}[w.st];
   banner={ok:0,t:'Oh non !',s:why.replace(/^./,c=>c.toUpperCase())};setTimeout(()=>end(false,why),1500)}
  cv.addEventListener('pointerdown',e=>{if(over||!w||w.st)return;if(banner&&banner.info)banner=null;if(PIN.LV[L].tilt)tryLock();const b=cv.getBoundingClientRect(),mx=(e.clientX-b.left)*W/b.width,my=(e.clientY-b.top)*H/b.height;let best=null,bd=24;
-  w.pins.forEach(s=>{if(!s.on)return;const[x1,y1,x2,y2]=s.a,dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;let t=((mx-x1)*dx+(my-y1)*dy)/l;t=Math.max(0,Math.min(1,t));const d=Math.min(Math.hypot(mx-x1-t*dx,my-y1-t*dy),Math.hypot(mx-(s.hx||-99),my-(s.hy||-99)));if(d<bd){bd=d;best=s}});
+  w.pins.forEach(s=>{if(!s.on)return;const[x1,y1,x2,y2]=s.a,dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;let t=((mx-x1)*dx+(my-y1)*dy)/l;t=Math.max(0,Math.min(1,t));const hd=Math.hypot(mx-(s.hx||-99),my-(s.hy||-99)),d=hd<20?hd-30:Math.hypot(mx-x1-t*dx,my-y1-t*dy);if(d<bd){bd=d;best=s}});
+  if(best&&best.lk.some(j=>w.pins[j].on)){best.shk=tt;toast('🔒 Bloquée : retire d\'abord l\'épingle qui la retient');try{navigator.vibrate&&navigator.vibrate([30,40,30])}catch(_){}return}
   if(best){best.on=false;e.preventDefault();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}}});
  addEventListener('deviceorientation',e=>{if(id!=RUN||over)return;if(e.gamma!=null){sens=e.gamma;sensB=e.beta||0;if(!sensOn){sensOn=true;const tp=$('#tperm');if(tp)tp.hidden=true;const tx=$('#tgt');if(tx)tx.innerHTML='📱 Capteur actif<br>Penche le téléphone'}}});
  const hold=(b,v)=>{const on=e=>{e.preventDefault();btn=v;b.classList.add('on')},off=()=>{if(btn==v)btn=0;b.classList.remove('on')};b.addEventListener('pointerdown',on);['pointerup','pointerleave','pointercancel'].forEach(t=>b.addEventListener(t,off))};$('#tbl').addEventListener('pointerdown',tryLock);$('#tbr').addEventListener('pointerdown',tryLock);hold($('#tbl'),-30);hold($('#tbr'),30);
@@ -1451,13 +1453,21 @@ PIN.LV=[
  {t:"Le grand final",
   w:[[100,16,100,100],[200,16,200,100],[16,210,120,210],[180,210,284,210],[200,226,200,300]],
   p:[[16,100,100,100,'a'],[100,100,200,100,'a'],[200,100,284,100,'b'],[120,210,180,210,'b'],[200,300,284,300,'b'],[110,408,190,408,'a']],
-  h:[150,80],g:[[230,194,36,264,45],[150,392]],b:[[58,80]],f:[['l',206,24,278,94],['w',206,226,278,294]]}
+  h:[150,80],g:[[230,194,36,264,45],[150,392]],b:[[58,80]],f:[['l',206,24,278,94],['w',206,226,278,294]]},
+ {t:"Deux Grinchs, un seul passage",
+  w:[[120,16,120,100],[180,16,180,100],[16,180,128,180],[172,180,284,180],[16,290,128,290],[172,290,284,290]],
+  p:[[120,100,180,100,'b'],[128,180,172,180,'b'],[128,290,172,290,'a']],
+  h:[150,80],g:[[60,164,36,264,72],[240,274,36,264,47]],f:[]},
+ {t:"Les verrous",
+  w:[[120,16,120,152],[180,16,180,152]],
+  p:[[16,120,120,120,'a'],[180,120,284,120,'b'],[120,152,180,152,'b',[1]],[16,240,284,240,'a',[0]]],
+  h:[150,132],g:[[90,224,36,264,50]],f:[['w',22,24,114,114],['l',186,62,278,114]]}
 ];
 function pinWorld(i){const D=PIN.LV[i],P=[];
  const add=(k,x,y)=>P.push({k,x,y,px:x,py:y,r:PIN.R[k],m:PIN.M[k]});
  add('h',D.h[0],D.h[1]);D.g.forEach(g=>{add('g',g[0],g[1]);if(g[2]){const q=P[P.length-1];q.pat=[g[2],g[3]];q.v=g[4]||50;q.dir=1}});(D.b||[]).forEach(b=>add('b',b[0],b[1]));
  D.f.forEach(([k,x1,y1,x2,y2])=>{const r=PIN.R[k],s=2*r+.3;let row=0;for(let y=y2-r;y>=y1+r;y-=s*.87,row++)for(let x=x1+r+(row%2?r:0);x<=x2-r;x+=s)add(k,x,y)});
- return{P,segs:[...PIN.BOX,...D.w].map(a=>({a,r:5})),pins:D.p.map(q=>({a:q.slice(0,4),side:q[4],r:5,on:true,out:0})),st:'',fx:[],t:0,tilt:0}}
+ return{P,segs:[...PIN.BOX,...D.w].map(a=>({a,r:5})),pins:D.p.map(q=>({a:q.slice(0,4),side:q[4],lk:q[5]||[],r:5,on:true,out:0})),st:'',fx:[],t:0,tilt:0}}
 function pinSeg(q,s){const[x1,y1,x2,y2]=s.a,dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy;let t=((q.x-x1)*dx+(q.y-y1)*dy)/l;t=t<0?0:t>1?1:t;const cx=x1+t*dx,cy=y1+t*dy;let ex=q.x-cx,ey=q.y-cy;const d2=ex*ex+ey*ey,m=q.r+s.r;
  if(d2<m*m){let d=Math.sqrt(d2);if(d<1e-6){ex=0;ey=-1;d=1}const nx=ex/d,ny=ey/d,pen=m-d;q.x+=nx*pen;q.y+=ny*pen;const vx=q.x-q.px,vy=q.y-q.py,vn=vx*nx+vy*ny,f=q.k=='l'||q.k=='w'?.995:.97;if(vn<0){const tx=vx-vn*nx,ty=vy-vn*ny;q.px=q.x-tx*f;q.py=q.y-ty*f}}}
 function pinStep(w,dt){const P=w.P;w.dt=dt;for(const q of P)if(q.pat&&!q.dead){if(q.x<q.pat[0])q.dir=1;else if(q.x>q.pat[1])q.dir=-1;else{q.stk=Math.abs(q.x-(q.lx??q.x))<q.v*dt*.3?(q.stk||0)+dt:0;if(q.stk>.25){q.dir*=-1;q.stk=0}}q.lx=q.x;q.px=q.x-q.dir*q.v*dt}const ta=(w.tilt||0)*Math.PI/180,gx=PIN.GR*Math.sin(ta)*dt*dt,g=PIN.GR*Math.cos(ta)*dt*dt;w.t+=dt;
