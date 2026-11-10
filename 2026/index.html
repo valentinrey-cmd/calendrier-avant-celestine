@@ -229,7 +229,7 @@ html.rotL #gwin,html.rotR #gwin{inset:auto;width:var(--vh);height:var(--vw);tran
 .arw2{max-width:min(100%,420px);margin:6px auto;background:radial-gradient(circle at 50% 40%,#173e30,#0a1d16);border-radius:16px;padding:6px;box-shadow:inset 0 0 0 2px #ffffff1c,0 6px 18px #0006;touch-action:manipulation}
 .arw2 svg{display:block;width:100%;height:auto;overflow:visible}.adots circle{fill:#ffffff22}
 .ag{cursor:pointer}.ag .ab{fill:none;stroke:var(--c);stroke-width:.3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 .04px .06px #000a)}.ag .ah path{fill:var(--c)}
-.ag.bad .ab{stroke:#ff3b5c}.ag.bad .ah path{fill:#ff3b5c}.ag.hitb{filter:brightness(1.8) drop-shadow(0 0 .2px #fff)}.ag.go{pointer-events:none}
+.ag.bad .ab{stroke:#ff3b5c}.ag.bad .ah .hd{fill:#ff3b5c}.ag.hitb{filter:brightness(1.8) drop-shadow(0 0 .2px #fff)}.ag.go{pointer-events:none}
 .pcx2{display:grid;gap:2px;max-width:min(100%,430px);margin:8px auto;align-items:end;background:#0b1f18;padding:6px;border-radius:12px;box-shadow:inset 0 0 0 2px #ffffff1a}
 .pcx2 .ct{font:800 .72rem/1.15 system-ui;text-align:center;color:#f3dc9a;padding:3px 0;border-radius:6px 6px 0 0;transition:background .3s}
 .pcx2 .cl{font:800 .75rem system-ui;color:#f3dc9a;text-align:right;padding:0 5px;align-self:stretch;display:flex;align-items:center;justify-content:flex-end;white-space:nowrap;border-radius:6px 0 0 6px;transition:background .3s}
@@ -284,8 +284,10 @@ html.rotL #gwin,html.rotR #gwin{inset:auto;width:var(--vh);height:var(--vw);tran
 .ag.lockd .ab{opacity:.75}
 .ag .rring{fill:none;stroke:#fff;stroke-width:.06;stroke-dasharray:.18 .14;opacity:.85;animation:gspin 3s linear infinite;transform-box:fill-box;transform-origin:center}.abomb circle{fill:#1b1f24;stroke:#ff4d6a;stroke-width:.07}.abomb text{fill:#fff;font:800 .42px system-ui;text-anchor:middle;dominant-baseline:central}.abomb.hot circle{fill:#a30d26;animation:bpulse .6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes bpulse{50%{transform:scale(1.18)}}.ag.boom{filter:brightness(2.5) drop-shadow(0 0 .5px #ff4d6a)}
 .aleg{display:flex;flex-direction:column;gap:4px;font-size:.78rem;opacity:.9;margin:4px auto 0;max-width:420px}.aleg span{display:flex;align-items:center;gap:6px}.aleg i{flex:none;display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-style:normal;font-size:.65rem;font-weight:800}.aleg i.lr{border:2px dashed #fff;font-size:.7rem}
-.ag .agh path{fill:none;stroke:var(--c);stroke-width:.09;stroke-dasharray:.13 .09;stroke-linejoin:round}
-.ag.flp .ab{filter:drop-shadow(0 0 .08px #fff) drop-shadow(0 .04px .06px #000a)}.aleg i.lb{background:#1b1f24;border:2px solid #ff4d6a;color:#fff}
+.ag .ah .rdisc{fill:#0d241c;stroke:var(--c);stroke-width:.07}
+.ag .ah .rarc{fill:none;stroke:#fff;stroke-width:.05;opacity:.85}
+.ag .ah .rarh{fill:#fff;opacity:.85}
+.ag .ah .hd{fill:var(--c)}.aleg i.lb{background:#1b1f24;border:2px solid #ff4d6a;color:#fff}
 #vbtn{position:fixed;right:14px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:12;width:58px;height:58px;min-height:0;padding:0;border-radius:50%;font-size:1.7rem;background:radial-gradient(circle at 35% 30%,#ff9ab8,#d0214f);border:3px solid #fff;box-shadow:0 6px 18px #000a,0 0 0 0 #ff5a8a88;animation:vpulse 2.4s ease infinite}
 #vbtn.play{animation:vplay .5s ease infinite alternate}body.playing #vbtn{display:none}
 @keyframes vpulse{70%{box-shadow:0 6px 18px #000a,0 0 0 14px #ff5a8a00}}@keyframes vplay{to{transform:scale(1.12) rotate(-6deg)}}
@@ -488,7 +490,7 @@ const DAYS={
  6:{t:"Le code secret du Père Noël",g:"master",p:{len:5,syms:7,tries:8,dup:true},tier:2,ev:"✨",x2:true},
  7:{t:"Zip",g:"zip",p:{n:7,k:9,time:150},tier:2,ev:"🎡",unlock:"La roue de la chance (un tour par jour)"},
  8:{t:"Le serpent gourmand",g:"snake",p:{n:12,goal:25,speed:190},tier:2},
- 9:{t:"Flèches en fuite",g:"arrows",p:{n:10,min:2,max:5,time:240,err:2,rot:.35,bombs:3,slack:2},tier:2},
+ 9:{t:"Flèches en fuite",g:"arrows",p:{n:10,min:2,max:5,time:240,err:2,rot:.2,bombs:3,slack:2},tier:2},
  10:{t:"Picross : l'image cachée",g:"picross",p:{time:420,pics:["coeur","cloche","etoile"]},tier:2},
  11:{t:"Simon des clochettes",g:"simon",p:{goal:10,time:300},tier:2},
  12:{t:"Sudoku expert",g:"sudoku",p:{n:9,bh:3,bw:3,blanks:56,time:900,digits:1},tier:2,ev:"🎁",bonus:100},
@@ -517,7 +519,7 @@ const RULES={
  master:p=>`Trouve la combinaison secrète de ${p.len} boules en ${p.tries} essais maximum.`,
  zip:p=>`Trace un seul chemin qui passe par toutes les cases en reliant les numéros de 1 à ${p.k} dans l'ordre. ${p.time} secondes.`,
  snake:p=>`Mange ${p.goal} cadeaux 🎁 sans te cogner. Fais glisser ton doigt pour tourner. Le serpent accélère et change de tête à chaque cadeau !`,
- arrows:p=>`Fais s'envoler toutes les flèches, une par une : chaque flèche file dans le sens de sa pointe si rien ne lui barre la route. Mais attention aux pièges ! Les flèches à double pointe ⇄ changent de sens à chaque fois qu'une autre flèche s'envole (la pointe en pointillés montre leur prochain sens). Les flèches 💣 sont des bombes : leur compte à rebours baisse à chaque flèche qui part, et elles doivent s'envoler avant d'arriver à 0. Si plus aucune flèche ne peut partir, c'est raté : réfléchis à l'ordre ! ${p.err} erreurs maximum, ${p.time/60} minutes.`,
+ arrows:p=>`Fais s'envoler toutes les flèches, une par une : chaque flèche file dans le sens de sa pointe si rien ne lui barre la route. Mais attention aux pièges ! Les flèches dans un rond ↻ tournent d'un quart de tour (dans le sens des aiguilles d'une montre) à chaque fois qu'une autre flèche s'envole. Les flèches 💣 sont des bombes : leur compte à rebours baisse à chaque flèche qui part, et elles doivent s'envoler avant d'arriver à 0. Si plus aucune flèche ne peut partir, c'est raté : réfléchis à l'ordre ! ${p.err} erreurs maximum, ${p.time/60} minutes.`,
  picross:p=>`Retrouve l'image cachée grâce aux nombres. 3 erreurs maximum, ${p.time/60} minutes.`,
  simon:p=>`Les clochettes jouent une mélodie : répète-la dans le même ordre en les touchant. À chaque manche, une note de plus et ça va plus vite ! Atteins la manche ${p.goal} sans te tromper. Monte le son 🔔`,
  stack:p=>`Empile ${p.goal} cadeaux jusqu'à la ligne rouge ! Touche l'écran pour lâcher le cadeau qui glisse : la partie qui dépasse de la tour tombe et le cadeau suivant est plus petit. Pose-le pile dessus pour faire un parfait : le cadeau grandit un peu, et encore plus si tu les enchaînes ! Ça accélère à chaque étage. ${p.time/60} minutes.`,
@@ -999,19 +1001,19 @@ arrows(p,el,win,fail){const id=RUN,n=p.n,DV=[[-1,0],[0,1],[1,0],[0,-1]],COL=['#f
  function gen(){const own=Array(n*n).fill(-1),AR=[];
   for(let t=0;t<20000;t++){const em=[];own.forEach((v,i)=>{if(v<0)em.push(i)});if(!em.length)break;const h=em[Math.floor(Math.random()*em.length)];
    const ds=shuffle([0,1,2,3]).filter(d=>rayO(own,h,d).every(x=>own[x]<0));if(!ds.length)continue;const d=ds[0],ry=new Set(rayO(own,h,d)),L=p.min+Math.floor(Math.random()*(p.max-p.min+1)),body=[h];
-   let fl=Math.random()<p.rot;if(fl){let r=Math.floor(h/n),c=h%n;for(let k=1;k<Math.min(L,4);k++){r-=DV[d][0];c-=DV[d][1];if(!inb(r,c)||own[r*n+c]>=0)break;body.push(r*n+c)}if(body.length<2){fl=false;body.length=1}}
+   const fl=Math.random()<p.rot;
    let cu=h;if(!fl)for(let k=1;k<L;k++){const op=nb(cu).filter(x=>own[x]<0&&!body.includes(x)&&!ry.has(x));if(!op.length)break;const nx=op[Math.floor(Math.random()*op.length)];body.push(nx);cu=nx}
-   if(body.length<2&&t<16000)continue;AR.push({d,d0:d,cells:body,c:COL[AR.length%COL.length],gone:false,flip:fl?1:0});body.forEach(x=>own[x]=AR.length-1)}
+   if(body.length<2&&!fl&&t<16000)continue;AR.push({d,d0:d,cells:body,c:COL[AR.length%COL.length],gone:false,rot:fl?1:0,rt:d});body.forEach(x=>own[x]=AR.length-1)}
   // pièges : flèches tournantes et bombes
-    const early=[...AR.keys()].reverse().slice(1,Math.max(4,Math.floor(AR.length*.45)));shuffle(early).slice(0,p.bombs).forEach(k=>AR[k].bomb=1);
+    const early=[...AR.keys()].reverse().slice(1,Math.max(4,Math.floor(AR.length*.45))).filter(k=>!AR[k].rot);shuffle(early).slice(0,p.bombs).forEach(k=>AR[k].bomb=1);
   return{own,AR}}
- const FL=a=>{a.cells.reverse();a.d=(a.d+2)%4};
+ const FL=a=>{a.d=(a.d+1)%4;a.rt++};
  // vérifie qu'une partie est faisable (recherche aléatoire) et règle le compte à rebours des bombes
  function solve(B){for(let tr=0;tr<250;tr++){const own=[...B.own],A=B.AR.map(a=>({...a,cells:[...a.cells]})),bt={};A.forEach((a,k)=>{if(a.bomb)bt[k]=0});let mv=0,ok=true;
    while(A.some(a=>!a.gone)){const fr=A.map((a,k)=>k).filter(k=>!A[k].gone&&rayO(own,A[k].cells[0],A[k].d).every(x=>own[x]<0));if(!fr.length){ok=false;break}
-    const bf=fr.filter(k=>A[k].bomb),k=bf.length&&Math.random()<.7?bf[0]:fr[Math.floor(Math.random()*fr.length)];A[k].gone=true;A[k].cells.forEach(x=>own[x]=-1);mv++;if(A[k].bomb)bt[k]=mv;A.forEach(a=>{if(a.flip&&!a.gone)FL(a)})}
+    const bf=fr.filter(k=>A[k].bomb),k=bf.length&&Math.random()<.7?bf[0]:fr[Math.floor(Math.random()*fr.length)];A[k].gone=true;A[k].cells.forEach(x=>own[x]=-1);mv++;if(A[k].bomb)bt[k]=mv;A.forEach(a=>{if(a.rot&&!a.gone)FL(a)})}
    if(ok)return bt}return null}
- let B,bt;for(let g2=0;g2<40;g2++){B=gen();bt=solve(B);if(bt)break}if(!bt){B.AR.forEach(a=>{a.flip=0;a.bomb=0});bt={}}
+ let B,bt;for(let g2=0;g2<40;g2++){B=gen();bt=solve(B);if(bt)break}if(!bt){B.AR.forEach(a=>{a.rot=0;a.bomb=0});bt={}}
  const own=B.own,AR=B.AR;AR.forEach((a,k)=>{if(a.bomb)a.cd=bt[k]+p.slack});
  let err=0,busy=0,moves=0;const total=AR.length;G={n,left:()=>AR.filter(a=>!a.gone).length};
  const ray=(h,d)=>rayO(own,h,d),blk=k=>{const a=AR[k],r=ray(a.cells[0],a.d);for(let i=0;i<r.length;i++)if(own[r[i]]>=0)return i+1;return 0};
@@ -1019,12 +1021,12 @@ arrows(p,el,win,fail){const id=RUN,n=p.n,DV=[[-1,0],[0,1],[1,0],[0,-1]],COL=['#f
  const ctr=i=>[i%n+.5,Math.floor(i/n)+.5];
  const pathOf=a=>{const pts=[...a.cells].reverse().map(ctr),[hx,hy]=ctr(a.cells[0]),ext=n+a.cells.length+2,ex=[hx+DV[a.d][1]*ext,hy+DV[a.d][0]*ext],L=a.cells.length-1;return{d:`M${pts.map(q=>q.join(' ')).join(' L')} L${ex.join(' ')}`,da:`${Math.max(.001,L)} ${ext+L+4}`}};
  const svg=AR.map((a,k)=>{const P=pathOf(a),[hx,hy]=ctr(a.cells[0]),m=a.cells[Math.floor(a.cells.length/2)],[mx,my]=ctr(m);
-  const [tx,ty]=ctr(a.cells[a.cells.length-1]);return`<g class="ag ${a.flip?'flp':''}" data-a="${k}" style="--c:${a.c}"><path class="ab" d="${P.d}" stroke-dasharray="${P.da}" stroke-dashoffset="0"/>${a.flip?`<g class="agh" transform="translate(${tx} ${ty})"><path d="M0 -.46 L.4 .06 L-.4 .06Z" transform="rotate(${(a.d+2)*90})"/></g>`:''}<g class="ah" transform="translate(${hx} ${hy})"><path d="M0 -.46 L.4 .06 L-.4 .06Z" transform="rotate(${a.d*90})"/></g>${a.bomb?`<g class="abomb" transform="translate(${mx} ${my})"><circle r=".42"/><text y=".03">${a.cd}</text></g>`:''}</g>`}).join('');
+  return`<g class="ag ${a.rot?'rotr':''}" data-a="${k}" style="--c:${a.c}"><path class="ab" d="${P.d}" stroke-dasharray="${P.da}" stroke-dashoffset="0"/><g class="ah" transform="translate(${hx} ${hy})">${a.rot?'<circle class="rdisc" r=".44"/><path class="rarc" d="M.3 -.33 A.45 .45 0 0 1 .44 .1"/><path class="rarh" d="M.44 .22 L.33 .04 L.55 .05Z"/>':''}<path class="hd" d="${a.rot?'M0 -.3 L.24 .1 L-.24 .1Z':'M0 -.46 L.4 .06 L-.4 .06Z'}" transform="rotate(${a.d*90})"/></g>${a.bomb?`<g class="abomb" transform="translate(${mx} ${my})"><circle r=".42"/><text y=".03">${a.cd}</text></g>`:''}</g>`}).join('');
  el.innerHTML=`<p class="center" id="arl"></p><div class="arw2" id="arw"><svg viewBox="-.15 -.15 ${n+.3} ${n+.3}" id="asv"><g class="adots">${Array.from({length:n*n},(_,i)=>`<circle cx="${i%n+.5}" cy="${Math.floor(i/n)+.5}" r=".06"/>`).join('')}</g>${svg}</svg></div>
-  <div class="aleg"><span><i class="lr">⇄</i>double pointe : la flèche change de sens à chaque flèche qui part (la pointe en pointillés = son prochain sens)</span><span><i class="lb">5</i>💣 bombe : à faire partir avant la fin du compte à rebours</span></div>`;
+  <div class="aleg"><span><i class="lr">↻</i>flèche dans un rond : tourne d'un quart de tour (sens des aiguilles d'une montre) à chaque flèche qui part</span><span><i class="lb">5</i>💣 bombe : à faire partir avant la fin du compte à rebours</span></div>`;
  const S=$('#asv');
  const lab=()=>$('#arl').innerHTML=`Flèches : <b>${AR.filter(a=>!a.gone).length}</b> / ${total} · Erreurs : ${'❌'.repeat(err)}${'▫️'.repeat(Math.max(0,p.err-err))}`;lab();
- const refresh=k=>{const a=AR[k],g=S.querySelector(`[data-a="${k}"]`);if(!g)return;const P=pathOf(a),ab=g.querySelector('.ab'),hp=g.querySelector('.ah path');ab.setAttribute('d',P.d);ab.setAttribute('stroke-dasharray',P.da);if(a.flip){const ah=g.querySelector('.ah'),gh=g.querySelector('.agh'),[hx,hy]=ctr(a.cells[0]),[tx,ty]=ctr(a.cells[a.cells.length-1]);ah.setAttribute('transform',`translate(${hx} ${hy})`);hp.setAttribute('transform',`rotate(${a.d*90})`);gh.setAttribute('transform',`translate(${tx} ${ty})`);gh.firstChild.setAttribute('transform',`rotate(${(a.d+2)*90})`);ah.animate([{opacity:0},{opacity:1}],{duration:300});gh.animate([{opacity:0},{opacity:1}],{duration:300})}const bb=g.querySelector('.abomb text');if(bb){bb.textContent=a.cd;g.querySelector('.abomb').classList.toggle('hot',a.cd<=2)}};
+ const refresh=k=>{const a=AR[k],g=S.querySelector(`[data-a="${k}"]`);if(!g)return;const P=pathOf(a),ab=g.querySelector('.ab'),hp=g.querySelector('.ah path');ab.setAttribute('d',P.d);ab.setAttribute('stroke-dasharray',P.da);if(a.rot){const hd=g.querySelector('.ah .hd');hd.animate([{transform:`rotate(${(a.rt-1)*90}deg)`},{transform:`rotate(${a.rt*90}deg)`}],{duration:280,easing:'ease-out'});hd.setAttribute('transform',`rotate(${a.d*90})`)}const bb=g.querySelector('.abomb text');if(bb){bb.textContent=a.cd;g.querySelector('.abomb').classList.toggle('hot',a.cd<=2)}};
  const anim=(k,D,back,dur)=>{const g=S.querySelector(`[data-a="${k}"]`),a=AR[k],ab=g.querySelector('.ab'),ah=g.querySelector('.ah'),[hx,hy]=ctr(a.cells[0]),dx=DV[a.d][1],dy=DV[a.d][0];
   const kf=back?[0,-D,0]:[0,-D],tk=back?[0,D,0]:[0,D],o=back?{duration:dur,easing:'ease-in-out'}:{duration:dur,easing:'cubic-bezier(.45,0,.85,.55)'};
   ab.animate(kf.map(v=>({strokeDashoffset:v})),o);return ah.animate(tk.map(v=>({transform:`translate(${hx+dx*v}px,${hy+dy*v}px)`})),o)};
@@ -1032,7 +1034,7 @@ arrows(p,el,win,fail){const id=RUN,n=p.n,DV=[[-1,0],[0,1],[1,0],[0,-1]],COL=['#f
   const a=AR[k],b=blk(k),g=S.querySelector(`[data-a="${k}"]`);
   if(!b){a.gone=true;moves++;a.cells.forEach(x2=>own[x2]=-1);lab();const D=ray(a.cells[0],a.d).length+a.cells.length+1;g.classList.add('go');anim(k,D,false,Math.max(320,D*55)).onfinish=()=>g.remove();
    if(AR.every(q=>q.gone)){busy=1;setTimeout(()=>{if(id==RUN)win()},600);return}
-   busy=1;setTimeout(()=>{busy=0;if(id!=RUN)return;AR.forEach((q,j)=>{if(q.gone)return;if(q.flip)FL(q);if(q.bomb)q.cd--;refresh(j)});
+   busy=1;setTimeout(()=>{busy=0;if(id!=RUN)return;AR.forEach((q,j)=>{if(q.gone)return;if(q.rot)FL(q);if(q.bomb)q.cd--;refresh(j)});
     if(!AR.some((q,j)=>!q.gone&&!blk(j))){busy=1;setTimeout(()=>{if(id==RUN)fail('plus aucune flèche ne peut s\'envoler : mauvais ordre 🔁')},500);return}const bo=AR.findIndex(q=>q.bomb&&!q.gone&&q.cd<=0);if(bo>=0){const bg=S.querySelector(`[data-a="${bo}"]`);if(bg)bg.classList.add('boom');try{SFX('burn')}catch(_){}busy=1;setTimeout(()=>{if(id==RUN)fail('une bombe a explosé 💣')},700)}},260);return}
   err++;lab();busy=1;g.classList.add('bad');const ob=own[ray(a.cells[0],a.d)[b-1]],og=S.querySelector(`[data-a="${ob}"]`);
   setTimeout(()=>{if(og){og.classList.add('hitb');setTimeout(()=>og.classList.remove('hitb'),350)}},180);
