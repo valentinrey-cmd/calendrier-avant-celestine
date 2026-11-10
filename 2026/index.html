@@ -1310,7 +1310,7 @@ spot(p,el,win,fail){const id=RUN,A=window[p.a],B=window[p.b],D=p.d,found=new Set
   if(D.some(([dx,dy,rr],j)=>found.has(j)&&Math.hypot(x-dx,(y-dy)*k)<=rr*1.25+.02))return;
   err++;T.add(-10);lab();const m=document.createElement('i');m.className='spx';m.style.left=x*100+'%';m.style.top=y*100+'%';w.appendChild(m);setTimeout(()=>m.remove(),700);toast('Non ! −10 s');if(err>=5)fail('5 erreurs')})},
 jigsaw(p,el,win,fail){const id=RUN,n=p.n,img=COUPLE;
- el.innerHTML=`<p class="center" id="jgl"></p><div class="jg" id="jg"></div><div class="row"><button class="alt sm" id="jgp">👁 Voir le modèle (−15 s)</button></div><p class="center muted">Glisse les pièces dans les cadres, touche-les pour les tourner.</p>`;
+ el.innerHTML=`<p class="center" id="jgl"></p><div class="jg" id="jg"></div><p class="center muted">Glisse les pièces dans les cadres, touche-les pour les tourner.</p>`;
  const A=$('#jg'),Wd=A.clientWidth,bs=Math.max(220,Math.min(Wd,360,(innerHeight-330)/1.75)),cs=bs/n,bx=(Wd-bs)/2,ty=bs+12,th=Math.round(Math.min(Wd*.95,bs*.75));A.style.height=(ty+th)+'px';
  A.innerHTML=`<div class="jgb" style="left:${bx}px;width:${bs}px;height:${bs}px;background-size:${cs}px ${cs}px"></div>`;
  const P=[],slot=Array(n*n).fill(-1);let z=10;
@@ -1323,8 +1323,7 @@ jigsaw(p,el,win,fail){const id=RUN,n=p.n,img=COUPLE;
  const check=()=>{lab();if(inb()==n*n){if(good()==n*n){A.classList.add('done');P.forEach(o=>o.d.classList.add('ok'));return setTimeout(()=>{if(id==RUN)win()},900)}toast('Toutes les pièces sont posées… mais certaines sont mal placées ou mal tournées !')}};
  const T=timer(p.time,()=>fail(`${good()} pièces bien placées sur ${n*n}`),id);
  G={P,cs,slot,move:(k,s,rot)=>{const o=P[k];if(rot!=null)o.rot=rot;drop(o,s,-1,0,0);put(o,1);check()}};
- $('#jgp').onclick=()=>{if(id!=RUN)return;T.add(-15);$('#pop').innerHTML=`<div class="peek" onclick="closePop()"><div style="background-image:url(${img});filter:none;aspect-ratio:1"></div></div>`;setTimeout(()=>{if($('.peek'))closePop()},2500)};
- const drop=(o,s,ps,ox,oy)=>{if(s>=0){const other=slot[s];if(other>=0&&other!=o.i){const q=P[other];if(ps>=0){q.s=ps;slot[ps]=q.i}else{q.s=-1;slot[s]=-1;q.x=Math.max(0,Math.min(Wd-cs,ox));q.y=Math.max(ty,Math.min(ty+th-cs,oy));if(q.y<ty)q.y=ty}put(q,1)}if(ps>=0&&slot[ps]==o.i)slot[ps]=-1;o.s=s;slot[s]=o.i}
+  const drop=(o,s,ps,ox,oy)=>{if(s>=0){const other=slot[s];if(other>=0&&other!=o.i){const q=P[other];if(ps>=0){q.s=ps;slot[ps]=q.i}else{q.s=-1;slot[s]=-1;q.x=Math.max(0,Math.min(Wd-cs,ox));q.y=Math.max(ty,Math.min(ty+th-cs,oy));if(q.y<ty)q.y=ty}put(q,1)}if(ps>=0&&slot[ps]==o.i)slot[ps]=-1;o.s=s;slot[s]=o.i}
   else{if(ps>=0&&slot[ps]==o.i)slot[ps]=-1;o.s=-1}};
  P.forEach(o=>{const d=o.d;d.onpointerdown=e=>{if(id!=RUN||A.classList.contains('done'))return;e.preventDefault();try{d.setPointerCapture(e.pointerId)}catch(_){}d.style.zIndex=++z;d.style.transition='transform .15s';const sx=e.clientX,sy=e.clientY,ox=o.x,oy=o.y,ps=o.s;let mv=false;
   d.onpointermove=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>6)mv=true;if(!mv)return;d.classList.remove('in');o.x=Math.max(0,Math.min(Wd-cs,ox+dx));o.y=Math.max(0,Math.min(ty+th-cs,oy+dy));d.style.left=o.x+'px';d.style.top=o.y+'px'};
