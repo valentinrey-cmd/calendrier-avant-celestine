@@ -2,6 +2,8 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon.svg">
+<meta name="color-scheme" content="dark only">
+<meta name="darkreader-lock">
 <title>Calendrier de l&#39;Avent</title>
 <style>
 :root{--g:#12382b;--g2:#1c5240;--r:#7a1f33;--o:#d9b45f;--c:#fbf5e6;--t:#2b1d16;--ok:#2f8f5b;--ko:#b3263e}
@@ -453,6 +455,19 @@ button.brass{display:block;width:100%;margin:6px 0 0!important;background:linear
 @media(min-width:700px){.lab{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:700px){main{max-width:760px}.cal{grid-template-columns:repeat(6,1fr)}.shop{grid-template-columns:1fr 1fr}h1{font-size:2rem}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.okb{position:sticky;bottom:-14px;z-index:3;padding:8px 2px calc(10px + env(safe-area-inset-bottom,0px));margin:6px -6px -14px;background:linear-gradient(#10261e00,#10261ef2 10px);display:flex;flex-direction:column;gap:6px;user-select:none;-webkit-user-select:none}
+.okr{display:flex;gap:4px;justify-content:center}
+.okk{flex:1 1 0;max-width:40px;min-width:0;height:46px;min-height:0;padding:0;border-radius:7px;font:800 1.02rem system-ui,sans-serif;background:#ffffff2e;color:#fff;border:none;box-shadow:0 2px 0 #0007;touch-action:manipulation}
+.okk.wide{max-width:60px;flex:1.6 1 0;font-size:.82rem}
+.okk.prs{transform:translateY(2px);background:#ffffff55}
+.okk.g{background:#3c9d4e}.okk.y{background:#d0a623;color:#1c1400}.okk.a{background:#0000004d;color:#ffffff59}
+html,button,a,input,label,[role=button]{touch-action:manipulation}
+:root{color-scheme:dark}
+.gfoot{position:sticky;bottom:-14px;z-index:3;margin:6px -12px -14px;padding:6px 8px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(#10261e00,#10261ef5 12px)}
+.gfoot .mpal{margin:4px 0}.gfoot .row{margin:4px 0}
+@media (max-height:860px){#gwin .mmb .ball{width:28px;height:28px}#gwin .mmrow{padding:2px 4px;gap:6px}#gwin .mpal .ball{width:30px;height:30px}#gwin .mleg{font-size:.72rem}}
+#gwin .pgwrap{max-width:min(340px,calc((100dvh - 270px)*300/520))}
+.okb{margin:6px -12px -14px}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -716,10 +731,13 @@ function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=
  const close=()=>{if(!d.isConnected)return;d.classList.add('out');setTimeout(()=>d.remove(),260)};d.onclick=close;document.body.appendChild(d);setTimeout(close,5000)}
 function useJoker(d){if(S.inv.joker<1)return;S.inv.joker--;const st=S.days[d];st.extra=(st.extra||0)+1;st.done=false;st.lost=false;save();toast('🃏 Un essai de plus !');startBox(d)}
 
-function hiddenKeyboard(el,onChar,onDel,onEnter){const old=document.getElementById('hk');if(old)old.remove();const K=document.createElement('input');
- K.id='hk';K.className='hk';K.type='text';K.autocomplete='off';K.setAttribute('autocorrect','off');K.setAttribute('autocapitalize','characters');K.spellcheck=false;K.enterKeyHint='go';K.setAttribute('aria-label','Clavier');K.value=' ';
- K.oninput=()=>{const v=K.value;if(v.length<1)onDel();else for(const ch of norm(v.slice(1)))onChar(ch);K.value=' ';try{K.setSelectionRange(1,1)}catch(_){}};
- K.onkeydown=e=>{if(e.key=='Enter'){e.preventDefault();onEnter?onEnter():K.blur()}};el.parentNode.appendChild(K);return K}
+function hiddenKeyboard(el,onChar,onDel,onEnter){const old=document.getElementById('hk');if(old)old.remove();
+ const K=document.createElement('div');K.id='hk';K.className='okb';const R=['AZERTYUIOP','QSDFGHJKLM',(onEnter?'⏎':'')+'WXCVBN⌫'];
+ K.innerHTML=R.map(r=>`<div class="okr">${[...r].map(c=>`<button type="button" class="okk${c=='⏎'||c=='⌫'?' wide':''}" data-k="${c}" aria-label="${c=='⏎'?'Valider':c=='⌫'?'Effacer':c}">${c=='⏎'?'OK':c}</button>`).join('')}</div>`).join('');
+ K.addEventListener('pointerdown',e=>{const b=e.target.closest('.okk');if(!b)return;e.preventDefault();const c=b.dataset.k;b.classList.add('prs');setTimeout(()=>b.classList.remove('prs'),120);if(c=='⌫')onDel();else if(c=='⏎'){if(onEnter)onEnter()}else onChar(c)});
+ const kd=e=>{if(!document.body.contains(K)){removeEventListener('keydown',kd);return}if(G&&G.key)return;if(e.target&&e.target.closest&&e.target.closest('input,textarea'))return;if(e.key=='Backspace'){onDel();e.preventDefault()}else if(e.key=='Enter'){if(onEnter)onEnter();e.preventDefault()}else if(/^[a-zA-ZÀ-ÿ]$/.test(e.key))onChar(e.key.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase())};addEventListener('keydown',kd);
+ el.parentNode.appendChild(K);
+ return{focus(){},blur(){},paint(m){K.querySelectorAll('.okk').forEach(b=>{b.classList.remove('g','y','a');const s=m[b.dataset.k];if(s)b.classList.add(s)})}}}
 /* Pendant une partie : on annule tout saut de page que la joueuse n'a pas provoqué */
 let lastY=0,userAct=0,touching=false,moved=false,moveEnd=0;const allowScroll=()=>userAct=Date.now();
 ['wheel','keydown'].forEach(t=>addEventListener(t,allowScroll,{passive:true}));
@@ -799,7 +817,7 @@ master(p,el,win,fail){const id=RUN,COLS=['#e0283f','#21a35a','#2d6fe0','#f3c623'
  const pins=(b,w)=>{const a=[...Array(b).fill('b'),...Array(w).fill('w')];while(a.length<p.len)a.push('');return`<span class="pins" style="grid-template-columns:repeat(${Math.ceil(p.len/2)},9px)">${a.map(x=>`<i class="${x}"></i>`).join('')}</span>`};
  const draw=rv=>{el.innerHTML=`<div class="mleg"><span style="flex-basis:100%;justify-content:center;opacity:.8">Pastilles à droite, sans dire quelle boule c'est :</span><span><i class="b"></i>1 boule bonne couleur, bien placée</span><span><i class="w"></i>1 boule bonne couleur, mal placée</span></div><p class="center muted" style="margin:0 0 6px;font-size:.8rem">🎲 Nouveau code secret à chaque essai${p.dup?' · une couleur peut revenir plusieurs fois':''}</p><div class="mmb"><div class="mmrow secret">${code.map((c,i)=>rv||REV.has(i)?ball(c):'<span class="ball hid">?</span>').join('')}<span class="pins"></span></div>
   ${Array.from({length:p.tries},(_,r)=>{const h=hist[r];if(h)return`<div class="mmrow">${h.g.map(c=>ball(c)).join('')}${pins(h.b,h.w)}</div>`;if(r==hist.length&&!rv)return`<div class="mmrow cur">${cur.map((c,i)=>`<button class="mslot" data-i="${i}" aria-label="Emplacement ${i+1}">${ball(c,c<0?'empty':'')}</button>`).join('')}<span class="pins tag">${r+1}/${p.tries}</span></div>`;return`<div class="mmrow fut">${Array(p.len).fill(ball(-1,'empty')).join('')}<span class="pins"></span></div>`}).reverse().join('')}</div>
-  ${rv?'':`<div class="mpal">${COLS.map((_,k)=>`<button data-k="${k}" aria-label="Boule ${CN[k]}">${ball(k)}</button>`).join('')}</div><div class="row"><button class="alt sm" id="mdel">⌫ Effacer</button><button class="sm" id="mok" ${cur.includes(-1)?'disabled':''}>Valider</button></div>`}`;
+  ${rv?'':`<div class="gfoot"><div class="mpal">${COLS.map((_,k)=>`<button data-k="${k}" aria-label="Boule ${CN[k]}">${ball(k)}</button>`).join('')}</div><div class="row"><button class="alt sm" id="mdel">⌫ Effacer</button><button class="sm" id="mok" ${cur.includes(-1)?'disabled':''}>Valider</button></div></div>`}`;
   if(rv)return;
   el.querySelectorAll('.mpal button').forEach(b=>b.onclick=()=>{const k=+b.dataset.k,i=cur.indexOf(-1);if(i<0)return;if(!p.dup&&cur.includes(k)){toast('Chaque couleur une seule fois');return}cur[i]=k;draw()});
   el.querySelectorAll('.mslot').forEach(b=>b.onclick=()=>{cur[+b.dataset.i]=-1;draw()});
@@ -912,9 +930,8 @@ sudoku(p,el,win,fail){const LOSE=w=>{fail(w,1);try{sol.forEach((v,i)=>cells[i]=v
  const left=()=>cells.filter(v=>v<0).length;
  const draw=()=>{el.innerHTML=`<p class="center">Validations ratées : ${'❌'.repeat(err)}${'▫️'.repeat(3-err)} · Cases vides : ${left()}</p>
   <div class="sdk" style="grid-template-columns:repeat(${n/bw},1fr)">${Array.from({length:n},(_,B)=>{const R0=Math.floor(B/(n/bw))*bh,C0=(B%(n/bw))*bw;return`<div class="box" style="grid-template-columns:repeat(${bw},1fr)">${Array.from({length:bh*bw},(_,k)=>cell((R0+Math.floor(k/bw))*n+C0+k%bw)).join('')}</div>`}).join('')}</div>
-  <div class="pal" style="grid-template-columns:repeat(5,1fr)">${SY.map((_,k)=>`<button data-k="${k}" aria-label="Chiffre ${k+1}">${face(k)}</button>`).join('')}<button data-k="-1" class="alt" aria-label="Effacer">${nm?'🧽':'⌫'}</button></div>
-  <div class="row"><button class="sm ${nm?'':'alt'}" id="sdm">✏️ Annoter : ${nm?'ON':'OFF'}</button></div>
-  <div class="row"><button id="sdv" ${left()?'disabled':''}>✔ Valider la grille</button></div>${bad.size?`<p class="center" style="color:#ff8a9a">${bad.size} case${bad.size>1?'s sont fausses':' est fausse'} (en rouge) : corrige-les puis valide à nouveau.</p>`:''}`;
+  <div class="gfoot"><div class="pal" style="grid-template-columns:repeat(5,1fr)">${SY.map((_,k)=>`<button data-k="${k}" aria-label="Chiffre ${k+1}">${face(k)}</button>`).join('')}<button data-k="-1" class="alt" aria-label="Effacer">${nm?'🧽':'⌫'}</button></div>
+  <div class="row"><button class="sm ${nm?'':'alt'}" id="sdm">✏️ Annoter : ${nm?'ON':'OFF'}</button><button class="sm" id="sdv" ${left()?'disabled':''}>✔ Valider la grille</button></div></div>${bad.size?`<p class="center" style="color:#ff8a9a">${bad.size} case${bad.size>1?'s sont fausses':' est fausse'} (en rouge) : corrige-les puis valide à nouveau.</p>`:''}`;
   el.querySelectorAll('.sdk button').forEach(b=>b.onclick=()=>{if(id!=RUN)return;const i=+b.dataset.i;if(FIX.has(i)){sel=-1;return draw()}sel=i;draw()});
   el.querySelectorAll('.pal button').forEach(b=>b.onclick=()=>{if(id!=RUN)return;if(sel<0){toast("Choisis d'abord une case");return}const k=+b.dataset.k;if(nm){if(cells[sel]>=0&&k>=0){toast('Efface d\'abord le chiffre de cette case');return}if(k<0)delete NT[sel];else{const S2=NT[sel]=NT[sel]||new Set();S2.has(k)?S2.delete(k):S2.add(k)}return draw()}cells[sel]=k;bad.delete(sel);draw()});
   $('#sdm').onclick=()=>{nm=!nm;draw()};
@@ -923,16 +940,15 @@ sudoku(p,el,win,fail){const LOSE=w=>{fail(w,1);try{sol.forEach((v,i)=>cells[i]=v
   if(!bad.size){draw();return setTimeout(()=>{if(id==RUN)win()},400)}err++;draw();if(err>=3)return setTimeout(()=>{if(id==RUN)LOSE(`la grille était encore fausse après 3 validations (${bad.size} erreur${bad.size>1?'s':''})`)},900);toast(`Pas encore… ${bad.size} erreur${bad.size>1?'s':''}`)};draw();G.hint=()=>{if(id!=RUN)return false;let k=sel>=0&&!FIX.has(sel)&&cells[sel]!=sol[sel]?sel:-1;if(k<0){const c=[...Array(n*n).keys()].filter(i=>!FIX.has(i)&&cells[i]!=sol[i]);if(!c.length)return'La grille est déjà juste : valide-la !';k=c[Math.floor(Math.random()*c.length)]}cells[k]=sol[k];FIX.add(k);bad.delete(k);delete NT[k];sel=k;draw();return true}},
 wordle(p,el,win,fail){const id=RUN;if(!window.WD5){WD5=WSOL.split(' ');WOK=new Set(WALL.split(' ').concat(WD5))}let W;do{W=WD5[Math.floor(Math.random()*WD5.length)]}while(W==window.WLAST);window.WLAST=W;const n=W.length,rows=[];let cur='',busy=false,fl=-1;const HW={};G={word:W};
  const score=g=>{const r=Array(n).fill('a'),rem={};[...W].forEach((c,i)=>{if(g[i]==c)r[i]='g';else rem[c]=(rem[c]||0)+1});[...g].forEach((c,i)=>{if(r[i]!='g'&&rem[c]>0){r[i]='y';rem[c]--}});return r};
- const sz=Math.max(22,Math.min(52,Math.floor((Math.min(innerWidth,560)-56)/n)-4));
+ const sz=Math.max(26,Math.min(52,Math.floor((Math.min(innerWidth,560)-56)/n)-4,Math.floor((innerHeight-400)/p.tries)-4));
  el.innerHTML=`<div class="wd" id="wdg" style="grid-template-columns:repeat(${n},${sz}px);font-size:${Math.round(sz*.55)}px"></div>
-  <p class="center" id="wdh" style="margin:6px 0;color:#ffe08a"></p><p class="center muted">Écris directement : les lettres s'affichent dans les cases. Valide avec la touche « Go » (ou Entrée) du clavier. Touche la grille si le clavier ne s'ouvre pas.</p>`;
+  <p class="center" id="wdh" style="margin:6px 0;color:#ffe08a"></p><p class="center muted" style="margin:2px 0">Tape les lettres sur le clavier ci-dessous, puis OK.</p>`;
  const grid=()=>{$('#wdg').innerHTML=Array.from({length:p.tries},(_,r)=>{const row=rows[r];return Array.from({length:n},(_,i)=>row?`<div class="wt ${row.s[i]}${r==fl?' flip':''}" style="animation-delay:${i*90}ms">${row.g[i]}</div>`:r==rows.length?`<div class="wt cur ${cur[i]?'f':''}">${cur[i]||''}</div>`:'<div class="wt"></div>').join('')}).join('')};
 
- const submit=()=>{if(id!=RUN||busy)return;if(cur.length<n){toast(`Il faut ${n} lettres (tu en as ${cur.length})`);return}if(!WOK.has(cur)){toast('Ce mot n\'est pas dans le dictionnaire');const e=$('#wdg');e.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:240});return}const s2=score(cur);rows.push({g:cur,s:s2});fl=rows.length-1;const g=cur;cur='';grid();fl=-1;
+ const submit=()=>{if(id!=RUN||busy)return;if(cur.length<n){toast(`Il faut ${n} lettres (tu en as ${cur.length})`);return}if(!WOK.has(cur)){toast('Ce mot n\'est pas dans le dictionnaire');const e=$('#wdg');e.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:240});return}const s2=score(cur);rows.push({g:cur,s:s2});fl=rows.length-1;const g=cur;cur='';grid();fl=-1;setTimeout(()=>{if(id!=RUN)return;const m={},rk={g:3,y:2,a:1};rows.forEach(rw=>[...rw.g].forEach((c,k)=>{if(!m[c]||rk[rw.s[k]]>rk[m[c]])m[c]=rw.s[k]}));I.paint(m)},n*90+300);
   if(g==W){busy=true;I.blur();return setTimeout(()=>{if(id==RUN)win()},n*90+500)}if(rows.length>=p.tries){busy=true;I.blur();return setTimeout(()=>{if(id!=RUN)return;el.insertAdjacentHTML('afterbegin',`<p class="center" style="font-size:1.2rem">Le mot était : <b>${W}</b></p>`);fail('le mot était '+W,1)},n*90+500)}};
  const I=hiddenKeyboard(el,ch=>{if(id!=RUN||busy||cur.length>=n)return;cur+=ch;grid()},()=>{if(id!=RUN||busy)return;cur=cur.slice(0,-1);grid()},submit);
- $('#wdg').onclick=()=>I.focus({preventScroll:true});
- G.key=k=>{if(k=='⏎')submit();else if(k=='⌫'){cur=cur.slice(0,-1);grid()}else if(/^[a-zA-Z]$/.test(k)&&cur.length<n){cur+=k.toUpperCase();grid()}};grid();I.focus({preventScroll:true});G.hint=()=>{if(id!=RUN||busy)return false;const ks=[...Array(n).keys()].filter(k=>!HW[k]&&!rows.some(rw=>rw.s[k]=='g'));if(!ks.length)return'Tu as déjà toutes les lettres bien placées !';const k=ks[Math.floor(Math.random()*ks.length)];HW[k]=W[k];$('#wdh').innerHTML='💡 '+Object.keys(HW).sort().map(q=>`${+q+1}ᵉ lettre : <b>${HW[q]}</b>`).join(' · ');return true}},
+  G.key=k=>{if(k=='⏎')submit();else if(k=='⌫'){cur=cur.slice(0,-1);grid()}else if(/^[a-zA-Z]$/.test(k)&&cur.length<n){cur+=k.toUpperCase();grid()}};grid();I.focus({preventScroll:true});G.hint=()=>{if(id!=RUN||busy)return false;const ks=[...Array(n).keys()].filter(k=>!HW[k]&&!rows.some(rw=>rw.s[k]=='g'));if(!ks.length)return'Tu as déjà toutes les lettres bien placées !';const k=ks[Math.floor(Math.random()*ks.length)];HW[k]=W[k];$('#wdh').innerHTML='💡 '+Object.keys(HW).sort().map(q=>`${+q+1}ᵉ lettre : <b>${HW[q]}</b>`).join(' · ');return true}},
 melee(p,el,win,fail){const LOSE=w=>{fail(w,1);try{pl.forEach(o=>{if(!found.includes(o))found.push(o)});a=b=-1;draw()}catch(e){console.error(e)}};const id=RUN,n=p.n,DIR=[[0,1],[1,0],[1,1],[-1,1],[0,-1],[-1,0],[-1,-1],[1,-1]].slice(0,p.dirs||8);let g,pl;
  for(;;){g=Array(n*n).fill('');pl=[];let all=true;for(const w of shuffle(p.words)){let done=false;for(let t=0;t<500&&!done;t++){const DW=DIR.concat(DIR.filter(v=>v[0]&&v[1]),DIR.filter(v=>v[0]&&v[1])),[dr,dc]=DW[Math.floor(Math.random()*DW.length)],r=Math.floor(Math.random()*n),c=Math.floor(Math.random()*n),cells=[];
    for(let i=0;i<w.length;i++){const R=r+dr*i,C=c+dc*i;if(R<0||R>=n||C<0||C>=n||(g[R*n+C]&&g[R*n+C]!=w[i])){cells.length=0;break}cells.push(R*n+C)}
