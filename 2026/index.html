@@ -1258,7 +1258,7 @@ pins(p,el,win,fail){const id=RUN,W=PIN.W,H=PIN.H,pr=!!document.querySelector('#g
   w.pins.forEach(s=>{if(s.on||s.out<1)rod(s)});
   w.pins.forEach(s=>{if(s.on&&s.hl&&tt<s.hl){const a=.5+.5*Math.sin(tt*10),hx=s.hx!=null?s.hx:(s.a[0]+s.a[2])/2,hy=s.hy!=null?s.hy:(s.a[1]+s.a[3])/2;x.save();x.strokeStyle='#ffe08a';x.shadowColor='#ffd24a';x.shadowBlur=14;x.lineWidth=5;x.globalAlpha=.45+.55*a;x.beginPath();x.arc(hx,hy,20+7*a,0,7);x.stroke();x.restore()}});
   keys();
-  for(const q of w.P){if(q.k=='g')grinch(q);else if(q.k=='b')gift(q);else if(q.k=='h')hero(q)}
+  for(const q of w.P){const cl=q.inS&&(q.k=='h'||q.k=='b'||q.k=='g');if(cl){if(q.y>470)continue;x.save();x.beginPath();x.rect(0,0,W,446);x.clip();x.globalAlpha=Math.max(0,Math.min(1,(470-q.y)/26))}if(q.k=='g')grinch(q);else if(q.k=='b')gift(q);else if(q.k=='h')hero(q);if(cl)x.restore()}
   hotDraw(1);
   w.fx=w.fx.filter(f=>f.t<1);w.fx.forEach(f=>{f.t+=f.big?.03:.06;x.globalAlpha=Math.max(0,1-f.t);x.fillStyle=f.c;x.beginPath();x.arc(f.x,f.y-f.t*(f.big?24:16),(f.big?8:3)+f.t*(f.big?16:7),0,7);x.fill();if(f.big){x.font='16px serif';x.textAlign='center';x.fillText('💥',f.x,f.y-f.t*10)}x.globalAlpha=1});
   x.fillStyle='rgba(255,255,255,.75)';for(const s of snow){s.y+=s.v;s.x+=Math.sin(tt*1.5+s.p)*.3;if(s.y>H){s.y=-4;s.x=Math.random()*W}x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill()}
