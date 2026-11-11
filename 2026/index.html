@@ -468,6 +468,16 @@ html,button,a,input,label,[role=button]{touch-action:manipulation}
 @media (max-height:860px){#gwin .mmb .ball{width:28px;height:28px}#gwin .mmrow{padding:2px 4px;gap:6px}#gwin .mpal .ball{width:30px;height:30px}#gwin .mleg{font-size:.72rem}}
 #gwin .pgwrap{max-width:min(340px,calc((100dvh - 270px)*300/520))}
 .okb{margin:6px -12px -14px}
+.cfc{display:block;width:min(100%,330px);aspect-ratio:300/340;margin:0 auto;touch-action:manipulation}
+.cfs{display:flex;gap:8px;justify-content:center;margin:6px 0;padding:6px;border-radius:12px;background:#0003}
+.cfe{width:52px;height:46px;border-radius:10px;border:2px dashed #ffffff40}
+.cfq{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.cfcol{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px}
+.cfcol small{color:#ffffffa0;font-size:.7rem}
+.cfb{width:52px;height:46px;min-height:0;padding:0;border-radius:10px;background:var(--c);color:var(--t);border:none;box-shadow:inset 0 -5px 0 #0003,0 2px 0 #0006;font:900 1.05rem system-ui;touch-action:manipulation}
+.cfb.bk{opacity:.55;transform:scale(.86);pointer-events:none}
+.cfb.fr{outline:2px solid #fff;outline-offset:1px}
+.cfb.sl{pointer-events:none}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -531,7 +541,7 @@ const COUPLE="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwQDAwQ
 if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 const DAYS={
  1:{t:"Memorizotto",g:"memory",p:{pairs:8,time:45},tier:1,ev:"🎉",bonus:50,unlock:"La boutique est ouverte"},
- 2:{t:"Wordle",g:"wordle",p:{word:"AMOUR",tries:6},tier:1},
+ 2:{t:"Colony Flow",g:"colony",p:{slots:4,min:8,max:16,time:240},tier:1},
  3:{t:"Mots mêlés pimentés 🌶️",g:"melee",p:{n:13,theme:"Sexe 🔥",words:["PENETRATION","CUNNILINGUS","LEVRETTE","FELLATION","ORGASME","PRELIMINAIRES","MISSIONNAIRE","KAMASUTRA","CAPOTE","LUBRIFIANT","EXTASE","CLITORIS"],time:360},tier:1},
  4:{t:"Flappy Célestine",g:"flappy",p:{goal:15,gap:142,gapMin:112,shrink:1.2,moveAt:6,ampMax:55,wob:1.7,pw:62,every:1.38,speed:165,acc:3.2,grav:1600,jump:460},tier:1},
  5:{t:"La hutte de Panoramix",g:"balls",p:{colors:7,empty:2,slack:8,time:300},tier:1},
@@ -577,6 +587,7 @@ const PICGEN=(W,H,dens)=>{
 
 const RULES={
  memory:p=>`Retrouve les ${p.pairs} paires de têtes en moins de ${p.time} secondes.`,
+ colony:p=>`Touche une boîte en tête de file pour l'envoyer sur un des ${p.slots} emplacements : ses fourmis 🐜 vont chercher les blocs de sa couleur dans l'image, mais seulement ceux qui sont à découvert (touchés par le vide). Une boîte disparaît quand elle est vide. Si les ${p.slots} emplacements sont pleins et que plus aucune fourmi ne peut avancer, c'est perdu. Vide toute l'image en ${p.time/60} minutes !`,
  wordle:p=>`Devine le mot de ${p.word.length} lettres en ${p.tries} essais. Vert = bonne lettre bien placée, jaune = lettre présente ailleurs, gris = absente. Un nouveau mot du dictionnaire à chaque partie, et seuls les vrais mots sont acceptés.`,
  melee:p=>`${p.theme?`Thème : <b>${p.theme}</b>. Les mots ne sont pas donnés : à toi de deviner lesquels se cachent ! `:""}Trouve les ${p.words.length} mots cachés en ${p.time/60} minutes. Ils peuvent être dans tous les sens, même en diagonale et à l'envers !`,
  flappy:p=>`Fais voler Célestine entre les sucres d'orge en touchant l'écran. Passe-en ${p.goal} sans rien toucher : au moindre choc, c'est raté ! Attention, ça accélère, les passages rétrécissent et les sucres d'orge finissent par bouger…`,
@@ -938,6 +949,41 @@ sudoku(p,el,win,fail){const LOSE=w=>{fail(w,1);try{sol.forEach((v,i)=>cells[i]=v
   $('#sdv').onclick=()=>check()};
  const check=()=>{if(id!=RUN||left())return;bad=new Set(cells.map((v,i)=>v!=sol[i]?i:-1).filter(i=>i>=0));sel=-1;
   if(!bad.size){draw();return setTimeout(()=>{if(id==RUN)win()},400)}err++;draw();if(err>=3)return setTimeout(()=>{if(id==RUN)LOSE(`la grille était encore fausse après 3 validations (${bad.size} erreur${bad.size>1?'s':''})`)},900);toast(`Pas encore… ${bad.size} erreur${bad.size>1?'s':''}`)};draw();G.hint=()=>{if(id!=RUN)return false;let k=sel>=0&&!FIX.has(sel)&&cells[sel]!=sol[sel]?sel:-1;if(k<0){const c=[...Array(n*n).keys()].filter(i=>!FIX.has(i)&&cells[i]!=sol[i]);if(!c.length)return'La grille est déjà juste : valide-la !';k=c[Math.floor(Math.random()*c.length)]}cells[k]=sol[k];FIX.add(k);bad.delete(k);delete NT[k];sel=k;draw();return true}},
+colony(p,el,win,fail){const id=RUN,ARTS={"sapin":["bbbbbbbyybbbbbbb","bbbbbbyyyybbbbbb","bbbbbbbggbbbbbbb","bbbbbbggggbbbbbb","bbbbbggrgggbbbbb","bbbbggggggggbbbb","bbbbbggggyggbbbb","bbbbgggrgggggbbb","bbbgggggggggggbb","bbbbgggyggrgggbb","bbbgggggggggggbb","bbggrggggggyggbb","bggggggggggggggb","bbbbbbbttbbbbbbb","wwwwwwwttwwwwwww","wwwwwwwwwwwwwwww"],"neige":["bbbbbbbbbbbbbbbb","bbbbbbkkkkbbbbbb","bbbbbbkkkkbbbbbb","bbbbbkkkkkkbbbbb","bbbbbwwwwwwbbbbb","bbbbwwkwwkwwbbbb","bbbbwwwoowwwbbbb","bbbbwwwwwwwwbbbb","bbbbrrrrrrrrbbbb","bbbwwwrwwwwwwbbb","bbwwwwrkwwwwwwbb","bbwwwwwwwwwwwwbb","bbwwwwwkwwwwwwbb","bbbwwwwwwwwwwbbb","wwwwwwwwwwwwwwww","wwwwwwwwwwwwwwww"],"cadeau":["bbbbbbbbbbbbbbbb","bbbbbggbbggbbbbb","bbbbgggbbgggbbbb","bbbbbggggggbbbbb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","bbyyyyyyyyyyyybb","bbyyyyyyyyyyyybb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","bbrrrrryyrrrrrbb","wwwwwwwwwwwwwwww","wwwwwwwwwwwwwwww"]},PAL={b:'#8fd3ff',g:'#2fa34a',y:'#ffd23a',r:'#e8364a',t:'#8a5a2b',w:'#f4f7fb',k:'#2b2b35',o:'#ff8a1f'};
+ const keys=Object.keys(ARTS),art=ARTS[keys[Math.floor(Math.random()*keys.length)]],N=16;let B=art.map(r=>[...r]);const NS=p.slots||4,NQ=4;
+ const cnt={};B.flat().forEach(c=>cnt[c]=(cnt[c]||0)+1);let boxes=[];Object.entries(cnt).forEach(([c,n])=>{while(n>0){let s=Math.min(n,p.min+Math.floor(Math.random()*(p.max-p.min+1)));if(n-s>0&&n-s<p.min)s=n;boxes.push({c,n:s});n-=s}});boxes=shuffle(boxes);
+ const Q=[...Array(NQ)].map(()=>[]);boxes.forEach((b,i)=>Q[i%NQ].push(b));const SL=Array(NS).fill(null),ants=[],res=new Set();let over=false,stall=0;G={B,Q,SL};
+ el.innerHTML=`<p class="center" style="margin:2px 0">Blocs restants : <b id="cfn"></b></p><canvas id="cfc" class="cfc"></canvas><div class="cfs" id="cfs"></div><div class="cfq" id="cfq"></div>`;
+ const cv=$('#cfc'),x=cv.getContext('2d'),dpr=Math.min(2,devicePixelRatio||1),W=300,H=340,cs=W/N*.92,ox=(W-cs*N)/2,oy=8;cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);const HX=W/2,HY=H-16;
+ const acc=()=>{const o=[...Array(N)].map(()=>Array(N).fill(false)),st=[];for(let i=0;i<N;i++){st.push([-1,i],[N,i],[i,-1],[i,N])}const E=(r,c)=>r<0||c<0||r>=N||c>=N||!B[r][c]||res.has(r*N+c);const seen=new Set();
+  const q=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(E(r,c)&&!(r<0)){}
+  // flood from outside through empty cells
+  const vis=[...Array(N)].map(()=>Array(N).fill(false));const qq=[];for(let i=0;i<N;i++){[[0,i],[N-1,i],[i,0],[i,N-1]].forEach(([r,c])=>{o[r][c]=true;if(E(r,c)&&!vis[r][c]){vis[r][c]=true;qq.push([r,c])}})}
+  while(qq.length){const[r,c]=qq.pop();[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const r2=r+a,c2=c+b;if(r2<0||c2<0||r2>=N||c2>=N)return;o[r2][c2]=true;if(E(r2,c2)&&!vis[r2][c2]){vis[r2][c2]=true;qq.push([r2,c2])}})}return o};
+ const left=()=>B.flat().filter(c=>c).length;
+ const cell=(r,c)=>[ox+c*cs+cs/2,oy+r*cs+cs/2];
+ const tick=()=>{if(over||id!=RUN)return;const A=acc();let moved=false;
+  SL.forEach((s,i)=>{if(!s)return;if(s.n-s.sent<=0){if(s.back>=s.n){SL[i]=null;moved=true;drawS()}return}s.cd=(s.cd||0)-1;if(s.cd>0)return;
+   let best=null,bd=1e9;for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(B[r][c]==s.c&&!res.has(r*N+c)&&A[r][c]){const[px,py]=cell(r,c),d=Math.hypot(px-HX,py-HY);if(d<bd){bd=d;best=[r,c]}}}
+   if(best){res.add(best[0]*N+best[1]);s.sent++;s.cd=2;moved=true;const[px,py]=cell(...best);ants.push({x:HX+(Math.random()-.5)*20,y:HY,tx:px,ty:py,r:best[0],c:best[1],col:PAL[s.c],ph:0,s})}});
+  const busy=ants.length>0;
+  if(left()==0&&!busy){over=true;try{SFX('win')}catch(_){}return setTimeout(()=>{if(id==RUN)win()},600)}
+  if(SL.every(s=>s)&&!moved&&!busy){stall++;if(stall>14){over=true;return fail('les emplacements sont pleins et plus aucune fourmi ne peut avancer 🐜')}}else stall=0;
+  drawS(1)};
+ const iv=setInterval(()=>{if(id!=RUN||over){clearInterval(iv);return}tick()},45);
+ const loop=()=>{if(id!=RUN)return;x.clearRect(0,0,W,H);x.fillStyle='#fdf3df';x.beginPath();x.roundRect(ox-6,oy-6,cs*N+12,cs*N+12,10);x.fill();
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const k=B[r][c];if(!k)continue;const px=ox+c*cs,py=oy+r*cs;x.fillStyle=PAL[k];x.fillRect(px+.6,py+.6,cs-1.2,cs-1.2);x.fillStyle='#ffffff40';x.fillRect(px+.6,py+.6,cs-1.2,cs*.28)}
+  x.fillStyle='#4a2f1a';x.beginPath();x.ellipse(HX,HY,26,9,0,0,7);x.fill();x.fillStyle='#2a180c';x.beginPath();x.ellipse(HX,HY+1,18,5,0,0,7);x.fill();
+  for(let i=ants.length-1;i>=0;i--){const a=ants[i],sp=9;const dx=a.tx-a.x,dy=a.ty-a.y,d=Math.hypot(dx,dy);if(d<sp){a.x=a.tx;a.y=a.ty;if(a.ph==0){a.ph=1;B[a.r][a.c]=null;res.delete(a.r*N+a.c);a.tx=HX+(Math.random()-.5)*16;a.ty=HY}else{ants.splice(i,1);a.s.back++;continue}}else{a.x+=dx/d*sp;a.y+=dy/d*sp}
+   const ang=Math.atan2(dy,dx);x.save();x.translate(a.x,a.y);x.rotate(ang);x.fillStyle='#222';x.beginPath();x.ellipse(-3,0,3.2,2.2,0,0,7);x.ellipse(2,0,2.4,2,0,0,7);x.fill();x.strokeStyle='#222';x.lineWidth=.8;x.beginPath();x.moveTo(-1,-3);x.lineTo(1,3);x.moveTo(1,-3);x.lineTo(-1,3);x.stroke();if(a.ph==1){x.fillStyle=a.col;x.fillRect(3,-3,5,5)}x.restore()}
+  $('#cfn')&&($('#cfn').textContent=left());requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ const bx=(b,cls,i)=>`<button class="cfb ${cls}" ${i!=null?`data-q="${i}"`:''} style="--c:${PAL[b.c]};--t:${b.c=='w'||b.c=='y'||b.c=='b'?'#222':'#fff'}"><b>${b.n-(b.sent||0)}</b></button>`;
+ function drawS(only){$('#cfs').innerHTML=SL.map(s=>s?bx(s,'sl'):'<span class="cfe"></span>').join('');if(only)return;
+  $('#cfq').innerHTML=Q.map((q,i)=>`<div class="cfcol">${q.slice(0,3).map((b,k)=>k==0?bx(b,'fr',i):bx(b,'bk')).join('')}${q.length>3?`<small>+${q.length-3}</small>`:''}</div>`).join('');
+  el.querySelectorAll('.cfb.fr').forEach(b=>b.onclick=()=>take(+b.dataset.q))}
+ function take(i){if(over||id!=RUN)return;const k=SL.indexOf(null);if(k<0){toast('Tous les emplacements sont occupés');try{SFX('bad')}catch(_){}return}const b=Q[i].shift();if(!b)return;b.sent=0;b.back=0;SL[k]=b;stall=0;try{SFX('tap')}catch(_){}drawS()}
+ drawS();
+ G.hint=()=>{if(over||id!=RUN)return false;if(SL.indexOf(null)<0)return'Tous les emplacements sont occupés : attends qu\'une boîte se vide';const A=acc();let bi=-1,bv=0;Q.forEach((q,i)=>{if(!q[0])return;let n=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(B[r][c]==q[0].c&&A[r][c]&&!res.has(r*N+c))n++;if(n>bv){bv=n;bi=i}});if(bi<0)return'Aucune boîte ne peut avancer pour l\'instant';take(bi);return true}},
 wordle(p,el,win,fail){const id=RUN;if(!window.WD5){WD5=WSOL.split(' ');WOK=new Set(WALL.split(' ').concat(WD5))}let W;do{W=WD5[Math.floor(Math.random()*WD5.length)]}while(W==window.WLAST);window.WLAST=W;const n=W.length,rows=[];let cur='',busy=false,fl=-1;const HW={};G={word:W};
  const score=g=>{const r=Array(n).fill('a'),rem={};[...W].forEach((c,i)=>{if(g[i]==c)r[i]='g';else rem[c]=(rem[c]||0)+1});[...g].forEach((c,i)=>{if(r[i]!='g'&&rem[c]>0){r[i]='y';rem[c]--}});return r};
  const sz=Math.max(26,Math.min(52,Math.floor((Math.min(innerWidth,560)-56)/n)-4,Math.floor((innerHeight-400)/p.tries)-4));
