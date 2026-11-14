@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon.svg">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Avent"><meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="color-scheme" content="dark only">
 <meta name="darkreader-lock">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
@@ -654,6 +654,19 @@ html,button,a,input,label,[role=button]{touch-action:manipulation}
 .cc-bl.pop button{color:#4a1257}
 .cc-go{font:1.1rem 'Lilita One',system-ui,sans-serif!important;background:linear-gradient(145deg,#4ff0a0,#0b9a52)!important;color:#fff!important;box-shadow:0 4px 0 #064a2a!important;border:0;padding:10px 18px!important;border-radius:14px!important}
 .cc-no{background:#ffffff33!important;color:#fff!important;border:0}
+
+#inst{position:fixed;inset:0;z-index:18;overflow:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 22px 24px;text-align:center;color:#fff;background:radial-gradient(circle at 50% 20%,#2a7a5a,#12382b 55%,#0b2a1f)}
+#inst img{width:110px;height:110px;border-radius:26px;box-shadow:0 10px 30px #0008;animation:instb 2.4s ease-in-out infinite}@keyframes instb{50%{transform:translateY(-8px) rotate(-3deg)}}
+#inst h1{font:2rem 'Lilita One',system-ui,sans-serif;color:#ffe27a;margin:14px 0 4px;text-shadow:0 3px 0 #0006}#inst .sub{opacity:.85;margin:0 0 16px;max-width:420px}
+.ist{display:flex;flex-direction:column;gap:10px;width:100%;max-width:440px;text-align:left}
+.ist div{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:#ffffff14;box-shadow:inset 0 0 0 1px #ffffff22;opacity:0;animation:istin .5s forwards}
+.ist div:nth-child(2){animation-delay:.25s}.ist div:nth-child(3){animation-delay:.5s}.ist div:nth-child(4){animation-delay:.75s}@keyframes istin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ist b.n{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:1.1rem 'Lilita One',system-ui,sans-serif;background:linear-gradient(145deg,#ffe27a,#ff9f1a);color:#3a1a00}
+.ist .k{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:8px;background:#fff;color:#0a5bd8;font-weight:700;white-space:nowrap}
+.ist svg{width:18px;height:18px;vertical-align:-3px}
+#inst .ibig{margin-top:18px;font:1.2rem 'Lilita One',system-ui,sans-serif;padding:12px 26px;background:linear-gradient(145deg,#4ff0a0,#0b9a52);border:0;box-shadow:0 5px 0 #064a2a}
+#inst .ilow{margin-top:14px;background:none;border:0;box-shadow:none;color:#fff;opacity:.6;text-decoration:underline;font-size:.85rem;min-height:0}
+#inst .ipt{position:fixed;top:calc(6px + env(safe-area-inset-top));right:18px;font-size:2.4rem;animation:ipt 1s ease-in-out infinite}@keyframes ipt{50%{transform:translateY(-10px)}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -1017,6 +1030,29 @@ async function vrecExport(){const o={};Object.entries(S.st||{}).forEach(([g,x])=
 /* musique d'ambiance */
 function bgmOn(){return S.bgm!==false&&S.sound!==false&&S.music!==false}
 function bgm(){try{if(!bgmOn()||document.getElementById('gwin'))return;if(MUS.cur&&MUS.cur.startsWith('bg'))return;MUS.play('deck',.025);MUS._bg=1}catch(_){}}
+
+/* ---------- Appli installable ---------- */
+const APP={standalone:()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true,
+ web:()=>/github\.io$/.test(location.hostname),
+ ios:()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1),
+ prompt:null};
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();APP.prompt=e;const b=document.getElementById('iand');if(b)b.hidden=false});
+if('serviceWorker' in navigator&&APP.web())addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+const SHARE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+function installScreen(force){if(!force&&(!APP.web()||APP.standalone()||sessionStorage.getItem('instSkip')))return;if(document.getElementById('inst'))return;
+ const ios=APP.ios(),prog=(S.opened||[]).length>0||(S.pts||0)>0,o=document.createElement('div');o.id='inst';
+ const steps=ios?[`Touche <span class="k">${SHARE} Partager</span> en haut de Safari <small style="opacity:.7">(ou le bouton <b>•••</b> puis Partager)</small>`,`Choisis <span class="k">➕ Sur l’écran d’accueil</span>`,`Laisse <b>« Ouvrir comme app web »</b> activé, puis touche <span class="k">Ajouter</span>`,`Ferme Safari et ouvre l’appli <b>🎄 Avent</b> depuis ton écran d’accueil !`]
+  :[`Touche le bouton ci-dessous <b>Installer</b> <small style="opacity:.7">(ou le menu <b>⋮</b> du navigateur → « Installer l’application »)</small>`,`Confirme avec <span class="k">Installer</span>`,`Ouvre l’appli <b>🎄 Avent</b> depuis ton écran d’accueil !`];
+ o.innerHTML=`${ios?'<div class="ipt">👆</div>':''}<img src="icon-512.png" alt=""><h1>Installe ton appli 🎁</h1><p class="sub">Ton calendrier de l’Avent devient une vraie appli sur ta tablette : une icône rien qu’à toi, en plein écran, sans le navigateur.</p>
+ <div class="ist">${steps.map((t,i)=>`<div><b class="n">${i+1}</b><span>${t}</span></div>`).join('')}</div>
+ ${ios?'':`<button class="ibig" id="iand" ${APP.prompt?'':'hidden'}>📲 Installer</button>`}
+ ${prog?`<button class="ibig" style="background:linear-gradient(145deg,#ffe27a,#ff9f1a);color:#3a1a00;box-shadow:0 5px 0 #a85a00" id="icode">📤 J’ai déjà joué ici : copier ma progression</button><p class="sub" style="font-size:.8rem;margin-top:6px">Dans l’appli, va dans Trésors → 📥 Coller un code pour la retrouver.</p>`:''}
+ <button class="ilow" id="iskip">Continuer dans le navigateur</button>`;
+ document.body.appendChild(o);
+ const a=o.querySelector('#iand');if(a)a.onclick=async()=>{if(!APP.prompt)return;APP.prompt.prompt();const r=await APP.prompt.userChoice;APP.prompt=null;if(r.outcome=='accepted')toast('🎉 Appli installée ! Ouvre-la depuis ton écran d’accueil')};
+ const c=o.querySelector('#icode');if(c)c.onclick=()=>syncExport();
+ o.querySelector('#iskip').onclick=()=>{sessionStorage.setItem('instSkip',1);o.remove()}}
+addEventListener('load',()=>setTimeout(()=>{try{installScreen()}catch(e){console.error(e)}},300));
 /* ---------- Succès ---------- */
 const ACHS=[
  {g:'Aventure',id:'first_case',ic:'🎄',n:'Premier pas',d:'Ouvre ta première case du calendrier.',t:'F',c:()=>S.opened.length>=1},
