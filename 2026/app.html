@@ -26,4 +26,5 @@ else if(and&&inapp){c.innerHTML=`<p>Ouvre ce lien dans <b>Chrome</b> pour télé
 else if(and){c.innerHTML=`<p>Pour ton appareil Android 🤖</p><a class="btn" href="avent.apk" download="Avent.apk">📥 Installer l'appli</a>
 <ol><li>Quand le téléchargement est fini, touche <b>Ouvrir</b></li><li>Si Android le demande, <b>autorise l'installation</b> puis reviens en arrière</li><li>Touche <b>Installer</b> <small>(et « Installer quand même » si Play Protect s'affiche)</small></li><li>L'icône <b>Calendrier 2026 Célestine</b> est dans tes applis !</li></ol>`}
 else{c.innerHTML=`<p>Ouvre ce lien sur ta <b>tablette</b> ou ton <b>téléphone</b> (iPad, iPhone ou Android) pour installer l'appli.</p><a class="btn" href="./">🎄 Jouer ici dans le navigateur</a>`}
+const sw=document.createElement('p');sw.innerHTML='<small>Ce lien marche sur <b>iPad, iPhone et Android</b> : la page s\'adapte toute seule à l\'appareil.</small>';c.appendChild(sw);
 </script></body></html>
