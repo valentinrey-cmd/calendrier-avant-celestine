@@ -1,9 +1,33 @@
-plugins{id 'com.android.application'}
-android{
- namespace 'io.github.valentinrey.avent'
- compileSdk 34
- defaultConfig{applicationId 'io.github.valentinrey.avent';minSdk 24;targetSdk 34;versionCode (System.getenv('GITHUB_RUN_NUMBER')?:'1').toInteger();versionName '1.'+(System.getenv('GITHUB_RUN_NUMBER')?:'0')}
- signingConfigs{rel{storeFile file('../avent.keystore');storePassword 'avent2026';keyAlias 'avent';keyPassword 'avent2026'}}
- buildTypes{release{minifyEnabled false;signingConfig signingConfigs.rel}}
- compileOptions{sourceCompatibility JavaVersion.VERSION_17;targetCompatibility JavaVersion.VERSION_17}
+plugins { id 'com.android.application' }
+
+def runNo = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace = 'io.github.valentinrey.avent'
+    compileSdk = 34
+    defaultConfig {
+        applicationId = 'io.github.valentinrey.avent'
+        minSdk = 24
+        targetSdk = 34
+        versionCode = runNo
+        versionName = "1.${runNo}"
+    }
+    signingConfigs {
+        rel {
+            storeFile = file('../avent.keystore')
+            storePassword = 'avent2026'
+            keyAlias = 'avent'
+            keyPassword = 'avent2026'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled = false
+            signingConfig = signingConfigs.rel
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
