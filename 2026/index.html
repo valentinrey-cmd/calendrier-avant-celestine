@@ -1058,7 +1058,7 @@ function instSteps(env){const K=t=>`<span class="k">${t}</span>`;switch(env){
 function installScreen(force){if(!force&&(!APP.web()||APP.standalone()||sessionStorage.getItem('instSkip')))return;if(document.getElementById('inst'))return;
  const env=instEnv(),ios=env=='ios'||env=='iosother',canBtn=/chrome|edge/.test(env),prog=(S.opened||[]).length>0||(S.pts||0)>0,o=document.createElement('div');o.id='inst';
  const steps=instSteps(env);
- o.innerHTML=`${env=='ios'?'<div class="ipt">👆</div>':''}<img src="icon-512.png" alt=""><h1>Installe ton appli 🎁</h1><p class="sub">Ton calendrier de l’Avent devient une vraie appli : une icône rien qu’à toi, en plein écran, sans le navigateur.</p>
+ o.innerHTML=`${env=='ios'?'<div class="ipt">👆</div>':''}<img src="icon-512.png" alt=""><h1>Installe ton appli 🎁</h1><p class="sub">Ton calendrier de l’Avent devient une vraie appli : une icône rien qu’à toi, en plein écran, sans le navigateur.</p>${env=='ios'?`<a class="ibig" href="avent.mobileconfig" style="display:inline-block;margin:0 0 6px;color:#fff;text-decoration:none;border-radius:999px">⚡ Installer en 1 clic</a><p class="sub" style="font-size:.85rem">Touche <b>Autoriser</b>, puis ouvre <b>Réglages</b> → <b>Profil téléchargé</b> → <b>Installer</b>.</p><p class="sub" style="opacity:.6;font-size:.8rem;margin:4px 0 8px">— ou à la main —</p>`:''}
  <div class="ist">${steps.map((t,i)=>`<div><b class="n">${i+1}</b><span>${t}</span></div>`).join('')}</div>
  ${canBtn?`<button class="ibig" id="iand">📲 Installer</button>`:''}${env=='inapp'?`<button class="ibig" id="ilink">🔗 Copier le lien</button>`:''}
  <p class="sub" id="imsg" style="font-size:.85rem;margin-top:10px"></p>
