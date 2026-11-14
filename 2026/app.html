@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Installer l'appli Avent 🎄</title><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#12382b">
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 22px;text-align:center;color:#fff;font:17px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(circle at 50% 20%,#2a7a5a,#12382b 55%,#0b2a1f)}
+img{width:120px;height:120px;border-radius:28px;box-shadow:0 10px 30px #0008;animation:b 2.4s ease-in-out infinite}@keyframes b{50%{transform:translateY(-8px) rotate(-3deg)}}
+h1{font-size:1.9rem;color:#ffe27a;margin:16px 0 4px}p{margin:6px 0;max-width:430px;opacity:.9}
+.btn{display:inline-block;margin:18px 0 8px;padding:15px 30px;border-radius:999px;font-weight:800;font-size:1.15rem;color:#fff;text-decoration:none;background:linear-gradient(145deg,#4ff0a0,#0b9a52);box-shadow:0 5px 0 #064a2a}
+ol{text-align:left;max-width:430px;margin:12px auto;padding:14px 18px 14px 38px;border-radius:16px;background:#ffffff14}li{margin:6px 0}
+small{opacity:.65}a.l{color:#ffe27a}
+</style></head><body>
+<img src="icon-512.png" alt="">
+<h1>L'appli Avent 🎄</h1>
+<div id="c"></div>
+<script>
+const u=navigator.userAgent,ios=/iPad|iPhone|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1),and=/Android/.test(u),
+inapp=/FBAN|FBAV|FB_IAB|Instagram|Snapchat|Messenger|Line\/|MicroMessenger|TikTok|Twitter|LinkedInApp|GSA\//.test(u),
+safari=ios&&!/CriOS|FxiOS|EdgiOS|OPiOS/.test(u),c=document.getElementById('c'),here=location.href;
+const copy=`<a class="btn" href="#" onclick="navigator.clipboard.writeText('${here}').then(()=>this.textContent='✅ Lien copié !');return false">🔗 Copier le lien</a>`;
+if(ios&&(inapp||!safari)){c.innerHTML=`<p>Pour installer l'appli sur ${/iPad/.test(u)||navigator.maxTouchPoints>1&&/Macintosh/.test(u)?'iPad':'iPhone'}, ce lien doit être ouvert dans <b>Safari</b>.</p>${copy}<p><small>Ouvre Safari, colle le lien dans la barre d'adresse.</small></p>`}
+else if(ios){c.innerHTML=`<p>Pour ton iPad / iPhone 🍎</p><a class="btn" href="avent.mobileconfig">⚡ Installer l'appli</a>
+<ol><li>Touche <b>Autoriser</b></li><li>Ouvre <b>Réglages</b> → <b>Profil téléchargé</b> (tout en haut)</li><li>Touche <b>Installer</b> et entre ton code</li><li>L'icône 🎄 <b>Avent</b> est sur ton écran d'accueil !</li></ol>
+<p><small>Autre méthode : <a class="l" href="./">ouvre le calendrier</a> → Partager → « Sur l'écran d'accueil ».</small></p>`}
+else if(and&&inapp){c.innerHTML=`<p>Ouvre ce lien dans <b>Chrome</b> pour télécharger l'appli.</p>${copy}`}
+else if(and){c.innerHTML=`<p>Pour ton appareil Android 🤖</p><a class="btn" href="avent.apk" download="Avent.apk">📥 Installer l'appli</a>
+<ol><li>Quand le téléchargement est fini, touche <b>Ouvrir</b></li><li>Si Android le demande, <b>autorise l'installation</b> puis reviens en arrière</li><li>Touche <b>Installer</b> <small>(et « Installer quand même » si Play Protect s'affiche)</small></li><li>L'icône 🎄 <b>Avent</b> est dans tes applis !</li></ol>`}
+else{c.innerHTML=`<p>Ouvre ce lien sur ta <b>tablette</b> ou ton <b>téléphone</b> (iPad, iPhone ou Android) pour installer l'appli.</p><a class="btn" href="./">🎄 Jouer ici dans le navigateur</a>`}
+</script></body></html>
