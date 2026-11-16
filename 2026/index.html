@@ -771,7 +771,23 @@ html,button,a,input,label,[role=button]{touch-action:manipulation}
 .ib h3{margin:12px 0 4px;font-size:1rem}.ihr{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed #0002;font-size:.92rem}.ihr b{white-space:nowrap}.ism{font-size:.8rem;margin:4px 0 0}
 .hlp p{margin:0 0 9px;font-size:.92rem;line-height:1.4;text-align:left}
 .rls{display:flex;flex-direction:column;gap:9px;margin:6px 0 12px;text-align:left}.rl{background:#0000000d;border-radius:14px;padding:10px 12px}.rlh{display:flex;align-items:center;gap:8px;font-size:1rem}.rli{font-size:1.25rem}.rl p{margin:4px 0 7px;font-size:.88rem;line-height:1.35;opacity:.85}
-.chips{display:flex;flex-wrap:wrap;gap:5px}.chips span{display:flex;flex-direction:column;align-items:center;flex:1;min-width:62px;background:#fff;border:1.5px solid #e2b04a66;border-radius:10px;padding:4px 6px}.chips small{font-size:.7rem;opacity:.7;white-space:nowrap}.chips b{font-size:.9rem;white-space:nowrap}</style></head><body>
+.chips{display:flex;flex-wrap:wrap;gap:5px}.chips span{display:flex;flex-direction:column;align-items:center;flex:1;min-width:62px;background:#fff;border:1.5px solid #e2b04a66;border-radius:10px;padding:4px 6px}.chips small{font-size:.7rem;opacity:.7;white-space:nowrap}.chips b{font-size:.9rem;white-space:nowrap}.rcov{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:18px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.rcov.atk{background:radial-gradient(circle at 50% 40%,#2f6b1fcc,#0b1a08f2)}.rcov.gift{background:radial-gradient(circle at 50% 40%,#b3123acc,#2a0510f2)}
+.rcbox{background:#fffaf2;color:#2a1a10;border-radius:22px;padding:20px 18px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px #0008;animation:rcIn .5s cubic-bezier(.2,1.4,.4,1)}
+.rcbox h2{margin:.2em 0;color:#b3123a}.rcbox p{margin:.4em 0;line-height:1.35}.rcbox button{margin-top:12px}
+@keyframes rcIn{from{transform:scale(.4) rotate(-8deg);opacity:0}}
+.rcg0{font-size:5rem;line-height:1;position:relative;display:inline-block;animation:rcBob 1s ease-in-out infinite}.rcg0 span,.rcg span{position:absolute;font-size:.45em;right:-.25em;bottom:-.1em}.rcg0.laugh{animation:rcLaugh .35s ease-in-out infinite}
+@keyframes rcBob{50%{transform:translateY(-8px) rotate(4deg)}}@keyframes rcLaugh{50%{transform:rotate(-10deg) scale(1.08)}}
+.rchud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);left:0;right:0;display:flex;justify-content:center;gap:26px;font-size:1.4rem;color:#fff;text-shadow:0 2px 6px #000}
+.rcg{position:fixed;width:96px;height:96px;font-size:4.6rem;line-height:1;background:none;border:0;box-shadow:none;padding:0;min-height:0;transition:left .28s ease,top .28s ease;cursor:pointer;filter:drop-shadow(0 6px 10px #0009)}
+.rcg.hit{animation:rcHit .25s}@keyframes rcHit{40%{transform:scale(.8) rotate(-15deg)}}
+.rcpow{position:fixed;font-style:normal;font-size:2rem;pointer-events:none;transform:translate(-50%,-50%);animation:rcPow .6s forwards}@keyframes rcPow{to{transform:translate(-50%,-140%) scale(1.6);opacity:0}}
+.rcit{display:flex;align-items:center;gap:10px;background:#0000000d;border-radius:12px;padding:8px 12px;margin:6px 0;text-align:left}.rcit span{font-size:1.4rem}
+.rcmsg{font-style:italic;color:#7a2440;margin-top:10px!important}
+.rcgift{font-size:6rem;background:none;border:0;box-shadow:none;padding:0;min-height:0;line-height:1.1;animation:rcBob 1.2s ease-in-out infinite;cursor:pointer}.rcgift.shk{animation:rcShk .4s}
+@keyframes rcShk{20%{transform:rotate(-14deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(6deg)}}
+.rcopen{font-size:4.5rem;animation:rcIn .5s}
+</style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
 <header id="top"><button id="logo" aria-label="Célestine"></button><b id="ttl">Calendrier de l'Avent</b><button id="tst" class="sm alt" hidden onclick="admin()">🧪 Test</button><button id="eggb" type="button" onclick="eggBasket()" aria-label="Œufs cachés trouvés">🥚 0/24</button><span id="pts" aria-live="polite">⭐ 0</span></header>
@@ -2786,6 +2802,44 @@ function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small
  ${R('🥚','Les œufs cachés',"Chaque jeu cache un œuf… Relis bien les textes. Les 24 œufs ouvrent un niveau secret.",[['Niveau secret','1 ⭐ / 10 pts']])}
  ${R('🧩','Le puzzle final',"Chaque case ouverte dévoile une pièce de l'image. Termine-le à la fin.",[['Facile','100 ⭐'],['Moyen','200 ⭐'],['Difficile','300 ⭐']])}
  </div><button onclick="closePop()">Compris !</button>`)}
+
+/* ---------- Attaques du Grinch & cadeaux à distance (depuis le site de suivi) ---------- */
+const RCI={pts:['⭐','étoile','étoiles'],scr:['🔩','clé à molette','clés à molette'],gem:['💎','gemme','gemmes'],hint:['💡','indice','indices'],joker:['🃏','joker','jokers'],dbl:['✨','points doublés','points doublés'],jeton:['🎟️','jeton','jetons']};
+let RCQ=[],RCbusy=false,RClast=Date.now();
+['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>RClast=Date.now(),{passive:true}));
+function rcHave(k){return k=='pts'?S.pts:k=='scr'?(S.scr||0):k=='gem'?(S.gem||0):(S.inv[k]||0)}
+function rcAdd(k,n){if(k=='pts')S.pts=Math.max(0,S.pts+n);else if(k=='scr')S.scr=Math.max(0,(S.scr||0)+n);else if(k=='gem')S.gem=Math.max(0,(S.gem||0)+n);else S.inv[k]=Math.max(0,(S.inv[k]||0)+n)}
+function rcPoll(){if(!/^https?:/.test(location.protocol)||instPend())return;fetch(SYNCU+'/cmd.json',{cache:'no-store'}).then(r=>r.json()).then(o=>{if(!o)return;S.rcDone=S.rcDone||[];
+ for(const k in o){const c=o[k];if(!c||c.done||S.rcDone.includes(k)||RCQ.some(x=>x.k==k))continue;RCQ.push({k,...c})}RCQ.sort((a,b)=>a.at-b.at)}).catch(()=>{})}
+function rcStart(){if(!/^https?:/.test(location.protocol))return;try{const es=new EventSource(SYNCU+'/cmd.json');const f=()=>rcPoll();es.addEventListener('put',f);es.addEventListener('patch',f)}catch(_){}rcPoll();setInterval(rcPoll,45000);
+ setInterval(()=>{if(RCbusy||!RCQ.length||document.hidden||instPend()||$('#gwin')||$('#inst')||$('#pop').innerHTML.trim()||(typeof cBusy!='undefined'&&cBusy)||Date.now()-RClast<4000)return;rcRun(RCQ.shift())},1500)}
+function rcList(L){return L.map(x=>`<div class="rcit"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}
+function rcRun(c){RCbusy=true;S.rcDone=S.rcDone||[];S.rcDone.push(c.k);if(S.rcDone.length>200)S.rcDone=S.rcDone.slice(-200);save();
+ const items=c.items||{},msg=c.msg?`<p class="rcmsg">💌 « ${esc(c.msg)} »</p>`:'';
+ const fin=(res,taps)=>{save();hdr();try{if(view=='me')meView();else if(view=='lab')labView();else if(view=='shop')shopView()}catch(_){}syncReq('cmd/'+c.k+'/done','PUT',{at:Date.now(),res,taps:taps||0});RCbusy=false};
+ const ov=document.createElement('div');ov.id='rcov';ov.className='rcov '+(c.type=='attack'?'atk':'gift');document.body.appendChild(ov);
+ if(c.type=='attack'){const took=[];
+  for(const k in RCI){const w=+items[k]||0;if(w<=0)continue;const n=Math.min(w,rcHave(k));if(n>0){rcAdd(k,-n);took.push([RCI[k][0],`${n} ${n>1?RCI[k][2]:RCI[k][1]}`])}}
+  for(const b of (c.bons||[])){let i=S.bons.findIndex(x=>!x.used&&b.at&&x.at==b.at);if(i<0)i=S.bons.findIndex(x=>!x.used&&x.n==b.n);if(i>=0){const x=S.bons.splice(i,1)[0];took.push([x.ic,'Bon : '+esc(x.n)])}}
+  slog('😈',`Attaque du Grinch : ${took.length?took.map(t=>t[0]+' '+t[1].replace(/<[^>]+>/g,'')).join(', '):'rien à voler'}`);
+  let taps=0,left=10,mv=0,tick=0;
+  ov.innerHTML=`<div class="rcbox"><div class="rcg0">😈<span>💰</span></div><h2>Le Grinch attaque !</h2><p>Ho ho ho… <b>NON !</b> Je viens piller <b>tout ton trésor</b> ! 💰</p><p>Tape sur moi le plus vite possible pendant 10 secondes pour me ralentir !</p><button id="rcgo">Je suis prête 😤</button></div>`;
+  try{SFX('bad')}catch(_){}
+  $('#rcgo').onclick=()=>{ov.innerHTML=`<div class="rchud"><span>⏱️ <b id="rct">10</b></span><span>👊 <b id="rcn">0</b></span></div><button class="rcg" id="rcg" aria-label="Le Grinch">😈<span>💰</span></button>`;const g=$('#rcg');
+   const jump=()=>{const W=innerWidth-110,H=innerHeight-170;g.style.left=(10+Math.random()*W)+'px';g.style.top=(70+Math.random()*H)+'px'};jump();
+   g.onpointerdown=e=>{e.preventDefault();taps++;$('#rcn').textContent=taps;g.classList.remove('hit');void g.offsetWidth;g.classList.add('hit');try{SFX('tap')}catch(_){}const p=document.createElement('i');p.className='rcpow';p.textContent=['💥','👊','⭐','💢'][taps%4];p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';ov.appendChild(p);setTimeout(()=>p.remove(),600);if(taps%3==0)jump()};
+   mv=setInterval(jump,850);tick=setInterval(()=>{left--;$('#rct').textContent=left;if(left<=0){clearInterval(tick);clearInterval(mv);end()}},1000)};
+  const end=()=>{try{SFX('lose')}catch(_){}ov.innerHTML=`<div class="rcbox"><div class="rcg0 laugh">😈<span>💰</span></div><h2>Hahaha !</h2><p>Tu m'as frappé <b>${taps} fois</b>… mais trop tard ! ${took.length?'Je t\'ai volé :':'Ton trésor était vide… quelle déception !'}</p>${rcList(took)}${msg}<button id="rcok">Grrr… 😤</button></div>`;$('#rcok').onclick=()=>{ov.remove();fin(took.map(t=>t[0]+' '+t[1].replace(/<[^>]+>/g,'')).join(', '),taps)}}}
+ else{const got=[];
+  ov.innerHTML=`<div class="rcbox"><h2>🎁 Un cadeau est arrivé !</h2><p>Quelqu'un a pensé à toi… Touche le paquet pour l'ouvrir !</p><button class="rcgift" id="rcgf" aria-label="Ouvrir le cadeau">🎁</button></div>`;let n=0;
+  $('#rcgf').onclick=()=>{n++;const b=$('#rcgf');b.classList.remove('shk');void b.offsetWidth;b.classList.add('shk');try{SFX('tap')}catch(_){}if(n<3)return;
+   for(const k in RCI){const w=+items[k]||0;if(w<=0)continue;if(k=='pts'){S.pts+=w;S.earned+=w}else rcAdd(k,w);got.push([RCI[k][0],`${w} ${w>1?RCI[k][2]:RCI[k][1]}`])}
+   for(const b of (c.bons||[])){S.bons.push({id:b.id||'cadeau',ic:b.ic||'💌',n:b.n,used:false,at:Date.now()});got.push([b.ic||'💌','Bon : '+esc(b.n)])}
+   slog('🎁',`Ouvre un cadeau : ${got.map(t=>t[0]+' '+t[1].replace(/<[^>]+>/g,'')).join(', ')||'un mot doux'}`);
+   try{confetti();ding()}catch(_){}
+   ov.innerHTML=`<div class="rcbox"><div class="rcopen">🎉</div><h2>Surprise !</h2>${got.length?'<p>Tu reçois :</p>'+rcList(got):''}${msg}<button id="rcok">Merci ❤️</button></div>`;
+   $('#rcok').onclick=()=>{ov.remove();try{achCheck()}catch(_){}const L=lvl();if(L>S.lvl){S.gem=(S.gem||0)+2*(L-S.lvl);S.lvl=L;S.inv.hint++;toast(`Niveau ${L+1} : ${LEVELS[L][1]} ! (+1 💡 +2 💎)`)}fin(got.map(t=>t[0]+' '+t[1].replace(/<[^>]+>/g,'')).join(', '))}}}}
+setTimeout(rcStart,2500);
 /* ---------- Trésors ---------- */
 function meView(){if(!feat(1)){app.innerHTML=`<h1>Mes trésors</h1><div class="panel center"><p style="font-size:2.5rem;margin:0">🔒</p><p>Tes trésors s'ouvrent avec la case du 1er décembre.</p></div>${syncHTML()}`;return}const L=lvl(),nx=LEVELS[L+1],pc=nx?(S.earned-LEVELS[L][0])/(nx[0]-LEVELS[L][0])*100:100;
   app.innerHTML=`<h1>Mes trésors</h1>

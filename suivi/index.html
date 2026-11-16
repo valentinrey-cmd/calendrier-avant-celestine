@@ -50,6 +50,16 @@ h2{font-size:1rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
 button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}
 .err{display:none;color:#ffb3c1;font-size:.85rem;margin-bottom:10px}
 @media(max-width:420px){.tile b{font-size:.98rem}.tile{padding:8px 4px}}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.big{padding:12px 8px;border-radius:14px;font-weight:700;font-size:.95rem}.big.atk{background:#2f6b1f;border-color:#58b13b}.big.gft{background:#8f1a3a;border-color:#ff7ab6}.big.on{outline:2px solid var(--or)}
+.frm{margin-top:12px;padding:12px;border-radius:14px;background:#00000033}
+.frm h3{margin:0 0 4px;font-size:.95rem}.frm .hint{color:var(--mut);font-size:.8rem;margin:0 0 10px}
+.it{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.it .ic{width:26px;text-align:center;font-size:1.15rem}.it .nm{flex:1}.it .nm small{display:block;color:var(--mut);font-size:.72rem}
+.step{display:flex;align-items:center;gap:4px}.step button{width:34px;height:34px;padding:0;border-radius:10px}.step input{width:58px;text-align:center;font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:10px;padding:6px 2px}
+.ck{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}.ck input{width:20px;height:20px;accent-color:#ff7ab6}
+.frm textarea{width:100%;margin-top:10px;font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:12px;padding:8px;min-height:54px;resize:vertical}
+.frm .go{width:100%;margin-top:10px;padding:12px;border-radius:14px;font-weight:700;background:var(--or);color:#2a1205;border:0}
+.sub{color:var(--mut);font-size:.78rem;margin:12px 0 4px;font-weight:700}
 </style>
 </head>
 <body>
@@ -57,6 +67,7 @@ button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--li
  <div class="top"><h1>🎄 Suivi de Célestine</h1><span class="tag" id="room"></span></div>
  <div class="err" id="err"></div>
  <div class="card"><div class="live"><span class="dot" id="dot"></span><div><b id="st">Connexion…</b><small id="st2"></small></div></div><div id="game"></div></div>
+ <div class="card"><h2>🎮 Actions</h2><div class="acts"><button class="big atk" id="bAtk">😈 Lancer une attaque</button><button class="big gft" id="bGift">🎁 Envoyer un cadeau</button></div><div id="form"></div><div id="sent"></div></div>
  <div class="card"><h2>⭐ Ses compteurs</h2><div class="tiles" id="tiles"></div><div class="lvl"><span id="lvn"></span><div class="bar"><i id="lvb"></i></div><span class="muted" id="lvp"></span></div></div>
  <div class="card"><h2>📅 Le calendrier</h2><div class="grid" id="grid"></div>
   <div class="leg"><span style="--c:#ffffff22">Fermée</span><span style="--c:#6bb6ff">Ouverte</span><span style="--c:#3ddc84">Réussi</span><span style="--c:#ff5c7a">Raté</span></div></div>
@@ -106,7 +117,31 @@ function renderLog(){const L=Object.entries(DB.log||{}).map(([k,v])=>({k,...v}))
  let h='',lastD='';for(const e of L){const dd=new Date(e.at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});if(dd!=lastD){h+=`<div class="day">${dd}</div>`;lastD=dd}
   const nw=!first&&!seen.has(e.k);h+=`<div class="row ${nw?'new':''}"><span class="ic">${esc(e.ic)}</span><span class="tx">${esc(e.txt)}${e.sim?' <span class="tag test">test</span>':''}</span><span class="tm">${hm(e.at)}</span></div>`}
  L.forEach(e=>seen.add(e.k));$('#log').innerHTML=h}
-function render(){renderLive();renderState();renderLog();first=false}
+
+const BONS=[["🍫","Un goûter surprise"],["🧽","Je fais la vaisselle (une semaine)"],["💆","Un massage"],["📺","Soirée série : tu choisis, je ne râle pas"],["🍝","Un repas maison préparé par moi"],["🎬","Un ciné de ton choix"],["🎁","Un Lego mystère"],["🔐","Un escape game"],["🍽️","Un resto de ton choix"],["🏴󠁧󠁢󠁳󠁣󠁴󠁿","Une activité en Écosse"]];
+const IT=[['pts','⭐','Étoiles',s=>s.pts,10],['scr','🔩','Clés à molette',s=>s.scr,5],['gem','💎','Gemmes',s=>s.gem,1],['hint','💡','Indices',s=>(s.inv||{}).hint||0,1],['joker','🃏','Jokers',s=>(s.inv||{}).joker||0,1],['dbl','✨','Points doublés',s=>(s.inv||{}).dbl||0,1],['jeton','🎟️','Jetons casino',s=>(s.inv||{}).jeton||0,1]];
+let MODE=null;
+function openForm(m){MODE=MODE==m?null:m;$('#bAtk').classList.toggle('on',MODE=='attack');$('#bGift').classList.toggle('on',MODE=='gift');drawForm()}
+function drawForm(){const f=$('#form');if(!MODE){f.innerHTML='';return}const s=DB.state||{},atk=MODE=='attack';
+ let h=`<div class="frm"><h3>${atk?'😈 Que doit voler le Grinch ?':'🎁 Que mettre dans le cadeau ?'}</h3><p class="hint">${atk?"Il attaquera dès qu'elle aura fini ce qu'elle fait (pas pendant un jeu). Elle devra taper sur lui pendant 10 s… mais il volera quand même ce que tu choisis.":"Un cadeau apparaîtra dès qu'elle sera libre ; elle l'ouvre en tapant dessus."}</p>`;
+ for(const [k,ic,n,get,st] of IT){const have=get(s)||0;h+=`<div class="it"><span class="ic">${ic}</span><span class="nm">${n}<small>elle en a ${have}</small></span><span class="step"><button data-k="${k}" data-d="-${st}">−</button><input id="q_${k}" type="number" min="0" ${atk?`max="${have}"`:''} value="0" inputmode="numeric"><button data-k="${k}" data-d="${st}">+</button>${atk?`<button data-k="${k}" data-all="${have}" title="Tout">Tout</button>`:''}</span></div>`}
+ if(atk){const B=(s.bons||[]).filter(b=>!b.u);h+=`<div class="sub">Ses bons pas encore utilisés</div>`+(B.length?B.map((b,i)=>`<label class="ck"><input type="checkbox" data-b="${i}"> ${esc(b.ic)} ${esc(b.n)}</label>`).join(''):'<p class="hint" style="margin:4px 0">Elle n\'a aucun bon à voler.</p>');f._bons=B}
+ else{h+=`<div class="sub">Bons à offrir</div>`+BONS.map((b,i)=>`<label class="ck"><input type="checkbox" data-b="${i}"> ${b[0]} ${esc(b[1])}</label>`).join('')+`<label class="ck"><input type="checkbox" id="cbOwn"> 💌 <input id="ownTxt" placeholder="Bon personnalisé…" style="flex:1;font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:10px;padding:6px"></label>`;f._bons=BONS.map(b=>({ic:b[0],n:b[1]}))}
+ h+=`<textarea id="msg" placeholder="${atk?'Un petit mot du Grinch (facultatif)…':'Un petit mot avec le cadeau (facultatif)…'}"></textarea><button class="go" id="send">${atk?'😈 Lancer l\'attaque':'🎁 Envoyer le cadeau'}</button></div>`;
+ f.innerHTML=h;
+ f.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const i=$('#q_'+b.dataset.k);let v=b.dataset.all!=null?+b.dataset.all:(+i.value||0)+(+b.dataset.d);v=Math.max(0,v);if(i.max!=='')v=Math.min(v,+i.max);i.value=v});
+ $('#send').onclick=send}
+async function send(){const f=$('#form'),items={};let any=false;for(const [k] of IT){let v=Math.max(0,parseInt($('#q_'+k).value)||0);const i=$('#q_'+k);if(i.max!=='')v=Math.min(v,+i.max);if(v){items[k]=v;any=true}}
+ const bons=[...f.querySelectorAll('[data-b]:checked')].map(x=>f._bons[+x.dataset.b]).map(b=>({ic:b.ic,n:b.n,at:b.at||0}));
+ if(MODE=='gift'&&$('#cbOwn').checked&&$('#ownTxt').value.trim())bons.push({ic:'💌',n:$('#ownTxt').value.trim()});
+ const msg=$('#msg').value.trim();if(!any&&!bons.length&&!msg){alert('Choisis au moins une chose.');return}
+ const b=$('#send');b.disabled=true;b.textContent='Envoi…';
+ try{const r=await fetch(URL0+'/cmd.json',{method:'POST',body:JSON.stringify({type:MODE,at:Date.now(),items,bons,msg})});if(!r.ok)throw 0;MODE=null;drawForm();$('#bAtk').classList.remove('on');$('#bGift').classList.remove('on')}catch(e){alert("L'envoi a échoué, réessaie.");b.disabled=false;b.textContent='Réessayer'}}
+function renderSent(){const C=Object.entries(DB.cmd||{}).map(([k,v])=>({k,...v})).sort((a,b)=>b.at-a.at).slice(0,8);if(!C.length){$('#sent').innerHTML='';return}
+ $('#sent').innerHTML='<div class="sub">Derniers envois</div>'+C.map(c=>{const what=[...Object.entries(c.items||{}).map(([k,v])=>{const x=IT.find(i=>i[0]==k);return(x?x[1]:k)+' '+v}),...(c.bons||[]).map(b=>b.ic+' '+b.n)].join(', ')||'un petit mot';
+  return`<div class="row"><span class="ic">${c.type=='attack'?'😈':'🎁'}</span><span class="tx">${esc(c.done?(c.done.res||'rien'):what)}${c.done&&c.type=='attack'?`<br><small class="muted">elle a tapé ${c.done.taps} fois</small>`:''}</span><span class="tm">${c.done?'✅ '+hm(c.done.at):'⏳ en attente'}</span></div>`}).join('')}
+$('#bAtk').onclick=()=>openForm('attack');$('#bGift').onclick=()=>openForm('gift');
+function render(){renderLive();renderState();renderLog();renderSent();first=false}
 setInterval(()=>{renderLive();const g=$('#gdur');if(g&&DB.live&&DB.live.game)g.textContent=dur(DB.live.game.at)},1000);
 function connect(){let es;try{es=new EventSource(URL0+'.json')}catch(e){return fail()}
  const on=ev=>{try{const m=JSON.parse(ev.data);if(ev.type=='put')setPath(m.path,m.data);else patch(m.path,m.data);$('#err').style.display='none';render()}catch(e){console.error(e)}};
