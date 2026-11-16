@@ -1109,7 +1109,7 @@ function hdr(){$('#pts').textContent='⭐ '+S.pts;eggBadge();achCheck();try{alTi
 
 /* ---------- Navigation ---------- */
 const SCR={},skey=()=>view=='day'?'day'+cur:view;
-function go(v,d){if(cBusy&&view=='casino'&&v!='casino')return toast('Attends la fin du tirage 😉');setTimeout(()=>syncLive(),50);closeGame();allowScroll();RUN++;document.body.classList.remove('playing');if(typeof view!='undefined'&&view)SCR[skey()]=scrollY;view=v;if(d)cur=d;closePop();render();const y=SCR[skey()]||0;window.scrollTo(0,y);lastY=y;requestAnimationFrame(()=>{allowScroll();window.scrollTo(0,y);lastY=y})}
+function go(v,d){if(cBusy&&view=='casino'&&v!='casino')return toast('Attends la fin du tirage 😉');setTimeout(()=>syncLive(),50);closeGame();allowScroll();RUN++;document.body.classList.remove('playing');if(typeof view!='undefined'&&view)SCR[skey()]=scrollY;try{if(!(v=='day'&&String(d||cur)===YTM.gday))YTM.stopGame()}catch(_){}view=v;if(d)cur=d;closePop();render();try{if(v=='day')YTM.start(cur)}catch(_){}const y=SCR[skey()]||0;window.scrollTo(0,y);lastY=y;requestAnimationFrame(()=>{allowScroll();window.scrollTo(0,y);lastY=y})}
 function render(){window.__prevView=window.__curView;window.__curView=view;if(view!='book'&&window.__prevView=='book'){try{ALBM.stop(.3)}catch(_){}}hdr();({book:bookView,cal:calView,day:dayView,puz:puzView,shop:shopView,lab:labView,casino:casinoView,me:meView})[view]();if(typeof updBadge=='function')updBadge()}
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>go(b.dataset.v));
 function popup(h){$('#pop').innerHTML=`<div class="modal" role="dialog" aria-modal="true"><div class="card">${h}</div></div>`}
@@ -1158,7 +1158,7 @@ function openGame(d,pr,quit){closeGame(true);const D=DAYS[d],ov=document.createE
  ov.querySelector('.gwx').onclick=()=>{const q=$('#gwq');if(pr)return quit('partie quittée');
   q.innerHTML=`<div class="gwc"><span>Quitter ? Cet essai comptera comme raté.</span><span><button class="sm" id="gwy">Quitter</button><button class="alt sm" id="gwn">Continuer</button></span></div>`;
   $('#gwy').onclick=()=>quit('tu as abandonné la partie');$('#gwn').onclick=()=>q.innerHTML=''}}
-function closeGame(silent){try{MUS.stop()}catch(_){}try{YTM.stopGame()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
+function closeGame(silent){try{MUS.stop()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
  if(P&&m){if(hud)P.insertBefore(hud,m);if(g)P.insertBefore(g,m)}ov.remove();const hk=document.getElementById('hk');if(hk)hk.remove();
  document.documentElement.classList.remove('gl');document.body.style.top='';window.scrollTo(0,lockY);lastY=lockY;allowScroll()}
 function hit(){const d=window.CURD;if(window.CURPR)return 0;if(!d)return -1;const sd=S.days[d]=S.days[d]||{},mx=3+(sd.extra||0);sd.fails=(sd.fails||0)+1;if(sd.fails>=mx){sd.fails=mx-1;save();return 0}save();const e=$('#lives');if(e)e.textContent='Essais : '+'❤️'.repeat(mx-sd.fails)+'🖤'.repeat(sd.fails);return mx-sd.fails}
@@ -3151,7 +3151,7 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  function go(url,vol,loop){try{MUS.stop();MUS._bg=0}catch(_){}try{if(ALBM.on)ALBM.stop(.3)}catch(_){}au.src=url;au.loop=!!loop;au.volume=vol;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(()=>{if(box)box.classList.add('tap')})}
  function stop(){try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
  const has=d=>!!URLS[String(d)];
- function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
+ function start(d){if(mode=='game'&&key===String(d)&&box)return true;if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
   const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
  function list(i,keep){if(!keep)ORD=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
@@ -3161,9 +3161,9 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
   if(S.shuf){if(!ORD.length||ORD[op]!==li||L.some((x,j)=>ok(j)&&!ORD.includes(j))){const k=ORD.indexOf(li);if(k>=0&&!L.some((x,j)=>ok(j)&&!ORD.includes(j)))op=k;else mkOrd()}
    op=((op+dir)%ORD.length+ORD.length)%ORD.length;return list(ORD[op],1)}
   for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
- document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode){const m=mode;stop();window.__ytmResume=m=='game'?window.CURD:0}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(document.getElementById('gwin')&&window.CURD==d)start(d)}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode){const m=mode;stop();window.__ytmResume=m=='game'?key:0}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(view=='day'&&String(cur)==String(d))start(d)}});
  addEventListener('pagehide',()=>{if(mode)stop()});
- return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
+ return{get gday(){return mode=='game'?key:null},start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
 function musMatch(name){const n=nrm(name.replace(/\.[^.]+$/,''));let best=null,bl=0;for(const k in SONGS){const t=nrm(SONGS[k].t.replace(/\(.*?\)/g,''));if(t&&(n.includes(t)||n.replace(/ /g,'').includes(t.replace(/ /g,'')))&&t.length>bl){best=k;bl=t.length}}return best}
