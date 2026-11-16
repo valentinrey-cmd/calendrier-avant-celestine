@@ -1018,7 +1018,8 @@ let IMG=DEF_IMG;try{IMG=localStorage.getItem('avent_img')||DEF_IMG}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}try{syncState()}catch(_){}}
 /* ---------- Suivi en direct (Firebase) ---------- */
 const SYNCU='https://calendrier-celestine-default-rtdb.europe-west1.firebasedatabase.app/avent-c7v4k9q2/'+(CONTENU.syncRoom||'c');let syncT=0;
-function syncReq(p,m,b){try{if(!/^https?:/.test(location.protocol))return;fetch(SYNCU+'/'+p+'.json',{method:m,body:JSON.stringify(b),keepalive:true}).catch(()=>{})}catch(_){}}
+function syncReq(p,m,b){try{if(!/^https?:/.test(location.protocol))return;fetch(SYNCU+'/'+p+'.json'+(m=='POST'?'':'?x-http-method-override='+m),{method:'POST',body:JSON.stringify(b),keepalive:true,mode:'no-cors'}).catch(()=>{})}catch(_){}}
+function instPend(){try{return !!document.getElementById('inst')||(APP.web()&&!APP.standalone()&&!sessionStorage.getItem('instSkip'))}catch(_){return false}}
 function syncSnap(){let L=0;try{L=lvl()}catch(_){}let A=0;try{A=Object.keys(achS()).length}catch(_){}let E=0;try{E=eggs().length}catch(_){}
  const D={};for(const k in S.days||{}){const x=S.days[k]||{};D[k]={d:x.done?1:0,l:x.lost?1:0,f:x.fails||0,s:x.score||0,e:x.extra||0}}
  return{at:Date.now(),sim:S.sim||0,pts:S.pts,earned:S.earned,lvl:L+1,lvlN:LEVELS[L][1],scr:S.scr||0,gem:S.gem||0,inv:S.inv||{},eggs:E,ach:A,achT:(typeof ACHS!='undefined'?ACHS.length:0),opened:S.opened||[],days:D,streak:S.streak||0,
@@ -1296,7 +1297,7 @@ const ALBM=(()=>{let A=null,G=null,iv=null,on=false,t0=0,step=0;
 /* ---------- 📸 Déblocage des photos de l'album ---------- */
 function alTotal(){return alC().chapitres.reduce((a,c)=>a+(c.photos||[]).length,0)}
 function alRev(){const days=Object.values(S.days||{}).filter(x=>x&&x.done).length,puz=Object.values(S.puzWon||{}).some(Boolean)?1:0,sec=(S.secret&&S.secret.done)?1:0;return Math.min(alTotal(),1+days+puz+sec)}
-function alTick(){const r=alRev(),b=document.getElementById('albdg');if(b)b.hidden=!(alOk()&&r>(S.alSeen||1));if(r>(S.alNew||1)&&!window.__alNT)window.__alNT=setTimeout(alNotify,3200)}
+function alTick(){if(instPend())return;const r=alRev(),b=document.getElementById('albdg');if(b)b.hidden=!(alOk()&&r>(S.alSeen||1));if(r>(S.alNew||1)&&!window.__alNT)window.__alNT=setTimeout(alNotify,3200)}
 function alNotify(){window.__alNT=0;const r=alRev(),from=S.alNew||1;if(r<=from)return;
  if(document.body.classList.contains('playing')||document.getElementById('spl')||document.getElementById('alz')){window.__alNT=setTimeout(alNotify,2500);return}
  const A=alPhotos(),x=A[from];S.alNew=from+1;save();if(!x)return;
@@ -1448,8 +1449,8 @@ function achEggs(){return(S.eggTroll?(S.eggsReal||[]):eggs()).length}
 function achMaxStreak(){S.maxStreak=Math.max(S.maxStreak||0,S.streak||0);return S.maxStreak}
 function achS(){if(!S.ach||typeof S.ach!='object')S.ach={};return S.ach}
 let achQ=[],achBusy=false;
-function ACH(id){const A=achS();if(A[id])return;const a=ACHS.find(x=>x.id==id);if(!a)return;slog('🏆',`Succès : ${a.n}`);A[id]=Date.now();try{EV('ach')}catch(_){}save();achBadge();achQ.push(a);achShow()}
-function achCheck(){try{const A=achS();ACHS.forEach(a=>{if(A[a.id])return;let ok=false;if(a.c)ok=a.c();else if(a.p){const[v,m]=a.p();ok=v>=m}if(ok)ACH(a.id)});achBadge()}catch(e){console.error(e)}}
+function ACH(id){if(instPend())return;const A=achS();if(A[id])return;const a=ACHS.find(x=>x.id==id);if(!a)return;slog('🏆',`Succès : ${a.n}`);A[id]=Date.now();try{EV('ach')}catch(_){}save();achBadge();achQ.push(a);achShow()}
+function achCheck(){if(instPend())return;try{const A=achS();ACHS.forEach(a=>{if(A[a.id])return;let ok=false;if(a.c)ok=a.c();else if(a.p){const[v,m]=a.p();ok=v>=m}if(ok)ACH(a.id)});achBadge()}catch(e){console.error(e)}}
 function achChime(t){if(S.sound===false)return;const A=eggAC();if(!A)return;const t0=A.currentTime,base=t=='L'?523:t=='D'?587:t=='M'?659:698;[0,4,7,12,16].forEach((s2,i)=>{const o=A.createOscillator(),g=A.createGain(),tt=t0+i*.07;o.type='triangle';o.frequency.value=base*Math.pow(2,s2/12);g.gain.setValueAtTime(.0001,tt);g.gain.exponentialRampToValueAtTime(.07,tt+.01);g.gain.exponentialRampToValueAtTime(.0001,tt+.5);o.connect(g).connect(A.destination);o.start(tt);o.stop(tt+.55)})}
 function achShow(){if(achBusy||!achQ.length)return;achBusy=true;let a=achQ.shift();let more=0;if(achQ.length>=3){more=achQ.length;achQ=[]}
  const e=document.createElement('div');e.className='achpop t'+a.t;e.innerHTML=`<span class="achic">${a.ic}</span><span class="achtx"><small>🏆 Succès débloqué !${more?` (+${more} autres)`:''}</small><b>${esc(a.n)}</b>${achRwHTML(a)}</span>`;e.onclick=()=>{e.remove();achBusy=false;go('me');setTimeout(()=>{const x=document.getElementById('achsec');if(x)x.scrollIntoView({behavior:'smooth'})},100);achShow()};document.body.appendChild(e);achChime(a.t);
