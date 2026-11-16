@@ -886,10 +886,31 @@ const CONTENU={
    {titre:"Pour toujours", date:"", photos:[
     {titre:"Côte à côte, pour toujours", date:"Dans très, très longtemps…", src:ALIMG.f_tombes, o:"l", pos:"center"}]},
   ]},
- playlist:[                    // ✏️ NOTRE PLAYLIST (coffre à souvenirs, niveau 2) : titre, artiste, ton petit mot, lien Spotify/YouTube
-  {titre:"Titre de la chanson", artiste:"Artiste", mot:"✏️ Pourquoi cette chanson compte pour nous", lien:""},
-  {titre:"Titre de la chanson", artiste:"Artiste", mot:"✏️ Le souvenir qui va avec", lien:""},
-  {titre:"Titre de la chanson", artiste:"Artiste", mot:"✏️ …", lien:""}
+ playlist:[                    // NOTRE PLAYLIST (coffre à souvenirs) : débloque aussi la musique de chaque mini-jeu
+  {titre:"À l'international", artiste:"TAL", mot:"La chanson du jour 1", lien:"https://www.youtube.com/watch?v=gQmAH6VSvBg"},
+  {titre:"Loser", artiste:"Tame Impala", mot:"La chanson du jour 2", lien:"https://www.youtube.com/watch?v=s3a4OQR-10M"},
+  {titre:"Stolen Dance", artiste:"Milky Chance", mot:"La chanson du jour 3", lien:"https://www.youtube.com/watch?v=iX-QaNzd-0Y"},
+  {titre:"The Fate of Ophelia", artiste:"Taylor Swift", mot:"La chanson du jour 4", lien:"https://www.youtube.com/watch?v=ko70cExuzZM"},
+  {titre:"Lush Life", artiste:"Zara Larsson", mot:"La chanson du jour 5", lien:"https://www.youtube.com/watch?v=tD4HCZe-tew"},
+  {titre:"DtMF", artiste:"Bad Bunny", mot:"La chanson du jour 6", lien:"https://www.youtube.com/watch?v=v9T_MGfzq7I"},
+  {titre:"Gigi l'amoroso", artiste:"Dalida", mot:"La chanson du jour 7", lien:"https://www.youtube.com/watch?v=dfNr3KNDoRs"},
+  {titre:"Le passé", artiste:"TAL", mot:"La chanson du jour 8", lien:"https://www.youtube.com/watch?v=wSXPHNHuw7A"},
+  {titre:"Dine N'Dash", artiste:"The Strokes", mot:"La chanson du jour 9", lien:"https://www.youtube.com/watch?v=sal78l1W6fE"},
+  {titre:"Zoo (Zootopie 2)", artiste:"Shakira", mot:"La chanson du jour 10", lien:"https://www.youtube.com/watch?v=WTRm-Yr5Foo"},
+  {titre:"Dracula (ft. JENNIE)", artiste:"Tame Impala", mot:"La chanson du jour 11", lien:"https://www.youtube.com/watch?v=0UPDBODtxzw"},
+  {titre:"White Keys", artiste:"Dominic Fike", mot:"La chanson du jour 12", lien:"https://www.youtube.com/watch?v=Cz200209hOs"},
+  {titre:"Out of My League", artiste:"Fitz and The Tantrums", mot:"La chanson du jour 13", lien:"https://www.youtube.com/watch?v=Z4mbxaa3XL8"},
+  {titre:"Last Nite", artiste:"The Strokes", mot:"La chanson du jour 14", lien:"https://www.youtube.com/watch?v=TOypSnKFHrE"},
+  {titre:"Opalite", artiste:"Taylor Swift", mot:"La chanson du jour 15", lien:"https://www.youtube.com/watch?v=1FVF-9KQiPo"},
+  {titre:"I Just Might", artiste:"Bruno Mars", mot:"La chanson du jour 16", lien:"https://www.youtube.com/watch?v=32LLE6Zk6zc"},
+  {titre:"Self Aware", artiste:"Temper City", mot:"La chanson du jour 17", lien:"https://www.youtube.com/watch?v=mh4AQkw4Jjc"},
+  {titre:"Nothing Breaks Like a Heart", artiste:"Mark Ronson ft. Miley Cyrus", mot:"La chanson du jour 18", lien:"https://www.youtube.com/watch?v=A9hcJgtnm6Q"},
+  {titre:"I Feel It Coming", artiste:"The Weeknd ft. Daft Punk", mot:"La chanson du jour 19", lien:"https://www.youtube.com/watch?v=qFLhGq0060w"},
+  {titre:"Diana", artiste:"GIMS", mot:"La chanson du jour 20", lien:"https://www.youtube.com/watch?v=bLsjzK3hoyg"},
+  {titre:"Black Madonna", artiste:"Cage The Elephant", mot:"La chanson du jour 21", lien:"https://www.youtube.com/watch?v=itxarI8weqQ"},
+  {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 22", lien:"https://www.youtube.com/watch?v=UnuEzP1rDLY"},
+  {titre:"Dance, Dance", artiste:"Fall Out Boy", mot:"La chanson du jour 23", lien:"https://www.youtube.com/watch?v=C6MOKXm8x50"},
+  {titre:"I Was Made for Lovin' You", artiste:"KISS", mot:"La chanson du jour 24", lien:"https://www.youtube.com/watch?v=ZhIsAZO5gl0"}
  ],
  coffre3:null,                 // ✏️ 3e surprise du coffre à souvenirs (à décider)
  recordsValentin:{},           // ✏️ tes records à battre, ex. {candy:{s:18400},flappy:{s:15,t:42}} (s = score, t = temps en secondes)
@@ -3094,7 +3115,7 @@ const YTM=(()=>{let api=null,pl=null,box=null,ids=[],k=0,tm=0;
    events:{onReady:e=>{try{e.target.setVolume(DAYS[window.CURD]&&DAYS[window.CURD].g=='simon'?25:80);e.target.playVideo()}catch(_){}tm=setTimeout(()=>{try{const st=pl.getPlayerState();if(st!=1&&st!=3)box.classList.add('tap')}catch(_){}},3000)},
     onError:()=>{k++;try{pl.destroy()}catch(_){}pl=null;if(k<ids.length)mk();else fail()},
     onStateChange:e=>{if(!box)return;if(e.data==1)box.classList.remove('tap');if(e.data==0){try{pl.seekTo(0);pl.playVideo()}catch(_){}}}}})}
- function start(d){stop();const sg=SONGS[d];if(!sg||S.music===false||!/^https?:/.test(location.protocol)||navigator.onLine===false)return false;
+ function start(d){stop();const sg=SONGS[d];if(!sg||S.music===false||!S.own.includes('playlist')||!/^https?:/.test(location.protocol)||navigator.onLine===false)return false;
   box=document.createElement('div');box.id='ytm';box.innerHTML=`<div class="ytv"></div><button class="ytl" title="Déplacer">🎵 ${esc(sg.t)} · ${esc(sg.a)}</button>`;document.body.appendChild(box);
   box.querySelector('.ytl').onclick=()=>box.classList.toggle('top');ids=sg.v.slice();k=0;load().then(r=>{if(!box)return;if(r=='err')return fail();mk()});return true}
  return{start,stop}})();
