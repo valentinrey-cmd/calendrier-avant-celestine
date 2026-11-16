@@ -2819,7 +2819,7 @@ function voixPlay(){const V=(CONTENU.voix||[]).slice(0,vCount());if(!V.length)re
  try{if(VA){VA.pause()}VA=new Audio(V[k]);VA.play().catch(()=>{});
   for(let i=0;i<7;i++){const h=document.createElement('i');h.className='vheart';h.textContent=['❤️','💖','💕'][i%3];h.style.left=(innerWidth/2+(Math.random()-.5)*120)+'px';h.style.top=(innerHeight*.45)+'px';h.style.animationDelay=(i*.12)+'s';document.body.appendChild(h);setTimeout(()=>h.remove(),2200)}}catch(e){}}
 
-function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[];return`<h2>🎵 Notre playlist</h2><div class="panel pl">${L.map((x,i)=>`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(x.titre)}</b><small>${esc(x.artiste||'')}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`).join('')}</div>`}
+function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[],u=unl(),n=L.filter(x=>!x.jour||x.jour<=u).length;return`<h2>🎵 Notre playlist <small class="muted" style="font-size:.8rem">${n}/${L.length}</small></h2><div class="panel pl">${n?'':'<p class="muted center" style="margin:0">Les chansons arrivent avec les cases du calendrier 🎁</p>'}${L.map((x,i)=>x.jour&&x.jour>u?'':`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(x.titre)}</b><small>${esc(x.artiste||'')}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`).join('')}</div>`}
 
 function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small>${l}</small><b>${v}</b></span>`).join('')}</div>`;
  const R=(ic,t,txt,ch)=>`<div class="rl"><div class="rlh"><span class="rli">${ic}</span><b>${t}</b></div><p>${txt}</p>${ch?C(ch):''}</div>`;
@@ -3133,8 +3133,8 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},mode='',li=0,
  function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
   const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i){const L=CONTENU.playlist||[],x=L[i];if(!x)return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
- function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(has(L[j].jour))return list(j)}}
+ function list(i){const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
+ function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(has(L[j].jour)&&L[j].jour<=unl())return list(j)}}
  return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 /* ---------- Mode admin : importer les MP3 ---------- */
 const nrm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
