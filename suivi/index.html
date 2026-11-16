@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1b0f1f">
+<title>Suivi · Calendrier de Célestine</title>
+<style>
+:root{--bg:#1b0f1f;--card:#2a1830;--line:#ffffff1a;--txt:#f6eef8;--mut:#bfa9c6;--or:#f2c45a;--ok:#3ddc84;--ko:#ff5c7a;--blue:#6bb6ff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 60% at 50% 0,#3a1838,var(--bg));color:var(--txt);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;padding:calc(env(safe-area-inset-top,0px) + 14px) 14px 40px}
+.wrap{max-width:760px;margin:0 auto}
+h1{font:700 1.35rem Georgia,serif;margin:0;color:var(--or)}
+h2{font-size:1rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.tag{font-size:.75rem;padding:3px 8px;border-radius:99px;background:#ffffff14;color:var(--mut);white-space:nowrap}
+.tag.test{background:#ff9a1f33;color:#ffc46b}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.live{display:flex;align-items:center;gap:12px}
+.dot{width:14px;height:14px;border-radius:50%;flex:none;background:#666}
+.dot.on{background:var(--ok);box-shadow:0 0 0 0 #3ddc8488;animation:pulse 1.6s infinite}
+.dot.bg{background:#f2c45a}
+@keyframes pulse{70%{box-shadow:0 0 0 10px #3ddc8400}100%{box-shadow:0 0 0 0 #3ddc8400}}
+.live b{font-size:1.05rem}.live small{display:block;color:var(--mut)}
+.game{margin-top:10px;padding:10px 12px;border-radius:12px;background:#3ddc8418;border:1px solid #3ddc8455}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tile{background:#ffffff0d;border-radius:12px;padding:9px 6px;text-align:center}
+.tile b{display:block;font-size:1.15rem}.tile small{color:var(--mut);font-size:.72rem}
+.lvl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:12px}.lvl .bar{flex:1 0 100%;order:3}
+.bar{flex:1;height:8px;background:#ffffff14;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff7ab6,var(--or))}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+.cell{aspect-ratio:1;overflow:hidden;line-height:1.15;text-align:center;border-radius:10px;background:#ffffff0a;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.72rem;color:var(--mut);position:relative}
+.cell b{font-size:.95rem;color:var(--txt)}.cell{font-size:.62rem}
+.cell.op{background:#6bb6ff1c;border-color:#6bb6ff55}
+.cell.ok{background:#3ddc8424;border-color:#3ddc8477}
+.cell.ko{background:#ff5c7a24;border-color:#ff5c7a77}
+.cell.now{outline:2px solid var(--or)}
+.cell .h{font-size:.6rem;letter-spacing:-1px}
+.leg{display:flex;flex-wrap:wrap;gap:10px;font-size:.75rem;color:var(--mut);margin-top:8px}.leg span:before{content:'';display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:var(--c)}
+.list{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#ffffff0a}
+.row .ic{font-size:1.2rem;width:26px;text-align:center;flex:none}.row .tx{flex:1;min-width:0}.row .tm{color:var(--mut);font-size:.75rem;white-space:nowrap}
+.row.used{opacity:.55}
+.muted{color:var(--mut)}
+.log .row{background:none;padding:6px 2px;border-bottom:1px solid var(--line);border-radius:0}
+.log .row.new{animation:flash 2s}
+@keyframes flash{from{background:#f2c45a33}to{background:none}}
+.day{color:var(--or);font-size:.78rem;font-weight:700;margin:10px 0 2px;text-transform:capitalize}
+button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}
+.err{display:none;color:#ffb3c1;font-size:.85rem;margin-bottom:10px}
+@media(max-width:420px){.tile b{font-size:.98rem}.tile{padding:8px 4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><h1>🎄 Suivi de Célestine</h1><span class="tag" id="room"></span></div>
+ <div class="err" id="err"></div>
+ <div class="card"><div class="live"><span class="dot" id="dot"></span><div><b id="st">Connexion…</b><small id="st2"></small></div></div><div id="game"></div></div>
+ <div class="card"><h2>⭐ Ses compteurs</h2><div class="tiles" id="tiles"></div><div class="lvl"><span id="lvn"></span><div class="bar"><i id="lvb"></i></div><span class="muted" id="lvp"></span></div></div>
+ <div class="card"><h2>📅 Le calendrier</h2><div class="grid" id="grid"></div>
+  <div class="leg"><span style="--c:#ffffff22">Fermée</span><span style="--c:#6bb6ff">Ouverte</span><span style="--c:#3ddc84">Réussi</span><span style="--c:#ff5c7a">Raté</span></div></div>
+ <div class="card"><h2>🛍️ Ses bons</h2><div class="list" id="bons"></div></div>
+ <div class="card"><h2>🧩 Puzzle &amp; niveau secret</h2><div id="puz"></div></div>
+ <div class="card log"><h2 style="justify-content:space-between"><span>📜 Activité</span><button id="clr" title="Effacer l'historique">🗑️</button></h2><div id="log"></div></div>
+ <p class="muted" style="text-align:center;font-size:.75rem">Mise à jour en direct · ne partage pas ce lien</p>
+</div>
+<script>
+const BASE='https://calendrier-celestine-default-rtdb.europe-west1.firebasedatabase.app/avent-c7v4k9q2/';
+const ROOM=new URLSearchParams(location.search).get('room')||'c';
+const URL0=BASE+ROOM;
+const LEVELS=[[0,"Célesteenager"],[110,"Célestinhaler"],[270,"Célestinégalable"],[460,"Célestinestimable"],[680,"Célestinattendue"],[940,"Célestinachevable"],[1230,"Célestinoubliable"],[1540,"Célestinévitable"],[1900,"Célestinouïe"],[2300,"Célestinarrêtable"]];
+const TITLES={1:"Memorizotto",2:"Colony Flow",3:"Mots mêlés pimentés",4:"Flappy Célestine",5:"La hutte de Panoramix",6:"Mastermindiens",7:"Zip",8:"Dj Snake",9:"Flèches en fuite",10:"Picross",11:"Simontagne",12:"Le sudokunnilingus",13:"Œil de lynx",14:"La tour de cadeaux",15:"Block blaster",16:"Notre mot fléché",17:"Libère la voiture",18:"Candy Noël",19:"2048",20:"Les 7 différences",21:"Relier les points",22:"Sauve Célestine",23:"Tu me connais par cœur ?",24:"Puzzle final"};
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+let DB={},seen=new Set(),first=true;
+$('#room').textContent=ROOM=='c'?'Appli de Célestine':'Données de test';if(ROOM!='c')$('#room').classList.add('test');
+function setPath(p,v){const k=p.split('/').filter(Boolean);if(!k.length){DB=v||{};return}let o=DB;for(let i=0;i<k.length-1;i++){if(typeof o[k[i]]!='object'||!o[k[i]])o[k[i]]={};o=o[k[i]]}if(v===null)delete o[k[k.length-1]];else o[k[k.length-1]]=v}
+function patch(p,v){for(const k in v)setPath(p.replace(/\/$/,'')+'/'+k,v[k])}
+const ago=t=>{const s=Math.max(0,Math.round((Date.now()-t)/1000));if(s<60)return'à l\'instant';const m=Math.round(s/60);if(m<60)return`il y a ${m} min`;const h=Math.round(m/60);if(h<24)return`il y a ${h} h`;return`il y a ${Math.round(h/24)} j`};
+const hm=t=>new Date(t).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+const dur=t=>{const s=Math.max(0,Math.round((Date.now()-t)/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const VIEWS={cal:'le calendrier',day:'une case du calendrier',puz:'le puzzle',shop:'la boutique',lab:'le labo',casino:'le casino',book:"l'album",me:'ses trésors'};
+function renderLive(){const L=DB.live,dot=$('#dot');if(!L){dot.className='dot';$('#st').textContent='Pas encore de nouvelles';$('#st2').textContent="Elle n'a pas encore ouvert la nouvelle version de l'appli.";$('#game').innerHTML='';return}
+ const fresh=Date.now()-L.at<75000;const on=fresh&&L.vis;dot.className='dot'+(on?' on':fresh?' bg':'');
+ $('#st').textContent=on?'Sur l\'appli en ce moment':fresh?'Appli ouverte en arrière-plan':'Hors ligne';
+ $('#st2').textContent=on?`Sur ${VIEWS[L.view]||'l\'appli'}`+(L.sim?` · mode test jour ${L.sim}`:''):`Vue ${ago(L.at)} (${hm(L.at)})`;
+ $('#game').innerHTML=on&&L.game?`<div class="game">🎮 <b>Joue au jour ${L.game.d} · ${esc(L.game.t)}</b>${L.game.pr?' <span class="tag">entraînement</span>':''}<br><small class="muted">depuis <span id="gdur">${dur(L.game.at)}</span></small></div>`:''}
+function renderState(){const s=DB.state;if(!s){$('#tiles').innerHTML='<p class="muted">En attente des premières données…</p>';return}
+ const inv=s.inv||{};const T=[['⭐',s.pts,'étoiles'],['🔩',s.scr,'clés'],['💎',s.gem,'gemmes'],['🥚',`${s.eggs}/24`,'œufs'],['🏆',`${s.ach}/${s.achT||'?'}`,'succès'],['🔥',s.streak,'flammes'],['💡',inv.hint||0,'indices'],['🃏',inv.joker||0,'jokers']];
+ $('#tiles').innerHTML=T.map(([i,v,l])=>`<div class="tile"><b>${i} ${esc(v)}</b><small>${l}</small></div>`).join('');
+ const L=Math.max(0,(s.lvl||1)-1),nx=LEVELS[L+1];$('#lvn').innerHTML=`<b>Niv. ${L+1}</b> · ${esc(s.lvlN||LEVELS[L][1])}`;
+ $('#lvb').style.width=(nx?Math.min(100,(s.earned-LEVELS[L][0])/(nx[0]-LEVELS[L][0])*100):100)+'%';$('#lvp').textContent=nx?`${s.earned}/${nx[0]} ⭐ gagnées`:`${s.earned} ⭐ · max !`;
+ const op=new Set(s.opened||[]),D=s.days||{};let g='';const last=Math.max(0,...op);
+ for(let d=1;d<=24;d++){const x=D[d]||{},c=x.d&&!x.l?'ok':x.l?'ko':op.has(d)?'op':'';const mx=3+(x.e||0);
+  const info=x.d&&!x.l?`${x.s}⭐${x.f?`<br>${x.f+1}e essai`:''}`:x.l?'perdu':op.has(d)&&x.f?`<span class="h">${'❤️'.repeat(Math.max(0,mx-x.f))}${'🖤'.repeat(x.f)}</span>`:op.has(d)?'à jouer':'';
+  g+=`<div class="cell ${c} ${d==last?'now':''}" title="${esc(TITLES[d])}"><b>${d}</b>${info}</div>`}
+ $('#grid').innerHTML=g;
+ const B=(s.bons||[]).slice().sort((a,b)=>(a.u-b.u)||(b.at-a.at));
+ $('#bons').innerHTML=B.length?B.map(b=>`<div class="row ${b.u?'used':''}"><span class="ic">${esc(b.ic)}</span><span class="tx">${esc(b.n)}</span><span class="tm">${b.u?'✅ utilisé':'🎁 à offrir'}${b.at?' · '+new Date(b.at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}</span></div>`).join(''):'<p class="muted" style="margin:0">Aucun bon acheté pour l\'instant.</p>';
+ const P=s.puz||{},DN={easy:'Facile',normal:'Moyen',hard:'Difficile'};
+ $('#puz').innerHTML=`<div class="row"><span class="ic">🧩</span><span class="tx">${P.diff?`${DN[P.diff]||P.diff} · ${P.done?'<b>terminé</b> ✅':`${P.ok}/24 pièces en place`}`:'Difficulté pas encore choisie'}</span><span class="tm">${P.moves?P.moves+' coups':''}</span></div>
+  <div class="row" style="margin-top:6px"><span class="ic">🌟</span><span class="tx">Niveau secret : ${s.secret&&s.secret.done?`terminé · score ${s.secret.score}`:'pas encore fait'}</span></div>
+  ${s.sim?`<p class="muted" style="margin:8px 0 0;font-size:.8rem">⚠️ L'appli est en mode test (jour ${s.sim} simulé).</p>`:''}<p class="muted" style="margin:8px 0 0;font-size:.75rem">Dernière synchro ${ago(s.at)}</p>`}
+function renderLog(){const L=Object.entries(DB.log||{}).map(([k,v])=>({k,...v})).sort((a,b)=>b.at-a.at).slice(0,150);
+ if(!L.length){$('#log').innerHTML='<p class="muted" style="margin:0">Rien pour l\'instant.</p>';return}
+ let h='',lastD='';for(const e of L){const dd=new Date(e.at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});if(dd!=lastD){h+=`<div class="day">${dd}</div>`;lastD=dd}
+  const nw=!first&&!seen.has(e.k);h+=`<div class="row ${nw?'new':''}"><span class="ic">${esc(e.ic)}</span><span class="tx">${esc(e.txt)}${e.sim?' <span class="tag test">test</span>':''}</span><span class="tm">${hm(e.at)}</span></div>`}
+ L.forEach(e=>seen.add(e.k));$('#log').innerHTML=h}
+function render(){renderLive();renderState();renderLog();first=false}
+setInterval(()=>{renderLive();const g=$('#gdur');if(g&&DB.live&&DB.live.game)g.textContent=dur(DB.live.game.at)},1000);
+function connect(){let es;try{es=new EventSource(URL0+'.json')}catch(e){return fail()}
+ const on=ev=>{try{const m=JSON.parse(ev.data);if(ev.type=='put')setPath(m.path,m.data);else patch(m.path,m.data);$('#err').style.display='none';render()}catch(e){console.error(e)}};
+ es.addEventListener('put',on);es.addEventListener('patch',on);
+ es.addEventListener('cancel',()=>{fail('Accès refusé par la base (vérifie les règles Firebase).')});
+ es.onerror=()=>{if(es.readyState==2){fail();setTimeout(connect,5000)}}}
+function fail(m){const e=$('#err');e.textContent=m||'Connexion perdue, nouvel essai…';e.style.display='block'}
+$('#clr').onclick=async()=>{if(!confirm("Effacer tout l'historique d'activité ?"))return;try{await fetch(URL0+'/log.json',{method:'DELETE'})}catch(e){alert('Impossible pour le moment')}};
+connect();
+</script>
+</body>
+</html>
