@@ -3140,14 +3140,24 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},mode='',li=0,
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
 function musMatch(name){const n=nrm(name.replace(/\.[^.]+$/,''));let best=null,bl=0;for(const k in SONGS){const t=nrm(SONGS[k].t.replace(/\(.*?\)/g,''));if(t&&(n.includes(t)||n.replace(/ /g,'').includes(t.replace(/ /g,'')))&&t.length>bl){best=k;bl=t.length}}return best}
-async function mysMake(input){const files=[...input.files];input.value='';if(!files.length)return;const items=[],miss=[];for(const f of files){const d=musMatch(f.name);if(d&&!items.some(x=>x.d==d))items.push({d,f});else miss.push(f.name)}
- if(!items.length){alert('Aucun fichier reconnu.');return}toast('📦 Création du fichier mystère…');
- const head=JSON.stringify(items.map(x=>({d:x.d,name:x.f.name,type:x.f.type||'audio/mpeg',size:x.f.size}))),hb=new TextEncoder().encode(head);
- const blob=new Blob([new TextEncoder().encode('AVENTMUS1'+String(hb.length).padStart(10,'0')),hb,...items.map(x=>x.f)],{type:'application/octet-stream'}),file=new File([blob],'fichier-mystere.avent',{type:'application/octet-stream'});
- popup(`<h2>📦 Fichier mystère prêt</h2><p>${items.length} chanson${items.length>1?'s':''} dedans (${(blob.size/1048576).toFixed(0)} Mo).${miss.length?`<br><small class="muted">Pas reconnus : ${miss.map(esc).join(', ')}</small>`:''}</p><p>Envoie-le-lui (AirDrop, Messages, WhatsApp en « document », Drive…). Elle l'ouvrira dans l'appli avec le bouton 🎁 de ses Trésors.</p>
+
+async function mysBuild(items){const head=JSON.stringify(items.map(x=>({d:x.d,name:x.name,type:x.blob.type||'audio/mpeg',size:x.blob.size}))),hb=new TextEncoder().encode(head);
+ return new Blob([new TextEncoder().encode('AVENTMUS1'+String(hb.length).padStart(10,'0')),hb,...items.map(x=>x.blob)],{type:'application/octet-stream'})}
+const b64=bl=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=rej;r.readAsDataURL(bl)});
+async function mysOut(blob,n,miss){const name='fichier-mystere.avent',mo=(blob.size/1048576).toFixed(0);
+ if(window.AventAndroid&&AventAndroid.fileBegin){popup(`<h2>📦 Création…</h2><p id="mysq">0 %</p>`);if(!AventAndroid.fileBegin(name)){popup('<h2>Oups</h2><p>Impossible de créer le fichier.</p><button onclick="admin()">OK</button>');return}
+  const CH=786432;for(let o=0;o<blob.size;o+=CH){if(!AventAndroid.fileChunk(await b64(blob.slice(o,o+CH)))){popup('<h2>Oups</h2><p>Pas assez de place sur le téléphone ?</p><button onclick="admin()">OK</button>');return}const q=$('#mysq');if(q)q.textContent=Math.round(Math.min(100,(o+CH)/blob.size*100))+' %'}
+  const r=AventAndroid.fileEnd();if(r.startsWith('err')){popup(`<h2>Oups</h2><p>${esc(r)}</p><button onclick="admin()">OK</button>`);return}
+  popup(`<h2>📦 Fichier mystère prêt</h2><p>${n} chanson${n>1?'s':''} dedans (${mo} Mo).${miss}</p><p>${r=='ok'?'Il est enregistré dans <b>Téléchargements</b> sous le nom <b>fichier-mystere.avent</b>.':'Enregistré ici : <small>'+esc(r.slice(5))+'</small>'}</p>${r=='ok'?'<button onclick="AventAndroid.fileShare()">📤 L\'envoyer maintenant</button>':''}<button class="alt" onclick="admin()">← Retour</button>`);return}
+ const file=new File([blob],name,{type:'application/octet-stream'});
+ popup(`<h2>📦 Fichier mystère prêt</h2><p>${n} chanson${n>1?'s':''} dedans (${mo} Mo).${miss}</p><p>Envoie-le-lui (AirDrop, Messages, WhatsApp en « document », Drive…). Elle l'ouvrira dans l'appli avec le bouton 🎁 de ses Trésors.</p>
   ${navigator.canShare&&navigator.canShare({files:[file]})?'<button id="mysh">📤 Partager</button>':''}<button id="mydl" class="alt">💾 Enregistrer</button><button class="alt" onclick="admin()">← Retour</button>`);
  const sh=$('#mysh');if(sh)sh.onclick=()=>navigator.share({files:[file],title:'Fichier mystère'}).catch(()=>{});
- $('#mydl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fichier-mystere.avent';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}}
+ $('#mydl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}}
+async function mysFromDevice(){let o={};try{o=await MDB.all()}catch(_){}const items=Object.keys(o).filter(k=>o[k]&&o[k].blob).sort((a,b)=>a-b).map(k=>({d:k,name:o[k].name||('jour'+k),blob:o[k].blob}));
+ if(!items.length){toast('Aucune musique sur cet appareil');return}toast('📦 Création du fichier mystère…');await mysOut(await mysBuild(items),items.length,'')}
+async function mysMake(input){const files=[...input.files];input.value='';if(!files.length)return;const items=[],miss=[];for(const f of files){const d=musMatch(f.name);if(d&&!items.some(x=>x.d==d))items.push({d,name:f.name,blob:f});else miss.push(f.name)}
+ if(!items.length){alert('Aucun fichier reconnu.');return}toast('📦 Création du fichier mystère…');await mysOut(await mysBuild(items),items.length,miss.length?`<br><small class="muted">Pas reconnus : ${miss.map(esc).join(', ')}</small>`:'')}
 async function mysOpen(input){const f=input.files[0];input.value='';if(!f)return;try{const magic=new TextDecoder().decode(await f.slice(0,19).arrayBuffer());if(!magic.startsWith('AVENTMUS1'))throw 0;
  const hl=+magic.slice(9),head=JSON.parse(new TextDecoder().decode(await f.slice(19,19+hl).arrayBuffer()));let off=19+hl,n=0;
  popup(`<h2>🎁 Ouverture…</h2><p id="mysp">0 / ${head.length}</p>`);
@@ -3161,7 +3171,8 @@ function mysBtn(){return`<label class="btn mysb">🎁 Ouvrir le fichier mystère
 const nrm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 function musAdmin(){const rows=Object.keys(SONGS).map(d=>{const sg=SONGS[d];return`<div class="mrow"><span class="mday">${d}</span><span class="mtt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></span>${YTM.has(d)?'<span title="Fichier présent">✅</span>':'<span class="muted">—</span>'}<label class="btn sm mbt">📂<input type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="${d}"></label>${YTM.has(d)?`<button class="sm alt mbt" onclick="musDel(${d})">🗑</button>`:''}</div>`}).join('');
  popup(`<h2>🎵 Musiques des mini-jeux</h2><p class="muted" style="margin:0 0 8px">${YTM.count()}/24 fichiers sur cet appareil. Les fichiers restent uniquement sur cet appareil : importe-les directement sur sa tablette.</p>
- <p><label class="btn">📦 Créer le fichier mystère (choisis tes 24 musiques)<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mysmk"></label></p><p>${mysBtn()}</p>
+ <p><button onclick="mysFromDevice()">📦 Créer le fichier mystère avec les ${YTM.count()} musiques de cet appareil</button></p>
+ <p><label class="btn">📦 Fichier mystère à partir d'autres fichiers<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mysmk"></label></p><p>${mysBtn()}</p>
  <p><label class="btn">📂 Importer plusieurs fichiers d'un coup<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="multi"></label></p><p class="muted" style="font-size:.8rem;margin:0 0 8px">Chaque fichier est rangé tout seul si son nom contient le titre de la chanson (ex. « Last Nite.mp3 »).</p><div class="mlist">${rows}</div><button class="alt" onclick="admin()">← Retour</button>`)}
 async function musImport(input){const files=[...input.files];input.value='';if(!files.length)return;let ok=0,miss=[];toast('🎵 Import en cours…');
  for(const f of files){let d=input.dataset.d;if(d=='multi')d=musMatch(f.name);
