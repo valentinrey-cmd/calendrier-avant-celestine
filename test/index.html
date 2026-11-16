@@ -796,6 +796,13 @@ body.playing #ytm:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}#
 .mrow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #ffffff1a;text-align:left}.mday{width:22px;font-weight:700;opacity:.7}.mtt{flex:1;min-width:0}.mtt b,.mtt small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mtt small{opacity:.7;font-size:.75rem}
 .mbt{position:relative;min-height:0;padding:6px 10px}.mlist{max-height:46vh;overflow:auto;margin-bottom:10px}#ytm .ytc{padding:6px 8px}
 .mysb{position:relative;background:linear-gradient(145deg,#ff7ab6,#b3123a);color:#fff;border:0}
+#ytm .ytbig{display:none}#ytm.big{width:min(330px,calc(100vw - 24px));border-radius:22px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);top:auto;background:linear-gradient(160deg,#3a1030f2,#120a18f5);padding:14px 14px 4px}
+#ytm.big .ytbig{display:block;color:#fff;text-align:center}#ytm.big .ytb .ytl{font-size:.7rem;opacity:.75}
+.ytcov{width:min(240px,62vw);aspect-ratio:1;margin:2px auto 10px;border-radius:16px;background:linear-gradient(145deg,#ff7ab6,#7a1f50) center/cover;display:grid;place-items:center;box-shadow:0 10px 30px #0008;cursor:pointer}.ytcov span{font-size:4rem}.ytcov.img span{display:none}
+.ytt{cursor:pointer}.ytt b{display:block;font-size:1.05rem}.ytt small{opacity:.75}
+.ytsk{width:100%;margin:12px 0 2px;accent-color:#ff7ab6}.yttm{display:flex;justify-content:space-between;font-size:.72rem;opacity:.75}
+.ytbtn{display:flex;justify-content:center;align-items:center;gap:18px;margin:6px 0 4px}.ytbtn .ytc{font-size:1.25rem;padding:8px}.ytbtn .ytpp{width:56px;height:56px;border-radius:50%!important;background:#fff!important;color:#3a1030!important;font-size:1.4rem}
+body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -3118,23 +3125,35 @@ const MDB=(()=>{let dbp=null;const db=()=>dbp||(dbp=new Promise((res,rej)=>{try{
  const tx=(m,f)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction('songs',m),st=t.objectStore('songs');let out;Promise.resolve(f(st,v=>out=v)).catch(rej);t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error)}));
  return{put:(k,v)=>tx('readwrite',st=>st.put(v,String(k))),del:k=>tx('readwrite',st=>st.delete(String(k))),
   all:()=>tx('readonly',(st,set)=>{const o={};const c=st.openCursor();c.onsuccess=()=>{const x=c.result;if(x){o[x.key]=x.value;x.continue()}else set(o)}})}})();
-const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},mode='',li=0,box=null,ready=false;
- function refresh(){return MDB.all().then(o=>{for(const k in URLS)URL.revokeObjectURL(URLS[k]);URLS={};for(const k in o)if(o[k]&&o[k].blob)URLS[k]=URL.createObjectURL(o[k].blob);ready=true}).catch(()=>{ready=true})}
+async function id3Cover(blob){try{const b=new Uint8Array(await blob.slice(0,3e6).arrayBuffer());if(b[0]!=73||b[1]!=68||b[2]!=51)return null;const v=b[3],end=10+((b[6]&127)<<21|(b[7]&127)<<14|(b[8]&127)<<7|(b[9]&127));let p=10;if(b[5]&64)p+=v==4?((b[10]&127)<<21|(b[11]&127)<<14|(b[12]&127)<<7|(b[13]&127)):(b[10]<<24|b[11]<<16|b[12]<<8|b[13])+4;
+ while(p+10<end&&p+10<b.length){const id=String.fromCharCode(b[p],b[p+1],b[p+2],b[p+3]);if(!/^[A-Z0-9]{4}$/.test(id))break;const sz=v==4?((b[p+4]&127)<<21|(b[p+5]&127)<<14|(b[p+6]&127)<<7|(b[p+7]&127)):(b[p+4]<<24|b[p+5]<<16|b[p+6]<<8|b[p+7]);
+  if(id=='APIC'){let q=p+10;const enc=b[q++];let m='';while(b[q])m+=String.fromCharCode(b[q++]);q++;q++;if(enc==1||enc==2){while(q+1<b.length&&!(b[q]==0&&b[q+1]==0))q+=2;q+=2}else{while(b[q])q++;q++}
+   const data=b.slice(q,p+10+sz);return URL.createObjectURL(new Blob([data],{type:m&&m.includes('/')?m:'image/jpeg'}))}p+=10+sz}}catch(_){}return null}
+const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},mode='',li=0,box=null,ready=false,key='';
+ function refresh(){return MDB.all().then(o=>{for(const k in URLS)URL.revokeObjectURL(URLS[k]);URLS={};BL={};for(const k in o)if(o[k]&&o[k].blob){URLS[k]=URL.createObjectURL(o[k].blob);BL[k]=o[k].blob}ready=true}).catch(()=>{ready=true})}
  refresh();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}
- function ui(sg,ctrl){if(box)box.remove();box=document.createElement('div');box.id='ytm';
-  box.innerHTML=`<div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Déplacer">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
-  box.querySelector('.ytl').onclick=()=>box.classList.toggle('top');
-  box.querySelectorAll('.ytc').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else next(+a)})}
- au.onplay=()=>{const b=box&&box.querySelector('[data-a="p"]');if(b)b.textContent='⏸';if(box)box.classList.remove('tap')};
- au.onpause=()=>{const b=box&&box.querySelector('[data-a="p"]');if(b)b.textContent='▶'};
+ const fmt2=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
+ function ui(sg,ctrl,k){if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';
+  box.innerHTML=`<div class="ytbig"><div class="ytcov"><span>🎵</span></div><div class="ytt"><b>${esc(sg.t)}</b><small>${esc(sg.a||'')}</small></div><input type="range" class="ytsk" min="0" max="1000" value="0" aria-label="Avancer dans la musique"><div class="yttm"><span class="ytcu">0:00</span><span class="ytdu">0:00</span></div>
+   <div class="ytbtn"><button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button></div></div>
+   <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
+  const tg=()=>box.classList.toggle('big');box.querySelector('.ytl').onclick=tg;box.querySelector('.ytcov').onclick=tg;box.querySelector('.ytt').onclick=tg;
+  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
+  const sk=box.querySelector('.ytsk');let drag=false;sk.oninput=()=>{drag=true;const d=au.duration||0;box.querySelector('.ytcu').textContent=fmt2(sk.value/1000*d)};sk.onchange=()=>{const d=au.duration||0;if(d)au.currentTime=sk.value/1000*d;drag=false};sk._drag=()=>drag;
+  const pb=box.querySelector('[data-a="p"]');if(pb&&au.paused===false)pb.textContent='⏸';
+  const setCov=u=>{const c=box&&box.querySelector('.ytcov');if(c&&u){c.style.backgroundImage=`url(${u})`;c.classList.add('img')}};
+  if(COV[key]!==undefined)setCov(COV[key]);else if(BL[key])id3Cover(BL[key]).then(u=>{COV[key]=u;setCov(u)})}
+ au.ontimeupdate=()=>{if(!box)return;const sk=box.querySelector('.ytsk');if(!sk||(sk._drag&&sk._drag()))return;const d=au.duration||0;sk.value=d?au.currentTime/d*1000:0;box.querySelector('.ytcu').textContent=fmt2(au.currentTime);box.querySelector('.ytdu').textContent=fmt2(d)};
+ au.onplay=()=>{if(box){box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='⏸');box.classList.remove('tap')}};
+ au.onpause=()=>{if(box)box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='▶')};
  au.onended=()=>{if(mode=='list')next(1)};
  function go(url,vol,loop){au.src=url;au.loop=!!loop;au.volume=vol;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(()=>{if(box)box.classList.add('tap')})}
  function stop(){try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
  const has=d=>!!URLS[String(d)];
  function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
-  const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
+  const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i){const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
+ function list(i){const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
  function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(has(L[j].jour)&&L[j].jour<=unl())return list(j)}}
  return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
