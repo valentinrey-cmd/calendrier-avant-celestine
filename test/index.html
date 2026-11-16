@@ -3161,6 +3161,8 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
   if(S.shuf){if(!ORD.length||ORD[op]!==li||L.some((x,j)=>ok(j)&&!ORD.includes(j))){const k=ORD.indexOf(li);if(k>=0&&!L.some((x,j)=>ok(j)&&!ORD.includes(j)))op=k;else mkOrd()}
    op=((op+dir)%ORD.length+ORD.length)%ORD.length;return list(ORD[op],1)}
   for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode){const m=mode;stop();window.__ytmResume=m=='game'?window.CURD:0}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(document.getElementById('gwin')&&window.CURD==d)start(d)}});
+ addEventListener('pagehide',()=>{if(mode)stop()});
  return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
