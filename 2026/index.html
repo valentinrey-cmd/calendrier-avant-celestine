@@ -797,7 +797,7 @@ body.playing #ytm:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}#
 .mbt{position:relative;min-height:0;padding:6px 10px}.mlist{max-height:46vh;overflow:auto;margin-bottom:10px}#ytm .ytc{padding:6px 8px}
 .mysb{position:relative;background:linear-gradient(145deg,#ff7ab6,#b3123a);color:#fff;border:0}
 #ytm .ytbig{display:none}#ytm.big{width:min(330px,calc(100vw - 24px));border-radius:22px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);top:auto;background:linear-gradient(160deg,#3a1030f2,#120a18f5);padding:14px 14px 4px}
-#ytm.big .ytbig{display:block;color:#fff;text-align:center}#ytm.big .ytb .ytl{font-size:.7rem;opacity:.75}
+#ytm.big .ytbig{display:block;color:#fff;text-align:center}#ytm.big .ytb .ytc:not([data-a="x"]){display:none}#ytm.big .ytb .ytl{font-size:.7rem;opacity:.75}
 .ytcov{width:min(240px,62vw);aspect-ratio:1;margin:2px auto 10px;border-radius:16px;background:linear-gradient(145deg,#ff7ab6,#7a1f50) center/cover;display:grid;place-items:center;box-shadow:0 10px 30px #0008;cursor:pointer}.ytcov span{font-size:4rem}.ytcov.img span{display:none}
 .ytt{cursor:pointer}.ytt b{display:block;font-size:1.05rem}.ytt small{opacity:.75}
 .ytsk{width:100%;margin:12px 0 2px;accent-color:#ff7ab6}.yttm{display:flex;justify-content:space-between;font-size:.72rem;opacity:.75}
@@ -3133,7 +3133,7 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  function refresh(){return MDB.all().then(o=>{for(const k in URLS)URL.revokeObjectURL(URLS[k]);URLS={};BL={};for(const k in o)if(o[k]&&o[k].blob){URLS[k]=URL.createObjectURL(o[k].blob);BL[k]=o[k].blob}ready=true}).catch(()=>{ready=true})}
  refresh();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}
  const fmt2=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
- function ui(sg,ctrl,k){if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';
+ function ui(sg,ctrl,k){const big=!!(box&&box.classList.contains('big'));if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';if(big)box.classList.add('big');
   box.innerHTML=`<div class="ytbig"><div class="ytcov"><span>🎵</span></div><div class="ytt"><b>${esc(sg.t)}</b><small>${esc(sg.a||'')}</small></div><input type="range" class="ytsk" min="0" max="1000" value="0" aria-label="Avancer dans la musique"><div class="yttm"><span class="ytcu">0:00</span><span class="ytdu">0:00</span></div>
    <div class="ytbtn"><button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button></div></div>
    <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
