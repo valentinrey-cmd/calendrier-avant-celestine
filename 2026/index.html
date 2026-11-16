@@ -891,7 +891,7 @@ const CONTENU={
     {titre:"Côte à côte, pour toujours", date:"Dans très, très longtemps…", src:ALIMG.f_tombes, o:"l", pos:"center"}]},
   ]},
  playlist:[                    // NOTRE PLAYLIST (coffre à souvenirs) : débloque aussi la musique de chaque mini-jeu
-  {titre:"À l'international", artiste:"TAL", mot:"La chanson du jour 1", jour:1},
+  {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 1", jour:1},
   {titre:"Loser", artiste:"Tame Impala", mot:"La chanson du jour 2", jour:2},
   {titre:"Stolen Dance", artiste:"Milky Chance", mot:"La chanson du jour 3", jour:3},
   {titre:"The Fate of Ophelia", artiste:"Taylor Swift", mot:"La chanson du jour 4", jour:4},
@@ -912,7 +912,7 @@ const CONTENU={
   {titre:"I Feel It Coming", artiste:"The Weeknd ft. Daft Punk", mot:"La chanson du jour 19", jour:19},
   {titre:"Diana", artiste:"GIMS", mot:"La chanson du jour 20", jour:20},
   {titre:"Black Madonna", artiste:"Cage The Elephant", mot:"La chanson du jour 21", jour:21},
-  {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 22", jour:22},
+  {titre:"À l'international", artiste:"TAL", mot:"La chanson du jour 22", jour:22},
   {titre:"Dance, Dance", artiste:"Fall Out Boy", mot:"La chanson du jour 23", jour:23},
   {titre:"I Was Made for Lovin' You", artiste:"KISS", mot:"La chanson du jour 24", jour:24}
  ],
@@ -3111,7 +3111,7 @@ const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
 document.addEventListener('pointerdown',()=>{try{bgm()}catch(_){}},{once:true});
 
 /* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
-const SONGS={"1":{"t":"À l'international","a":"TAL"},"2":{"t":"Loser","a":"Tame Impala"},"3":{"t":"Stolen Dance","a":"Milky Chance"},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift"},"5":{"t":"Lush Life","a":"Zara Larsson"},"6":{"t":"DtMF","a":"Bad Bunny"},"7":{"t":"Gigi l'amoroso","a":"Dalida"},"8":{"t":"Le passé","a":"TAL"},"9":{"t":"Dine N'Dash","a":"The Strokes"},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira"},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala"},"12":{"t":"White Keys","a":"Dominic Fike"},"13":{"t":"Out of My League","a":"Fitz and The Tantrums"},"14":{"t":"Last Nite","a":"The Strokes"},"15":{"t":"Opalite","a":"Taylor Swift"},"16":{"t":"I Just Might","a":"Bruno Mars"},"17":{"t":"Self Aware","a":"Temper City"},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus"},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk"},"20":{"t":"Diana","a":"GIMS"},"21":{"t":"Black Madonna","a":"Cage The Elephant"},"22":{"t":"Babydoll","a":"Dominic Fike"},"23":{"t":"Dance, Dance","a":"Fall Out Boy"},"24":{"t":"I Was Made for Lovin' You","a":"KISS"}};
+const SONGS={"1":{"t":"Babydoll","a":"Dominic Fike"},"2":{"t":"Loser","a":"Tame Impala"},"3":{"t":"Stolen Dance","a":"Milky Chance"},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift"},"5":{"t":"Lush Life","a":"Zara Larsson"},"6":{"t":"DtMF","a":"Bad Bunny"},"7":{"t":"Gigi l'amoroso","a":"Dalida"},"8":{"t":"Le passé","a":"TAL"},"9":{"t":"Dine N'Dash","a":"The Strokes"},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira"},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala"},"12":{"t":"White Keys","a":"Dominic Fike"},"13":{"t":"Out of My League","a":"Fitz and The Tantrums"},"14":{"t":"Last Nite","a":"The Strokes"},"15":{"t":"Opalite","a":"Taylor Swift"},"16":{"t":"I Just Might","a":"Bruno Mars"},"17":{"t":"Self Aware","a":"Temper City"},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus"},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk"},"20":{"t":"Diana","a":"GIMS"},"21":{"t":"Black Madonna","a":"Cage The Elephant"},"22":{"t":"À l'international","a":"TAL"},"23":{"t":"Dance, Dance","a":"Fall Out Boy"},"24":{"t":"I Was Made for Lovin' You","a":"KISS"}};
 /* Les fichiers audio sont importés par Valentin (mode admin) et gardés uniquement sur cet appareil (IndexedDB) */
 const MDB=(()=>{let dbp=null;const db=()=>dbp||(dbp=new Promise((res,rej)=>{try{const r=indexedDB.open('avent_music',1);r.onupgradeneeded=()=>r.result.createObjectStore('songs');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}}));
  const tx=(m,f)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction('songs',m),st=t.objectStore('songs');let out;Promise.resolve(f(st,v=>out=v)).catch(rej);t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error)}));
