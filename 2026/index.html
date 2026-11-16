@@ -787,10 +787,12 @@ html,button,a,input,label,[role=button]{touch-action:manipulation}
 .rcgift{font-size:6rem;background:none;border:0;box-shadow:none;padding:0;min-height:0;line-height:1.1;animation:rcBob 1.2s ease-in-out infinite;cursor:pointer}.rcgift.shk{animation:rcShk .4s}
 @keyframes rcShk{20%{transform:rotate(-14deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(6deg)}}
 .rcopen{font-size:4.5rem;animation:rcIn .5s}
-#ytm{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);z-index:18;width:176px;background:#000d;border:1px solid #ffffff33;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px #0009}
+body.playing #ytm:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}#ytm{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);z-index:18;width:176px;background:#000d;border:1px solid #ffffff33;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px #0009}
 #ytm.top{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 54px)}#ytm .ytv{height:99px;background:#000}#ytm iframe{display:block;width:176px;height:99px;border:0}
 #ytm .ytl{display:block;width:100%;min-height:0;padding:4px 7px;border-radius:0;background:none;box-shadow:none;border:0;color:#fff;font-size:.68rem;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ytm.tap{outline:2px solid #ffd24a;animation:ytp 1s ease-in-out infinite}#ytm.tap .ytl:after{content:' · touche ▶';color:#ffd24a}@keyframes ytp{50%{box-shadow:0 0 0 6px #ffd24a44}}
+#ytm .ytb{display:flex;align-items:center}#ytm .ytb .ytl{flex:1;min-width:0}#ytm .ytc{min-height:0;padding:3px 6px;border-radius:0;background:none;box-shadow:none;border:0;color:#fff;font-size:.8rem}
+.plr.play{background:#ff7ab622;border-radius:10px}button.plp{min-height:0;width:38px;height:38px;padding:0;border-radius:50%;flex:none}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -887,30 +889,30 @@ const CONTENU={
     {titre:"Côte à côte, pour toujours", date:"Dans très, très longtemps…", src:ALIMG.f_tombes, o:"l", pos:"center"}]},
   ]},
  playlist:[                    // NOTRE PLAYLIST (coffre à souvenirs) : débloque aussi la musique de chaque mini-jeu
-  {titre:"À l'international", artiste:"TAL", mot:"La chanson du jour 1", lien:"https://www.youtube.com/watch?v=gQmAH6VSvBg"},
-  {titre:"Loser", artiste:"Tame Impala", mot:"La chanson du jour 2", lien:"https://www.youtube.com/watch?v=s3a4OQR-10M"},
-  {titre:"Stolen Dance", artiste:"Milky Chance", mot:"La chanson du jour 3", lien:"https://www.youtube.com/watch?v=iX-QaNzd-0Y"},
-  {titre:"The Fate of Ophelia", artiste:"Taylor Swift", mot:"La chanson du jour 4", lien:"https://www.youtube.com/watch?v=ko70cExuzZM"},
-  {titre:"Lush Life", artiste:"Zara Larsson", mot:"La chanson du jour 5", lien:"https://www.youtube.com/watch?v=tD4HCZe-tew"},
-  {titre:"DtMF", artiste:"Bad Bunny", mot:"La chanson du jour 6", lien:"https://www.youtube.com/watch?v=v9T_MGfzq7I"},
-  {titre:"Gigi l'amoroso", artiste:"Dalida", mot:"La chanson du jour 7", lien:"https://www.youtube.com/watch?v=dfNr3KNDoRs"},
-  {titre:"Le passé", artiste:"TAL", mot:"La chanson du jour 8", lien:"https://www.youtube.com/watch?v=wSXPHNHuw7A"},
-  {titre:"Dine N'Dash", artiste:"The Strokes", mot:"La chanson du jour 9", lien:"https://www.youtube.com/watch?v=sal78l1W6fE"},
-  {titre:"Zoo (Zootopie 2)", artiste:"Shakira", mot:"La chanson du jour 10", lien:"https://www.youtube.com/watch?v=WTRm-Yr5Foo"},
-  {titre:"Dracula (ft. JENNIE)", artiste:"Tame Impala", mot:"La chanson du jour 11", lien:"https://www.youtube.com/watch?v=0UPDBODtxzw"},
-  {titre:"White Keys", artiste:"Dominic Fike", mot:"La chanson du jour 12", lien:"https://www.youtube.com/watch?v=Cz200209hOs"},
-  {titre:"Out of My League", artiste:"Fitz and The Tantrums", mot:"La chanson du jour 13", lien:"https://www.youtube.com/watch?v=Z4mbxaa3XL8"},
-  {titre:"Last Nite", artiste:"The Strokes", mot:"La chanson du jour 14", lien:"https://www.youtube.com/watch?v=TOypSnKFHrE"},
-  {titre:"Opalite", artiste:"Taylor Swift", mot:"La chanson du jour 15", lien:"https://www.youtube.com/watch?v=1FVF-9KQiPo"},
-  {titre:"I Just Might", artiste:"Bruno Mars", mot:"La chanson du jour 16", lien:"https://www.youtube.com/watch?v=32LLE6Zk6zc"},
-  {titre:"Self Aware", artiste:"Temper City", mot:"La chanson du jour 17", lien:"https://www.youtube.com/watch?v=mh4AQkw4Jjc"},
-  {titre:"Nothing Breaks Like a Heart", artiste:"Mark Ronson ft. Miley Cyrus", mot:"La chanson du jour 18", lien:"https://www.youtube.com/watch?v=A9hcJgtnm6Q"},
-  {titre:"I Feel It Coming", artiste:"The Weeknd ft. Daft Punk", mot:"La chanson du jour 19", lien:"https://www.youtube.com/watch?v=qFLhGq0060w"},
-  {titre:"Diana", artiste:"GIMS", mot:"La chanson du jour 20", lien:"https://www.youtube.com/watch?v=bLsjzK3hoyg"},
-  {titre:"Black Madonna", artiste:"Cage The Elephant", mot:"La chanson du jour 21", lien:"https://www.youtube.com/watch?v=itxarI8weqQ"},
-  {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 22", lien:"https://www.youtube.com/watch?v=UnuEzP1rDLY"},
-  {titre:"Dance, Dance", artiste:"Fall Out Boy", mot:"La chanson du jour 23", lien:"https://www.youtube.com/watch?v=C6MOKXm8x50"},
-  {titre:"I Was Made for Lovin' You", artiste:"KISS", mot:"La chanson du jour 24", lien:"https://www.youtube.com/watch?v=ZhIsAZO5gl0"}
+  {titre:"À l'international", artiste:"TAL", mot:"La chanson du jour 1", jour:1, lien:"https://www.youtube.com/watch?v=gQmAH6VSvBg"},
+  {titre:"Loser", artiste:"Tame Impala", mot:"La chanson du jour 2", jour:2, lien:"https://www.youtube.com/watch?v=s3a4OQR-10M"},
+  {titre:"Stolen Dance", artiste:"Milky Chance", mot:"La chanson du jour 3", jour:3, lien:"https://www.youtube.com/watch?v=iX-QaNzd-0Y"},
+  {titre:"The Fate of Ophelia", artiste:"Taylor Swift", mot:"La chanson du jour 4", jour:4, lien:"https://www.youtube.com/watch?v=ko70cExuzZM"},
+  {titre:"Lush Life", artiste:"Zara Larsson", mot:"La chanson du jour 5", jour:5, lien:"https://www.youtube.com/watch?v=tD4HCZe-tew"},
+  {titre:"DtMF", artiste:"Bad Bunny", mot:"La chanson du jour 6", jour:6, lien:"https://www.youtube.com/watch?v=v9T_MGfzq7I"},
+  {titre:"Gigi l'amoroso", artiste:"Dalida", mot:"La chanson du jour 7", jour:7, lien:"https://www.youtube.com/watch?v=dfNr3KNDoRs"},
+  {titre:"Le passé", artiste:"TAL", mot:"La chanson du jour 8", jour:8, lien:"https://www.youtube.com/watch?v=wSXPHNHuw7A"},
+  {titre:"Dine N'Dash", artiste:"The Strokes", mot:"La chanson du jour 9", jour:9, lien:"https://www.youtube.com/watch?v=sal78l1W6fE"},
+  {titre:"Zoo (Zootopie 2)", artiste:"Shakira", mot:"La chanson du jour 10", jour:10, lien:"https://www.youtube.com/watch?v=WTRm-Yr5Foo"},
+  {titre:"Dracula (ft. JENNIE)", artiste:"Tame Impala", mot:"La chanson du jour 11", jour:11, lien:"https://www.youtube.com/watch?v=0UPDBODtxzw"},
+  {titre:"White Keys", artiste:"Dominic Fike", mot:"La chanson du jour 12", jour:12, lien:"https://www.youtube.com/watch?v=Cz200209hOs"},
+  {titre:"Out of My League", artiste:"Fitz and The Tantrums", mot:"La chanson du jour 13", jour:13, lien:"https://www.youtube.com/watch?v=Z4mbxaa3XL8"},
+  {titre:"Last Nite", artiste:"The Strokes", mot:"La chanson du jour 14", jour:14, lien:"https://www.youtube.com/watch?v=TOypSnKFHrE"},
+  {titre:"Opalite", artiste:"Taylor Swift", mot:"La chanson du jour 15", jour:15, lien:"https://www.youtube.com/watch?v=1FVF-9KQiPo"},
+  {titre:"I Just Might", artiste:"Bruno Mars", mot:"La chanson du jour 16", jour:16, lien:"https://www.youtube.com/watch?v=32LLE6Zk6zc"},
+  {titre:"Self Aware", artiste:"Temper City", mot:"La chanson du jour 17", jour:17, lien:"https://www.youtube.com/watch?v=mh4AQkw4Jjc"},
+  {titre:"Nothing Breaks Like a Heart", artiste:"Mark Ronson ft. Miley Cyrus", mot:"La chanson du jour 18", jour:18, lien:"https://www.youtube.com/watch?v=A9hcJgtnm6Q"},
+  {titre:"I Feel It Coming", artiste:"The Weeknd ft. Daft Punk", mot:"La chanson du jour 19", jour:19, lien:"https://www.youtube.com/watch?v=qFLhGq0060w"},
+  {titre:"Diana", artiste:"GIMS", mot:"La chanson du jour 20", jour:20, lien:"https://www.youtube.com/watch?v=bLsjzK3hoyg"},
+  {titre:"Black Madonna", artiste:"Cage The Elephant", mot:"La chanson du jour 21", jour:21, lien:"https://www.youtube.com/watch?v=itxarI8weqQ"},
+  {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 22", jour:22, lien:"https://www.youtube.com/watch?v=UnuEzP1rDLY"},
+  {titre:"Dance, Dance", artiste:"Fall Out Boy", mot:"La chanson du jour 23", jour:23, lien:"https://www.youtube.com/watch?v=C6MOKXm8x50"},
+  {titre:"I Was Made for Lovin' You", artiste:"KISS", mot:"La chanson du jour 24", jour:24, lien:"https://www.youtube.com/watch?v=ZhIsAZO5gl0"}
  ],
  coffre3:null,                 // ✏️ 3e surprise du coffre à souvenirs (à décider)
  recordsValentin:{},           // ✏️ tes records à battre, ex. {candy:{s:18400},flappy:{s:15,t:42}} (s = score, t = temps en secondes)
@@ -1145,7 +1147,7 @@ function openGame(d,pr,quit){closeGame(true);const D=DAYS[d],ov=document.createE
  ov.querySelector('.gwx').onclick=()=>{const q=$('#gwq');if(pr)return quit('partie quittée');
   q.innerHTML=`<div class="gwc"><span>Quitter ? Cet essai comptera comme raté.</span><span><button class="sm" id="gwy">Quitter</button><button class="alt sm" id="gwn">Continuer</button></span></div>`;
   $('#gwy').onclick=()=>quit('tu as abandonné la partie');$('#gwn').onclick=()=>q.innerHTML=''}}
-function closeGame(silent){try{MUS.stop()}catch(_){}try{YTM.stop()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
+function closeGame(silent){try{MUS.stop()}catch(_){}try{YTM.stopGame()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
  if(P&&m){if(hud)P.insertBefore(hud,m);if(g)P.insertBefore(g,m)}ov.remove();const hk=document.getElementById('hk');if(hk)hk.remove();
  document.documentElement.classList.remove('gl');document.body.style.top='';window.scrollTo(0,lockY);lastY=lockY;allowScroll()}
 function hit(){const d=window.CURD;if(window.CURPR)return 0;if(!d)return -1;const sd=S.days[d]=S.days[d]||{},mx=3+(sd.extra||0);sd.fails=(sd.fails||0)+1;if(sd.fails>=mx){sd.fails=mx-1;save();return 0}save();const e=$('#lives');if(e)e.textContent='Essais : '+'❤️'.repeat(mx-sd.fails)+'🖤'.repeat(sd.fails);return mx-sd.fails}
@@ -1269,7 +1271,7 @@ async function vrecExport(){const o={};Object.entries(S.st||{}).forEach(([g,x])=
  popup(`<h2>⚔️ Code de tes records</h2><p>Envoie-lui ce code : elle le colle dans <b>Trésors → 📥 Coller un code</b>, et tes records apparaissent à battre dans chaque jeu.</p><textarea class="synct" readonly onclick="this.select()">${code}</textarea><p class="muted">${Object.keys(o).length} jeu(x) avec un record.</p><button onclick="closePop()">OK</button>`)}
 /* musique d'ambiance */
 function bgmOn(){return S.bgm!==false&&S.sound!==false&&S.music!==false}
-function bgm(){if(typeof ALBM!='undefined'&&ALBM.on)return;try{if(!bgmOn()||document.getElementById('gwin'))return;if(MUS.cur&&MUS.cur.startsWith('bg'))return;MUS.play('deck',.025);MUS._bg=1}catch(_){}}
+function bgm(){if(typeof ALBM!='undefined'&&ALBM.on)return;try{if(YTM.on())return}catch(_){}try{if(!bgmOn()||document.getElementById('gwin'))return;if(MUS.cur&&MUS.cur.startsWith('bg'))return;MUS.play('deck',.025);MUS._bg=1}catch(_){}}
 
 /* ---------- Appli installable ---------- */
 const APP={native:()=>/AventApp/.test(navigator.userAgent),standalone:()=>/AventApp/.test(navigator.userAgent)||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true,
@@ -2815,7 +2817,7 @@ function voixPlay(){const V=(CONTENU.voix||[]).slice(0,vCount());if(!V.length)re
  try{if(VA){VA.pause()}VA=new Audio(V[k]);VA.play().catch(()=>{});
   for(let i=0;i<7;i++){const h=document.createElement('i');h.className='vheart';h.textContent=['❤️','💖','💕'][i%3];h.style.left=(innerWidth/2+(Math.random()-.5)*120)+'px';h.style.top=(innerHeight*.45)+'px';h.style.animationDelay=(i*.12)+'s';document.body.appendChild(h);setTimeout(()=>h.remove(),2200)}}catch(e){}}
 
-function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[];return`<h2>🎵 Notre playlist</h2><div class="panel pl">${L.map((x,i)=>`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(x.titre)}</b><small>${esc(x.artiste||'')}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div>${x.lien?`<a class="plp" href="${x.lien}" target="_blank" rel="noopener">▶</a>`:''}</div>`).join('')}</div>`}
+function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[];return`<h2>🎵 Notre playlist</h2><div class="panel pl">${L.map((x,i)=>`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(x.titre)}</b><small>${esc(x.artiste||'')}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`).join('')}</div>`}
 
 function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small>${l}</small><b>${v}</b></span>`).join('')}</div>`;
  const R=(ic,t,txt,ch)=>`<div class="rl"><div class="rlh"><span class="rli">${ic}</span><b>${t}</b></div><p>${txt}</p>${ch?C(ch):''}</div>`;
@@ -2895,6 +2897,7 @@ function admin(){popup(`<h2>Mode test</h2><p>Jour simulé : <select id="sim" sty
  <p><button class="alt" onclick="vrecExport()">⚔️ Code de mes records (à lui envoyer)</button></p>
  <p><button class="alt" onclick="achReset()">🏆 Réinitialiser les succès</button></p>
  <p><button class="alt" onclick="secReset()">🌟 Réinitialiser le niveau secret${S.secret&&S.secret.done?' (score '+(S.secret.score||0)+')':''}</button></p>
+ <p><button class="${S.own.includes('playlist')?'':'alt'}" onclick="if(S.own.includes('playlist'))S.own=S.own.filter(x=>x!='playlist');else S.own.push('playlist');save();admin()">🎵 Playlist débloquée (test) : <b>${S.own.includes('playlist')?'ON':'OFF'}</b></button></p>
  <p><span class="btn">📷 Changer l'image du puzzle<input type="file" accept="image/*" class="fpick" aria-label="Changer l'image du puzzle"></span></p>
  <p><button class="alt" onclick="resetPuz()">🧩 Réinitialiser le puzzle${S.diffLock?' ('+LV[S.diffLock].n+')':''}</button></p>
  <p><button class="alt" onclick="askWipe()">🗑️ Tout réinitialiser</button></p><p class="muted">Pense à remettre « Date réelle » (ou à tout réinitialiser) avant de lui laisser l'appareil.</p><button class="alt" onclick="closePop()">Fermer</button>`)}
@@ -3106,19 +3109,29 @@ document.addEventListener('pointerdown',()=>{try{bgm()}catch(_){}},{once:true});
 
 /* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
 const SONGS={"1":{"t":"À l'international","a":"TAL","v":["gQmAH6VSvBg","PfSypFuO6LM"]},"2":{"t":"Loser","a":"Tame Impala","v":["s3a4OQR-10M","GQgL-Dk9sq0"]},"3":{"t":"Stolen Dance","a":"Milky Chance","v":["iX-QaNzd-0Y","K1m_Dt_ImXQ"]},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift","v":["ko70cExuzZM","7nVctvQVz0U","svcboYY81wU"]},"5":{"t":"Lush Life","a":"Zara Larsson","v":["tD4HCZe-tew","RG-D4bcg54s"]},"6":{"t":"DtMF","a":"Bad Bunny","v":["v9T_MGfzq7I","TiebZllW8As"]},"7":{"t":"Gigi l'amoroso","a":"Dalida","v":["dfNr3KNDoRs","OEFZo2WxOq4"]},"8":{"t":"Le passé","a":"TAL","v":["wSXPHNHuw7A","x9X097Rwnp4"]},"9":{"t":"Dine N'Dash","a":"The Strokes","v":["sal78l1W6fE","VoSw7nVMjPI"]},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira","v":["WTRm-Yr5Foo","lRxrQw9LBDg"]},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala","v":["0UPDBODtxzw","NiNXwI_Y1So"]},"12":{"t":"White Keys","a":"Dominic Fike","v":["Cz200209hOs","BqaUS8slDPY"]},"13":{"t":"Out of My League","a":"Fitz and The Tantrums","v":["Z4mbxaa3XL8","4d2I6SIs_bk"]},"14":{"t":"Last Nite","a":"The Strokes","v":["TOypSnKFHrE","Bn-lcvrMOlc"]},"15":{"t":"Opalite","a":"Taylor Swift","v":["1FVF-9KQiPo","JCcUifiu3UU"]},"16":{"t":"I Just Might","a":"Bruno Mars","v":["32LLE6Zk6zc","luotSpkyCVU"]},"17":{"t":"Self Aware","a":"Temper City","v":["mh4AQkw4Jjc","kpeVxYk8CdU"]},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus","v":["A9hcJgtnm6Q","OP2FrMUjufI"]},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk","v":["qFLhGq0060w","qPRNIHxLhmc"]},"20":{"t":"Diana","a":"GIMS","v":["bLsjzK3hoyg","qAoEHAdkrcc"]},"21":{"t":"Black Madonna","a":"Cage The Elephant","v":["itxarI8weqQ","458JYRJM2fc"]},"22":{"t":"Babydoll","a":"Dominic Fike","v":["UnuEzP1rDLY"]},"23":{"t":"Dance, Dance","a":"Fall Out Boy","v":["C6MOKXm8x50","P43XYXqJJlU"]},"24":{"t":"I Was Made for Lovin' You","a":"KISS","v":["ZhIsAZO5gl0","kLKr342VKaU"]}};
-const YTM=(()=>{let api=null,pl=null,box=null,ids=[],k=0,tm=0;
+const YTM=(()=>{let api=null,pl=null,box=null,ids=[],k=0,tm=0,mode='',li=0;
  const load=()=>api||(api=new Promise(res=>{if(window.YT&&YT.Player)return res();const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev&&prev()}catch(_){}res()};const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=()=>{api=null;res('err')};document.head.appendChild(sc);setTimeout(()=>res('err'),9000)}));
- function stop(){clearTimeout(tm);try{pl&&pl.destroy()}catch(_){}pl=null;if(box){box.remove();box=null}}
- function fail(){const d=window.CURD;stop();try{MUS.day(d)}catch(_){}}
- function mk(){if(!box)return;const host=document.createElement('div');box.querySelector('.ytv').innerHTML='';box.querySelector('.ytv').appendChild(host);
+ function stop(){clearTimeout(tm);try{pl&&pl.destroy()}catch(_){}pl=null;if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
+ function fail(){const m=mode,d=window.CURD;stop();if(m=='game'){try{MUS.day(d)}catch(_){}}else if(m=='list'){toast('🎵 Impossible de lire cette chanson pour le moment');try{bgm()}catch(_){}}}
+ function mk(){if(!box)return;const v=box.querySelector('.ytv');v.innerHTML='';const host=document.createElement('div');v.appendChild(host);
   pl=new YT.Player(host,{width:176,height:99,videoId:ids[k],playerVars:{autoplay:1,playsinline:1,controls:1,rel:0,modestbranding:1,fs:0,origin:location.origin},
-   events:{onReady:e=>{try{e.target.setVolume(DAYS[window.CURD]&&DAYS[window.CURD].g=='simon'?25:80);e.target.playVideo()}catch(_){}tm=setTimeout(()=>{try{const st=pl.getPlayerState();if(st!=1&&st!=3)box.classList.add('tap')}catch(_){}},3000)},
+   events:{onReady:e=>{try{e.target.setVolume(mode=='game'&&DAYS[window.CURD]&&DAYS[window.CURD].g=='simon'?25:80);e.target.playVideo()}catch(_){}tm=setTimeout(()=>{try{const st=pl.getPlayerState();if(st!=1&&st!=3&&box)box.classList.add('tap')}catch(_){}},3000)},
     onError:()=>{k++;try{pl.destroy()}catch(_){}pl=null;if(k<ids.length)mk();else fail()},
-    onStateChange:e=>{if(!box)return;if(e.data==1)box.classList.remove('tap');if(e.data==0){try{pl.seekTo(0);pl.playVideo()}catch(_){}}}}})}
- function start(d){stop();const sg=SONGS[d];if(!sg||S.music===false||!S.own.includes('playlist')||!/^https?:/.test(location.protocol)||navigator.onLine===false)return false;
-  box=document.createElement('div');box.id='ytm';box.innerHTML=`<div class="ytv"></div><button class="ytl" title="Déplacer">🎵 ${esc(sg.t)} · ${esc(sg.a)}</button>`;document.body.appendChild(box);
-  box.querySelector('.ytl').onclick=()=>box.classList.toggle('top');ids=sg.v.slice();k=0;load().then(r=>{if(!box)return;if(r=='err')return fail();mk()});return true}
- return{start,stop}})();
+    onStateChange:e=>{if(!box)return;if(e.data==1)box.classList.remove('tap');if(e.data==0){if(mode=='list')next(1);else{try{pl.seekTo(0);pl.playVideo()}catch(_){}}}}}})}
+ function open(sg,m,ctrl){stop();mode=m;box=document.createElement('div');box.id='ytm';
+  box.innerHTML=`<div class="ytv"></div><div class="ytb"><button class="ytl" title="Déplacer">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button><button class="ytc" data-a="x">✕</button>':''}</div>`;document.body.appendChild(box);
+  box.querySelector('.ytl').onclick=()=>box.classList.toggle('top');box.querySelectorAll('.ytc').forEach(b=>b.onclick=()=>{const a=b.dataset.a;if(a=='x'){stop();try{bgm()}catch(_){}}else next(+a)});
+  ids=sg.v.slice();k=0;load().then(r=>{if(!box)return;if(r=='err')return fail();mk()})}
+ const ok=()=>S.music!==false&&S.own.includes('playlist')&&/^https?:/.test(location.protocol)&&navigator.onLine!==false;
+ function start(d){if(mode=='game')stop();const sg=SONGS[d];if(!sg||!ok())return false;open(sg,'game');return true}
+ function stopGame(){if(mode=='game')stop()}
+ function list(i){if(!/^https?:/.test(location.protocol)||navigator.onLine===false){toast('🎵 Il faut être connectée à internet');return}const L=CONTENU.playlist||[];if(!L[i])return;li=i;try{MUS.stop();MUS._bg=0}catch(_){}
+  const x=L[i],v=[...(SONGS[x.jour]||{}).v||[],...(x.lien?[(x.lien.match(/[?&]v=([\w-]{11})/)||[])[1]]:[])].filter((y,j,a)=>y&&a.indexOf(y)==j);open({t:x.titre,a:x.artiste,v},'list',1);try{plMark()}catch(_){}}
+ function next(dir){const n=(CONTENU.playlist||[]).length;if(!n)return;list((li+dir+n)%n)}
+ if(S.own&&S.own.includes('playlist'))setTimeout(()=>{if(/^https?:/.test(location.protocol))load()},4000);
+ return{start,stop,stopGame,list,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
+function plMark(){document.querySelectorAll('.plr').forEach((r,i)=>{const on=YTM.li==i;r.classList.toggle('play',on);const b=r.querySelector('.plp');if(b)b.textContent=on?'⏸':'▶'})}
+function plTap(i){if(YTM.li==i){YTM.stop();try{bgm()}catch(_){}}else YTM.list(i)}
 /* ---------- Effets sonores (synthétisés, discrets) ---------- */
 const SFX=(()=>{let A=null,M=null;const ctx=()=>{if(!A){try{A=new (window.AudioContext||window.webkitAudioContext)();M=A.createGain();M.gain.value=.55;M.connect(A.destination)}catch(_){A=null}}if(A&&A.state=='suspended')A.resume();return A};
  const tone=(f,t0,d,v,type='sine',f2)=>{const a=ctx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(M);o.start(t);o.stop(t+d+.02)};
