@@ -1339,7 +1339,7 @@ const ALBM=(()=>{let A=null,G=null,iv=null,on=false,t0=0,step=0;
  function bar(i,t){const [c,mel]=BARS[i%BARS.length],ch=CH[c];bell(fq(ch[0]),t,2.2,.16);bell(fq(ch[1]),t+BEAT,1.4,.07);bell(fq(ch[2]),t+2*BEAT,1.4,.07);
   let x=0;mel.split(' ').forEach(n=>{const [p,d]=n.split(':');if(p!='R')bell(fq(p),t+x*BEAT,1.8,.2);x+=+d})}
  function tick(){if(!on)return;while(t0<A.currentTime+1.2){bar(step++,t0);t0+=3*BEAT}}
- function start(){if(on||S.sound===false||S.music===false)return;try{A=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(A.state=='suspended')A.resume();
+ function start(){if(on||S.sound===false||S.music===false)return;try{if(YTM.on())return}catch(_){}try{A=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(A.state=='suspended')A.resume();
   try{MUS.stop()}catch(_){}
   G=A.createGain();G.gain.setValueAtTime(0,A.currentTime);G.gain.linearRampToValueAtTime(.55,A.currentTime+1.5);
   const dl=A.createDelay(),fb=A.createGain(),wet=A.createGain();dl.delayTime.value=.34;fb.gain.value=.32;wet.gain.value=.3;G.connect(A.destination);G.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(wet);wet.connect(A.destination);G._fx=[dl,fb,wet];
@@ -3148,7 +3148,7 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  au.onplay=()=>{if(box){box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='⏸');box.classList.remove('tap')}};
  au.onpause=()=>{if(box)box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='▶')};
  au.onended=()=>{if(mode=='list')next(1)};
- function go(url,vol,loop){au.src=url;au.loop=!!loop;au.volume=vol;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(()=>{if(box)box.classList.add('tap')})}
+ function go(url,vol,loop){try{MUS.stop();MUS._bg=0}catch(_){}try{if(ALBM.on)ALBM.stop(.3)}catch(_){}au.src=url;au.loop=!!loop;au.volume=vol;au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(()=>{if(box)box.classList.add('tap')})}
  function stop(){try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
  const has=d=>!!URLS[String(d)];
  function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
