@@ -803,6 +803,7 @@ body.playing #ytm:not(.top){bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}#
 .ytsk{width:100%;margin:12px 0 2px;accent-color:#ff7ab6}.yttm{display:flex;justify-content:space-between;font-size:.72rem;opacity:.75}
 .ytbtn{display:flex;justify-content:center;align-items:center;gap:18px;margin:6px 0 4px}.ytbtn .ytc{font-size:1.25rem;padding:8px}.ytbtn .ytpp{width:56px;height:56px;border-radius:50%!important;background:#fff!important;color:#3a1030!important;font-size:1.4rem}
 body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+.ytsh{opacity:.45}.ytsh.on{opacity:1;color:#ff7ab6!important}.ytsp{width:38px;visibility:hidden}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -3135,10 +3136,10 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  const fmt2=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
  function ui(sg,ctrl,k){const big=!!(box&&box.classList.contains('big'));if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';if(big)box.classList.add('big');
   box.innerHTML=`<div class="ytbig"><div class="ytcov"><span>🎵</span></div><div class="ytt"><b>${esc(sg.t)}</b><small>${esc(sg.a||'')}</small></div><input type="range" class="ytsk" min="0" max="1000" value="0" aria-label="Avancer dans la musique"><div class="yttm"><span class="ytcu">0:00</span><span class="ytdu">0:00</span></div>
-   <div class="ytbtn"><button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button></div></div>
+   <div class="ytbtn">${ctrl?`<button class="ytc ytsh ${S.shuf?'on':''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>`:''}<button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button>${ctrl?'<span class="ytc ytsp"></span>':''}</div></div>
    <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
   const tg=()=>box.classList.toggle('big');box.querySelector('.ytl').onclick=tg;box.querySelector('.ytcov').onclick=tg;box.querySelector('.ytt').onclick=tg;
-  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
+  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='s'){S.shuf=!S.shuf;save();b.classList.toggle('on',S.shuf);toast(S.shuf?'🔀 Ordre aléatoire':'➡️ Dans l\'ordre')}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
   const sk=box.querySelector('.ytsk');let drag=false;sk.oninput=()=>{drag=true;const d=au.duration||0;box.querySelector('.ytcu').textContent=fmt2(sk.value/1000*d)};sk.onchange=()=>{const d=au.duration||0;if(d)au.currentTime=sk.value/1000*d;drag=false};sk._drag=()=>drag;
   const pb=box.querySelector('[data-a="p"]');if(pb&&au.paused===false)pb.textContent='⏸';
   const setCov=u=>{const c=box&&box.querySelector('.ytcov');if(c&&u){c.style.backgroundImage=`url(${u})`;c.classList.add('img')}};
@@ -3153,8 +3154,11 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
   const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i){const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
- function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(has(L[j].jour)&&L[j].jour<=unl())return list(j)}}
+ function list(i,keep){if(!keep&&!S.shuf)HIST=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
+ let HIST=[];
+ function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;const ok=j=>has(L[j].jour)&&L[j].jour<=unl();
+  if(S.shuf){if(dir<0&&HIST.length){const j=HIST.pop();return list(j,1)}const c=[...Array(n).keys()].filter(j=>ok(j)&&j!=li);if(!c.length)return ok(li)?list(li):0;HIST.push(li);if(HIST.length>50)HIST.shift();return list(c[Math.floor(Math.random()*c.length)],1)}
+  for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
  return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
