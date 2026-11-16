@@ -787,6 +787,10 @@ html,button,a,input,label,[role=button]{touch-action:manipulation}
 .rcgift{font-size:6rem;background:none;border:0;box-shadow:none;padding:0;min-height:0;line-height:1.1;animation:rcBob 1.2s ease-in-out infinite;cursor:pointer}.rcgift.shk{animation:rcShk .4s}
 @keyframes rcShk{20%{transform:rotate(-14deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(6deg)}}
 .rcopen{font-size:4.5rem;animation:rcIn .5s}
+#ytm{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);z-index:18;width:176px;background:#000d;border:1px solid #ffffff33;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px #0009}
+#ytm.top{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 54px)}#ytm .ytv{height:99px;background:#000}#ytm iframe{display:block;width:176px;height:99px;border:0}
+#ytm .ytl{display:block;width:100%;min-height:0;padding:4px 7px;border-radius:0;background:none;box-shadow:none;border:0;color:#fff;font-size:.68rem;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ytm.tap{outline:2px solid #ffd24a;animation:ytp 1s ease-in-out infinite}#ytm.tap .ytl:after{content:' · touche ▶';color:#ffd24a}@keyframes ytp{50%{box-shadow:0 0 0 6px #ffd24a44}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -1120,7 +1124,7 @@ function openGame(d,pr,quit){closeGame(true);const D=DAYS[d],ov=document.createE
  ov.querySelector('.gwx').onclick=()=>{const q=$('#gwq');if(pr)return quit('partie quittée');
   q.innerHTML=`<div class="gwc"><span>Quitter ? Cet essai comptera comme raté.</span><span><button class="sm" id="gwy">Quitter</button><button class="alt sm" id="gwn">Continuer</button></span></div>`;
   $('#gwy').onclick=()=>quit('tu as abandonné la partie');$('#gwn').onclick=()=>q.innerHTML=''}}
-function closeGame(silent){try{MUS.stop()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
+function closeGame(silent){try{MUS.stop()}catch(_){}try{YTM.stop()}catch(_){}try{if(window.__lg){window.__lg=null;syncLive(null)}}catch(_){}setTimeout(()=>{try{bgm()}catch(_){}},400);const ov=$('#gwin');if(!ov)return;const P=$('.panel'),hud=$('#gwhud .hud'),g=$('#game'),m=$('#gmsg');
  if(P&&m){if(hud)P.insertBefore(hud,m);if(g)P.insertBefore(g,m)}ov.remove();const hk=document.getElementById('hk');if(hk)hk.remove();
  document.documentElement.classList.remove('gl');document.body.style.top='';window.scrollTo(0,lockY);lastY=lockY;allowScroll()}
 function hit(){const d=window.CURD;if(window.CURPR)return 0;if(!d)return -1;const sd=S.days[d]=S.days[d]||{},mx=3+(sd.extra||0);sd.fails=(sd.fails||0)+1;if(sd.fails>=mx){sd.fails=mx-1;save();return 0}save();const e=$('#lives');if(e)e.textContent='Essais : '+'❤️'.repeat(mx-sd.fails)+'🖤'.repeat(sd.fails);return mx-sd.fails}
@@ -1130,7 +1134,7 @@ function launch(d,pr){window.CURD=d;window.CURPR=!!pr;try{if(!pr)slog('🎮',`La
  const end=(ok,why,keep)=>{if(over||id!=RUN)return;over=true;try{recEnd(ok)}catch(e){console.error(e)}RUN++;const fin=()=>{closeGame();const y0=lockY;result(d,pr,ok,why);allowScroll();window.scrollTo(0,y0);lastY=y0};
   if(!ok&&keep&&$('#gwin')){const hk=document.getElementById('hk');if(hk)hk.remove();try{document.activeElement.blur()}catch(_){}SFX('lose');$('#tmr').textContent='';$('#gwq').innerHTML=`<div class="gwc solb"><span>❌ Raté : ${esc(why)}.<br><b>Voici la solution 👇</b></span><button class="sm" id="gws">Fermer ✕</button></div>`;$('#gwin .gwx').onclick=fin;$('#gws').onclick=fin;el0.classList.add('solv');return}fin()};
  const el0=$('#game');el0.classList.remove('solv');el0.onpointerdown=el0.onpointermove=el0.onpointerup=el0.onpointercancel=null;
- openGame(d,pr,w=>end(false,w));try{MUS.day(d)}catch(_){}try{recStart(d,pr)}catch(e){console.error(e)}
+ openGame(d,pr,w=>end(false,w));try{if(!YTM.start(d))MUS.day(d)}catch(_){}try{recStart(d,pr)}catch(e){console.error(e)}
  try{syncLive({d,t:D.t,pr:pr?1:0,at:Date.now()})}catch(_){}
  GAMES[D.g](D.p,$('#game'),()=>end(true),(w,k)=>end(false,w,k))}
 function result(d,pr,ok,why){const D=DAYS[d];SFX(ok?'win':'lose');try{const s0=S.days[d]||{};if(pr)slog(ok?'🏋️':'🏋️',`Entraînement jour ${d} · ${D.t} : ${ok?'réussi':'raté'}${ok?'':' ('+String(why||'').replace(/<[^>]+>/g,'')+')'}`);else if(ok)slog('✅',`Jour ${d} · ${D.t} réussi ${s0.fails?'au '+(s0.fails+1)+'e essai':'du premier coup'}`);else slog('❌',`Jour ${d} · ${D.t} raté : ${String(why||'').replace(/<[^>]+>/g,'')}${(s0.fails||0)+1>=3+(s0.extra||0)?' · défi perdu 💔':''}`)}catch(_){}
@@ -3078,6 +3082,22 @@ const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
   tick();iv=setInterval(tick,90)};
  return{play,stop,day:d=>play(BY[d]||'jingle'),get cur(){return cur},get bg(){return isBg&&!!cur}}})();
 document.addEventListener('pointerdown',()=>{try{bgm()}catch(_){}},{once:true});
+
+/* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
+const SONGS={"1":{"t":"À l'international","a":"TAL","v":["gQmAH6VSvBg","PfSypFuO6LM"]},"2":{"t":"Loser","a":"Tame Impala","v":["s3a4OQR-10M","GQgL-Dk9sq0"]},"3":{"t":"Stolen Dance","a":"Milky Chance","v":["iX-QaNzd-0Y","K1m_Dt_ImXQ"]},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift","v":["ko70cExuzZM","7nVctvQVz0U","svcboYY81wU"]},"5":{"t":"Lush Life","a":"Zara Larsson","v":["tD4HCZe-tew","RG-D4bcg54s"]},"6":{"t":"DtMF","a":"Bad Bunny","v":["v9T_MGfzq7I","TiebZllW8As"]},"7":{"t":"Gigi l'amoroso","a":"Dalida","v":["dfNr3KNDoRs","OEFZo2WxOq4"]},"8":{"t":"Le passé","a":"TAL","v":["wSXPHNHuw7A","x9X097Rwnp4"]},"9":{"t":"Dine N'Dash","a":"The Strokes","v":["sal78l1W6fE","VoSw7nVMjPI"]},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira","v":["WTRm-Yr5Foo","lRxrQw9LBDg"]},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala","v":["0UPDBODtxzw","NiNXwI_Y1So"]},"12":{"t":"White Keys","a":"Dominic Fike","v":["Cz200209hOs","BqaUS8slDPY"]},"13":{"t":"Out of My League","a":"Fitz and The Tantrums","v":["Z4mbxaa3XL8","4d2I6SIs_bk"]},"14":{"t":"Last Nite","a":"The Strokes","v":["TOypSnKFHrE","Bn-lcvrMOlc"]},"15":{"t":"Opalite","a":"Taylor Swift","v":["1FVF-9KQiPo","JCcUifiu3UU"]},"16":{"t":"I Just Might","a":"Bruno Mars","v":["32LLE6Zk6zc","luotSpkyCVU"]},"17":{"t":"Self Aware","a":"Temper City","v":["mh4AQkw4Jjc","kpeVxYk8CdU"]},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus","v":["A9hcJgtnm6Q","OP2FrMUjufI"]},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk","v":["qFLhGq0060w","qPRNIHxLhmc"]},"20":{"t":"Diana","a":"GIMS","v":["bLsjzK3hoyg","qAoEHAdkrcc"]},"21":{"t":"Black Madonna","a":"Cage The Elephant","v":["itxarI8weqQ","458JYRJM2fc"]},"22":{"t":"Babydoll","a":"Dominic Fike","v":["UnuEzP1rDLY"]},"23":{"t":"Dance, Dance","a":"Fall Out Boy","v":["C6MOKXm8x50","P43XYXqJJlU"]},"24":{"t":"I Was Made for Lovin' You","a":"KISS","v":["ZhIsAZO5gl0","kLKr342VKaU"]}};
+const YTM=(()=>{let api=null,pl=null,box=null,ids=[],k=0,tm=0;
+ const load=()=>api||(api=new Promise(res=>{if(window.YT&&YT.Player)return res();const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev&&prev()}catch(_){}res()};const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=()=>{api=null;res('err')};document.head.appendChild(sc);setTimeout(()=>res('err'),9000)}));
+ function stop(){clearTimeout(tm);try{pl&&pl.destroy()}catch(_){}pl=null;if(box){box.remove();box=null}}
+ function fail(){const d=window.CURD;stop();try{MUS.day(d)}catch(_){}}
+ function mk(){if(!box)return;const host=document.createElement('div');box.querySelector('.ytv').innerHTML='';box.querySelector('.ytv').appendChild(host);
+  pl=new YT.Player(host,{width:176,height:99,videoId:ids[k],playerVars:{autoplay:1,playsinline:1,controls:1,rel:0,modestbranding:1,fs:0,origin:location.origin},
+   events:{onReady:e=>{try{e.target.setVolume(DAYS[window.CURD]&&DAYS[window.CURD].g=='simon'?25:80);e.target.playVideo()}catch(_){}tm=setTimeout(()=>{try{const st=pl.getPlayerState();if(st!=1&&st!=3)box.classList.add('tap')}catch(_){}},3000)},
+    onError:()=>{k++;try{pl.destroy()}catch(_){}pl=null;if(k<ids.length)mk();else fail()},
+    onStateChange:e=>{if(!box)return;if(e.data==1)box.classList.remove('tap');if(e.data==0){try{pl.seekTo(0);pl.playVideo()}catch(_){}}}}})}
+ function start(d){stop();const sg=SONGS[d];if(!sg||S.music===false||!/^https?:/.test(location.protocol)||navigator.onLine===false)return false;
+  box=document.createElement('div');box.id='ytm';box.innerHTML=`<div class="ytv"></div><button class="ytl" title="Déplacer">🎵 ${esc(sg.t)} · ${esc(sg.a)}</button>`;document.body.appendChild(box);
+  box.querySelector('.ytl').onclick=()=>box.classList.toggle('top');ids=sg.v.slice();k=0;load().then(r=>{if(!box)return;if(r=='err')return fail();mk()});return true}
+ return{start,stop}})();
 /* ---------- Effets sonores (synthétisés, discrets) ---------- */
 const SFX=(()=>{let A=null,M=null;const ctx=()=>{if(!A){try{A=new (window.AudioContext||window.webkitAudioContext)();M=A.createGain();M.gain.value=.55;M.connect(A.destination)}catch(_){A=null}}if(A&&A.state=='suspended')A.resume();return A};
  const tone=(f,t0,d,v,type='sine',f2)=>{const a=ctx();if(!a)return;const t=a.currentTime+t0,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(M);o.start(t);o.stop(t+d+.02)};
