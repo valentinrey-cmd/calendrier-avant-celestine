@@ -1356,7 +1356,7 @@ function alNotify(){window.__alNT=0;const r=alRev(),from=S.alNew||1;if(r<=from)r
  if(document.body.classList.contains('playing')||document.getElementById('spl')||document.getElementById('alz')){window.__alNT=setTimeout(alNotify,2500);return}
  const A=alPhotos(),x=A[from];S.alNew=from+1;save();if(!x)return;
  let o=document.getElementById('alnew');if(o)o.remove();o=document.createElement('div');o.id='alnew';
- const ok=alOk();o.innerHTML=`<div class="aln-in"><p class="aln-k">✨ Nouveau souvenir gagné ✨</p><div class="aln-pol ${ok?'':'blur'}"><img src="${x.src}" alt="">${ok?'':'<span class="aln-lk">🔒</span>'}</div>${ok?`<p class="aln-t">${x.titre||''}</p>${x.date?`<p class="aln-d">${x.date}</p>`:''}`:`<p class="aln-t" style="font-size:1.5rem">Un souvenir t'attend…</p><p class="aln-d">Pour le voir, débloque le 💝 coffre à souvenirs dans le labo 🧪</p>`}<p class="aln-c">${S.alNew} / ${alTotal()} souvenirs</p><div class="row"><button class="aln-go">${ok?"📖 Voir dans l'album":'🧪 Aller au labo'}</button><button class="alt aln-x">Plus tard</button></div></div>`;
+ const ok=alOk();o.innerHTML=`<div class="aln-in"><p class="aln-k">✨ Nouveau souvenir gagné ✨</p><div class="aln-pol ${ok?'':'blur'}"><img src="${x.src}" alt="">${ok?'':'<span class="aln-lk">🔒</span>'}</div>${ok?`<p class="aln-t">${x.titre||''}</p>${x.date?`<p class="aln-d">${x.date}</p>`:''}`:`<p class="aln-t" style="font-size:1.5rem">Un souvenir t'attend…</p><p class="aln-d">Pour le voir, fabrique l'album dans le 💝 coffre à souvenirs du labo 🧪</p>`}<p class="aln-c">${S.alNew} / ${alTotal()} souvenirs</p><div class="row"><button class="aln-go">${ok?"📖 Voir dans l'album":'🧪 Aller au labo'}</button><button class="alt aln-x">Plus tard</button></div></div>`;
  document.body.appendChild(o);try{bkT(784,.25,'sine',.05);setTimeout(()=>bkT(1046,.35,'sine',.05),140);setTimeout(()=>bkT(1318,.5,'sine',.04),280)}catch(_){}
  const cl=()=>{o.classList.add('out');setTimeout(()=>{o.remove();if((S.alNew||1)<alRev())window.__alNT=setTimeout(alNotify,700)},300)};
  o.querySelector('.aln-x').onclick=cl;o.querySelector('.aln-go').onclick=()=>{if(!alOk()){cl();try{closePop()}catch(_){}go('lab');return}const P=alPages(),pg=P.findIndex(p=>p.items&&p.items.some(it=>it.idx==from));alS().goto=Math.max(0,pg);cl();try{closePop()}catch(_){}go('book')};
@@ -1386,11 +1386,11 @@ function alCoverHTML(cp){const L=alC(),sp=alSpread(),P=alPages(),q=cp==null?0:cp
   <div class="al-ttl"><div class="bk-tree">✦</div><h1>${L.titre||'Notre Histoire'}</h1><p>${L.sousTitre||'Célestine & Valentin'}</p><div class="bk-dots"><i></i><i></i><i></i></div></div>
   <div class="bk-rib h"></div><div class="bk-seal" id="bkseal"><span>C</span><span class="hrt">♥</span><span>V</span><i class="s1"></i><i class="s2"></i></div></div>
   <div class="face b">${sp?alPageHTML(P,q):''}</div></div></div>
- <p class="bk-hint">${alOk()?'Un album scellé… touche le sceau pour l’ouvrir':'🔒 Un album verrouillé… <small style="display:block">Débloque-le dans le 💝 coffre à souvenirs du labo</small>'}</p>`}
+ <p class="bk-hint">${alOk()?'Un album scellé… touche le sceau pour l’ouvrir':'🔒 Un album verrouillé… <small style="display:block">Fabrique-le dans le 💝 coffre à souvenirs du labo</small>'}</p>`}
 const alOk=()=>S.own.includes('album');
 function alCoverBind(){const B=alS(),bk=$('#alb');let busy=false;bk.onclick=()=>{if(busy)return;
  if(!alOk()){bk.classList.remove('shake');void bk.offsetWidth;bk.classList.add('shake');bkT(140,.18,'square',.05);bkT(110,.25,'sine',.07);
-  const h=$('.bk-hint');if(h){h.innerHTML='🔒 Cet album est verrouillé…<br><small>Fabrique-le dans le <b>💝 coffre à souvenirs</b> du labo 🧪</small>';h.classList.add('lockmsg')}toast('🔒 Débloque le coffre à souvenirs dans le labo');return}
+  const h=$('.bk-hint');if(h){h.innerHTML='🔒 Cet album est verrouillé…<br><small>Fabrique-le dans le <b>💝 coffre à souvenirs</b> du labo 🧪</small>';h.classList.add('lockmsg')}toast('🔒 Fabrique l\'album dans le coffre à souvenirs du labo');return}
  busy=true;const s=$('#bkseal');
  s.classList.add('crack');bkT(180,.15,'sawtooth',.06);
  setTimeout(()=>{s.classList.add('broken');document.querySelectorAll('.bk-rib').forEach(r=>r.classList.add('fall'));bkT(660,.25,'triangle',.06,1320);try{confetti()}catch(_){}},550);
@@ -3237,11 +3237,11 @@ const MACH=[
  {id:'conv',ic:'🔄',n:"Convertisseur",day:5,cost:15,up:[15,30],rep:1,max:3,conv:true,d:"Échange tes ⭐ contre des 🔩, ou l'inverse."},
  {id:'deco',ic:'🎨',n:"Atelier déco",day:8,cost:40,up:[40,60],rep:3,max:3,unlk:1,items:['coeurs','fondrose','ordore'],d:"Fabrique des décorations pour embellir l'appli. Chaque amélioration débloque une nouvelle déco."},
  {id:'jeton',ic:'🎰',n:"Imprimante à jetons",day:11,cost:25,rep:4,max:3,flat:1,items:['jeton'],d:"Imprime des 🎟️ jetons : une mise gratuite au casino. Chaque amélioration rend tes jetons plus précieux (10 ⭐ → 25 ⭐ → 50 ⭐)."},
- {id:'studio',ic:'💝',n:"Le coffre à souvenirs",day:3,cost:20,up:[20,30],rep:1,max:3,unlk:1,items:['album','voix','playlist'],d:""},
+ {id:'studio',ic:'💝',n:"Le coffre à souvenirs",day:3,cost:20,up:[20,30],rep:1,max:3,unlk:1,items:['playlist','album','voix'],d:""},
  {id:'secret',ic:'🎁',n:"Machine secrète",day:24,cost:0,rep:0,max:1,items:['secret'],d:"Une machine mystérieuse… Qui sait ce qu'elle va fabriquer ?"}
 ];
 // Recettes : prix en 🔩 et durée en minutes (au niveau 1)
-const RCP={hint:{c:10,t:20},joker:{c:15,t:45},coeurs:{c:30,t:60},fondrose:{c:35,t:90},ordore:{c:40,t:120},jeton:{c:10,t:60},dbl:{c:25,t:120},album:{c:10,t:30},voix:{c:50,t:240},playlist:{c:50,t:240},surprise3:{c:120,t:300},early:{c:50,t:240},secret:{c:0,t:60}};
+const RCP={hint:{c:10,t:20},joker:{c:15,t:45},coeurs:{c:30,t:60},fondrose:{c:35,t:90},ordore:{c:40,t:120},jeton:{c:10,t:60},dbl:{c:25,t:120},album:{c:50,t:240},voix:{c:50,t:240},playlist:{c:10,t:30},surprise3:{c:120,t:300},early:{c:50,t:240},secret:{c:0,t:60}};
 const CONV={t:30,lots:[1,5]}; // 10 ⭐ → 5 🔩 ou 10 🔩 → 5 ⭐, par lot
 const CAPS=[[2,0],[4,20],[6,35],[10,55]]; // places de l'entrepôt et prix pour y passer
 const FLMS={3:25,7:40,14:60,24:120}; // 🔩 gagnées aux paliers de flammes
