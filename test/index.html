@@ -3139,7 +3139,7 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
    <div class="ytbtn">${ctrl?`<button class="ytc ytsh ${S.shuf?'on':''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>`:''}<button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button>${ctrl?'<span class="ytc ytsp"></span>':''}</div></div>
    <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
   const tg=()=>box.classList.toggle('big');box.querySelector('.ytl').onclick=tg;box.querySelector('.ytcov').onclick=tg;box.querySelector('.ytt').onclick=tg;
-  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='s'){S.shuf=!S.shuf;save();b.classList.toggle('on',S.shuf);toast(S.shuf?'🔀 Ordre aléatoire':'➡️ Dans l\'ordre')}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
+  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='s'){S.shuf=!S.shuf;save();if(S.shuf)mkOrd();b.classList.toggle('on',S.shuf);toast(S.shuf?'🔀 Ordre aléatoire':'➡️ Dans l\'ordre')}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
   const sk=box.querySelector('.ytsk');let drag=false;sk.oninput=()=>{drag=true;const d=au.duration||0;box.querySelector('.ytcu').textContent=fmt2(sk.value/1000*d)};sk.onchange=()=>{const d=au.duration||0;if(d)au.currentTime=sk.value/1000*d;drag=false};sk._drag=()=>drag;
   const pb=box.querySelector('[data-a="p"]');if(pb&&au.paused===false)pb.textContent='⏸';
   const setCov=u=>{const c=box&&box.querySelector('.ytcov');if(c&&u){c.style.backgroundImage=`url(${u})`;c.classList.add('img')}};
@@ -3154,10 +3154,12 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  function start(d){if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
   const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i,keep){if(!keep&&!S.shuf)HIST=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
- let HIST=[];
+ function list(i,keep){if(!keep)ORD=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
+ let ORD=[],op=0;
+ function mkOrd(){const L=CONTENU.playlist||[];const c=[...Array(L.length).keys()].filter(j=>has(L[j].jour)&&L[j].jour<=unl()&&j!=li);for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]]}ORD=[li,...c];op=0}
  function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;const ok=j=>has(L[j].jour)&&L[j].jour<=unl();
-  if(S.shuf){if(dir<0&&HIST.length){const j=HIST.pop();return list(j,1)}const c=[...Array(n).keys()].filter(j=>ok(j)&&j!=li);if(!c.length)return ok(li)?list(li):0;HIST.push(li);if(HIST.length>50)HIST.shift();return list(c[Math.floor(Math.random()*c.length)],1)}
+  if(S.shuf){if(!ORD.length||ORD[op]!==li||L.some((x,j)=>ok(j)&&!ORD.includes(j))){const k=ORD.indexOf(li);if(k>=0&&!L.some((x,j)=>ok(j)&&!ORD.includes(j)))op=k;else mkOrd()}
+   op=((op+dir)%ORD.length+ORD.length)%ORD.length;return list(ORD[op],1)}
   for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
  return{start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
