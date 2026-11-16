@@ -10,6 +10,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.*;
+import android.content.ContentValues;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Base64;
+import java.io.*;
 
 public class MainActivity extends Activity {
   static final String URL = "https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/?app=android";
@@ -55,6 +60,7 @@ public class MainActivity extends Activity {
         return true;
       }
     });
+    w.addJavascriptInterface(new Bridge(), "AventAndroid");
     if (b != null) w.restoreState(b); else w.loadUrl(URL);
   }
   @Override protected void onActivityResult(int req, int res, Intent data) {
@@ -69,5 +75,52 @@ public class MainActivity extends Activity {
   @Override public void onWindowFocusChanged(boolean f) {
     super.onWindowFocusChanged(f);
     if (f) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+  }
+
+  // Pont pour enregistrer et partager le « fichier mystère » (les WebView ne savent pas télécharger un fichier généré)
+  class Bridge {
+    File tmp; OutputStream os; Uri saved;
+    @JavascriptInterface public boolean fileBegin(String name) {
+      try { if (os != null) os.close(); tmp = new File(getCacheDir(), name); os = new BufferedOutputStream(new FileOutputStream(tmp), 1 << 20); return true; } catch (Exception e) { return false; }
+    }
+    @JavascriptInterface public boolean fileChunk(String b64) {
+      try { os.write(Base64.decode(b64, Base64.DEFAULT)); return true; } catch (Exception e) { return false; }
+    }
+    @JavascriptInterface public String fileEnd() {
+      try {
+        os.close(); os = null;
+        if (Build.VERSION.SDK_INT >= 29) {
+          ContentValues v = new ContentValues();
+          v.put(MediaStore.MediaColumns.DISPLAY_NAME, tmp.getName());
+          v.put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream");
+          v.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+          saved = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+          try (InputStream in = new FileInputStream(tmp); OutputStream out = getContentResolver().openOutputStream(saved)) {
+            byte[] buf = new byte[1 << 16]; int n; while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+          }
+          tmp.delete();
+          return "ok";
+        } else {
+          File d = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS); File f = new File(d, tmp.getName());
+          try (InputStream in = new FileInputStream(tmp); OutputStream out = new FileOutputStream(f)) {
+            byte[] buf = new byte[1 << 16]; int n; while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+          }
+          tmp.delete(); saved = null;
+          return "path:" + f.getAbsolutePath();
+        }
+      } catch (Exception e) { return "err:" + e.getMessage(); }
+    }
+    @JavascriptInterface public void fileShare() {
+      runOnUiThread(() -> {
+        try {
+          if (saved == null) return;
+          Intent i = new Intent(Intent.ACTION_SEND);
+          i.setType("application/octet-stream");
+          i.putExtra(Intent.EXTRA_STREAM, saved);
+          i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          startActivity(Intent.createChooser(i, "Envoyer le fichier mystère"));
+        } catch (Exception e) {}
+      });
+    }
   }
 }
