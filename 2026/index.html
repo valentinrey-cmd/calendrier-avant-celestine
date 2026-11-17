@@ -1002,7 +1002,7 @@ const DAYS={
  16:{t:"Notre mot fléché 💕",g:"fleche",p:{time:480},tier:2},
  17:{t:"Libère la voiture",g:"rush",p:{time:180},tier:3},
  18:{t:"Candy Noël",g:"candy",p:{moves:22,target:14000},tier:3},
- 19:{t:"2048",g:"g2048",p:{goal:512},tier:3},
+ 19:{t:"2048",g:"g2048",p:{goal:256},tier:3},
  20:{t:"Les 7 différences",g:"spot",p:{a:"IMG_BAR",b:"IMG_BAR2",d:[[0.5156, 0.7678, 0.0244], [0.4133, 0.0729, 0.0222], [0.5633, 0.5758, 0.0178], [0.4533, 0.5336, 0.0156], [0.74, 0.6065, 0.0167], [0.9667, 0.215, 0.02], [0.3289, 0.0384, 0.0144]],time:150},tier:3},
  21:{t:"Relier les points",g:"relier",p:{n:9,k:8,time:60},tier:3,ev:"✨",x2:true},
  22:{t:"Sauve Célestine",g:"pins",p:{time:300},tier:3},
@@ -2137,7 +2137,10 @@ g2048(p,el,win,fail){const id=RUN,N=4,PH=CONTENU.photos||[],IMG=PH.length>=8?shu
    if(Math.max(...T.map(t=>t.v))>=p.goal){done=true;return setTimeout(()=>{if(id==RUN)win()},450)}if(!can()){done=true;return setTimeout(()=>{if(id==RUN)fail(`plus aucun mouvement possible (meilleure tuile : ${Math.max(...T.map(t=>t.v))})`)},450)}
    if(qd){const q=qd;qd=null;move(q,1)}},125)};
  const B=$('#g48');let x0=null,y0;B.onpointerdown=e=>{x0=e.clientX;y0=e.clientY};B.onpointerup=e=>{if(x0==null)return;const dx=e.clientX-x0,dy=e.clientY-y0;x0=null;if(Math.max(Math.abs(dx),Math.abs(dy))<20){if(DEL&&!busy){const R=B.getBoundingClientRect(),cw=(R.width-16)/4,c=Math.floor((e.clientX-R.left-8)/cw),rr=Math.floor((e.clientY-R.top-8)/cw),tl=T.find(q=>q.r==rr&&q.c==c);if(tl){DEL=0;B.classList.remove('g4del');T=T.filter(q=>q!=tl);tl.in.animate([{transform:'scale(1)',opacity:1},{transform:'scale(0)',opacity:0}],{duration:220}).onfinish=()=>tl.el.remove();try{SFX('pin')}catch(_){}}}return}move(Math.abs(dx)>Math.abs(dy)?(dx>0?'R':'L'):(dy>0?'D':'U'))};
- G={move,board:()=>{const b=Array(16).fill(0);T.forEach(t=>b[t.r*N+t.c]=t.v);return b},key:k=>{const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[k];if(m)move(m)}};G.hint=()=>{if(id!=RUN||done)return false;if(DEL)return'Touche le bloc à supprimer';if(T.length<2)return'Il n\'y a pas assez de blocs';DEL=1;$('#g48').classList.add('g4del');toast('Touche le bloc que tu veux supprimer');return true}},
+ G={move,board:()=>{const b=Array(16).fill(0);T.forEach(t=>b[t.r*N+t.c]=t.v);return b},key:k=>{const m={ArrowLeft:'L',ArrowRight:'R',ArrowUp:'U',ArrowDown:'D'}[k];if(m)move(m)}};G.hint=()=>{if(id!=RUN||done||busy)return false;if(T.length<3)return'Pas besoin de ranger pour l’instant 😉';
+  const mn=Math.min(...T.map(t=>t.v)),gone=T.length-T.filter(t=>t.v!=mn).length>=T.length-1?[]:T.filter(t=>t.v==mn);gone.forEach(tl=>tl.in.animate([{transform:'scale(1)',opacity:1},{transform:'scale(0)',opacity:0}],{duration:260}).onfinish=()=>tl.el.remove());T=T.filter(t=>!gone.includes(t));
+  const ord=[];for(let r=N-1;r>=0;r--){const k=N-1-r;for(let i=0;i<N;i++)ord.push([r,k%2?N-1-i:i])}T.sort((a,b)=>b.v-a.v).forEach((t,i)=>{t.r=ord[i][0];t.c=ord[i][1];pos(t)});
+  busy=true;setTimeout(()=>{busy=false;if(!can()){add()}},300);try{SFX('perfect')}catch(_){}toast(`✨ Rangement magique !${gone.length?` Les ${mn} disparaissent`:''}`);return true}},
 flappy(p,el,win,fail){const id=RUN,LW=360,LH=540,GR=56,R=19,BX=96,PH=shuffle([...(CONTENU.photos||[])]);
  el.innerHTML=`<div class="fbw" id="fbw"><canvas id="fbc"></canvas></div><p class="center muted">Touche l'écran (ou Espace) pour la faire voler. Passe ${p.goal} sucres d'orge sans rien toucher !</p>`;
  const cv=$('#fbc'),x=cv.getContext('2d'),dpr=Math.min(3,devicePixelRatio||1);cv.width=LW*dpr;cv.height=LH*dpr;x.scale(dpr,dpr);
