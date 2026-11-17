@@ -850,7 +850,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794942534';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794943062';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1233,7 +1233,7 @@ const BRULES={
  11:["🎵 La musique démarre et des notes descendent dans 4 colonnes.","👆 Touche la colonne (ou <b>D F J K</b> sur ordinateur) quand la note arrive dans le cercle, en rythme avec la musique.","✨ Chaque note réussie enlève 1 PV au renne. 10 notes d'affilée te rendent 1 💜.","💔 Chaque note ratée coûte 1 💜 de groove : à zéro, c'est perdu. Il faut le battre avant la fin du morceau !","💡 L'indice te rend 1 💜."],
  15:["👆 Glisse le doigt pour bouger la luge, touche pour lancer la boule.","🧊 Casse le mur de glace et touche la Reine avec la boule (<b>10 PV</b>).","🎁 Parfois un bonus tombe (cercle doré) : ↔️ grande luge, ✨ multi-boules, 🔥 boule de feu, ❤️ vie.","⚠️ Évite les malus (cercle rouge) : 🤏 mini-luge, 🙃 commandes inversées. Et ses stalactites 🧊 gèlent ta luge !","❤️ Si toutes les boules tombent, tu perds une vie (<b>3 vies</b>). 💡 L'indice donne une vie."],
  19:["🏃 Célestine court toute seule : touche l'écran pour sauter, deux fois pour un double saut.","🎄⛄ Saute par-dessus les obstacles et évite les cailloux 🪨 qui volent.","🍬 Tu te rapproches du troll tout le temps. Les bonbons te font aller plus vite, mais tu peux le rattraper même sans.","❤️ Tu as <b>3 vies</b> : chaque obstacle touché t'en coûte une. À la 3ᵉ, le troll s'échappe ! Rattrape-le (barre pleine) en moins de 80 secondes.","💡 L'indice te rapproche d'un coup."],
- 22:["🏠 Le fantôme apparaît aux fenêtres de la maison en pain d'épice.","👆 Touche-le vite avant qu'il disparaisse : <b>22 PV</b> à lui enlever en 60 secondes.","🚫 Ne touche jamais les habitants (🎅 🤶 🧝 🦌 ⛄ 🐈) : tu perds une vie (<b>3 vies</b>).","🌫️ De temps en temps il crée du brouillard, et il accélère quand il faiblit.","💡 L'indice dissipe le brouillard et donne une vie."]};
+ 22:["🏠 Le fantôme apparaît aux fenêtres de la maison en pain d'épice.","👆 Touche-le vite avant qu'il disparaisse : <b>22 PV</b> à lui enlever en 45 secondes.","🚫 Ne touche jamais les habitants (🎅 🤶 🧝 🦌 ⛄ 🐈) : tu perds une vie (<b>3 vies</b>).","🌫️ De temps en temps il crée du brouillard, et il accélère quand il faiblit.","💡 L'indice dissipe le brouillard et donne une vie."]};
 const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Le Bonhomme de neige géant',ic:'☃️',g:'bossfight',p:{hp:34,time:90,lives:4,sp:.82,atk:1.25,ic:'☃️',n:'Bonhomme de neige géant'}},
@@ -1241,7 +1241,7 @@ function bossCfg(d){const C={
  11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'brhythm',quiet:1,p:{len:46,need:.68,lives:6}},
  15:{n:'La Reine des glaces',ic:'👸',g:'bbreak',p:{hp:10,lives:3,pw:86,v:310,vmax:420}},
  19:{n:'Le Troll des neiges',ic:'🧌',g:'brun',p:{gap0:60,gapMax:110,close:1.25,hitGap:8,candy:7,v:240,time:80,lives:3}},
- 22:{n:'Le Fantôme de Noël',ic:'👻',g:'bwhack',p:{hp:22,lives:3,time:60}}};return C[d]||null}
+ 22:{n:'Le Fantôme de Noël',ic:'👻',g:'bwhack',p:{hp:22,lives:3,time:45}}};return C[d]||null}
 function bossBtn(d){const B=bossCfg(d);if(!B)return'';if((S.boss||{})[d])return`<p><span class="ribbon">🏆 Boss vaincu · 🎬 vidéo débloquée</span></p>`;const n=(S.bossTry||{})[d]||0;
  return`<button class="bossb" onclick="launchBoss(${d})">⚔️ Affronter le boss ${B.ic} <small>${n?`(−${BOSSCOST} ⭐)`:'(1ʳᵉ tentative gratuite)'}</small></button><p class="muted" style="font-size:.85rem;margin-top:0">Il garde une 🎬 vidéo mystère de votre album.</p>`}
 function bossDev(d){if((CONTENU.syncRoom!='t'&&!TEST())||!bossCfg(d))return'';const B=bossCfg(d);return`<div class="bossdev"><b>🧪 Mode test</b> · boss de cette case : ${B.ic} ${B.n}<br><button class="alt sm" onclick="launchBoss(${d},1)">▶ Tester le boss (gratuit, débloque la vidéo)</button>${(S.boss||{})[d]||(S.bossTry||{})[d]?`<button class="alt sm" onclick="bossReset(${d})">↺ Remettre ce boss à zéro</button>`:''}</div>`}
