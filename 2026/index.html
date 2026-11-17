@@ -850,7 +850,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794943677';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794944129';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1238,7 +1238,7 @@ const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Le Bonhomme de neige géant',ic:'☃️',g:'bossfight',p:{hp:34,time:90,lives:4,sp:.82,atk:1.25,ic:'☃️',n:'Bonhomme de neige géant'}},
  8:{n:'Le Grinch voleur',ic:'😈',g:'snake',p:{n:13,goal:999,speed:175,grinch:{hp:3,lives:3,gtick:.42,pow:6}}},
- 11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'brhythm',quiet:1,p:{len:46,need:.74,lives:3}},
+ 11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'brhythm',quiet:1,p:{len:46,need:.76,lives:3}},
  15:{n:'La Reine des glaces',ic:'👸',g:'bbreak',p:{hp:10,lives:3,pw:86,v:310,vmax:420}},
  19:{n:'Le Troll des neiges',ic:'🧌',g:'brun',p:{gap0:60,gapMax:110,close:1.25,hitGap:8,candy:7,v:240,time:80,lives:3}},
  22:{n:'Le Fantôme de Noël',ic:'👻',g:'bwhack',p:{hp:22,lives:3,time:45}}};return C[d]||null}
@@ -2283,7 +2283,9 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
   FIN=[[[0,'C6',4],[0,'G5',4]]];
  const SONG=[null,null,...V,...H,...V,...H,...X,...FIN],SEC=bi=>bi<2?'in':bi<6?'v':bi<10?'h':bi<14?'v':bi<18?'h':bi<22?'x':'fin',T0=.6;
  const lane=m=>m<=76?0:m<=79?1:m<=83?2:3;const NT=[];
- SONG.forEach((bar,bi)=>{if(!bar)return;const used={};bar.forEach(([b,n,d])=>{const m=M(n),t=T0+bi*BAR+b*BT;let l=lane(m);const k=t.toFixed(3);if(used[k]!=null&&used[k]==l)l=l>0?l-1:1;used[k]=l;NT.push({t,l,mi:m,d:(d||(b%1?.5:1))*BT})})});NT.sort((a,b)=>a.t-b.t);
+ const SC=[0,2,4,5,7,9,11],th=m=>{const pc=m%12,ix=SC.indexOf(pc);if(ix<0)return m-3;const tg=SC[(ix+5)%7];return m-((pc-tg+12)%12)};
+ SONG.forEach((bar,bi)=>{if(!bar)return;const sc=SEC(bi),used={};const add=(m,t,d)=>{let l=lane(m);const k=t.toFixed(3);const u=used[k]||(used[k]=[]);if(u.length>=2)return;if(u.includes(l)){const alt=[l-1,l+1,l-2,l+2].find(v=>v>=0&&v<4&&!u.includes(v));if(alt==null)return;l=alt}u.push(l);NT.push({t,l,mi:m,d})};
+  bar.forEach(([b,n,d])=>{const m=M(n),t=T0+bi*BAR+b*BT,dd=(d||(b%1?.5:1))*BT;add(m,t,dd);const on=b%1==0,dbl=sc=='x'?on:sc=='h'?(b==0||b==2):sc=='v'?(b==0&&bi%2==0):false;if(dbl&&!bar.some(q=>q[0]==b&&q[1]!=n))add(th(m),t,dd)})});NT.sort((a,b)=>a.t-b.t);
  let END=T0+SONG.length*BAR,MX=Math.ceil(NT.length*p.need);let hp=MX,groove=p.lives,st='ready',combo=0,fx=[],bHit=0,flash=[0,0,0,0];
  // ---- audio : kick 4/4, clap, charleston, grelots, basse pompée, nappe, arpège, réverb + écho
  let AC=null,MG=null,NB=null,DK=null,RV=null,DL=null,ta=0,sch=0,pt0=0;const mute=S.sound===false;
