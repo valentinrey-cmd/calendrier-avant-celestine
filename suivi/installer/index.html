@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><title>Installer · Suivi Célestine</title>
+<link rel="icon" href="../icon-192.png"><meta name="theme-color" content="#1b0f1f">
+<style>
+*{box-sizing:border-box}html,body{margin:0}body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px 40px;text-align:center;color:#f6eef8;font:17px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(120% 70% at 50% 0,#4a1646,#1b0f1f);overflow-x:hidden}
+.sn{position:fixed;inset:0;pointer-events:none}.sn i{position:absolute;top:-10px;color:#fff;opacity:.8;animation:f linear infinite;font-style:normal}@keyframes f{to{transform:translateY(110vh) rotate(360deg)}}
+img{width:140px;height:140px;border-radius:32px;box-shadow:0 12px 34px #7a123066;animation:b 2.4s ease-in-out infinite}@keyframes b{50%{transform:translateY(-8px) rotate(-3deg)}}
+h1{font:800 1.9rem Georgia,serif;color:#f2c45a;text-shadow:0 3px 0 #000;margin:16px 0 2px}
+.sub{margin:0 0 4px;max-width:420px;opacity:.9}
+.btn{display:inline-flex;align-items:center;gap:10px;margin:20px 0 6px;padding:16px 30px;border-radius:999px;font-weight:800;font-size:1.15rem;color:#fff;text-decoration:none;background:linear-gradient(145deg,#4ff0a0,#0b9a52);box-shadow:0 6px 0 #064a2a,0 12px 24px #0004;transition:transform .1s}.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #064a2a}
+.size{font-size:.8rem;opacity:.7}
+.card{max-width:430px;width:100%;margin:18px auto 0;padding:14px 16px;border-radius:18px;background:#ffffff14;box-shadow:inset 0 0 0 1px #ffffff2a;text-align:left}
+.step{display:flex;gap:12px;align-items:flex-start;margin:8px 0}.n{flex:none;width:28px;height:28px;border-radius:50%;background:#f2c45a;color:#2a1205;font-weight:800;display:grid;place-items:center}
+.k{background:#ffffff26;border-radius:8px;padding:0 6px;font-weight:700;white-space:nowrap}
+.warn{display:none;max-width:430px;margin:16px auto 0;padding:12px 14px;border-radius:14px;background:#ffffff1f;font-size:.95rem}
+details{max-width:430px;width:100%;margin:14px auto 0;text-align:left;font-size:.92rem}summary{cursor:pointer;font-weight:700;text-align:center}
+.alt{display:inline-block;margin-top:14px;color:#f2c45a;font-size:.9rem}
+</style></head><body>
+<div class="sn" id="sn"></div>
+<img src="../icon-512.png" alt="">
+<h1>Suivi Célestine</h1>
+<p class="sub">Suis son calendrier en direct, envoie des cadeaux… ou le Grinch 😈</p>
+<div class="warn" id="warn">📱 Cette page sert à installer l’appli sur <b>Android</b>. Ouvre-la depuis une tablette ou un téléphone Android.</div>
+<a class="btn" id="dl" href="../suivi.apk" download="Suivi-Celestine.apk">📥 Télécharger l’appli</a>
+<div class="size">Android 7 ou plus récent · environ 3 Mo</div>
+<div class="card">
+ <div class="step"><span class="n">1</span><span>Touche <span class="k">📥 Télécharger l’appli</span>. Si Chrome te demande, touche <span class="k">Télécharger quand même</span>.</span></div>
+ <div class="step"><span class="n">2</span><span>Ouvre le fichier <b>Suivi-Celestine.apk</b> (dans la notification ou dans <b>Téléchargements</b>).</span></div>
+ <div class="step"><span class="n">3</span><span>Si Android le demande : <span class="k">Paramètres</span> → active <span class="k">Autoriser cette source</span>, puis reviens en arrière.</span></div>
+ <div class="step"><span class="n">4</span><span>Touche <span class="k">Installer</span>, puis <span class="k">Ouvrir</span>. L’icône 💗 reste sur ton écran d’accueil.</span></div>
+</div>
+<details><summary>Un souci ?</summary><p>• <b>Play Protect</b> affiche un avertissement : touche <b>Plus de détails</b> → <b>Installer quand même</b>. L’appli n’est simplement pas sur le Play Store.</p><p>• <b>« Appli non installée »</b> : désinstalle l’ancienne version de Suivi Célestine, puis réessaie.</p><p>• Le suivi a besoin d’internet ; il se met à jour tout seul en direct.</p></details>
+<a class="alt" href="../">Ouvrir le suivi dans le navigateur</a>
+<script>
+if(!/Android/i.test(navigator.userAgent)){document.getElementById('warn').style.display='block';}
+const sn=document.getElementById('sn');for(let i=0;i<26;i++){const e=document.createElement('i');e.textContent=Math.random()<.5?'✦':'•';e.style.left=Math.random()*100+'vw';e.style.fontSize=(8+Math.random()*16)+'px';e.style.animationDuration=(6+Math.random()*8)+'s';e.style.animationDelay=(-Math.random()*10)+'s';sn.appendChild(e)}
+</script>
+</body></html>
