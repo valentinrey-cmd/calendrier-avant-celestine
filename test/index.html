@@ -833,6 +833,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .blo-h{position:absolute;top:-10%;font-size:1.7rem;animation:bloh 2.4s ease-in var(--d) both}@keyframes bloh{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(105vh) rotate(var(--r));opacity:0}}
 .blo-t{position:absolute;top:31%;font:900 3.6rem system-ui;color:#c9c9d6;-webkit-text-stroke:2px #3a0a14;text-shadow:0 6px 18px #000;animation:blot .7s ease-out 1.9s both}@keyframes blot{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(8px)}100%{transform:none;opacity:1}}
 .bko-v em{display:block;font-weight:600;font-size:.95rem;color:#ffd0dc;margin-top:6px}
+.day .bsb{position:absolute;bottom:-7px;left:-7px;font-size:.85rem;background:#b3122e;border:2px solid #ffd34d;border-radius:999px;width:24px;height:24px;display:grid;place-items:center;box-shadow:0 0 10px #ff3d6e99;animation:bsbp 1.8s ease-in-out infinite}.day .bsb.won{background:#1c5240;box-shadow:none;animation:none}@keyframes bsbp{50%{transform:scale(1.15)}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -850,7 +851,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794946990';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794947718';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1164,7 +1165,7 @@ function calView(){const u=unl(),n=S.opened.length,dn=Object.values(S.days).filt
  ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>
  ${feat(7)?(wheelEnd()?`<div class="row"><button disabled>🎡 La roue est terminée : joyeux Noël 🎄</button></div>`:`<div class="row"><button onclick="wheel()" ${S.wheel==dayKey()?'disabled':''}>🎡 Roue de la chance${S.wheel==dayKey()?' : reviens demain':''}</button></div>`):''}
  <div class="cal">${Array.from({length:24},(_,i)=>{const d=i+1,o=S.opened.includes(d),ok=avail(d),D=DAYS[d],dn=S.days[d]&&S.days[d].done;
-  return`<button class="day ${o?'done':ok?'ok':'lock'}" style="${o?pcs(S.map[i]):''}" aria-label="Jour ${d}${o?', ouvert':ok?', disponible':', verrouillé'}" onclick="tapDay(${d})">${o||ok?d:'🔒'}${D.ev&&(o||ok)?`<span class="ev">${D.ev}</span>`:''}${o?`<span class="ck">${dn?(S.days[d].lost?'😢':'✅'):'⏳'}</span>`:''}</button>`}).join('')}</div>`}
+  return`<button class="day ${o?'done':ok?'ok':'lock'}" style="${o?pcs(S.map[i]):''}" aria-label="Jour ${d}${o?', ouvert':ok?', disponible':', verrouillé'}" onclick="tapDay(${d})">${o||ok?d:'🔒'}${D.ev&&(o||ok)?`<span class="ev">${D.ev}</span>`:''}${o?`<span class="ck">${dn?(S.days[d].lost?'😢':'✅'):'⏳'}</span>`:''}${bossCfg(d)?`<span class="bsb ${(S.boss||{})[d]?'won':''}" title="Boss">${(S.boss||{})[d]?'🏆':'👹'}</span>`:''}</button>`}).join('')}</div>`}
 function tapDay(d){if(!avail(d)){SFX('bad');toast(d>unl()?`Encore un peu de patience pour le ${d} 🎁`:'');return}
  if(S.opened.includes(d)){SFX('tap');return go('day',d)}SFX('open');
  const D=DAYS[d];S.opened.push(d);S.opened.sort((a,b)=>a-b);slog('📅',`Ouvre la case ${d} · ${D.t}`);let bonus=0;
@@ -3211,6 +3212,7 @@ function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small
  ${R('🎯','Le défi du jour',"Tu as 3 essais. Un 🃏 joker t'en donne un de plus, un 💡 indice t'aide pendant le jeu. Les jours ✨×2 rapportent le double.",[['1er essai','40 ⭐'],['2e essai','30 ⭐'],['3e essai','20 ⭐'],['4e et +','10 ⭐']])}
  ${R('🔥','Les flammes',"Réussis les défis plusieurs jours d'affilée. Un défi raté éteint la flamme.",[['3 jours','10 ⭐'],['7 jours','25 ⭐'],['14 jours','50 ⭐'],['24 jours','100 ⭐']])}
  ${R('🔁','Entraînement',"Après le défi, rejoue autant que tu veux pour t'entraîner.")}
+ ${R('👹','Les boss',"Les cases avec 👹 cachent un boss. Réussis le défi du jour pour l'affronter : chaque boss vaincu débloque une 🎬 vidéo mystère dans l'album. 1ʳᵉ tentative gratuite, puis "+BOSSCOST+" ⭐.")}
  ${R('🥚','Les œufs cachés',"Chaque jeu cache un œuf… Relis bien les textes. Les 24 œufs ouvrent un niveau secret.",[['Niveau secret','1 ⭐ / 10 pts']])}
  ${R('🧩','Le puzzle final',"Chaque case ouverte dévoile une pièce de l'image. Termine-le à la fin.",[['Facile','100 ⭐'],['Moyen','200 ⭐'],['Difficile','300 ⭐']])}
  </div><button onclick="closePop()">Compris !</button>`)}
