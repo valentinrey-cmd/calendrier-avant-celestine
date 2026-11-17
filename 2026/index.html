@@ -881,7 +881,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .finb b{color:#ffe08a;font-size:1.15rem}
 .finb p{margin:6px 0}
 .finb .row{justify-content:center;margin:8px 0 0}
-.fintg{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:99px;background:#ffd76a;color:#4a2a00;font-size:.7rem;font-weight:800;vertical-align:middle}
+.fintw{text-align:center;margin:-6px 0 10px}.fintg{display:inline-block;padding:1px 8px;border-radius:99px;background:#ffd76a;color:#4a2a00;font-size:.7rem;font-weight:800;vertical-align:middle}
 
 .vshk{animation:vshk .6s cubic-bezier(.36,.07,.19,.97)}
 @keyframes vshk{10%,90%{transform:translate(-2px,0) rotate(-.5deg)}20%,80%{transform:translate(5px,0) rotate(.8deg)}30%,50%,70%{transform:translate(-9px,0) rotate(-1.2deg)}40%,60%{transform:translate(9px,0) rotate(1.2deg)}}
@@ -910,7 +910,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794956118';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794956222';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1221,7 +1221,7 @@ const pcs=p=>`background-image:url(${IMG});background-size:400% 600%;background-
 function finHTML(){if(!S.vbDone)return'';const d=new Date(S.vbDone),ds=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}),nb=Object.keys(S.boss||{}).filter(k=>S.boss[k]).length;
  return`<div class="panel finb"><div class="fbig">🏆</div><b>Jeu terminé !</b><p>Le ${esc(ds)}, Célestine a vaincu Valentin… par amour 💘</p><p class="muted" style="font-size:.85rem">👹 ${nb}/6 boss battus · ✅ ${Object.values(S.days).filter(x=>x.done&&!x.lost).length} jeux réussis · 🏅 ${Object.keys(S.ach||{}).length} succès</p><div class="row"><button class="sm" onclick="vCredits()">🎬 Revoir le générique</button></div></div>`}
 function calView(){if(new Date().getHours()<5&&!window.__nightMsg){window.__nightMsg=1;setTimeout(()=>toast('Il est tard… Valentin dort déjà, lui (il ronfle) 😴'),700)}const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
- app.innerHTML=`<h1 class="calh">Calendrier de l'Avent${S.vbDone?'<span class="fintg">TERMINÉ</span>':''}<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>
+ app.innerHTML=`<h1 class="calh">Calendrier de l'Avent<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>${S.vbDone?'<div class="fintw"><span class="fintg">🏆 TERMINÉ</span></div>':''}
  <div class="panel"><div class="row" style="justify-content:space-between;margin:0"><span>📅 ${n}/24 cases</span><span>✅ ${dn} jeux réussis</span><span>🔥 ${flames()} flamme${flames()>1?'s':''}</span></div><div class="bar"><i style="width:${n/24*100}%"></i></div>
  ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>${finHTML()}
  ${feat(7)?(wheelEnd()?`<div class="row"><button disabled>🎡 La roue est terminée : joyeux Noël 🎄</button></div>`:`<div class="row"><button onclick="wheel()" ${S.wheel==dayKey()?'disabled':''}>🎡 Roue de la chance${S.wheel==dayKey()?' : reviens demain':''}</button></div>`):''}
