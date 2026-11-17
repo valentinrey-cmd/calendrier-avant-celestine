@@ -813,6 +813,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .al-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22%;aspect-ratio:1;border-radius:50%;background:#0009;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--alw)*.07);box-shadow:0 0 0 3px #fffc;padding-left:1%}
 .al-myst{flex-direction:column;background:#2a1a3a55!important}.al-myst small{font-size:calc(var(--alw)*.035);opacity:.7;font-style:italic}
 #vidov{position:fixed;inset:0;z-index:10050;background:#000e;display:flex;align-items:center;justify-content:center;padding:10px}.vid-in{width:min(96vw,1000px);text-align:center}.vid-in video{width:100%;max-height:78vh;border-radius:12px;background:#000;box-shadow:0 10px 40px #000}.vid-t{color:#fff;font-weight:700;margin:10px 0 8px}.vid-t small{opacity:.7;font-weight:500}
+.bossr{text-align:left;padding:6px 4px;max-width:420px;margin:0 auto}.bossr .bri{text-align:center;font-size:3.4rem;margin:0;line-height:1.1}.bossr h3{text-align:center;margin:.3em 0 .6em}.bossr ul{padding-left:0;list-style:none;margin:0 0 14px}.bossr li{background:#ffffff10;border-radius:10px;padding:8px 10px;margin:6px 0;line-height:1.35;font-size:.95rem}.bossr button{width:100%}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -915,6 +916,7 @@ const CONTENU={
   {titre:"Le lancer du bouquet", date:"Juillet 2034", src:"videos/4-bouquet.mp4", poster:"videos/4-bouquet.jpg", ch:"Le grand oui", apres:"Notre mariage"},
   {titre:"Notre tour du monde", date:"2035 · nos 30 ans", src:"videos/5-tour-du-monde.mp4", poster:"videos/5-tour-du-monde.jpg", ch:"Le grand oui", apres:"Notre lune de miel à La Réunion"},
   {titre:"Papy fait le show", date:"2072", src:"videos/6-papy-mamie.mp4", poster:"videos/6-papy-mamie.jpg", ch:"Le temps passe", apres:"Papi et mamie"}],
+ bossSong:{k:"b11", start:0, dur:70},  // 🦌 boss du renne : musique importée (👹 dans 🎵 Musiques), extrait de « dur » secondes à partir de « start »
  playlist:[                    // NOTRE PLAYLIST (coffre à souvenirs) : débloque aussi la musique de chaque mini-jeu
   {titre:"Babydoll", artiste:"Dominic Fike", mot:"La chanson du jour 1", jour:1},
   {titre:"Loser", artiste:"Tame Impala", mot:"La chanson du jour 2", jour:2},
@@ -1202,6 +1204,13 @@ function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=
  const close=()=>{if(!d.isConnected)return;d.classList.add('out');setTimeout(()=>d.remove(),260)};d.onclick=close;document.body.appendChild(d);setTimeout(close,5000)}
 /* ---------- 👹 Les boss (ils gardent les vidéos de l'album) ---------- */
 const BOSSCOST=10;
+const BRULES={
+ 4:["👆 Glisse le doigt pour déplacer Célestine en bas de l'écran.","❤️ Tes cœurs partent tout seuls vers le haut : vise le bonhomme de neige pour lui enlever des PV (sa barre est en haut).","❄️ Esquive ses boules de neige : visées, en éventail ou en pluie. Tu as <b>4 vies</b>.","😡 Quand il perd la moitié de ses PV, il accélère… puis il s'énerve !","⏱️ Tu as 90 secondes. 💡 L'indice donne une vie en plus."],
+ 8:["🐍 C'est le Snake du jour : glisse le doigt pour tourner (ou flèches du clavier).","🎁 Mange les cadeaux pour grandir… avant que le Grinch ne te les vole !","⭐ Attrape une étoile : pendant 6 s tu as le super-pouvoir 🌈, le Grinch a peur 😱 et s'enfuit.","💥 Fonce sur lui avec le super-pouvoir pour lui enlever 1 PV (<b>3 PV</b> en tout). Sans super-pouvoir, s'il te touche tu perds une vie.","⚫ Évite les bords, ta queue et son charbon. Tu as <b>3 vies</b>. 💡 L'indice donne le super-pouvoir."],
+ 11:["🎵 La musique démarre et des notes descendent dans 4 colonnes.","👆 Touche la colonne (ou <b>D F J K</b> sur ordinateur) quand la note arrive dans le cercle, en rythme avec la musique.","✨ Chaque note réussie enlève 1 PV au renne. 10 notes d'affilée te rendent 1 💜.","💔 Chaque note ratée coûte 1 💜 de groove : à zéro, c'est perdu. Il faut le battre avant la fin du morceau !","💡 L'indice te rend 1 💜."],
+ 15:["👆 Glisse le doigt pour bouger la luge, touche pour lancer la boule.","🧊 Casse le mur de glace et touche la Reine avec la boule (<b>10 PV</b>).","🎁 Parfois un bonus tombe (cercle doré) : ↔️ grande luge, ✨ multi-boules, 🔥 boule de feu, ❤️ vie.","⚠️ Évite les malus (cercle rouge) : 🤏 mini-luge, 🙃 commandes inversées. Et ses stalactites 🧊 gèlent ta luge !","❤️ Si toutes les boules tombent, tu perds une vie (<b>3 vies</b>). 💡 L'indice donne une vie."],
+ 19:["🏃 Célestine court toute seule : touche l'écran pour sauter, deux fois pour un double saut.","🎄⛄ Saute par-dessus les obstacles et évite les cailloux 🪨 qui volent.","🍬 Attrape les bonbons pour te rapprocher du troll. Chaque obstacle touché le fait s'éloigner.","🏁 Rattrape-le (barre pleine) avant qu'il s'enfuie ou que les 80 secondes soient écoulées.","💡 L'indice te rapproche d'un coup."],
+ 22:["🏠 Le fantôme apparaît aux fenêtres de la maison en pain d'épice.","👆 Touche-le vite avant qu'il disparaisse : <b>22 PV</b> à lui enlever en 60 secondes.","🚫 Ne touche jamais les habitants (🎅 🤶 🧝 🦌 ⛄ 🐈) : tu perds une vie (<b>3 vies</b>).","🌫️ De temps en temps il crée du brouillard, et il accélère quand il faiblit.","💡 L'indice dissipe le brouillard et donne une vie."]};
 const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Le Bonhomme de neige géant',ic:'☃️',g:'bossfight',p:{hp:34,time:90,lives:4,sp:.82,atk:1.25,ic:'☃️',n:'Bonhomme de neige géant'}},
@@ -1225,7 +1234,7 @@ function launchBoss(d,test){const B=bossCfg(d);if(!B)return;S.bossTry=S.bossTry|
  const g=$('#game');g.classList.remove('solv');g.onpointerdown=g.onpointermove=g.onpointerup=g.onpointercancel=null;try{$('#lives').textContent=''}catch(_){}
  openGame(d,true,w=>end(false,w),`${B.ic} BOSS · ${B.n}${test?' (test)':''}`);if(B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}}else{try{if(!YTM.start(d))MUS.day(d)}catch(_){}}
  g.innerHTML=`<div class="bossin"><span>⚠️ BOSS ⚠️</span><b class="bi">${B.ic}</b><b>${B.n}</b></div>`;try{SFX('lose')}catch(_){}
- setTimeout(()=>{if(id!=RUN)return;GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))},1800)}
+ setTimeout(()=>{if(id!=RUN)return;const RL=BRULES[d]||[];g.innerHTML=`<div class="bossr"><p class="bri">${B.ic}</p><h3>Comment battre ${esc(B.n)} ?</h3><ul>${RL.map(t=>`<li>${t}</li>`).join('')}</ul><button id="bgo">⚔️ J'ai compris, c'est parti !</button></div>`;$('#bgo').onclick=()=>{if(id!=RUN)return;GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))}},1800)}
 function bossResult(d,ok,why,test){try{SFX(ok?'win':'lose')}catch(_){}
  if(test)return startBox(d,ok?'Boss vaincu (test : rien de débloqué) 🎉':`Boss raté (test) : ${esc(why)}.`);
  if(ok){S.boss=S.boss||{};S.boss[d]=Date.now();save();try{slog('🏆',`Boss du jour ${d} vaincu ! Vidéo ${vidN()} débloquée 🎬`)}catch(_){}ding();confetti();splash(true);startBox(d,'Boss vaincu ! 🏆');setTimeout(vidNew,1500)}
@@ -1767,6 +1776,13 @@ function secRun(ov){const cv=ov.querySelector('#secc'),x=cv.getContext('2d');let
  requestAnimationFrame(loop)}
 function secReset(){S.secret={};save();toast('🌟 Niveau secret réinitialisé');admin()}
 function bcv(el,hint){el.innerHTML=`<div class="fbw"><canvas></canvas></div><p class="center muted">${hint}</p>`;const W=el.querySelector('.fbw'),cv=W.querySelector('canvas'),x=cv.getContext('2d'),dpr=Math.min(3,devicePixelRatio||1);cv.width=360*dpr;cv.height=540*dpr;x.scale(dpr,dpr);const P=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*360,(e.clientY-r.top)/r.height*540]};return{W,cv,x,P}}
+async function bAnalyse(buf,ln){const sr=buf.sampleRate,len=Math.min(buf.length,Math.floor(ln*sr)),OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
+ const band=(type,f)=>new Promise((res,rej)=>{const oc=new OC(1,len,sr),s=oc.createBufferSource(),fl=oc.createBiquadFilter();s.buffer=buf;fl.type=type;fl.frequency.value=f;s.connect(fl);fl.connect(oc.destination);s.start();oc.oncomplete=e=>res(e.renderedBuffer.getChannelData(0));const pr=oc.startRendering();if(pr&&pr.then)pr.then(r=>res(r.getChannelData(0)),rej)});
+ const lo=await band('lowpass',160),hi=await band('highpass',2500),hop=Math.round(sr*.01),nH=Math.floor(len/hop);
+ const flux=d=>{const e=new Float32Array(nH);for(let i=0;i<nH;i++){let q=0;for(let k=i*hop,K=k+hop;k<K;k++)q+=d[k]*d[k];e[i]=Math.log(1+q*40)}const f=new Float32Array(nH);for(let i=1;i<nH;i++)f[i]=Math.max(0,e[i]-e[i-1]);return f};
+ const cand=[];[[flux(lo),0],[flux(hi),1]].forEach(([f,b])=>{let sum=0;const W2=30;for(let i=0;i<Math.min(nH,W2);i++)sum+=f[i];for(let i=3;i<nH-3;i++){const a=i-W2,z=i+W2;if(z<nH)sum+=f[z];if(a>=0)sum-=f[a];const m=sum/(Math.min(nH,z+1)-Math.max(0,a+1));const th=m*1.7+1e-4;if(f[i]>th&&f[i]>=f[i-1]&&f[i]>=f[i+1]&&f[i]>=f[i-2]&&f[i]>=f[i+2]&&f[i]>=f[i-3]&&f[i]>=f[i+3])cand.push({t:i*hop/sr,s:f[i]/th,b})}});
+ cand.sort((a,b)=>b.s-a.s);const want=Math.round(ln*1.6),acc=[];for(const c of cand){if(c.t<1.2||c.t>ln-1.8)continue;if(acc.some(a=>Math.abs(a.t-c.t)<.25))continue;acc.push(c);if(acc.length>=want)break}
+ acc.sort((a,b)=>a.t-b.t);let k0=0,k1=0;return acc.map(c=>{const k=c.b?k1++:k0++,l=(c.b?2:0)+([0,1,0,0,1,1,0,1][k%8]);return{t:c.t,l}})}
 function bimgU(){try{return lvlPic(lvl())||(CONTENU.photos||[])[0]||''}catch(_){return''}}
 function bimg(){const i=new Image();const u=bimgU();if(u)i.src=u;return i}
 function bface(x,im,X,Y,r,ring){x.save();x.translate(X,Y);x.fillStyle=ring||'#f3c623';x.beginPath();x.arc(0,0,r+3,0,7);x.fill();x.beginPath();x.arc(0,0,r,0,7);x.clip();if(im&&im.complete&&im.naturalWidth)x.drawImage(im,-r,-r,2*r,2*r);else{x.fillStyle='#ff7ab6';x.fill()}x.restore()}
@@ -2213,7 +2229,7 @@ bsnake(p,el,win,fail){const id=RUN,N=15,C=24,OY=92;const {W,x,P}=bcv(el,"Touche 
   draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={key:k=>{const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[k];if(m){go0();turn(...m)}},hint:()=>{if(st!='play')return false;pow=p.pow;return true}}},
 brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (pointer:fine)').matches,KL=['D','F','J','K'];
- const {W,x,P}=bcv(el,KB?"Appuie sur <b>D F J K</b> (ou touche la colonne) quand la note arrive sur le cercle : c'est toi qui joues la mélodie ! Chaque note réussie fait perdre des PV au renne.":"Touche la bonne colonne quand la note arrive sur le cercle : c'est toi qui joues la mélodie ! Chaque note réussie fait perdre des PV au renne. Trop de notes ratées et tu perds le groove…");
+ const {W,x,P}=bcv(el,KB?"Appuie sur <b>D F J K</b> (ou touche la colonne) quand la note arrive sur le cercle , en rythme avec la musique ! Chaque note réussie fait perdre des PV au renne.":"Touche la bonne colonne quand la note arrive sur le cercle , en rythme avec la musique ! Chaque note réussie fait perdre des PV au renne. Trop de notes ratées et tu perds le groove…");
  const L=[45,135,225,315],LC=['#ff4f7b','#ffd34d','#4fc3ff','#7be08a'],LY=462,SPD=320,BPM=118,BT=60/BPM,BAR=4*BT;
  const M=n=>{const m=/^([A-G])(#|b)?(\d)$/.exec(n);return {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]=='#'?1:m[2]=='b'?-1:0)+12*(+m[3]+1)},HZ=m=>440*2**((m-69)/12);
  const CH=[['A1',['A3','C4','E4','A4']],['F1',['A3','C4','F4','A4']],['C2',['G3','C4','E4','G4']],['G1',['G3','B3','D4','G4']]];
@@ -2224,7 +2240,7 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
  const SONG=[null,null,...V,...H,...V,...H,...X,...FIN],SEC=bi=>bi<2?'in':bi<6?'v':bi<10?'h':bi<14?'v':bi<18?'h':bi<22?'x':'fin',T0=.6;
  const lane=m=>m<=77?0:m<=81?1:m<=84?2:3;const NT=[];
  SONG.forEach((bar,bi)=>{if(!bar)return;const used={};bar.forEach(([b,n,d])=>{const m=M(n),t=T0+bi*BAR+b*BT;let l=lane(m);const k=t.toFixed(3);if(used[k]!=null&&used[k]==l)l=l>0?l-1:1;used[k]=l;NT.push({t,l,mi:m,d:(d||(b%1?.5:1))*BT})})});NT.sort((a,b)=>a.t-b.t);
- const END=T0+SONG.length*BAR;const MX=Math.ceil(NT.length*p.need);let hp=MX,groove=p.lives,st='ready',combo=0,fx=[],bHit=0,flash=[0,0,0,0];
+ let END=T0+SONG.length*BAR,MX=Math.ceil(NT.length*p.need);let hp=MX,groove=p.lives,st='ready',combo=0,fx=[],bHit=0,flash=[0,0,0,0];
  // ---- audio : kick 4/4, clap, charleston, grelots, basse pompée, nappe, arpège, réverb + écho
  let AC=null,MG=null,NB=null,DK=null,RV=null,DL=null,ta=0,sch=0,pt0=0;const mute=S.sound===false;
  const au=()=>{if(mute)return null;if(AC)return AC;try{AC=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(AC.state=='suspended')AC.resume();
@@ -2251,13 +2267,21 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
     bass(r,tb,BT*.45);bass(r+12,tb+BT/2,BT*.4)}else{hat(tb+BT/2,.08);if(bi==1&&b==3){[0,.25,.5,.75].forEach(o=>clap(tb+o*BT))}}}
   if(sc!='in')pad(c[1],t,BAR);
   if(sc=='h'||sc=='x'){const ar=c[1].map(M).map(v=>v+12);for(let k=0;k<16;k++)pl(ar[[0,1,2,3,2,1,2,3][k%8]],t+k*BT/4,sc=='x'?.05:.04)}};
- const schedule=()=>{if(!AC||st=='ready')return;while(sch<SONG.length&&ta+T0+sch*BAR<AC.currentTime+.3){bar(sch,ta+T0+sch*BAR);sch++}};
+ const schedule=()=>{if(!AC||st=='ready'||st=='load'||SONGM)return;while(sch<SONG.length&&ta+T0+sch*BAR<AC.currentTime+.3){bar(sch,ta+T0+sch*BAR);sch++}};
  const now2=()=>AC?AC.currentTime-ta:(performance.now()-pt0)/1000;
  const stopAudio=()=>{if(!MG)return;try{MG.gain.setTargetAtTime(0,AC.currentTime,.08);const g=MG;setTimeout(()=>{try{g.disconnect()}catch(_){}},900)}catch(_){}};
- const begin=()=>{au();st='play';pt0=performance.now();if(AC)ta=AC.currentTime+.05;schedule()};
+ let SONGM=0,SBUF=null;const SB=CONTENU.bossSong||{};
+ if(SB.k){st='load';(async()=>{try{const o=await MDB.all(),it=o&&o[SB.k];if(!it||!it.blob)throw 0;const bl=it.blob;
+   const dur=await new Promise((res,rej)=>{const a=new Audio(),u=URL.createObjectURL(bl);a.preload='metadata';a.onloadedmetadata=()=>{const d=a.duration;URL.revokeObjectURL(u);res(d)};a.onerror=()=>{URL.revokeObjectURL(u);rej()};a.src=u;setTimeout(rej,8000)});
+   if(!isFinite(dur)||dur<15)throw 0;const s0=Math.min(SB.start||0,Math.max(0,dur-20)),ln=Math.min(SB.dur||70,dur-s0-.5),bps=bl.size/dur;
+   const ab=await bl.slice(Math.floor(s0*bps),Math.min(bl.size,Math.ceil((s0+ln+2)*bps))).arrayBuffer();const A0=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());
+   const buf=await new Promise((res,rej)=>{const pr=A0.decodeAudioData(ab,res,rej);if(pr&&pr.then)pr.then(res,rej)});if(id!=RUN)return;
+   const L2=Math.min(buf.duration-.3,ln),notes=await bAnalyse(buf,L2);if(id!=RUN)return;if(notes.length<30)throw 0;
+   NT.length=0;notes.forEach(n=>NT.push({t:T0+n.t,l:n.l,mi:null,d:BT}));SBUF=buf;SONGM=L2;END=T0+L2;MX=Math.ceil(NT.length*p.need);hp=MX}catch(e){SONGM=0;SBUF=null}if(id==RUN&&st=='load')st='ready'})()}
+ const begin=()=>{if(st!='ready')return;au();st='play';pt0=performance.now();if(AC){ta=AC.currentTime+.05;if(SONGM&&SBUF){const src=AC.createBufferSource(),g=AC.createGain();src.buffer=SBUF;g.gain.setValueAtTime(1,ta+T0);g.gain.setValueAtTime(1,ta+T0+SONGM-2.5);g.gain.linearRampToValueAtTime(0,ta+T0+SONGM);src.connect(g);g.connect(MG);src.start(ta+T0,0,SONGM+.1)}}schedule()};
  W.onpointerdown=e=>{e.preventDefault();if(st=='ready')return begin();if(st!='play')return;const q=P(e),l=Math.max(0,Math.min(3,Math.floor(q[0]/90)));tap(l)};
  const tap=l=>{const tt=now2();flash[l]=performance.now();let best=null,bd=.15;NT.forEach(n=>{if(!n.h&&!n.m&&n.l==l&&Math.abs(n.t-tt)<bd){bd=Math.abs(n.t-tt);best=n}});
-  if(best){best.h=1;combo++;hp--;bHit=performance.now();lead(best.mi,best.d);fx.push({t:bd<.06?'PARFAIT !':'BIEN',l,at:performance.now()});if(combo%10==0&&groove<p.lives)groove++;if(hp<=0&&st=='play'){st='won';setTimeout(()=>{stopAudio();if(id==RUN)win()},1600)}}
+  if(best){best.h=1;combo++;hp--;bHit=performance.now();if(best.mi==null){if(AC)osc('triangle',1568,AC.currentTime,.07,.035,.002)}else lead(best.mi,best.d);fx.push({t:bd<.06?'PARFAIT !':'BIEN',l,at:performance.now()});if(combo%10==0&&groove<p.lives)groove++;if(hp<=0&&st=='play'){st='won';setTimeout(()=>{stopAudio();if(id==RUN)win()},1600)}}
   else{combo=0;if(AC)osc('sine',110,AC.currentTime,.08,.05)}};
  const draw=now=>{const tt=st=='ready'?0:now2();const g=x.createLinearGradient(0,0,0,540);g.addColorStop(0,'#1a0b2e');g.addColorStop(1,'#3a1257');x.fillStyle=g;x.fillRect(0,0,360,540);
   const beat=tt>0?(tt%BT)/BT:0;for(let i=0;i<6;i++){x.fillStyle=`hsla(${(i*60+now/20)%360},90%,60%,${.08+.08*(1-beat)})`;x.beginPath();x.moveTo(30+i*60,0);x.lineTo(i*60-40,540);x.lineTo(i*60+60,540);x.fill()}
@@ -2268,42 +2292,42 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
   bbar(x,hp,MX,`🦌 Rodolphe, le renne DJ · ${hp} PV`,now-bHit<150,8);
   fx=fx.filter(f=>now-f.at<600);fx.forEach(f=>{x.save();x.globalAlpha=1-(now-f.at)/600;x.font='900 15px system-ui';x.textAlign='center';x.fillStyle=f.t[0]=='P'?'#ffe08a':'#fff';x.fillText(f.t,L[f.l],LY-40-(now-f.at)/20);x.restore()});
   x.font='15px system-ui';x.textAlign='left';x.fillStyle='#fff';x.fillText('🕺 '+'💜'.repeat(Math.max(0,groove))+'🖤'.repeat(Math.max(0,p.lives-groove)),6,532);if(combo>2){x.textAlign='right';x.font='800 15px system-ui';x.fillStyle='#ffe08a';x.fillText('Combo ×'+combo,354,532)}
-  if(st=='ready')bready(x,KB?'👆 Clique ou appuie sur Espace':'👆 Touche pour lancer la musique');if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+  if(st=='load')bready(x,'🎵 Préparation de la musique…');if(st=='ready')bready(x,SONGM?(KB?'👆 Espace : « Let It Happen » 🎵':'👆 Touche : « Let It Happen » 🎵'):(KB?'👆 Clique ou appuie sur Espace':'👆 Touche pour lancer la musique'));if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
  const loop=now=>{if(id!=RUN){stopAudio();return}if(st=='play'){schedule();const tt=now2();
    NT.forEach(n=>{if(!n.h&&!n.m&&tt-n.t>.16){n.m=1;combo=0;groove--;if(AC)osc('sine',90,AC.currentTime,.12,.08,.002,60);if(groove<=0&&st=='play'){st='dead';stopAudio();setTimeout(()=>{if(id==RUN)fail('tu as perdu le groove 💔')},800)}}});
    if(st=='play'&&tt>END+.4){st='dead';stopAudio();setTimeout(()=>{if(id==RUN)fail(`le renne avait encore ${hp} PV`)},600)}}
   draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={key:k=>{if(st=='ready'&&(k==' '||k=='Enter'||k=='⏎'))return begin();const l={d:0,f:1,j:2,k:3,arrowleft:0,arrowdown:1,arrowup:2,arrowright:3}[String(k).toLowerCase()];if(l!=null&&st=='play')tap(l)},hint:()=>{if(st!='play')return false;if(groove>=p.lives)return'Ton groove est déjà au max 💜';groove++;return true}}},
 bbreak(p,el,win,fail){const id=RUN,PY=500;const {W,x,P}=bcv(el,"Glisse le doigt pour bouger la luge, touche pour lancer la boule. Casse la glace, touche la Reine et attrape les bonus qui tombent ! Évite ses stalactites : elles gèlent ta luge.");const im=bimg();
- let px=180,tx=180,lives=p.lives,hp=p.hp,st='ready',kx=180,ky=86,ic=[],icT=3,frz=0,bHit=0,T=0,spd=p.v,wide=0,fire=0,bon=[],bT=8,msg=null;
- let balls=[{x:180,y:PY-14,vx:0,vy:0,held:1}];const PW=()=>p.pw*(wide>0?1.6:1);
- const BK={big:{e:'↔️',n:'Grande luge !'},multi:{e:'✨',n:'Multi-boules !'},fire:{e:'🔥',n:'Boule de feu !'},life:{e:'❤️',n:'+1 vie !'}};
+ let px=180,tx=180,lives=p.lives,hp=p.hp,st='ready',kx=180,ky=86,ic=[],icT=3,frz=0,bHit=0,T=0,spd=p.v,wide=0,fire=0,small=0,inv2=0,bon=[],bT=15,msg=null;
+ let balls=[{x:180,y:PY-14,vx:0,vy:0,held:1}];const PW=()=>p.pw*(wide>0?1.6:1)*(small>0?.6:1);
+ const BK={big:{e:'↔️',n:'Grande luge !'},multi:{e:'✨',n:'Multi-boules !'},fire:{e:'🔥',n:'Boule de feu !'},life:{e:'❤️',n:'+1 vie !'},small:{e:'🤏',n:'Mini-luge…',bad:1},rev:{e:'🙃',n:'Commandes inversées !',bad:1}};
  const BR=[];for(let r=0;r<5;r++)for(let c=0;c<8;c++)BR.push({x:22+c*40,y:138+r*22,w:36,h:16,hp:r<2?2:1,mx:r<2?2:1,a:1});
- const drop=(X,Y)=>{const r=Math.random(),k=r<.3?'big':r<.6?'multi':r<.88?'fire':'life';bon.push({x:X,y:Y,k})};
+ const drop=(X,Y)=>{const r=Math.random(),k=r<.2?'big':r<.38?'multi':r<.55?'fire':r<.63?'life':r<.82?'small':'rev';bon.push({x:X,y:Y,k})};
  W.onpointerdown=e=>{e.preventDefault();tx=P(e)[0];if(st=='ready'){st='play';timer(p.time||120,()=>{if(st=='play'){st='dead';fail('le temps est écoulé ⏱️')}},id)}if(st=='play')balls.forEach(b=>{if(b.held){b.held=0;const a=-Math.PI/2+(Math.random()-.5)*.8;b.vx=Math.cos(a)*spd;b.vy=Math.sin(a)*spd}})};W.onpointermove=e=>{tx=P(e)[0]};
  const norm=b=>{const m=Math.hypot(b.vx,b.vy)||1;b.vx=b.vx/m*spd;b.vy=b.vy/m*spd;if(Math.abs(b.vy)<spd*.35){b.vy=Math.sign(b.vy||-1)*spd*.35;const m2=Math.hypot(b.vx,b.vy);b.vx=b.vx/m2*spd;b.vy=b.vy/m2*spd}};
- const kill=(b,now)=>{b.hp--;if(fire>0)b.hp=0;if(b.hp<=0){b.a=0;if(Math.random()<.22)drop(b.x+18,b.y+8)}try{bkT(1200+Math.random()*400,.08,'sine',.04)}catch(_){}};
- const upd=(dt,now)=>{T+=dt;frz=Math.max(0,frz-dt);wide=Math.max(0,wide-dt);fire=Math.max(0,fire-dt);const pw=PW();px+=(tx-px)*Math.min(1,dt*(frz>0?2:16));px=Math.max(pw/2,Math.min(360-pw/2,px));kx=180+Math.sin(T*.8)*120;ky=86+Math.sin(T*1.7)*6;
+ const kill=(b,now)=>{b.hp--;if(fire>0)b.hp=0;if(b.hp<=0){b.a=0;if(Math.random()<.07)drop(b.x+18,b.y+8)}try{bkT(1200+Math.random()*400,.08,'sine',.04)}catch(_){}};
+ const upd=(dt,now)=>{T+=dt;frz=Math.max(0,frz-dt);wide=Math.max(0,wide-dt);fire=Math.max(0,fire-dt);small=Math.max(0,small-dt);inv2=Math.max(0,inv2-dt);const pw=PW(),gx=inv2>0?360-tx:tx;px+=(gx-px)*Math.min(1,dt*(frz>0?2:16));px=Math.max(pw/2,Math.min(360-pw/2,px));kx=180+Math.sin(T*.8)*120;ky=86+Math.sin(T*1.7)*6;
   balls.forEach(b=>{if(b.held){b.x=px;b.y=PY-14;return}for(let k=0;k<4;k++){const sd=dt/4,ox=b.x,oy=b.y;b.x+=b.vx*sd;b.y+=b.vy*sd;if(b.x<8){b.x=8;b.vx=Math.abs(b.vx)}if(b.x>352){b.x=352;b.vx=-Math.abs(b.vx)}if(b.y<8){b.y=8;b.vy=Math.abs(b.vy)}
    if(b.vy>0&&b.y>PY-16&&b.y<PY+6&&Math.abs(b.x-px)<pw/2+8){b.vy=-Math.abs(b.vy);b.vx+=(b.x-px)/(pw/2)*170;spd=Math.min(p.vmax,spd+3);norm(b);try{bkT(520,.08,'square',.03)}catch(_){}}
    for(const r of BR){if(!r.a)continue;if(b.x>r.x-8&&b.x<r.x+r.w+8&&b.y>r.y-8&&b.y<r.y+r.h+8){kill(r,now);if(fire<=0){if(ox<r.x-8||ox>r.x+r.w+8)b.vx=-b.vx;else b.vy=-b.vy;b.x=ox;b.y=oy}break}}
    if(Math.hypot(b.x-kx,b.y-ky)<38){const a=Math.atan2(b.y-ky,b.x-kx);b.x=kx+Math.cos(a)*39;b.y=ky+Math.sin(a)*39;b.vx=Math.cos(a)*spd;b.vy=Math.abs(Math.sin(a))*spd;norm(b);if(now-bHit>300){hp-=fire>0?2:1;bHit=now;try{SFX('ok')}catch(_){}if(hp<=0&&st=='play'){hp=0;st='won';setTimeout(()=>{if(id==RUN)win()},900)}}}
    if(b.y>560){b.lost=1;break}}});
-  balls=balls.filter(b=>!b.lost);if(!balls.length&&st=='play'){lives--;wide=0;fire=0;spd=p.v;try{SFX('bad')}catch(_){}if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail(`la Reine avait encore ${hp} PV`)},700)}balls=[{x:px,y:PY-14,vx:0,vy:0,held:1}]}
-  bT-=dt;if(bT<=0){bT=8+Math.random()*4;drop(kx,ky+30)}
+  balls=balls.filter(b=>!b.lost);if(!balls.length&&st=='play'){lives--;wide=0;fire=0;small=0;inv2=0;spd=p.v;try{SFX('bad')}catch(_){}if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail(`la Reine avait encore ${hp} PV`)},700)}balls=[{x:px,y:PY-14,vx:0,vy:0,held:1}]}
+  bT-=dt;if(bT<=0){bT=16+Math.random()*8;drop(kx,ky+30)}
   bon.forEach(o=>o.y+=150*dt);bon=bon.filter(o=>{if(o.y>PY-12&&o.y<PY+14&&Math.abs(o.x-px)<pw/2+12){const B=BK[o.k];msg={t:B.e+' '+B.n,at:now};try{bkT(880,.1,'triangle',.06,1320)}catch(_){}
-    if(o.k=='big')wide=10;else if(o.k=='fire')fire=7;else if(o.k=='life')lives++;else{const s0=balls.find(b=>!b.held)||balls[0];[-.5,.5].forEach(da=>{const a=Math.atan2(s0.held?-1:s0.vy,s0.held?0:s0.vx)+da;balls.push({x:s0.held?px:s0.x,y:s0.held?PY-14:s0.y,vx:Math.cos(a)*spd,vy:-Math.abs(Math.sin(a))*spd,held:0})})}return false}return o.y<560});
+    try{if(B.bad)SFX('bad')}catch(_){}if(o.k=='big'){wide=10;small=0}else if(o.k=='small'){small=8;wide=0}else if(o.k=='rev')inv2=7;else if(o.k=='fire')fire=7;else if(o.k=='life')lives++;else{const s0=balls.find(b=>!b.held)||balls[0];[-.5,.5].forEach(da=>{const a=Math.atan2(s0.held?-1:s0.vy,s0.held?0:s0.vx)+da;balls.push({x:s0.held?px:s0.x,y:s0.held?PY-14:s0.y,vx:Math.cos(a)*spd,vy:-Math.abs(Math.sin(a))*spd,held:0})})}return false}return o.y<560});
   icT-=dt;if(icT<=0){icT=2.2+Math.random()*1.6;ic.push({x:kx,y:ky+30})}ic.forEach(i=>i.y+=220*dt);ic=ic.filter(i=>{if(i.y>PY-14&&i.y<PY+10&&Math.abs(i.x-px)<pw/2+6){frz=2;try{SFX('bad')}catch(_){}return false}return i.y<560})};
  const draw=now=>{const g=x.createLinearGradient(0,0,0,540);g.addColorStop(0,'#0d2b4e');g.addColorStop(1,'#7fb8e6');x.fillStyle=g;x.fillRect(0,0,360,540);const pw=PW();
   bemo(x,st=='won'?'💥':'👸',kx+(now-bHit<200?Math.random()*8-4:0),ky,58);bbar(x,hp,p.hp,`👸 La Reine des glaces · ${hp} PV`,now-bHit<200,4);
   BR.forEach(b=>{if(!b.a)return;x.fillStyle=b.hp==2?'#7fd6ff':'#d6f3ff';x.strokeStyle='#fff';x.lineWidth=2;x.beginPath();x.roundRect(b.x,b.y,b.w,b.h,4);x.fill();x.stroke()});
   ic.forEach(i=>bemo(x,'🧊',i.x,i.y,22));
-  bon.forEach(o=>{x.save();x.fillStyle='#fff3';x.strokeStyle='#ffd34d';x.lineWidth=3;x.beginPath();x.arc(o.x,o.y,15,0,7);x.fill();x.stroke();x.restore();bemo(x,BK[o.k].e,o.x,o.y+1,17)});
-  x.fillStyle=frz>0?'#9fe6ff':wide>0?'#8e44ad':'#c0392b';x.beginPath();x.roundRect(px-pw/2,PY,pw,12,6);x.fill();x.strokeStyle=frz>0?'#fff':'#ffd34d';x.lineWidth=2;x.stroke();bface(x,im,px,PY+6,11,frz>0?'#9fe6ff':'#f3c623');
+  bon.forEach(o=>{x.save();x.fillStyle=BK[o.k].bad?'#ff3d6e44':'#fff3';x.strokeStyle=BK[o.k].bad?'#ff3d6e':'#ffd34d';x.lineWidth=3;x.beginPath();x.arc(o.x,o.y,15,0,7);x.fill();x.stroke();x.restore();bemo(x,BK[o.k].e,o.x,o.y+1,17)});
+  x.fillStyle=frz>0?'#9fe6ff':inv2>0?'#2ecc71':wide>0?'#8e44ad':'#c0392b';x.beginPath();x.roundRect(px-pw/2,PY,pw,12,6);x.fill();x.strokeStyle=frz>0?'#fff':'#ffd34d';x.lineWidth=2;x.stroke();bface(x,im,px,PY+6,11,frz>0?'#9fe6ff':'#f3c623');
   balls.forEach(b=>{x.save();x.fillStyle=fire>0?'#ff7a1f':'#fff';x.shadowColor=fire>0?'#ff3d00':'#fff';x.shadowBlur=fire>0?16:10;x.beginPath();x.arc(b.x,b.y,8,0,7);x.fill();x.restore()});
   if(msg&&now-msg.at<1300){x.save();x.globalAlpha=1-(now-msg.at)/1300;x.font='900 18px system-ui';x.textAlign='center';x.fillStyle='#fff';x.strokeStyle='#0008';x.lineWidth=4;x.strokeText(msg.t,180,440-(now-msg.at)/25);x.fillText(msg.t,180,440-(now-msg.at)/25);x.restore()}
   x.font='17px system-ui';x.textAlign='left';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),8,532);
-  x.textAlign='right';x.font='800 13px system-ui';x.fillStyle='#e8fbff';x.fillText(frz>0?'🥶 Luge gelée !':[wide>0?`↔️ ${Math.ceil(wide)}s`:'',fire>0?`🔥 ${Math.ceil(fire)}s`:''].filter(Boolean).join('  '),352,532);
+  x.textAlign='right';x.font='800 13px system-ui';x.fillStyle='#e8fbff';x.fillText(frz>0?'🥶 Luge gelée !':[wide>0?`↔️ ${Math.ceil(wide)}s`:'',fire>0?`🔥 ${Math.ceil(fire)}s`:'',small>0?`🤏 ${Math.ceil(small)}s`:'',inv2>0?`🙃 ${Math.ceil(inv2)}s`:''].filter(Boolean).join('  '),352,532);
   if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.033,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt,now);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={hint:()=>{if(st!='play')return false;lives++;return true}}},
@@ -3409,7 +3433,7 @@ const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
 document.addEventListener('pointerdown',()=>{try{bgm()}catch(_){}},{once:true});
 
 /* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
-const SONGS={"1":{"t":"Babydoll","a":"Dominic Fike"},"2":{"t":"Loser","a":"Tame Impala"},"3":{"t":"Stolen Dance","a":"Milky Chance"},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift"},"5":{"t":"Lush Life","a":"Zara Larsson"},"6":{"t":"DtMF","a":"Bad Bunny"},"7":{"t":"Gigi l'amoroso","a":"Dalida"},"8":{"t":"Le passé","a":"TAL"},"9":{"t":"Dine N'Dash","a":"The Strokes"},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira"},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala"},"12":{"t":"White Keys","a":"Dominic Fike"},"13":{"t":"Out of My League","a":"Fitz and The Tantrums"},"14":{"t":"Last Nite","a":"The Strokes"},"15":{"t":"Opalite","a":"Taylor Swift"},"16":{"t":"I Just Might","a":"Bruno Mars"},"17":{"t":"Self Aware","a":"Temper City"},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus"},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk"},"20":{"t":"Diana","a":"GIMS"},"21":{"t":"Black Madonna","a":"Cage The Elephant"},"22":{"t":"À l'international","a":"TAL"},"23":{"t":"Dance, Dance","a":"Fall Out Boy"},"24":{"t":"I Was Made for Lovin' You","a":"KISS"}};
+const SONGS={"1":{"t":"Babydoll","a":"Dominic Fike"},"2":{"t":"Loser","a":"Tame Impala"},"3":{"t":"Stolen Dance","a":"Milky Chance"},"4":{"t":"The Fate of Ophelia","a":"Taylor Swift"},"5":{"t":"Lush Life","a":"Zara Larsson"},"6":{"t":"DtMF","a":"Bad Bunny"},"7":{"t":"Gigi l'amoroso","a":"Dalida"},"8":{"t":"Le passé","a":"TAL"},"9":{"t":"Dine N'Dash","a":"The Strokes"},"10":{"t":"Zoo (Zootopie 2)","a":"Shakira"},"11":{"t":"Dracula (ft. JENNIE)","a":"Tame Impala"},"12":{"t":"White Keys","a":"Dominic Fike"},"13":{"t":"Out of My League","a":"Fitz and The Tantrums"},"14":{"t":"Last Nite","a":"The Strokes"},"15":{"t":"Opalite","a":"Taylor Swift"},"16":{"t":"I Just Might","a":"Bruno Mars"},"17":{"t":"Self Aware","a":"Temper City"},"18":{"t":"Nothing Breaks Like a Heart","a":"Mark Ronson ft. Miley Cyrus"},"19":{"t":"I Feel It Coming","a":"The Weeknd ft. Daft Punk"},"20":{"t":"Diana","a":"GIMS"},"21":{"t":"Black Madonna","a":"Cage The Elephant"},"22":{"t":"À l'international","a":"TAL"},"23":{"t":"Dance, Dance","a":"Fall Out Boy"},"24":{"t":"I Was Made for Lovin' You","a":"KISS"},"b11":{"t":"Let It Happen","a":"Tame Impala"}};
 /* Les fichiers audio sont importés par Valentin (mode admin) et gardés uniquement sur cet appareil (IndexedDB) */
 const MDB=(()=>{let dbp=null;const db=()=>dbp||(dbp=new Promise((res,rej)=>{try{const r=indexedDB.open('avent_music',1);r.onupgradeneeded=()=>r.result.createObjectStore('songs');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}}));
  const tx=(m,f)=>db().then(d=>new Promise((res,rej)=>{const t=d.transaction('songs',m),st=t.objectStore('songs');let out;Promise.resolve(f(st,v=>out=v)).catch(rej);t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error)}));
@@ -3485,8 +3509,8 @@ addEventListener('change',e=>{const t=e.target;if(!t.classList)return;if(t.class
 function mysBtn(){return`<label class="btn mysb">🎁 Ouvrir le fichier mystère de Valentin<input type="file" class="fpick mysop"></label>`}
 /* ---------- Mode admin : importer les MP3 ---------- */
 const nrm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-function musAdmin(){const rows=Object.keys(SONGS).map(d=>{const sg=SONGS[d];return`<div class="mrow"><span class="mday">${d}</span><span class="mtt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></span>${YTM.has(d)?'<span title="Fichier présent">✅</span>':'<span class="muted">—</span>'}<label class="btn sm mbt">📂<input type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="${d}"></label>${YTM.has(d)?`<button class="sm alt mbt" onclick="musDel(${d})">🗑</button>`:''}</div>`}).join('');
- popup(`<h2>🎵 Musiques des mini-jeux</h2><p class="muted" style="margin:0 0 8px">${YTM.count()}/24 fichiers sur cet appareil. Les fichiers restent uniquement sur cet appareil : importe-les directement sur sa tablette.</p>
+function musAdmin(){const rows=Object.keys(SONGS).map(d=>{const sg=SONGS[d];return`<div class="mrow"><span class="mday">${/^b/.test(d)?'👹':d}</span><span class="mtt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></span>${YTM.has(d)?'<span title="Fichier présent">✅</span>':'<span class="muted">—</span>'}<label class="btn sm mbt">📂<input type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="${d}"></label>${YTM.has(d)?`<button class="sm alt mbt" onclick="musDel('${d}')">🗑</button>`:''}</div>`}).join('');
+ popup(`<h2>🎵 Musiques des mini-jeux</h2><p class="muted" style="margin:0 0 8px">${YTM.count()}/${Object.keys(SONGS).length} fichiers sur cet appareil (👹 = musique du boss du renne). Les fichiers restent uniquement sur cet appareil : importe-les directement sur sa tablette.</p>
  <p><button onclick="mysFromDevice()">📦 Créer le fichier mystère avec les ${YTM.count()} musiques de cet appareil</button></p>
  <p><label class="btn">📦 Fichier mystère à partir d'autres fichiers<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mysmk"></label></p><p>${mysBtn()}</p>
  <p><label class="btn">📂 Importer plusieurs fichiers d'un coup<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="multi"></label></p><p class="muted" style="font-size:.8rem;margin:0 0 8px">Chaque fichier est rangé tout seul si son nom contient le titre de la chanson (ex. « Last Nite.mp3 »).</p><div class="mlist">${rows}</div><button class="alt" onclick="admin()">← Retour</button>`)}
