@@ -862,6 +862,26 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .al-pred{position:absolute;right:5%;bottom:7%;z-index:2;font:700 calc(var(--alw)*.026) system-ui;background:#2a1a3acc;color:#ffe7a8;padding:2px 6px;border-radius:999px;pointer-events:none}
 .alz-stamp{margin:10px auto 0;display:inline-block;transform:rotate(-6deg);border:3px solid #3ddc84;color:#3ddc84;font:900 1.05rem system-ui;padding:6px 12px;border-radius:10px;animation:bloha .5s ease-out both}.alz-stamp small{display:block;font-weight:600;font-size:.75rem}
 #boot{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1c4a3a,#0b1f18);color:#f3e6c4;transition:opacity .4s}#boot.out{opacity:0}.bt-in{text-align:center;padding:20px}.bt-ic{font-size:3.4rem;animation:bsbp 1s ease-in-out infinite}.bt-in p{font:italic 600 1.05rem Georgia,serif;margin:12px 0}.bt-bar{width:200px;height:8px;border-radius:8px;background:#ffffff22;margin:0 auto;overflow:hidden}.bt-bar i{display:block;height:100%;width:0;background:#e8c768;animation:btb 1.4s ease-out forwards}@keyframes btb{to{width:99%}}
+
+/* ===== Jeu terminé ===== */
+body.fini #top{background:linear-gradient(90deg,#3a2a00cc,#5a1030cc,#3a2a00cc);box-shadow:0 2px 0 #ffd76a88,0 6px 18px #ffcc4433}
+body.fini #ttl{background:linear-gradient(90deg,#ffe9a3,#ffd23f,#ff9ec4,#ffe9a3);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:fgold 5s linear infinite}
+body.fini #logo{box-shadow:0 0 0 2px #ffd76a,0 0 14px #ffd76a99}
+body.fini #logo::after{content:'👑';position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:15px;line-height:1;filter:drop-shadow(0 1px 2px #0008)}
+body.fini #logo{position:relative;overflow:visible}
+body.fini #tabs{box-shadow:0 -2px 0 #ffd76a88,0 -6px 18px #ffcc4422}
+body.fini #tabs button.on{color:#ffd76a;background:linear-gradient(180deg,#ffd76a22,#ff9ec41a)}
+body.fini #tabs button.on span{filter:drop-shadow(0 0 6px #ffd76a)}
+body.fini .day.done{box-shadow:0 0 0 2px #ffd76acc,0 0 10px #ffd76a55}
+body.fini h1{text-shadow:0 0 14px #ffd76a66}
+@keyframes fgold{to{background-position:-200% 0}}
+.finb{position:relative;overflow:hidden;text-align:center;border:2px solid #ffd76a;background:linear-gradient(135deg,#4a3200,#6a1640 55%,#4a3200);box-shadow:0 0 22px #ffd76a44}
+.finb::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,#fff3 45%,transparent 60%);background-size:250% 100%;animation:fgold 3.5s linear infinite;pointer-events:none}
+.finb .fbig{font-size:2.6rem;line-height:1;margin:2px 0 4px}
+.finb b{color:#ffe08a;font-size:1.15rem}
+.finb p{margin:6px 0}
+.finb .row{justify-content:center;margin:8px 0 0}
+.fintg{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:99px;background:#ffd76a;color:#4a2a00;font-size:.7rem;font-weight:800;vertical-align:middle}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -879,7 +899,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794954690';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794955220';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1174,7 +1194,7 @@ function ding(){if(S.voix!==false&&S.own.includes('voix')&&(CONTENU.voix||[]).le
 function lvl(){let i=0;LEVELS.forEach((l,k)=>{if(S.earned>=l[0])i=k});return i}
 function award(n,why){if(n<=0)return;S.pts+=n;S.earned+=n;try{EV('stars',n)}catch(_){}const L=lvl();toast(`+${n} ⭐ ${why||''}`);
  if(L>S.lvl){slog('⬆️',`Passe niveau ${L+1} · ${LEVELS[L][1]}`);S.gem=(S.gem||0)+2*(L-S.lvl);S.lvl=L;S.inv.hint++;setTimeout(()=>{toast(`Niveau ${L+1} : ${LEVELS[L][1]} ! (+1 💡 +2 💎)`);if(!$('#pop').innerHTML.trim())popup(`<h2>Niveau ${L+1} !</h2><span class="lvpic big" style="background-image:url(${lvlPic(L)})"></span><p style="font-size:1.3rem;margin:.4em 0"><b>${LEVELS[L][1]}</b></p><p class="muted">Tu gagnes un 💡 indice et 2 💎 gemmes en cadeau.</p><button onclick="closePop()">Trop bien !</button>`)},600);confetti()}save();hdr()}
-function hdr(){$('#pts').textContent='⭐ '+S.pts;eggBadge();achCheck();try{alTick()}catch(_){}{const lg=$('#logo'),u=lvlPic(lvl());if(lg&&lg.dataset.u!==u){lg.dataset.u=u;lg.style.backgroundImage=u?`url(${u})`:'';lg.textContent=u?'':'🎄';lg.style.fontSize=u?'0':'1.5rem'}}{const t=$('#ttl');t.textContent=LEVELS[lvl()][1];t.style.fontSize='';let f=parseFloat(getComputedStyle(t).fontSize);while(t.scrollWidth>t.clientWidth+1&&f>11){f-=.5;t.style.fontSize=f+'px'}}$('#banner').innerHTML=S.sim?`Mode test : jour ${S.sim} simulé`:CONTENU.modeTest?'🧪 Mode test : les 24 jours sont ouverts':'';
+function hdr(){$('#pts').textContent='⭐ '+S.pts;document.body.classList.toggle('fini',!!S.vbDone);eggBadge();achCheck();try{alTick()}catch(_){}{const lg=$('#logo'),u=lvlPic(lvl());if(lg&&lg.dataset.u!==u){lg.dataset.u=u;lg.style.backgroundImage=u?`url(${u})`:'';lg.textContent=u?'':'🎄';lg.style.fontSize=u?'0':'1.5rem'}}{const t=$('#ttl');t.textContent=(S.vbDone?'👑 ':'')+LEVELS[lvl()][1];t.style.fontSize='';let f=parseFloat(getComputedStyle(t).fontSize);while(t.scrollWidth>t.clientWidth+1&&f>11){f-=.5;t.style.fontSize=f+'px'}}$('#banner').innerHTML=S.sim?`Mode test : jour ${S.sim} simulé`:CONTENU.modeTest?'🧪 Mode test : les 24 jours sont ouverts':'';
  {const R=document.documentElement;R.dataset.theme='sapin';R.dataset.bg=S.own.includes('fondrose')&&S.fondrose!==false?'rose':'';R.dataset.txt=S.own.includes('ordore')&&S.ordore!==false?'or':''}document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v==view||(view=='day'&&b.dataset.v=='cal')))}
 
 /* ---------- Navigation ---------- */
@@ -1187,10 +1207,12 @@ function closePop(){$('#pop').innerHTML=''}
 
 /* ---------- Calendrier ---------- */
 const pcs=p=>`background-image:url(${IMG});background-size:400% 600%;background-position:${p%4/3*100}% ${Math.floor(p/4)/5*100}%`;
+function finHTML(){if(!S.vbDone)return'';const d=new Date(S.vbDone),ds=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}),nb=Object.keys(S.boss||{}).filter(k=>S.boss[k]).length;
+ return`<div class="panel finb"><div class="fbig">🏆</div><b>Jeu terminé !</b><p>Le ${esc(ds)}, Célestine a vaincu Valentin… par amour 💘</p><p class="muted" style="font-size:.85rem">👹 ${nb}/6 boss battus · ✅ ${Object.values(S.days).filter(x=>x.done&&!x.lost).length} jeux réussis · 🏅 ${Object.keys(S.ach||{}).length} succès</p><div class="row"><button class="sm" onclick="vCredits()">🎬 Revoir le générique</button></div></div>`}
 function calView(){if(new Date().getHours()<5&&!window.__nightMsg){window.__nightMsg=1;setTimeout(()=>toast('Il est tard… Valentin dort déjà, lui (il ronfle) 😴'),700)}const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
- app.innerHTML=`<h1 class="calh">Calendrier de l'Avent<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>
+ app.innerHTML=`<h1 class="calh">Calendrier de l'Avent${S.vbDone?'<span class="fintg">TERMINÉ</span>':''}<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>
  <div class="panel"><div class="row" style="justify-content:space-between;margin:0"><span>📅 ${n}/24 cases</span><span>✅ ${dn} jeux réussis</span><span>🔥 ${flames()} flamme${flames()>1?'s':''}</span></div><div class="bar"><i style="width:${n/24*100}%"></i></div>
- ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>
+ ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>${finHTML()}
  ${feat(7)?(wheelEnd()?`<div class="row"><button disabled>🎡 La roue est terminée : joyeux Noël 🎄</button></div>`:`<div class="row"><button onclick="wheel()" ${S.wheel==dayKey()?'disabled':''}>🎡 Roue de la chance${S.wheel==dayKey()?' : reviens demain':''}</button></div>`):''}
  <div class="cal">${Array.from({length:24},(_,i)=>{const d=i+1,o=S.opened.includes(d),ok=avail(d),D=DAYS[d],dn=S.days[d]&&S.days[d].done;
   return`<button class="day ${o?'done':ok?'ok':'lock'}" style="${o?pcs(S.map[i]):''}" aria-label="Jour ${d}${o?', ouvert':ok?', disponible':', verrouillé'}" onclick="tapDay(${d})">${o||ok?d:'🔒'}${D.ev&&(o||ok)?`<span class="ev">${D.ev}</span>`:''}${o?`<span class="ck">${dn?(S.days[d].lost?'😢':'✅'):'⏳'}</span>`:''}${bossCfg(d)?`<span class="bsb ${(S.boss||{})[d]?'won':''}" title="Boss">${(S.boss||{})[d]?'🏆':'👹'}</span>`:''}</button>`}).join('')}</div>`}
@@ -1373,7 +1395,7 @@ function vCredits(){if(document.getElementById('vcr'))return;const mu=vMusic(['b
   ['t','RÉALISATION'],['p','Valentin (avec beaucoup trop de nuits blanches)'],['t','ACTRICE PRINCIPALE'],['p','Célestine, la plus belle'],['t','SCÉNARIO'],['p','Notre histoire'],['t','CODAGE DU SITE'],['p','Claude'],['t','TESTEURS DU SITE'],['p','Gaspard, Alexandre et Victor'],['t','EFFETS SPÉCIAUX'],['p','Beaucoup, beaucoup trop de cœurs'],['t','CASCADEUR'],['p','Valentin (il s’est pris une crêpe sur la tête)'],['t','REMERCIEMENTS'],['p','Le Grinch, Rodolphe, la Reine des glaces,'],['p','le Troll, le Fantôme et le Bonhomme de neige'],['p','pour avoir accepté de perdre.'],['',''],
   ['p','Et maintenant, la suite de l’histoire'],['p','s’écrit à deux… pour toujours.'],['',''],['b','Je t’aime ❤️'],['p','Joyeux Noël 🎄'],['p','— Valentin']];
  const o=document.createElement('div');o.id='vcr';o.innerHTML=`<div class="vc-h">${Array.from({length:26},(_,i)=>`<span style="left:${(i*37)%100}%;--d:${(i*.61%7).toFixed(2)}s;--s:${(7+i%5*1.4).toFixed(1)}s;font-size:${1+i%4*.45}rem">${['💖','💗','💕','❤️','💘'][i%5]}</span>`).join('')}</div><div class="vc-sc"><div class="vc-tx">${L.map(([k,t])=>`<p class="vc-${k||'e'}">${esc(t)||'&nbsp;'}</p>`).join('')}</div></div><button class="vc-x alt sm">✕ Fermer</button>`;
- document.body.appendChild(o);let gone=0;const close=()=>{if(gone)return;gone=1;o.classList.add('out');mu.stop();setTimeout(()=>{o.remove();try{go('cal')}catch(_){try{render()}catch(_){}}},600)};o.querySelector('.vc-x').onclick=close;try{slog('🎬','Regarde le générique de fin')}catch(_){}
+ document.body.appendChild(o);let gone=0;const close=()=>{if(gone)return;gone=1;o.classList.add('out');mu.stop();setTimeout(()=>{o.remove();try{go('cal')}catch(_){try{render()}catch(_){}}if(S.vbDone&&!S.finSeen){S.finSeen=1;try{save()}catch(_){}setTimeout(()=>toast('👑 Jeu terminé : le calendrier a mis sa tenue de fête !'),900)}},600)};o.querySelector('.vc-x').onclick=close;try{slog('🎬','Regarde le générique de fin')}catch(_){}
  o.querySelector('.vc-tx').addEventListener('animationend',e=>{if(e.animationName!='vcs'||gone)return;const f=document.createElement('div');f.className='vc-fin';const vs=(((CONTENU.videos||[])[0]||{}).src||'videos/x').replace(/[^/]*$/,'')+'fin-bisou.mp4';f.innerHTML=`<div class="vc-fw"><video src="${vs}" poster="${VFIN}" muted playsinline webkit-playsinline autoplay preload="auto"></video></div>`;o.appendChild(f);requestAnimationFrame(()=>requestAnimationFrame(()=>f.classList.add('on')));const v=f.querySelector('video');try{const pp=v.play();if(pp&&pp.catch)pp.catch(()=>{})}catch(_){}
   let ir=0;const iris=()=>{if(ir||gone)return;ir=1;f.classList.add('iris');setTimeout(()=>{if(gone)return;mu.stop();setTimeout(close,900)},3000)};v.onended=()=>setTimeout(iris,700);v.onerror=()=>setTimeout(iris,4000);setTimeout(iris,12000)})}
 
