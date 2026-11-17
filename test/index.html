@@ -910,7 +910,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794956618';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794956843';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1333,8 +1333,10 @@ const VIMG={v:"data:image/webp;base64,UklGRn4yAABXRUJQVlA4WAoAAAAQAAAAxgAAAwEAQU
 function vMusic(keys){keys=keys||['b24','b11'];let a=null,u=null,dead=0,fb=0;const was={ytm:0};try{was.ytm=YTM.hold()}catch(_){}window.__vidOn=1;try{ALBM.stop(.2)}catch(_){}try{MUS.stop();MUS._bg=0}catch(_){}
  (async()=>{try{if(S.sound===false||S.music===false)return;const o=await MDB.all();let it=null;for(const k of keys)if(o&&o[k]&&o[k].blob){it=o[k];break}if(dead)return;if(!it||!it.blob){fb=1;window.__vidOn=0;try{ALBM.start()}catch(_){}return}u=URL.createObjectURL(it.blob);a=new Audio(u);a.loop=true;a.volume=0;await a.play();let v=0;const f=setInterval(()=>{if(dead||!a){clearInterval(f);return}v=Math.min(.75,v+.04);a.volume=v;if(v>=.75)clearInterval(f)},120)}catch(_){}})();
  return{stop(){if(dead)return;dead=1;window.__vidOn=0;if(fb){try{ALBM.stop(.6)}catch(_){}}if(a){const A=a;let v=A.volume;const f=setInterval(()=>{v-=.06;if(v<=0){clearInterval(f);try{A.pause()}catch(_){}if(u)URL.revokeObjectURL(u)}else A.volume=v},90)}if(was.ytm)try{YTM.unhold()}catch(_){}else setTimeout(()=>{try{bgm()}catch(_){}},1200)}}}
-function vMiss(){const m=[],n=Array.from({length:24},(_,i)=>i+1).filter(d=>!S.opened.includes(d));if(n.length)m.push(`📅 Ouvrir les 24 cases du calendrier (il en manque ${n.length} : ${n.slice(0,8).join(', ')}${n.length>8?'…':''})`);if(!S.puzWon)m.push('🧩 Terminer le puzzle final');return m}
-function vTry(b){const m=vMiss();if(!m.length){closePop();return vBoss()}
+function vMiss(){const m=[],n=Array.from({length:24},(_,i)=>i+1).filter(d=>!S.opened.includes(d));if(n.length)m.push(`📅 Ouvrir les 24 cases du calendrier (il en manque ${n.length} : ${n.slice(0,8).join(', ')}${n.length>8?'…':''})`);if(!Object.values(S.puzWon||{}).some(Boolean))m.push('🧩 Terminer le puzzle final (onglet Puzzle)');return m}
+function vTry(b){const m=vMiss();if(!m.length){const bl=[4,8,11,15,19,22].filter(d=>bossCfg(d)&&!(S.boss||{})[d]);
+  if(bl.length&&!b.dataset.ok){b.dataset.ok=1;b.textContent='⚔️ Y aller quand même';const c=b.closest('.card')||b.parentNode,e=c.querySelector('#vgm');if(e)e.innerHTML=`<b>💡 Petit conseil avant le combat…</b><br>Valentin est coriace ! Tu serais mieux préparée en battant d’abord tous les autres boss. Il t’en reste ${bl.length} :<br>${bl.map(d=>`• ${esc(bossCfg(d).n)} (jour ${d})`).join('<br>')}`;return}
+  closePop();return vBoss()}
  const c=b.closest('.card')||b.parentNode;c.classList.remove('vshk');void c.offsetWidth;c.classList.add('vshk');try{SFX('lose')}catch(_){}try{navigator.vibrate&&navigator.vibrate([80,40,80])}catch(_){}
  const e=c.querySelector('#vgm');if(e)e.innerHTML=`<b>😈 Valentin rigole : « Tu n’es pas prête ! »</b><br>Avant de m’affronter, il te reste à :<br>${m.map(x=>'• '+esc(x)).join('<br>')}`}
 function vBoss(test){if(document.getElementById('vbo'))return;const mu=vMusic();try{slog('😈',`Lance le boss final${test?' (test)':''}`)}catch(_){}
