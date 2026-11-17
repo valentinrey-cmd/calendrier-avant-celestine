@@ -875,7 +875,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794951596';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794952252';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1390,7 +1390,7 @@ function vidNew(){if(document.getElementById('spl')){setTimeout(vidNew,1200);ret
  popup(`<h2>🎬 Nouvelle vidéo débloquée !</h2><p class="center" style="font-size:3rem;margin:.2em 0">🎞️</p><p class="center">Un nouveau souvenir… <b>en vidéo</b> t'attend dans l'album 📖</p>${ok?'':`<p class="muted center">Pour la regarder, fabrique l'album dans le 💝 coffre à souvenirs du labo 🧪</p>`}<button onclick="closePop();${ok?`vidGo(${k})`:"go('lab')"}">${ok?"📖 La voir dans l'album":'🧪 Aller au labo'}</button><button class="alt" onclick="closePop()">Plus tard</button>`)}
 function vidGo(k){const P=alPages(),pg=P.findIndex(p=>p.items&&p.items.some(it=>it.vid==k));alS().goto=Math.max(0,pg);go('book')}
 function vidPlay(k){const V=(CONTENU.videos||[])[k];if(!V||!vidOk(k))return;const was={alb:0,ytm:0};try{was.alb=ALBM.on}catch(_){}try{was.ytm=YTM.hold()}catch(_){}
- window.__vidOn=1;try{ALBM.stop(.15)}catch(_){}try{MUS.stop();MUS._bg=0}catch(_){}
+ window.__vidOn=1;try{ALBM.stop(.15,1)}catch(_){}try{MUS.stop();MUS._bg=0}catch(_){}
  const o=document.createElement('div');o.id='vidov';o.innerHTML=`<div class="vid-in"><video src="${V.src}" poster="${V.poster||''}" controls autoplay playsinline webkit-playsinline></video><p class="vid-t">🎬 ${esc(V.titre)}${V.date?` <small>· ${esc(V.date)}</small>`:''}</p><button class="alt sm vid-x">✕ Fermer</button></div>`;document.body.appendChild(o);
  const v=o.querySelector('video');try{slog('🎬',`Regarde la vidéo « ${V.titre} »`)}catch(_){}
  const close=()=>{if(!o.isConnected)return;try{v.pause()}catch(_){}o.remove();window.__vidOn=0;if(was.ytm){try{YTM.unhold()}catch(_){}}else if(was.alb&&view=='book'){try{ALBM.start()}catch(_){}}else{try{bgm()}catch(_){}}};
@@ -1550,18 +1550,19 @@ const ALBM=(()=>{let A=null,G=null,iv=null,on=false,t0=0,step=0;
  function bar(i,t){const [c,mel]=BARS[i%BARS.length],ch=CH[c];bell(fq(ch[0]),t,2.2,.16);bell(fq(ch[1]),t+BEAT,1.4,.07);bell(fq(ch[2]),t+2*BEAT,1.4,.07);
   let x=0;mel.split(' ').forEach(n=>{const [p,d]=n.split(':');if(p!='R')bell(fq(p),t+x*BEAT,1.8,.2);x+=+d})}
  function tick(){if(!on)return;while(t0<A.currentTime+1.2){bar(step++,t0);t0+=3*BEAT}}
- let fa=null,fu=null,fm=0,stok=0;
- function start(){if(on||S.sound===false||S.music===false)return;try{if(YTM.on())return}catch(_){}on=true;const tok=++stok;
+ let fa=null,fu=null,fm=0,stok=0,hy=0;
+ function start(){if(on||S.sound===false||S.music===false)return;try{if(YTM.hold())hy=1}catch(_){}on=true;const tok=++stok;
   (async()=>{let bl=null;try{const o=await MDB.all();bl=o&&o.b26&&o.b26.blob}catch(_){}if(!on||tok!=stok)return;
    if(bl){fm=1;try{MUS.stop()}catch(_){}fu=URL.createObjectURL(bl);fa=new Audio(fu);fa.loop=true;fa.volume=0;try{await fa.play()}catch(_){}const A2=fa;let v=0;const iv2=setInterval(()=>{if(fa!==A2){clearInterval(iv2);return}v=Math.min(.6,v+.04);A2.volume=v;if(v>=.6)clearInterval(iv2)},120);return}
    on=false;synthStart()})()}
- function synthStart(){if(on||S.sound===false||S.music===false)return;try{if(YTM.on())return}catch(_){}try{A=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(A.state=='suspended')A.resume();
+ function synthStart(){if(on||S.sound===false||S.music===false)return;try{A=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(A.state=='suspended')A.resume();
   try{MUS.stop()}catch(_){}
   G=A.createGain();G.gain.setValueAtTime(0,A.currentTime);G.gain.linearRampToValueAtTime(.55,A.currentTime+1.5);
   const dl=A.createDelay(),fb=A.createGain(),wet=A.createGain();dl.delayTime.value=.34;fb.gain.value=.32;wet.gain.value=.3;G.connect(A.destination);G.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(wet);wet.connect(A.destination);G._fx=[dl,fb,wet];
   on=true;step=0;t0=A.currentTime+.15;tick();iv=setInterval(tick,250)}catch(e){console.error(e)}}
- function stop(fade){if(!on)return;if(fm){on=false;fm=0;stok++;const A2=fa,U=fu;fa=null;fu=null;if(A2){let v=A2.volume;const f2=setInterval(()=>{v-=.06;if(v<=0){clearInterval(f2);try{A2.pause()}catch(_){}if(U)URL.revokeObjectURL(U)}else A2.volume=v},Math.max(30,(fade||.4)*100))}setTimeout(()=>{try{bgm()}catch(_){}},1500);return}on=false;stok++;clearInterval(iv);const g=G;try{g.gain.cancelScheduledValues(A.currentTime);g.gain.setTargetAtTime(0,A.currentTime,fade||.4);setTimeout(()=>{try{g.disconnect();g._fx.forEach(n=>n.disconnect())}catch(_){}},3000)}catch(_){}
-  setTimeout(()=>{try{bgm()}catch(_){}},1500)}
+ const rel=keep=>{if(hy&&!keep){hy=0;setTimeout(()=>{try{YTM.unhold()}catch(_){}},(1)*700);return 1}return 0};
+ function stop(fade,keep){if(!on)return;const ry=rel(keep);if(fm){on=false;fm=0;stok++;const A2=fa,U=fu;fa=null;fu=null;if(A2){let v=A2.volume;const f2=setInterval(()=>{v-=.06;if(v<=0){clearInterval(f2);try{A2.pause()}catch(_){}if(U)URL.revokeObjectURL(U)}else A2.volume=v},Math.max(30,(fade||.4)*100))}if(!ry&&!keep)setTimeout(()=>{try{bgm()}catch(_){}},1500);return}on=false;stok++;clearInterval(iv);const g=G;try{g.gain.cancelScheduledValues(A.currentTime);g.gain.setTargetAtTime(0,A.currentTime,fade||.4);setTimeout(()=>{try{g.disconnect();g._fx.forEach(n=>n.disconnect())}catch(_){}},3000)}catch(_){}
+  if(!ry&&!keep)setTimeout(()=>{try{bgm()}catch(_){}},1500)}
  return{start,stop,get on(){return on}}})();
 
 /* ---------- 📸 Déblocage des photos de l'album ---------- */
@@ -1627,8 +1628,13 @@ function alBind(first){const bk=$('#alb');if(first)bk.classList.add('appear');
  let x0=null,y0=0;bk.onpointerdown=e=>{x0=e.clientX;y0=e.clientY};
  bk.onpointerup=e=>{if(x0==null)return;const dx=e.clientX-x0,dy=e.clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))alFlip(dx<0?1:-1)}}
 function alNav(){const P=alPages(),B=alS(),sp=alSpread(),tot=sp?P.length/2:P.length,cur=sp?B.p/2+1:B.p+1;$('#bkpn').textContent=`${cur} / ${tot}`;$('#bkprev').disabled=cur<=1;$('#bknext').disabled=cur>=tot}
+function pageFlip(d){if(S.sound===false)return;try{const A=eggAC();if(!A)return;const t=A.currentTime,sr=A.sampleRate,n=Math.floor(sr*.6),b=A.createBuffer(1,n,sr),q=b.getChannelData(0);
+ for(let i=0;i<n;i++){const u=i/n,env=Math.pow(Math.sin(Math.PI*Math.min(1,u*1.25)),1.4)*(1-u*.4);q[i]=(Math.random()*2-1)*env*(Math.random()<.035?2.6:1)}
+ const src=A.createBufferSource(),bp=A.createBiquadFilter(),hp=A.createBiquadFilter(),g=A.createGain();src.buffer=b;bp.type='bandpass';bp.Q.value=.8;bp.frequency.setValueAtTime(d>0?3200:2400,t);bp.frequency.exponentialRampToValueAtTime(d>0?1100:1600,t+.5);hp.type='highpass';hp.frequency.value=500;g.gain.setValueAtTime(.32,t);
+ src.connect(hp);hp.connect(bp);bp.connect(g);g.connect(A.destination);src.start(t);
+ const n2=Math.floor(sr*.09),b2=A.createBuffer(1,n2,sr),q2=b2.getChannelData(0);for(let i=0;i<n2;i++)q2[i]=(Math.random()*2-1)*Math.pow(1-i/n2,3);const s2=A.createBufferSource(),lp=A.createBiquadFilter(),g2=A.createGain();s2.buffer=b2;lp.type='lowpass';lp.frequency.value=900;g2.gain.value=.35;s2.connect(lp);lp.connect(g2);g2.connect(A.destination);s2.start(t+.62)}catch(_){}}
 function alFlip(d){const B=alS(),P=alPages(),sp=alSpread(),st=sp?2:1,n=B.p+d*st;if(alBusy||n<0||n>=P.length)return;alBusy=true;
- bkT(d>0?900:700,.05,'triangle',.025);setTimeout(()=>bkT(d>0?1250:600,.05,'sine',.02),70);
+ pageFlip(d);
  const bk=$('#alb'),leaf=document.createElement('div');leaf.className='al-leaf '+(d>0?'fw':'bw')+(sp?'':' one');
  if(sp){if(d>0){leaf.innerHTML=`<div class="face f">${alPageHTML(P,B.p+1)}</div><div class="face b">${alPageHTML(P,n)}</div>`;$('#alR').innerHTML=alPageHTML(P,n+1)}
   else{leaf.innerHTML=`<div class="face f">${alPageHTML(P,B.p)}</div><div class="face b">${alPageHTML(P,n+1)}</div>`;$('#alL').innerHTML=alPageHTML(P,n)}}
