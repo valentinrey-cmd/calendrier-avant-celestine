@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Calendrier 2026 Célestine"><meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="color-scheme" content="dark only">
 <meta name="darkreader-lock">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Caveat:wght@600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <meta name="robots" content="noindex"><title>Calendrier 2026 Célestine</title>
 <style>
 :root{--g:#12382b;--g2:#1c5240;--r:#7a1f33;--o:#d9b45f;--c:#fbf5e6;--t:#2b1d16;--ok:#2f8f5b;--ko:#b3263e}
@@ -886,6 +886,13 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .vshk{animation:vshk .6s cubic-bezier(.36,.07,.19,.97)}
 @keyframes vshk{10%,90%{transform:translate(-2px,0) rotate(-.5deg)}20%,80%{transform:translate(5px,0) rotate(.8deg)}30%,50%,70%{transform:translate(-9px,0) rotate(-1.2deg)}40%,60%{transform:translate(9px,0) rotate(1.2deg)}}
 .vgm{margin:6px 0 10px;padding:8px 10px;border-radius:10px;background:#fff;color:#8a1030;font-size:.88rem;line-height:1.45;text-align:left;box-shadow:0 2px 8px #0003}.vgm:empty{display:none}
+
+.vc-end{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:.25em;pointer-events:none;opacity:0;animation:vcend 2.2s ease 1.9s forwards}
+.vc-end b{font-family:'Dancing Script','Caveat',cursive;font-weight:700;font-size:min(30vw,9rem);line-height:1;color:#fff4d6;text-shadow:0 0 18px #ff9ec4,0 0 40px #ff4f8b99,0 4px 0 #b0123a;transform-origin:center;animation:vcfb 3.4s ease-in-out 1.9s infinite}
+.vc-eh{font-size:min(9vw,2.8rem);animation:vcfh 1.6s ease-in-out infinite}.vc-eh.r{animation-delay:.8s}
+@keyframes vcend{0%{opacity:0;transform:scale(.4) rotate(-8deg)}60%{opacity:1;transform:scale(1.12) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes vcfb{50%{transform:scale(1.05)}}
+@keyframes vcfh{50%{transform:translateY(-8px) scale(1.15)}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -903,7 +910,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794956056';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794956118';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1405,7 +1412,7 @@ function vCredits(){if(document.getElementById('vcr'))return;const mu=vMusic(['b
  const o=document.createElement('div');o.id='vcr';o.innerHTML=`<div class="vc-h">${Array.from({length:26},(_,i)=>`<span style="left:${(i*37)%100}%;--d:${(i*.61%7).toFixed(2)}s;--s:${(7+i%5*1.4).toFixed(1)}s;font-size:${1+i%4*.45}rem">${['💖','💗','💕','❤️','💘'][i%5]}</span>`).join('')}</div><div class="vc-sc"><div class="vc-tx">${L.map(([k,t])=>`<p class="vc-${k||'e'}">${esc(t)||'&nbsp;'}</p>`).join('')}</div></div><button class="vc-x alt sm">✕ Fermer</button>`;
  document.body.appendChild(o);let gone=0;const close=()=>{if(gone)return;gone=1;o.classList.add('out');mu.stop();setTimeout(()=>{o.remove();try{go('cal')}catch(_){try{render()}catch(_){}}if(S.vbDone&&!S.finSeen){S.finSeen=1;try{save()}catch(_){}setTimeout(()=>toast('👑 Jeu terminé : le calendrier a mis sa tenue de fête !'),900)}},600)};o.querySelector('.vc-x').onclick=close;try{slog('🎬','Regarde le générique de fin')}catch(_){}
  o.querySelector('.vc-tx').addEventListener('animationend',e=>{if(e.animationName!='vcs'||gone)return;const f=document.createElement('div');f.className='vc-fin';const vs=(((CONTENU.videos||[])[0]||{}).src||'videos/x').replace(/[^/]*$/,'')+'fin-bisou.mp4';f.innerHTML=`<div class="vc-fw"><video src="${vs}" poster="${VFIN}" muted playsinline webkit-playsinline autoplay preload="auto"></video></div>`;o.appendChild(f);requestAnimationFrame(()=>requestAnimationFrame(()=>f.classList.add('on')));const v=f.querySelector('video');try{const pp=v.play();if(pp&&pp.catch)pp.catch(()=>{})}catch(_){}
-  let ir=0;const iris=()=>{if(ir||gone)return;ir=1;f.classList.add('iris');setTimeout(()=>{if(gone)return;mu.stop();setTimeout(close,900)},3000)};v.onended=()=>setTimeout(iris,700);v.onerror=()=>setTimeout(iris,4000);setTimeout(iris,12000)})}
+  let ir=0;const iris=()=>{if(ir||gone)return;ir=1;f.classList.add('iris');const fe=document.createElement('div');fe.className='vc-end';fe.innerHTML='<span class="vc-eh l">💖</span><b>Fin</b><span class="vc-eh r">💖</span>';f.appendChild(fe);setTimeout(()=>{if(gone)return;mu.stop();setTimeout(close,900)},6000)};v.onended=()=>setTimeout(iris,700);v.onerror=()=>setTimeout(iris,4000);setTimeout(iris,12000)})}
 
 function bossReset(d){if(d){if(S.boss)delete S.boss[d];if(S.bossTry)delete S.bossTry[d]}else{S.boss={};S.bossTry={}}save();toast('👹 Boss réinitialisé'+(d?'':'s'));if(d)startBox(d);else admin()}
 function bossOffer(d){if(document.getElementById('spl')||document.getElementById('alnew')){setTimeout(()=>bossOffer(d),1500);return}if(cur!=d||view!='day'||document.getElementById('gwin'))return;const B=bossCfg(d);if(!B||(S.boss||{})[d])return;
