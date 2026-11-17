@@ -814,6 +814,17 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .al-myst{flex-direction:column;background:#2a1a3a55!important}.al-myst small{font-size:calc(var(--alw)*.035);opacity:.7;font-style:italic}
 #vidov{position:fixed;inset:0;z-index:10050;background:#000e;display:flex;align-items:center;justify-content:center;padding:10px}.vid-in{width:min(96vw,1000px);text-align:center}.vid-in video{width:100%;max-height:78vh;border-radius:12px;background:#000;box-shadow:0 10px 40px #000}.vid-t{color:#fff;font-weight:700;margin:10px 0 8px}.vid-t small{opacity:.7;font-weight:500}
 .bossr{text-align:left;padding:6px 4px;max-width:420px;margin:0 auto}.bossr .bri{text-align:center;font-size:3.4rem;margin:0;line-height:1.1}.bossr h3{text-align:center;margin:.3em 0 .6em}.bossr ul{padding-left:0;list-style:none;margin:0 0 14px}.bossr li{background:#ffffff10;border-radius:10px;padding:8px 10px;margin:6px 0;line-height:1.35;font-size:.95rem}.bossr button{width:100%}
+.bko{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border-radius:inherit;background:radial-gradient(circle,#2a0a3acc,#0a0010ee);animation:bkobg .3s both;cursor:pointer}
+@keyframes bkobg{from{opacity:0}}
+.bko-b{font-size:7.5rem;line-height:1;animation:bkob 1.4s both}
+@keyframes bkob{0%{transform:translate(0) scale(1)}8%{transform:translate(-9px,4px) rotate(-6deg)}16%{transform:translate(9px,-4px) rotate(6deg)}24%{transform:translate(-11px,-2px) rotate(-8deg)}32%{transform:translate(11px,3px) rotate(8deg)}40%{transform:translate(-7px,5px) rotate(-4deg);filter:brightness(1.5)}50%{transform:scale(1.2);filter:brightness(2.5)}58%{transform:scale(1.7);filter:brightness(5);opacity:1}66%{transform:scale(.1);opacity:0}100%{opacity:0;transform:scale(0)}}
+.bko-fl{position:absolute;inset:0;background:#fff;opacity:0;animation:bkofl 1.5s both}@keyframes bkofl{0%,55%{opacity:0}60%{opacity:.95}100%{opacity:0}}
+.bko-p{position:absolute;left:50%;top:42%;font-size:1.9rem;margin:-.6em;opacity:0;animation:bkop 1.4s ease-out calc(.82s + var(--d)) both}
+@keyframes bkop{0%{transform:translate(0,0) scale(.3);opacity:0}10%{opacity:1}100%{transform:translate(var(--x),var(--y)) scale(1.4) rotate(260deg);opacity:0}}
+.bko-t{position:absolute;top:30%;font:900 4.4rem system-ui;color:#ffd34d;-webkit-text-stroke:3px #b3122e;text-shadow:0 6px 24px #ff3d6e;animation:bkot .55s cubic-bezier(.2,1.6,.4,1) 1.05s both}
+@keyframes bkot{0%{transform:scale(3.5) rotate(-12deg);opacity:0}100%{transform:scale(1) rotate(-6deg);opacity:1}}
+.bko-v{position:absolute;bottom:20%;font-weight:800;font-size:1.25rem;color:#fff;text-align:center;padding:0 14px;animation:bkov .5s ease-out 1.7s both}.bko-v small{display:block;font-weight:500;font-size:.8rem;opacity:.7;margin-top:6px}
+@keyframes bkov{from{transform:translateY(20px);opacity:0}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -831,7 +842,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794941147';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794942082';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1213,7 +1224,7 @@ const BRULES={
  8:["🐍 C'est le Snake du jour : glisse le doigt pour tourner (ou flèches du clavier).","🎁 Mange les cadeaux pour grandir… avant que le Grinch ne te les vole !","⭐ Attrape une étoile : pendant 6 s tu as le super-pouvoir 🌈, le Grinch a peur 😱 et s'enfuit.","💥 Fonce sur lui avec le super-pouvoir pour lui enlever 1 PV (<b>3 PV</b> en tout). Sans super-pouvoir, s'il te touche tu perds une vie.","⚫ Évite les bords, ta queue et son charbon. Tu as <b>3 vies</b>. 💡 L'indice donne le super-pouvoir."],
  11:["🎵 La musique démarre et des notes descendent dans 4 colonnes.","👆 Touche la colonne (ou <b>D F J K</b> sur ordinateur) quand la note arrive dans le cercle, en rythme avec la musique.","✨ Chaque note réussie enlève 1 PV au renne. 10 notes d'affilée te rendent 1 💜.","💔 Chaque note ratée coûte 1 💜 de groove : à zéro, c'est perdu. Il faut le battre avant la fin du morceau !","💡 L'indice te rend 1 💜."],
  15:["👆 Glisse le doigt pour bouger la luge, touche pour lancer la boule.","🧊 Casse le mur de glace et touche la Reine avec la boule (<b>10 PV</b>).","🎁 Parfois un bonus tombe (cercle doré) : ↔️ grande luge, ✨ multi-boules, 🔥 boule de feu, ❤️ vie.","⚠️ Évite les malus (cercle rouge) : 🤏 mini-luge, 🙃 commandes inversées. Et ses stalactites 🧊 gèlent ta luge !","❤️ Si toutes les boules tombent, tu perds une vie (<b>3 vies</b>). 💡 L'indice donne une vie."],
- 19:["🏃 Célestine court toute seule : touche l'écran pour sauter, deux fois pour un double saut.","🎄⛄ Saute par-dessus les obstacles et évite les cailloux 🪨 qui volent.","🍬 Attrape les bonbons pour te rapprocher du troll. Chaque obstacle touché le fait s'éloigner.","🏁 Rattrape-le (barre pleine) avant qu'il s'enfuie ou que les 80 secondes soient écoulées.","💡 L'indice te rapproche d'un coup."],
+ 19:["🏃 Célestine court toute seule : touche l'écran pour sauter, deux fois pour un double saut.","🎄⛄ Saute par-dessus les obstacles et évite les cailloux 🪨 qui volent.","🍬 Tu te rapproches du troll tout le temps. Les bonbons te font aller plus vite, mais tu peux le rattraper même sans.","❤️ Tu as <b>3 vies</b> : chaque obstacle touché t'en coûte une. À la 3ᵉ, le troll s'échappe ! Rattrape-le (barre pleine) en moins de 80 secondes.","💡 L'indice te rapproche d'un coup."],
  22:["🏠 Le fantôme apparaît aux fenêtres de la maison en pain d'épice.","👆 Touche-le vite avant qu'il disparaisse : <b>22 PV</b> à lui enlever en 60 secondes.","🚫 Ne touche jamais les habitants (🎅 🤶 🧝 🦌 ⛄ 🐈) : tu perds une vie (<b>3 vies</b>).","🌫️ De temps en temps il crée du brouillard, et il accélère quand il faiblit.","💡 L'indice dissipe le brouillard et donne une vie."]};
 const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
@@ -1221,11 +1232,16 @@ function bossCfg(d){const C={
  8:{n:'Le Grinch voleur',ic:'😈',g:'snake',p:{n:13,goal:999,speed:175,grinch:{hp:3,lives:3,gtick:.42,pow:6}}},
  11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'brhythm',quiet:1,p:{len:46,need:.68,lives:6}},
  15:{n:'La Reine des glaces',ic:'👸',g:'bbreak',p:{hp:10,lives:3,pw:86,v:310,vmax:420}},
- 19:{n:'Le Troll des neiges',ic:'🧌',g:'brun',p:{gap0:60,gapMax:110,close:1.1,hitGap:16,candy:8,v:240,time:80}},
+ 19:{n:'Le Troll des neiges',ic:'🧌',g:'brun',p:{gap0:60,gapMax:110,close:1.25,hitGap:8,candy:7,v:240,time:80,lives:3}},
  22:{n:'Le Fantôme de Noël',ic:'👻',g:'bwhack',p:{hp:22,lives:3,time:60}}};return C[d]||null}
 function bossBtn(d){const B=bossCfg(d);if(!B)return'';if((S.boss||{})[d])return`<p><span class="ribbon">🏆 Boss vaincu · 🎬 vidéo débloquée</span></p>`;const n=(S.bossTry||{})[d]||0;
  return`<button class="bossb" onclick="launchBoss(${d})">⚔️ Affronter le boss ${B.ic} <small>${n?`(−${BOSSCOST} ⭐)`:'(1ʳᵉ tentative gratuite)'}</small></button><p class="muted" style="font-size:.85rem;margin-top:0">Il garde une 🎬 vidéo mystère de votre album.</p>`}
-function bossDev(d){if((CONTENU.syncRoom!='t'&&!TEST())||!bossCfg(d))return'';const B=bossCfg(d);return`<div class="bossdev"><b>🧪 Mode test</b> · boss de cette case : ${B.ic} ${B.n}<br><button class="alt sm" onclick="launchBoss(${d},1)">▶ Tester le boss (ne débloque rien)</button>${(S.boss||{})[d]||(S.bossTry||{})[d]?`<button class="alt sm" onclick="bossReset(${d})">↺ Remettre ce boss à zéro</button>`:''}</div>`}
+function bossDev(d){if((CONTENU.syncRoom!='t'&&!TEST())||!bossCfg(d))return'';const B=bossCfg(d);return`<div class="bossdev"><b>🧪 Mode test</b> · boss de cette case : ${B.ic} ${B.n}<br><button class="alt sm" onclick="launchBoss(${d},1)">▶ Tester le boss (gratuit, débloque la vidéo)</button>${(S.boss||{})[d]||(S.bossTry||{})[d]?`<button class="alt sm" onclick="bossReset(${d})">↺ Remettre ce boss à zéro</button>`:''}</div>`}
+function bossKO(B,cb){const box=document.getElementById('gwin');if(!box){cb();return}try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}
+ const o=document.createElement('div');o.className='bko';const PT=['✨','⭐','💥','🎉','❄️','💫','🎊','💖'];
+ o.innerHTML=`<div class="bko-fl"></div><div class="bko-b">${B.ic}</div>${Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2+Math.random()*.2,r=110+Math.random()*140;return`<span class="bko-p" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r).toFixed(0)}px;--d:${(Math.random()*.25).toFixed(2)}s">${PT[i%PT.length]}</span>`}).join('')}<div class="bko-t">K.O. !</div><div class="bko-v">🏆 ${esc(B.n)} est vaincu${/^La /.test(B.n)?'e':''} !<small>Touche pour continuer</small></div>`;
+ box.appendChild(o);try{bkT(110,1,'sawtooth',.05,45);setTimeout(()=>{bkT(160,.6,'square',.07,40);bkT(900,.5,'sawtooth',.03,90)},850);[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>bkT(f,i==4?.9:.22,'triangle',.07),1150+i*130))}catch(_){}
+ setTimeout(()=>{try{confetti()}catch(_){}},1150);const t0=performance.now();let done=0;const go=()=>{if(done)return;done=1;o.remove();cb()};o.onclick=()=>{if(performance.now()-t0>1800)go()};setTimeout(go,4200)}
 function bossReset(d){if(d){if(S.boss)delete S.boss[d];if(S.bossTry)delete S.bossTry[d]}else{S.boss={};S.bossTry={}}save();toast('👹 Boss réinitialisé'+(d?'':'s'));if(d)startBox(d);else admin()}
 function bossOffer(d){if(document.getElementById('spl')||document.getElementById('alnew')){setTimeout(()=>bossOffer(d),1500);return}if(cur!=d||view!='day'||document.getElementById('gwin'))return;const B=bossCfg(d);if(!B||(S.boss||{})[d])return;
  popup(`<h2>⚠️ Un boss apparaît !</h2><p class="center" style="font-size:3.4rem;margin:.2em 0">${B.ic}</p><p class="center"><b>${B.n}</b> garde une <b>🎬 vidéo mystère</b> de votre album.</p><p class="muted center" style="font-size:.85rem">1ʳᵉ tentative gratuite, puis ${BOSSCOST} ⭐ par nouvelle tentative. Tu pourras aussi l'affronter plus tard depuis cette case.</p><button onclick="closePop();launchBoss(${d})">⚔️ L'affronter</button><button class="alt" onclick="closePop()">Plus tard</button>`)}
@@ -1234,13 +1250,13 @@ function launchBoss(d,test){const B=bossCfg(d);if(!B)return;S.bossTry=S.bossTry|
  if(!test&&n>0){if(S.pts<BOSSCOST){toast(`Il te faut ${BOSSCOST} ⭐ pour retenter le boss`);return}S.pts-=BOSSCOST;try{hdr()}catch(_){}}
  if(!test){S.bossTry[d]=n+1;save();try{slog('👹',`Boss jour ${d} · ${B.n} : tentative ${n+1}${n?` (−${BOSSCOST} ⭐)`:''}`)}catch(_){}}
  window.CURD=d;window.CURPR=true;allowScroll();lastY=scrollY;RUN++;G={};$('#gmsg').innerHTML='';document.body.classList.add('playing');const id=RUN;let over=false;
- const end=(ok,why)=>{if(over||id!=RUN)return;over=true;RUN++;const y0=lockY;closeGame();bossResult(d,ok,why,test);allowScroll();window.scrollTo(0,y0);lastY=y0};
+ const end=(ok,why)=>{if(over||id!=RUN)return;over=true;RUN++;const fin=()=>{const y0=lockY;closeGame();bossResult(d,ok,why,test);allowScroll();window.scrollTo(0,y0);lastY=y0};if(ok&&document.getElementById('gwin'))bossKO(B,fin);else fin()};
  const g=$('#game');g.classList.remove('solv');g.onpointerdown=g.onpointermove=g.onpointerup=g.onpointercancel=null;try{$('#lives').textContent=''}catch(_){}
  openGame(d,true,w=>end(false,w),`${B.ic} BOSS · ${B.n}${test?' (test)':''}`);if(B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}}else{try{if(!YTM.start(d))MUS.day(d)}catch(_){}}
  g.innerHTML=`<div class="bossin"><span>⚠️ BOSS ⚠️</span><b class="bi">${B.ic}</b><b>${B.n}</b></div>`;try{SFX('lose')}catch(_){}
  setTimeout(()=>{if(id!=RUN)return;const RL=BRULES[d]||[];g.innerHTML=`<div class="bossr"><p class="bri">${B.ic}</p><h3>Comment battre ${esc(B.n)} ?</h3><ul>${RL.map(t=>`<li>${t}</li>`).join('')}</ul><button id="bgo">⚔️ J'ai compris, c'est parti !</button></div>`;$('#bgo').onclick=()=>{if(id!=RUN)return;GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))}},1800)}
 function bossResult(d,ok,why,test){try{SFX(ok?'win':'lose')}catch(_){}
- if(test)return startBox(d,ok?'Boss vaincu (test : rien de débloqué) 🎉':`Boss raté (test) : ${esc(why)}.`);
+ if(test&&!ok)return startBox(d,`Boss raté (test) : ${esc(why)}.`);
  if(ok){S.boss=S.boss||{};S.boss[d]=Date.now();save();try{slog('🏆',`Boss du jour ${d} vaincu ! Vidéo ${vidN()} débloquée 🎬`)}catch(_){}ding();confetti();splash(true);startBox(d,'Boss vaincu ! 🏆');setTimeout(vidNew,1500)}
  else{try{slog('💥',`Boss du jour ${d} raté : ${String(why||'').replace(/<[^>]+>/g,'')}`)}catch(_){}startBox(d,`Le boss a gagné : ${esc(why)}. Tu peux le retenter (${BOSSCOST} ⭐).`)}}
 function vidNew(){if(document.getElementById('spl')){setTimeout(vidNew,1200);return}const k=vidN()-1,V=(CONTENU.videos||[])[k];if(!V)return;const ok=alOk();
@@ -1780,6 +1796,11 @@ function secRun(ov){const cv=ov.querySelector('#secc'),x=cv.getContext('2d');let
  requestAnimationFrame(loop)}
 function secReset(){S.secret={};save();toast('🌟 Niveau secret réinitialisé');admin()}
 function bcv(el,hint){el.innerHTML=`<div class="fbw"><canvas></canvas></div><p class="center muted">${hint}</p>`;const W=el.querySelector('.fbw'),cv=W.querySelector('canvas'),x=cv.getContext('2d'),dpr=Math.min(3,devicePixelRatio||1);cv.width=360*dpr;cv.height=540*dpr;x.scale(dpr,dpr);const P=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*360,(e.clientY-r.top)/r.height*540]};return{W,cv,x,P}}
+async function bMp3(bl){try{const h=new Uint8Array(await bl.slice(0,10).arrayBuffer());let off=0;if(h[0]==73&&h[1]==68&&h[2]==51)off=10+((h[6]&127)<<21|(h[7]&127)<<14|(h[8]&127)<<7|(h[9]&127))+((h[5]&16)?10:0);
+ const f=new Uint8Array(await bl.slice(off,off+131072).arrayBuffer());for(let i=0;i<f.length-200;i++){if(f[i]!=255||(f[i+1]&224)!=224)continue;const ver=(f[i+1]>>3)&3,lay=(f[i+1]>>1)&3,bi=f[i+2]>>4,si=(f[i+2]>>2)&3;if(lay!=1||bi==0||bi==15||si==3||ver==1)continue;
+  const m1=ver==3,BR=m1?[0,32,40,48,56,64,80,96,112,128,160,192,224,256,320]:[0,8,16,24,32,40,48,56,64,80,96,112,128,144,160],SR=[[11025,12000,8000],null,[22050,24000,16000],[44100,48000,32000]][ver][si],spf=m1?1152:576,st=off+i;
+  const tag=String.fromCharCode(...f.slice(i+4,i+200));const xi=Math.max(tag.indexOf('Xing'),tag.indexOf('Info'));if(xi>=0){const q=i+4+xi;if(f[q+7]&1){const fr=(f[q+8]<<24|f[q+9]<<16|f[q+10]<<8|f[q+11])>>>0;if(fr>0){const dur=fr*spf/SR;return{off:st,bps:(bl.size-st)/dur}}}}
+  return{off:st,bps:BR[bi]*1000/8}}return null}catch(_){return null}}
 async function bAnalyse(buf,ln){const sr=buf.sampleRate,len=Math.min(buf.length,Math.floor(ln*sr)),OC=window.OfflineAudioContext||window.webkitOfflineAudioContext;
  const band=(type,f)=>new Promise((res,rej)=>{const oc=new OC(1,len,sr),s=oc.createBufferSource(),fl=oc.createBiquadFilter();s.buffer=buf;fl.type=type;fl.frequency.value=f;s.connect(fl);fl.connect(oc.destination);s.start();oc.oncomplete=e=>res(e.renderedBuffer.getChannelData(0));const pr=oc.startRendering();if(pr&&pr.then)pr.then(r=>res(r.getChannelData(0)),rej)});
  const lo=await band('lowpass',160),hi=await band('highpass',2500),hop=Math.round(sr*.01),nH=Math.floor(len/hop);
@@ -2275,13 +2296,13 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
  const now2=()=>AC?AC.currentTime-ta:(performance.now()-pt0)/1000;
  const stopAudio=()=>{if(!MG)return;try{MG.gain.setTargetAtTime(0,AC.currentTime,.08);const g=MG;setTimeout(()=>{try{g.disconnect()}catch(_){}},900)}catch(_){}};
  let SONGM=0,SBUF=null;const SB=CONTENU.bossSong||{};
- if(SB.k){st='load';(async()=>{try{const o=await MDB.all(),it=o&&o[SB.k];if(!it||!it.blob)throw 0;const bl=it.blob;
-   const dur=await new Promise((res,rej)=>{const a=new Audio(),u=URL.createObjectURL(bl);a.preload='metadata';a.onloadedmetadata=()=>{const d=a.duration;URL.revokeObjectURL(u);res(d)};a.onerror=()=>{URL.revokeObjectURL(u);rej()};a.src=u;setTimeout(rej,8000)});
-   if(!isFinite(dur)||dur<15)throw 0;const s0=Math.min(SB.start||0,Math.max(0,dur-20)),ln=Math.min(SB.dur||70,dur-s0-.5),bps=bl.size/dur;
-   const ab=await bl.slice(Math.floor(s0*bps),Math.min(bl.size,Math.ceil((s0+ln+2)*bps))).arrayBuffer();const A0=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());
-   const buf=await new Promise((res,rej)=>{const pr=A0.decodeAudioData(ab,res,rej);if(pr&&pr.then)pr.then(res,rej)});if(id!=RUN)return;
-   const L2=Math.min(buf.duration-.3,ln),notes=await bAnalyse(buf,L2);if(id!=RUN)return;if(notes.length<30)throw 0;
-   NT.length=0;notes.forEach(n=>NT.push({t:T0+n.t,l:n.l,mi:null,d:BT}));SBUF=buf;SONGM=L2;END=T0+L2;MX=Math.ceil(NT.length*p.need);hp=MX}catch(e){SONGM=0;SBUF=null}if(id==RUN&&st=='load')st='ready'})()}
+ let SERR='';if(SB.k){st='load';(async()=>{let stp='lecture';try{let o={};try{o=await MDB.all()}catch(_){}const it=o&&o[SB.k];if(!it||!it.blob){SERR='introuvable';throw 0}const bl=it.blob;
+   const A0=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());const dec=ab=>new Promise((res,rej)=>{let ok=0;const pr=A0.decodeAudioData(ab,b=>{ok=1;res(b)},e=>{if(!ok)rej(e)});if(pr&&pr.then)pr.then(b=>{ok=1;res(b)},e=>{if(!ok)rej(e)})});
+   const mi=await bMp3(bl);let buf=null;const want=(SB.dur||70)+2;
+   if(mi){stp='découpe';const s0=Math.max(0,SB.start||0),a=Math.min(bl.size-1,Math.floor(mi.off+s0*mi.bps)),z=Math.min(bl.size,Math.ceil(a+want*mi.bps));try{buf=await dec(await bl.slice(a,z).arrayBuffer())}catch(_){buf=null}}
+   if(!buf){stp='décodage';if(bl.size>40*1048576){SERR='trop lourde';throw 0}const full=await dec(await bl.arrayBuffer());const sr=full.sampleRate,s0=Math.min(Math.floor((SB.start||0)*sr),Math.max(0,full.length-sr*20)),n=Math.min(full.length-s0,Math.floor(want*sr));const cut=A0.createBuffer(full.numberOfChannels,n,sr);for(let c=0;c<full.numberOfChannels;c++)cut.getChannelData(c).set(full.getChannelData(c).subarray(s0,s0+n));buf=cut}
+   if(id!=RUN)return;stp='analyse';const L2=Math.min(buf.duration-.3,SB.dur||70);if(L2<15){SERR='trop courte';throw 0}const notes=await bAnalyse(buf,L2);if(id!=RUN)return;if(notes.length<30){SERR='pas assez de rythme détecté';throw 0}
+   NT.length=0;notes.forEach(n=>NT.push({t:T0+n.t,l:n.l,mi:null,d:BT}));SBUF=buf;SONGM=L2;END=T0+L2;MX=Math.ceil(NT.length*p.need);hp=MX}catch(e){SONGM=0;SBUF=null;if(!SERR)SERR='illisible ('+stp+')';try{slog('🎵',`Musique du boss : ${SERR}`)}catch(_){}}if(id==RUN&&st=='load')st='ready'})()}
  const begin=()=>{if(st!='ready')return;au();st='play';pt0=performance.now();if(AC){ta=AC.currentTime+.05;if(SONGM&&SBUF){const src=AC.createBufferSource(),g=AC.createGain();src.buffer=SBUF;g.gain.setValueAtTime(1,ta+T0);g.gain.setValueAtTime(1,ta+T0+SONGM-2.5);g.gain.linearRampToValueAtTime(0,ta+T0+SONGM);src.connect(g);g.connect(MG);src.start(ta+T0,0,SONGM+.1)}}schedule()};
  W.onpointerdown=e=>{e.preventDefault();if(st=='ready')return begin();if(st!='play')return;const q=P(e),l=Math.max(0,Math.min(3,Math.floor(q[0]/90)));tap(l)};
  const tap=l=>{const tt=now2();flash[l]=performance.now();let best=null,bd=.15;NT.forEach(n=>{if(!n.h&&!n.m&&n.l==l&&Math.abs(n.t-tt)<bd){bd=Math.abs(n.t-tt);best=n}});
@@ -2296,7 +2317,7 @@ brhythm(p,el,win,fail){const id=RUN;const KB=matchMedia('(hover:hover) and (poin
   bbar(x,hp,MX,`🦌 Rodolphe, le renne DJ · ${hp} PV`,now-bHit<150,8);
   fx=fx.filter(f=>now-f.at<600);fx.forEach(f=>{x.save();x.globalAlpha=1-(now-f.at)/600;x.font='900 15px system-ui';x.textAlign='center';x.fillStyle=f.t[0]=='P'?'#ffe08a':'#fff';x.fillText(f.t,L[f.l],LY-40-(now-f.at)/20);x.restore()});
   x.font='15px system-ui';x.textAlign='left';x.fillStyle='#fff';x.fillText('🕺 '+'💜'.repeat(Math.max(0,groove))+'🖤'.repeat(Math.max(0,p.lives-groove)),6,532);if(combo>2){x.textAlign='right';x.font='800 15px system-ui';x.fillStyle='#ffe08a';x.fillText('Combo ×'+combo,354,532)}
-  if(st=='load')bready(x,'🎵 Préparation de la musique…');if(st=='ready')bready(x,SONGM?(KB?'👆 Espace : « Let It Happen » 🎵':'👆 Touche : « Let It Happen » 🎵'):(KB?'👆 Clique ou appuie sur Espace':'👆 Touche pour lancer la musique'));if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+  if(st=='load')bready(x,'🎵 Préparation de la musique…');if(st=='ready'&&SB.k&&!SONGM){x.save();x.font='700 12px system-ui';x.textAlign='center';x.fillStyle='#ffd0dc';x.fillText(SERR=='introuvable'?'« Let It Happen » absente : importe-la (Admin › 🎵 Musiques, ligne 👹)':'« Let It Happen » : '+SERR+' → musique de secours',180,338);x.restore()}if(st=='ready')bready(x,SONGM?(KB?'👆 Espace : « Let It Happen » 🎵':'👆 Touche : « Let It Happen » 🎵'):(KB?'👆 Clique ou appuie sur Espace':'👆 Touche pour lancer la musique'));if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
  const loop=now=>{if(id!=RUN){stopAudio();return}if(st=='play'){schedule();const tt=now2();
    NT.forEach(n=>{if(!n.h&&!n.m&&tt-n.t>.16){n.m=1;combo=0;groove--;if(AC)osc('sine',90,AC.currentTime,.12,.08,.002,60);if(groove<=0&&st=='play'){st='dead';stopAudio();setTimeout(()=>{if(id==RUN)fail('tu as perdu le groove 💔')},800)}}});
    if(st=='play'&&tt>END+.4){st='dead';stopAudio();setTimeout(()=>{if(id==RUN)fail(`le renne avait encore ${hp} PV`)},600)}}
@@ -2336,21 +2357,21 @@ bbreak(p,el,win,fail){const id=RUN,PY=500;const {W,x,P}=bcv(el,"Glisse le doigt 
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.033,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt,now);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={hint:()=>{if(st!='play')return false;lives++;return true}}},
 brun(p,el,win,fail){const id=RUN,GY=470,PX=70,R=20;const {W,x,P}=bcv(el,"Touche pour sauter (2 fois = double saut). Évite les obstacles et attrape les 🍬 pour rattraper le troll qui a volé les cadeaux !");const im=bimg();
- let st='ready',y=GY-R,vy=0,jn=0,ob=[],cd=[],gap=p.gap0,spd=p.v,oT=1.2,cT=1.6,inv=0,off=0,T=0,hitAt=0;
+ let st='ready',y=GY-R,vy=0,jn=0,ob=[],cd=[],gap=p.gap0,spd=p.v,oT=1.2,cT=1.6,inv=0,off=0,T=0,hitAt=0,lives=p.lives||3;
  const jump=()=>{if(st=='ready'){st='play';timer(p.time,()=>{if(st=='play'){st='dead';fail('le troll a filé avec les cadeaux ⏱️')}},id)}if(st=='play'&&jn<2){vy=-610;jn++;try{bkT(jn==1?600:800,.1,'sine',.04,jn==1?900:1200)}catch(_){}}};
  W.onpointerdown=e=>{e.preventDefault();jump()};
  const upd=(dt,now)=>{T+=dt;spd=p.v+T*2.2;off+=spd*dt;vy+=1900*dt;y+=vy*dt;if(y>=GY-R){y=GY-R;vy=0;jn=0}
   gap=Math.max(0,gap-p.close*dt);oT-=dt;if(oT<=0){oT=(1+Math.random()*.8)*240/spd;const k=Math.random();ob.push(k<.4?{x:380,y:GY-22,w:30,h:44,e:'🎄',s:44}:k<.75?{x:380,y:GY-24,w:32,h:48,e:'⛄',s:46}:{x:380,y:GY-110-Math.random()*40,w:24,h:24,e:'🪨',s:26,fl:1})}
   cT-=dt;if(cT<=0){cT=1.6+Math.random()*1.4;cd.push({x:380,y:GY-50-Math.random()*150})}
   ob.forEach(o=>o.x-=spd*dt*(o.fl?1.25:1));cd.forEach(c=>c.x-=spd*dt);ob=ob.filter(o=>o.x>-40);cd=cd.filter(c=>c.x>-30&&!c.got);
-  ob.forEach(o=>{if(now<inv||o.hit)return;const cx=Math.max(o.x-o.w/2,Math.min(PX,o.x+o.w/2)),cy=Math.max(o.y-o.h/2,Math.min(y,o.y+o.h/2));if(Math.hypot(PX-cx,y-cy)<R*.85){o.hit=1;gap+=p.hitGap;inv=now+1100;hitAt=now;try{SFX('bad')}catch(_){}}});
+  ob.forEach(o=>{if(now<inv||o.hit)return;const cx=Math.max(o.x-o.w/2,Math.min(PX,o.x+o.w/2)),cy=Math.max(o.y-o.h/2,Math.min(y,o.y+o.h/2));if(Math.hypot(PX-cx,y-cy)<R*.85){o.hit=1;lives--;gap=Math.min(p.gapMax,gap+p.hitGap);inv=now+1300;hitAt=now;try{SFX('bad')}catch(_){}if(lives<=0&&st=='play'){st='dead';setTimeout(()=>{if(id==RUN)fail('le troll s’est enfui avec les cadeaux 💨')},900)}}});
   cd.forEach(c=>{if(Math.hypot(PX-c.x,y-c.y)<R+14){c.got=1;gap-=p.candy;try{bkT(1046,.12,'triangle',.05,1568)}catch(_){}}});
-  if(gap<=0&&st=='play'){st='won';try{SFX('ok')}catch(_){}setTimeout(()=>{if(id==RUN)win()},1000)}if(gap>=p.gapMax&&st=='play'){st='dead';setTimeout(()=>{if(id==RUN)fail('le troll s’est enfui avec les cadeaux')},800)}};
+  if(gap<=0&&st=='play'){st='won';try{SFX('ok')}catch(_){}setTimeout(()=>{if(id==RUN)win()},1000)}};
  const draw=now=>{const g=x.createLinearGradient(0,0,0,540);g.addColorStop(0,'#0b1440');g.addColorStop(1,'#4a3a8a');x.fillStyle=g;x.fillRect(0,0,360,540);
   x.fillStyle='#2a3a6a';for(let i=-1;i<5;i++){const mx=((i*140-off*.2)%700+700)%700-140;x.beginPath();x.moveTo(mx,GY);x.lineTo(mx+80,GY-160);x.lineTo(mx+160,GY);x.fill();x.fillStyle='#e8f0ff';x.beginPath();x.moveTo(mx+60,GY-115);x.lineTo(mx+80,GY-160);x.lineTo(mx+100,GY-115);x.fill();x.fillStyle='#2a3a6a'}
   x.fillStyle='#f4f8ff';x.fillRect(0,GY,360,70);x.fillStyle='#c9d8f0';for(let i=0;i<12;i++)x.fillRect(((i*40-off)%480+480)%480-40,GY+18,20,4);
   cd.forEach(c=>bemo(x,'🍬',c.x,c.y+Math.sin(now/200+c.x)*4,26));ob.forEach(o=>bemo(x,o.e,o.x,o.y,o.s));
-  const tx=PX+42+gap*2.6;bemo(x,st=='won'?'💥':'🧌',Math.min(tx,330),GY-30-Math.abs(Math.sin(now/110))*10,52);bemo(x,'🎁',Math.min(tx,330)+22,GY-56,22);
+  x.save();x.font='17px system-ui';x.textAlign='left';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,(p.lives||3)-lives)),8,528);x.restore();const tx=PX+42+gap*2.6;bemo(x,st=='won'?'💥':'🧌',Math.min(tx,330),GY-30-Math.abs(Math.sin(now/110))*10,52);bemo(x,'🎁',Math.min(tx,330)+22,GY-56,22);
   if(!(now<inv&&Math.floor(now/90)%2))bface(x,im,PX,y,R,now-hitAt<400?'#ff3d6e':'#f3c623');
   const pr=1-gap/p.gapMax;x.save();x.fillStyle='#000a';x.beginPath();x.roundRect(40,16,280,16,8);x.fill();x.fillStyle=gap<20?'#7be08a':gap>80?'#ff3d6e':'#ffd34d';x.beginPath();x.roundRect(42,18,Math.max(4,276*pr),12,6);x.fill();x.font='800 12px system-ui';x.textAlign='center';x.fillStyle='#ffd0dc';x.fillText(gap>80?'🧌 Il s’éloigne… attrape des 🍬 !':gap<20?'🧌 Tu y es presque !':'🧌 Rattrape le Troll des neiges',180,48);x.restore();
   if(st=='ready')bready(x,'👆 Touche pour courir');if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
@@ -2462,7 +2483,7 @@ zip(p,el,win,fail){const LOSE=w=>{fail(w,1);try{path=[...P];draw()}catch(e){cons
   if(num[x]==1){path=[x];rev=false}else if(num[x]==p.k&&(!path.includes(x)||path[0]==x)){path=[x];rev=true}else{const j=path.indexOf(x);if(j<0)return;path=path.slice(0,j+1)}drag=true;draw()};
  W.onpointermove=e=>{if(!drag||id!=RUN)return;const x=cellAt(e);if(x<0)return;let g2=0;while(g2++<2*n){const last=path[path.length-1];if(last==x)break;const lr=Math.floor(last/n),lc=last%n,xr=Math.floor(x/n),xc=x%n;const st=Math.abs(xr-lr)>=Math.abs(xc-lc)?last+Math.sign(xr-lr)*n:last+Math.sign(xc-lc);if(!ext(st))break}draw()};
  W.onpointerup=W.onpointercancel=()=>{if(!drag)return;drag=false;if(path.length==L&&num[path[L-1]]==(rev?1:p.k)){if(rev){EGG(7);try{navigator.vibrate&&navigator.vibrate([90,50,90,50,160])}catch(_){}const zb=$('#zsv');if(zb&&zb.animate)zb.animate([{transform:'translateX(0)'},{transform:'translateX(-9px) rotate(-1.5deg)'},{transform:'translateX(9px) rotate(1.5deg)'},{transform:'translateX(-7px)'},{transform:'translateX(6px)'},{transform:'translateX(-3px)'},{transform:'translateX(0)'}],{duration:600});try{SFX('bad')}catch(_){}toast('Dans le mauvais sens, ça ne compte pas !');setTimeout(()=>{if(id!=RUN)return;path=[];rev=false;draw()},650)}else setTimeout(()=>{if(id==RUN)win()},300)}else if(path.length==L)toast('Il faut finir sur le dernier numéro')};draw();G.hint=()=>{if(id!=RUN)return false;if(rev){rev=false;path=[]}let k=0;while(k<path.length&&path[k]==P[k])k++;let e=k;while(e<L&&!num[P[e]])e++;if(e>=L)e=L-1;path=P.slice(0,e+1);drag=false;draw();if(path.length==L)setTimeout(()=>{if(id==RUN)win()},300);return true}},
-snake(p,el,win,fail){const id=RUN,n=p.n,S=30,PH=shuffle([...(CONTENU.photos||[])]);let sn=[[6,4],[6,3],[6,2]],old=sn.map(s=>[...s]),dir=[0,1],q=[],food=null,eaten=0,spd=p.speed,alive=true,started=false,last=0,face=0,pop=0,SH=0,EG=null,egT=0,egDone=false;const egAt=4+Math.floor(Math.random()*9);const BZ=p.grinch;let GR=BZ?[1,n-2]:null,GO=GR&&[...GR],gLast=0,gAcc=0,coal=[],star=null,stT=5,pow=0,bhp=BZ?BZ.hp:0,lives=BZ?BZ.lives:1,inv=0,ct=6,bmsg=null,bHit=0,lastT=0;if(BZ)egDone=true;
+snake(p,el,win,fail){const id=RUN,n=p.n,S=30,PH=shuffle([...(CONTENU.photos||[])]);let sn=[[6,4],[6,3],[6,2]],old=sn.map(s=>[...s]),dir=[0,1],q=[],food=null,eaten=0,spd=p.speed,alive=true,started=false,last=0,face=0,pop=0,SH=0,EG=null,egT=0,egDone=false;const egAt=4+Math.floor(Math.random()*9);const BZ=p.grinch;let GR=BZ?[1,n-2]:null,GO=GR&&[...GR],gLast=0,gAcc=0,coal=[],star=null,stT=5,pow=0,bhp=BZ?BZ.hp:0,lives=BZ?BZ.lives:1,inv=0,ct=6,bmsg=null,bHit=0,lastT=0,pc=null;if(BZ)egDone=true;
  const imgs=PH.map(u=>{const i=new Image();i.src=u;return i});
  const free=()=>{let f;do{f=[Math.floor(Math.random()*n),Math.floor(Math.random()*n)]}while(sn.some(s=>s[0]==f[0]&&s[1]==f[1])||(BZ&&(coal.some(k=>k[0]==f[0]&&k[1]==f[1])||(GR&&GR[0]==f[0]&&GR[1]==f[1])||(star&&star[0]==f[0]&&star[1]==f[1])||(food&&food[0]==f[0]&&food[1]==f[1]))));return f};food=free();
  el.innerHTML=`${BZ?`<p class="center" id="bzh"></p><b id="se" hidden></b>`:`<p class="center">Cadeaux : <b id="se">0</b> / ${p.goal}</p>`}<div class="snw" id="snw"><canvas id="scv" class="scv"></canvas></div><p class="center muted">Fais glisser ton doigt n'importe où sur l'écran (ou utilise les flèches du clavier) pour tourner. Ne touche ni les bords ni ta queue !${BZ?' Mange les 🎁, attrape une ⭐ puis fonce sur le Grinch 😈. Évite son charbon !':''}</p>`;
@@ -2493,8 +2514,8 @@ snake(p,el,win,fail){const id=RUN,n=p.n,S=30,PH=shuffle([...(CONTENU.photos||[])
   gAcc+=dt;const gs=BZ.gtick*(bhp<=2?.8:1)*(pow>0?1.25:1);if(gAcc<gs)return;gAcc=0;GO=[...GR];gLast=now;const h=sn[0],di=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]);
   const opts=[[1,0],[-1,0],[0,1],[0,-1]].map(d=>[GR[0]+d[0],GR[1]+d[1]]).filter(c=>c[0]>=0&&c[1]>=0&&c[0]<n&&c[1]<n&&!coal.some(k=>k[0]==c[0]&&k[1]==c[1])&&!sn.slice(1).some(s=>s[0]==c[0]&&s[1]==c[1]));if(!opts.length)return;let c;
   if(pow>0)c=opts.sort((a,b)=>di(b,h)-di(a,h))[0];else if(Math.random()<.3)c=opts[Math.floor(Math.random()*opts.length)];else c=opts.sort((a,b)=>di(a,food)-di(b,food))[0];
-  const prev=[...GR];GR=c;if(GR[0]==food[0]&&GR[1]==food[1]){food=free();bmsg={t:'😈 Volé !',r:GR[0],c:GR[1],at:now}}
-  if(ct<=0&&coal.length<8&&!sn.some(s=>s[0]==prev[0]&&s[1]==prev[1])&&di(prev,sn[0])>2){coal.push(prev);ct=6}
+  const prev=[...GR];GR=c;if(pc&&pc[0]==prev[0]&&pc[1]==prev[1]){if(!sn.some(s=>s[0]==prev[0]&&s[1]==prev[1]))coal.push(prev);pc=null}if(GR[0]==food[0]&&GR[1]==food[1]){food=free();pc=[...GR];bmsg={t:'😈 Volé !',r:GR[0],c:GR[1],at:now}}
+
   if(star&&sn[0][0]==star[0]&&sn[0][1]==star[1]){}bzMeet(now)};
  const bzEat=()=>{if(star&&sn[0][0]==star[0]&&sn[0][1]==star[1]){star=null;pow=BZ.pow;stT=9;pop=1;try{SFX('perfect')}catch(_){}bzH()}};
  const bzD1=now=>{coal.forEach(k=>{x.fillStyle='#111';x.beginPath();x.arc(k[1]*S+S/2,k[0]*S+S/2,S*.36,0,7);x.fill();x.fillStyle='#ff5a1f66';x.beginPath();x.arc(k[1]*S+S/2,k[0]*S+S/2,S*.15,0,7);x.fill()});
