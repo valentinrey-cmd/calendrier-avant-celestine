@@ -879,7 +879,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794953851';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794954690';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -3342,7 +3342,11 @@ function voixPlay(){const V=(CONTENU.voix||[]).slice(0,vCount());if(!V.length)re
  try{if(VA){VA.pause()}VA=new Audio(V[k]);VA.play().catch(()=>{});
   for(let i=0;i<7;i++){const h=document.createElement('i');h.className='vheart';h.textContent=['❤️','💖','💕'][i%3];h.style.left=(innerWidth/2+(Math.random()-.5)*120)+'px';h.style.top=(innerHeight*.45)+'px';h.style.animationDelay=(i*.12)+'s';document.body.appendChild(h);setTimeout(()=>h.remove(),2200)}}catch(e){}}
 
-function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[],u=unl(),n=L.filter(x=>!x.jour||x.jour<=u).length;return`<h2>🎵 Notre playlist <small class="muted" style="font-size:.8rem">${n}/${L.length}</small></h2><div class="panel pl">${n?'':'<p class="muted center" style="margin:0">Les chansons arrivent avec les cases du calendrier 🎁</p>'}${L.map((x,i)=>x.jour&&x.jour>u?'':`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(x.titre)}</b><small>${esc(x.artiste||'')}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`).join('')}</div>`}
+function songName(f){let n=String(f||'').replace(/^.*[\\/]/,'').replace(/\.[a-z0-9]{2,4}$/i,'').replace(/_/g,' ');
+ n=n.replace(/[\(\[][^\)\]]*(official|audio|video|lyric|clip|visuali[sz]er|hq|hd|remaster|explicit|paroles|music)[^\)\]]*[\)\]]/ig,'').replace(/^\s*\d{1,3}\s*[-.)_ ]\s*/,'').replace(/\s{2,}/g,' ').trim();
+ const m=n.match(/^(.+?)\s+[-–—]\s+(.+)$/);return m?{t:m[2].trim(),a:m[1].trim()}:{t:n,a:''}}
+function songOf(d,def){def=def||{t:'Musique',a:''};try{const f=YTM.name(d);if(f){const r=songName(f);if(r.t)return r}}catch(_){}return def}
+function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[],u=unl(),n=L.filter(x=>!x.jour||x.jour<=u).length;return`<h2>🎵 Notre playlist <small class="muted" style="font-size:.8rem">${n}/${L.length}</small></h2><div class="panel pl">${n?'':'<p class="muted center" style="margin:0">Les chansons arrivent avec les cases du calendrier 🎁</p>'}${L.map((x,i)=>{if(x.jour&&x.jour>u)return'';const sg=songOf(x.jour,{t:x.titre,a:x.artiste||''});return`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`}).join('')}</div>`}
 
 function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small>${l}</small><b>${v}</b></span>`).join('')}</div>`;
  const R=(ic,t,txt,ch)=>`<div class="rl"><div class="rlh"><span class="rli">${ic}</span><b>${t}</b></div><p>${txt}</p>${ch?C(ch):''}</div>`;
@@ -3651,7 +3655,8 @@ async function id3Cover(blob){try{const b=new Uint8Array(await blob.slice(0,3e6)
   if(id=='APIC'){let q=p+10;const enc=b[q++];let m='';while(b[q])m+=String.fromCharCode(b[q++]);q++;q++;if(enc==1||enc==2){while(q+1<b.length&&!(b[q]==0&&b[q+1]==0))q+=2;q+=2}else{while(b[q])q++;q++}
    const data=b.slice(q,p+10+sz);return URL.createObjectURL(new Blob([data],{type:m&&m.includes('/')?m:'image/jpeg'}))}p+=10+sz}}catch(_){}return null}
 const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},mode='',li=0,box=null,ready=false,key='';
- function refresh(){return MDB.all().then(o=>{for(const k in URLS)URL.revokeObjectURL(URLS[k]);URLS={};BL={};for(const k in o)if(o[k]&&o[k].blob){URLS[k]=URL.createObjectURL(o[k].blob);BL[k]=o[k].blob}ready=true}).catch(()=>{ready=true})}
+ let NM={};function name(k){return NM[String(k)]||''}
+ function refresh(){return MDB.all().then(o=>{for(const k in URLS)URL.revokeObjectURL(URLS[k]);URLS={};BL={};NM={};for(const k in o)if(o[k]&&o[k].blob){URLS[k]=URL.createObjectURL(o[k].blob);BL[k]=o[k].blob;NM[k]=o[k].name||''}ready=true}).catch(()=>{ready=true})}
  refresh();try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(_){}
  const fmt2=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
  function ui(sg,ctrl,k){const big=!!(box&&box.classList.contains('big'));if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';if(big)box.classList.add('big');
@@ -3672,9 +3677,9 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  function stop(){try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
  const has=d=>!!URLS[String(d)];
  function start(d){if(mode=='game'&&key===String(d)&&box)return true;if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
-  const sg=SONGS[d]||{t:'Musique',a:''};ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
+  const sg=songOf(d,SONGS[d]||{t:'Musique',a:''});ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i,keep){if(!keep)ORD=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui({t:x.titre,a:x.artiste},1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
+ function list(i,keep){if(!keep)ORD=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui(songOf(x.jour,{t:x.titre,a:x.artiste}),1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
  let ORD=[],op=0;
  function mkOrd(){const L=CONTENU.playlist||[];const c=[...Array(L.length).keys()].filter(j=>has(L[j].jour)&&L[j].jour<=unl()&&j!=li);for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]]}ORD=[li,...c];op=0}
  function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;const ok=j=>has(L[j].jour)&&L[j].jour<=unl();
@@ -3683,7 +3688,7 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
   for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode){const m=mode;stop();window.__ytmResume=m=='game'?key:0}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(view=='day'&&String(cur)==String(d))start(d)}});
  addEventListener('pagehide',()=>{if(mode)stop()});
- return{hold(){if(mode&&!au.paused){au.pause();return 1}return 0},unhold(){if(mode){const p=au.play();if(p&&p.catch)p.catch(()=>{})}},get gday(){return mode=='game'?key:null},start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
+ return{hold(){if(mode&&!au.paused){au.pause();return 1}return 0},unhold(){if(mode){const p=au.play();if(p&&p.catch)p.catch(()=>{})}},get gday(){return mode=='game'?key:null},start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,name,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
 function musMatch(name){const n=nrm(name.replace(/\.[^.]+$/,''));let best=null,bl=0;for(const k in SONGS){const t=nrm(SONGS[k].t.replace(/\(.*?\)/g,''));if(t&&(n.includes(t)||n.replace(/ /g,'').includes(t.replace(/ /g,'')))&&t.length>bl){best=k;bl=t.length}}return best}
@@ -3716,7 +3721,7 @@ addEventListener('change',e=>{const t=e.target;if(!t.classList)return;if(t.class
 function mysBtn(){return`<label class="btn mysb">🎁 Ouvrir le fichier mystère de Valentin<input type="file" class="fpick mysop"></label>`}
 /* ---------- Mode admin : importer les MP3 ---------- */
 const nrm=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-function musAdmin(){const rows=Object.keys(SONGS).map(d=>{const sg=SONGS[d];return`<div class="mrow"><span class="mday">${/^b/.test(d)?'👹':d}</span><span class="mtt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></span>${YTM.has(d)?'<span title="Fichier présent">✅</span>':'<span class="muted">—</span>'}<label class="btn sm mbt">📂<input type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="${d}"></label>${YTM.has(d)?`<button class="sm alt mbt" onclick="musDel('${d}')">🗑</button>`:''}</div>`}).join('');
+function musAdmin(){const rows=Object.keys(SONGS).map(d=>{const sg=songOf(d,SONGS[d]);return`<div class="mrow"><span class="mday">${/^b/.test(d)?'👹':d}</span><span class="mtt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></span>${YTM.has(d)?'<span title="Fichier présent">✅</span>':'<span class="muted">—</span>'}<label class="btn sm mbt">📂<input type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mpick" data-d="${d}"></label>${YTM.has(d)?`<button class="sm alt mbt" onclick="musDel('${d}')">🗑</button>`:''}</div>`}).join('');
  popup(`<h2>🎵 Musiques des mini-jeux</h2><p class="muted" style="margin:0 0 8px">${YTM.count()}/${Object.keys(SONGS).length} fichiers sur cet appareil (👹 = combat final, générique de fin et album photo). Les fichiers restent uniquement sur cet appareil : importe-les directement sur sa tablette.</p>
  <p><button onclick="mysFromDevice()">📦 Créer le fichier mystère avec les ${YTM.count()} musiques de cet appareil</button></p>
  <p><label class="btn">📦 Fichier mystère à partir d'autres fichiers<input type="file" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg" class="fpick mysmk"></label></p><p>${mysBtn()}</p>
