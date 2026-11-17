@@ -910,7 +910,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794957154';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794957281';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -3491,9 +3491,7 @@ function puzView(){if(!feat(1)){app.innerHTML=`<h1>Le puzzle</h1><div class="pan
  const all=S.opened.length>=24;
  app.innerHTML=`<h1>Puzzle · ${LV[S.diff].n}</h1> <div id="bw"><div class="fi" id="fi"><div id="bd" role="group" aria-label="Plateau du puzzle"></div><div class="bk" style="--bi:url(${IMG})" onclick="$('#fi').classList.remove('on')" role="img" aria-label="${esc(CONTENU.finale)}"><span>${esc(CONTENU.finale)}</span></div></div></div>
  <div class="row"><button class="alt sm" id="pzh" onclick="peek()">💡 Indice (${S.inv.hint||0})</button></div>
- <p id="st" class="center" aria-live="polite"></p><div id="pzd"></div>`;build();stats();if(S.done)$('#fi').classList.add('on');pzDone();chk()}
-function pzRes(){const b=S.best[S.diff];return S.auto?'Résolu automatiquement.':`Terminé en <b>${fmt(S.t)}</b> avec <b>${S.moves}</b> coup${S.moves>1?'s':''}.${b?`<br><small class="muted">🏆 Record ${esc(LV[S.diff].n)} : ${fmt(b.t)} · ${b.m} coups</small>`:''}`}
-function pzDone(){const e=$('#pzd');if(!e)return;e.innerHTML=S.done?`<div class="panel center pzdn"><p style="margin:.2em 0;font-size:1.15rem">🎉 <b>Puzzle terminé !</b></p><p style="margin:.3em 0">${pzRes()}</p><div class="row" style="justify-content:center"><button onclick="newGame()">🔁 Rejouer</button><button class="alt" onclick="$('#fi').classList.toggle('on')">🔄 Retourner l'image</button>${TEST()?`<button class="alt" onclick="S.diff=S.diffLock=null;save();go('puz')">Changer de difficulté</button>`:''}</div></div>`:''}
+ <p id="st" class="center" aria-live="polite"></p>`;build();stats();if(S.done)$('#fi').classList.add('on');chk()}
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function chk(){if(!S.done&&solvedPos()&&S.opened.length>=24)win(false);else stats()}
 function bgs(id){const c=id%C,r=Math.floor(id/C);return`background-image:url(${IMG});background-size:400% 600%;background-position:${c/3*100}% ${r/5*100}%;width:25%;height:${100/6}%`}
@@ -3533,8 +3531,8 @@ function peek(){if(S.done||PZB)return;if(!(S.inv.hint>0))return toast("Tu n'as p
  toast('💡 Je cherche les bons coups…');PZB=true;setTimeout(()=>{const m=puzPlan(S.perm,90000);PZB=false;if(!m){toast('Indice indisponible pour le moment, réessaie');return}PLAN={k,m};run()},60)}
 function win(auto){S.done=true;S.auto=auto;slog('🧩',`Puzzle terminé (${LV[S.diff].n}, ${S.moves} coups)`);let rec=false,pts=0;
  if(!auto){const b=S.best[S.diff];if(!b||S.t<b.t||(S.t==b.t&&S.moves<b.m)){S.best[S.diff]={t:S.t,m:S.moves};rec=true}if(!S.puzWon[S.diff]){S.puzWon[S.diff]=1;pts=LV[S.diff].p}confetti()}
- paint();stats();save();$('#fi')&&$('#fi').classList.add('on');try{pzDone()}catch(_){}try{if(pts)award(pts,'puzzle terminé')}catch(_){}
- const shw=(n)=>{if(view!='puz')return;if($('#pop').innerHTML.trim()&&n<8)return setTimeout(()=>shw(n+1),1500);popup(`<div class="love">${esc(CONTENU.finale)}</div><p>${auto?'Résolu automatiquement.':`Terminé en <b>${fmt(S.t)}</b> avec <b>${S.moves}</b> coup${S.moves>1?'s':''}.${rec?'<br>🏆 Nouveau record !':''}`}</p><p><button onclick="newGame()">Rejouer</button>${TEST()?`<button class="alt" onclick="S.diff=S.diffLock=null;save();go('puz')">Changer de difficulté</button>`:''}<button class="alt" onclick="closePop();$('#fi')&&$('#fi').classList.remove('on')">Voir l'image</button></p>`)};setTimeout(()=>shw(0),1800)}
+ paint();stats();save();$('#fi')&&$('#fi').classList.add('on');try{if(pts)award(pts,'puzzle terminé')}catch(_){}
+}
 function solve(){if(S.done||S.opened.length<24)return;S.perm=S.perm.map((_,i)=>i);U=[];win(true)}
 function askRestart(){popup(`<h2>Relancer ?</h2><p>La partie en cours sera perdue.</p><p><button onclick="newGame()">Même difficulté</button><button onclick="S.diff=S.diffLock=null;save();go('puz')">Choisir la difficulté</button><button class="alt" onclick="closePop()">Annuler</button></p>`)}
 setInterval(()=>{if(view=='puz'&&S.started&&!S.done&&!document.hidden&&$('#tm')){S.t++;stats();if(S.t%5==0)save()}},1000);
