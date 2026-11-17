@@ -858,6 +858,10 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .vc-tx{position:absolute;left:0;right:0;top:100%;text-align:center;color:#fff;text-shadow:0 2px 10px #b3123a88;padding:0 18px;animation:vcs 62s linear 1.2s forwards}@keyframes vcs{to{transform:translateY(calc(-100% - 50vh))}}
 .vc-tx p{margin:.35em 0;font:600 1.15rem Georgia,serif}.vc-h,.vc-tx .vc-h{font:700 2rem Georgia,serif!important}p.vc-h{font:italic 700 2.1rem Georgia,serif}p.vc-t{font:800 .8rem system-ui;letter-spacing:.25em;opacity:.85;margin-top:1.4em}p.vc-s{font:700 1rem system-ui}p.vc-b{font:italic 900 3rem Georgia,serif;margin:.6em 0 .2em;animation:vcb 1.4s ease-in-out infinite}@keyframes vcb{50%{transform:scale(1.08)}}
 .vc-x{position:absolute;top:12px;right:12px;z-index:2;background:#fff!important;color:#b3123a!important;border:0!important}
+.mstrk{position:absolute;top:4px;left:4px;right:4px;z-index:3;font:700 .6rem/1.2 system-ui;background:#b3122e;color:#fff;border-radius:6px;padding:2px 4px;transform:rotate(-3deg)}
+.al-pred{position:absolute;right:5%;bottom:7%;z-index:2;font:700 calc(var(--alw)*.026) system-ui;background:#2a1a3acc;color:#ffe7a8;padding:2px 6px;border-radius:999px;pointer-events:none}
+.alz-stamp{margin:10px auto 0;display:inline-block;transform:rotate(-6deg);border:3px solid #3ddc84;color:#3ddc84;font:900 1.05rem system-ui;padding:6px 12px;border-radius:10px;animation:bloha .5s ease-out both}.alz-stamp small{display:block;font-weight:600;font-size:.75rem}
+#boot{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1c4a3a,#0b1f18);color:#f3e6c4;transition:opacity .4s}#boot.out{opacity:0}.bt-in{text-align:center;padding:20px}.bt-ic{font-size:3.4rem;animation:bsbp 1s ease-in-out infinite}.bt-in p{font:italic 600 1.05rem Georgia,serif;margin:12px 0}.bt-bar{width:200px;height:8px;border-radius:8px;background:#ffffff22;margin:0 auto;overflow:hidden}.bt-bar i{display:block;height:100%;width:0;background:#e8c768;animation:btb 1.4s ease-out forwards}@keyframes btb{to{width:99%}}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -875,7 +879,7 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794952252';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794953851';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1183,14 +1187,17 @@ function closePop(){$('#pop').innerHTML=''}
 
 /* ---------- Calendrier ---------- */
 const pcs=p=>`background-image:url(${IMG});background-size:400% 600%;background-position:${p%4/3*100}% ${Math.floor(p/4)/5*100}%`;
-function calView(){const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
+function calView(){if(new Date().getHours()<5&&!window.__nightMsg){window.__nightMsg=1;setTimeout(()=>toast('Il est tard… Valentin dort déjà, lui (il ronfle) 😴'),700)}const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
  app.innerHTML=`<h1 class="calh">Calendrier de l'Avent<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>
  <div class="panel"><div class="row" style="justify-content:space-between;margin:0"><span>📅 ${n}/24 cases</span><span>✅ ${dn} jeux réussis</span><span>🔥 ${flames()} flamme${flames()>1?'s':''}</span></div><div class="bar"><i style="width:${n/24*100}%"></i></div>
  ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>
  ${feat(7)?(wheelEnd()?`<div class="row"><button disabled>🎡 La roue est terminée : joyeux Noël 🎄</button></div>`:`<div class="row"><button onclick="wheel()" ${S.wheel==dayKey()?'disabled':''}>🎡 Roue de la chance${S.wheel==dayKey()?' : reviens demain':''}</button></div>`):''}
  <div class="cal">${Array.from({length:24},(_,i)=>{const d=i+1,o=S.opened.includes(d),ok=avail(d),D=DAYS[d],dn=S.days[d]&&S.days[d].done;
   return`<button class="day ${o?'done':ok?'ok':'lock'}" style="${o?pcs(S.map[i]):''}" aria-label="Jour ${d}${o?', ouvert':ok?', disponible':', verrouillé'}" onclick="tapDay(${d})">${o||ok?d:'🔒'}${D.ev&&(o||ok)?`<span class="ev">${D.ev}</span>`:''}${o?`<span class="ck">${dn?(S.days[d].lost?'😢':'✅'):'⏳'}</span>`:''}${bossCfg(d)?`<span class="bsb ${(S.boss||{})[d]?'won':''}" title="Boss">${(S.boss||{})[d]?'🏆':'👹'}</span>`:''}</button>`}).join('')}</div>`}
-function tapDay(d){if(!avail(d)){SFX('bad');toast(d>unl()?`Encore un peu de patience pour le ${d} 🎁`:'');return}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const JK={lock:['Patience, jeune padawan 🧘','Non.','Toujours non.','Tu insistes ? Le Père Noël te surveille 👀'],lose:['Même Valentin aurait réussi… non, c’est faux.','C’est la faute du téléphone, évidemment.','Respire. Bois un thé, mange des spéculoos. Réessaie.'],hint:['💡 Indice gratuit : concentre-toi 🙂','Même Valentin, aussi débile qu’il soit, l’a réussi sans indice.'],lab:['Les lutins font une pause café ☕','Un lutin s’est coincé le doigt, ça va aller','Les lutins se disputent pour la radio 📻','Les lutins sont en manif étudiante 🪧'],boot:['Chargement de l’amour… 99 %… toujours 99 %','Réchauffage des lutins…','Calibrage des blagues nulles…','Dégivrage du Père Noël…'],vtap:['Arrête, ça chatouille !','Je sais que je suis beau.','Hé ! On ne touche pas au boss !','Encore ? T’es amoureuse ou quoi ?','Ça ne te fera pas gagner plus vite…','Bon ok… encore une fois.','Tu me déconcentres là.','J’appelle mon avocat.','Hihi.']};
+let lockT={d:0,n:0};
+function tapDay(d){if(!avail(d)){SFX('bad');if(d>unl()){S.lockTaps=(S.lockTaps||0)+1;save();if(S.lockTaps>=20)try{ACH('lockTap')}catch(_){}lockT=lockT.d==d?{d,n:lockT.n+1}:{d,n:1};if(lockT.n==10){popup(`<h2>⚠️ Erreur 418</h2><p style="font-size:2.6rem;margin:.1em 0">🛠️</p><p><b>Case cassée.</b></p><p>Valentin a été prévenu.<br><small class="muted">(Il s’en fiche.)</small></p><button onclick="closePop()">Ok…</button>`);return}toast(pick(JK.lock))}return}
  if(S.opened.includes(d)){SFX('tap');return go('day',d)}SFX('open');
  const D=DAYS[d];S.opened.push(d);S.opened.sort((a,b)=>a-b);slog('📅',`Ouvre la case ${d} · ${D.t}`);let bonus=0;
  award(PTS.open+(D.bonus||0),D.bonus?'cadeau du jour 🎁':'case ouverte');ding();calView();
@@ -1213,7 +1220,7 @@ function startBox(d,msg){document.body.classList.remove('playing');try{$('#lives
  else{h+=`<button onclick="launch(${d})">${vLoad(d,0)?'▶ Reprendre ma partie sauvegardée':f?`Réessayer (essai ${f+1}/${max})`:"▶ Commencer le mini-jeu"}</button>`;if(S.inv.dbl>0)h+=S.dblOn==d?`<p class="center"><span class="ribbon">✨ Points doublés activés pour ce jeu</span> <button class="alt sm" onclick="S.dblOn=0;save();startBox(${d})">Annuler</button></p>`:`<button class="alt" onclick="S.dblOn=${d};save();SFX('ok');startBox(${d})">✨ Utiliser Points doublés sur ce jeu (${S.inv.dbl})</button>`}
  $('#gmsg').innerHTML=h+bossDev(d)}
 let lockY=0;
-function useHint(){if(!$('#gwin')||$('#game').classList.contains('solv'))return;if(!(S.inv.hint>0)){toast("Plus d'indice 💡 : fabrique-en au labo ou gagne-en à la roue");return}if(!G||typeof G.hint!='function'){toast('Pas d\'indice pour ce jeu');return}
+function useHint(){if(!$('#gwin')||$('#game').classList.contains('solv'))return;if(!(S.inv.hint>0)){toast(pick(JK.hint));setTimeout(()=>toast("Plus d'indice 💡 : fabrique-en au labo ou gagne-en à la roue"),2300);return}if(!G||typeof G.hint!='function'){toast('Pas d\'indice pour ce jeu');return}
  let r;try{r=G.hint()}catch(e){console.error(e);r='Indice impossible pour le moment'}if(r!==true){toast(typeof r=='string'?r:'Indice impossible pour le moment');return}
  S.inv.hint--;window.__hint=1;save();const b=$('#hintn');if(b)b.textContent=S.inv.hint;try{SFX('key')}catch(_){}toast('💡 Indice utilisé')}
 function openGame(d,pr,quit,ttl){closeGame(true);const D=DAYS[d],ov=document.createElement('div');ov.id='gwin';
@@ -1245,12 +1252,12 @@ function launch(d,pr){window.CURD=d;window.CURPR=!!pr;try{if(!pr)slog('🎮',`La
  GAMES[D.g](D.p,$('#game'),()=>end(true),(w,k)=>end(false,w,k))}
 function result(d,pr,ok,why){const D=DAYS[d];SFX(ok?'win':'lose');try{const s0=S.days[d]||{};if(pr)slog(ok?'🏋️':'🏋️',`Entraînement jour ${d} · ${D.t} : ${ok?'réussi':'raté'}${ok?'':' ('+String(why||'').replace(/<[^>]+>/g,'')+')'}`);else if(ok)slog('✅',`Jour ${d} · ${D.t} réussi ${s0.fails?'au '+(s0.fails+1)+'e essai':'du premier coup'}`);else slog('❌',`Jour ${d} · ${D.t} raté : ${String(why||'').replace(/<[^>]+>/g,'')}${(s0.fails||0)+1>=3+(s0.extra||0)?' · défi perdu 💔':''}`)}catch(_){}
  if(pr){const s0=S.days[d]||{};if(ok&&s0.lost&&!s0.late){const n=0;Object.assign(s0,{late:true,lost:false,score:s0.score||10});S.days[d]=s0;S.scr+=5;save();toast('✅ Réussi après coup · +5 🔩');ding();confetti();splash(true);save();return startBox(d,`Bravo, tu l'as enfin eu ! 🎉 Le défi est validé (+5 🔩)`)}
-  if(ok){splash(true);ding()}return startBox(d,ok?'Bravo ! 🎉 (entraînement, sans points)':`Raté : ${esc(why)}.`)}
+  if(ok){splash(true);ding()}return startBox(d,ok?'Bravo ! 🎉 (entraînement, sans points)':`Raté : ${esc(why)}.<br><small class="muted"><i>${esc(pick(JK.lose))}</i></small>`)}
  const st=S.days[d]=S.days[d]||{};
  if(ok){const f=st.fails||0;let n=[40,30,20][f]||10,m=D.x2?2:1;if(S.dblOn==d&&S.inv.dbl>0){S.inv.dbl--;S.dblOn=0;m*=2;toast('✨ Points doublés !')}n*=m;
   Object.assign(st,{done:true,lost:false,score:n});S.scr+=25;award(n,'jeu réussi · +25 🔩');flameWin(d);ding();confetti();splash(true);if(bossCfg(d)&&!(S.boss||{})[d])setTimeout(()=>bossOffer(d),1400);startBox(d,`Bravo, réussi ${f?`au ${f+1}e essai`:'du premier coup'} ! 🎉`)}
  else{st.fails=(st.fails||0)+1;const max=3+(st.extra||0);if(st.fails>=max){st.done=true;st.lost=true;flameLost(d);splash(false);}
-  save();startBox(d,`Raté : ${esc(why)}.${st.lost?'':` Il te reste ${max-st.fails} essai${max-st.fails>1?'s':''}.`}`)}
+  save();startBox(d,`Raté : ${esc(why)}.${st.lost?'':` Il te reste ${max-st.fails} essai${max-st.fails>1?'s':''}.`}<br><small class="muted"><i>${esc(pick(JK.lose))}</i></small>`)}
  save()}
 function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=$('#spl');if(old)old.remove();const u=PH[Math.floor(Math.random()*PH.length)],d=document.createElement('div');
  d.id='spl';d.className='spl '+(win?'w':'l');d.setAttribute('role','dialog');d.setAttribute('aria-label',win?'You win':'You lose');
@@ -1304,6 +1311,7 @@ function vBoss(test){if(document.getElementById('vbo'))return;const mu=vMusic();
  const $$=q=>o.querySelector(q),T=$$('#vbT'),M=$$('#vbM'),B=$$('#vbB'),wait=ms=>new Promise(r=>setTimeout(r,ms));let alive=true;
  const st={e:150,eM:150,c:100,cM:100,it:{choco:2,photo:1,chaus:1},stun:0,charm:0,pout:0,ult:0,heal:0,msg:1,turn:0};
  const hp=()=>{const pe=Math.max(0,st.e)/st.eM,pc=Math.max(0,st.c)/st.cM;$$('#vbE').style.width=pe*100+'%';$$('#vbC').style.width=pc*100+'%';$$('#vbE').style.background=pe>.5?'#3ddc84':pe>.2?'#f3c623':'#ff3d6e';$$('#vbC').style.background=pc>.5?'#3ddc84':pc>.2?'#f3c623':'#ff3d6e';$$('#vbEt').textContent=Math.max(0,Math.ceil(st.e))+' / '+st.eM;$$('#vbCt').textContent=Math.max(0,Math.ceil(st.c))+' / '+st.cM};hp();
+ {let vt=0;const ve=$$('#vbSE img');ve.style.cursor='pointer';ve.addEventListener('pointerdown',e=>{if(!alive)return;e.stopPropagation();vt++;pop('e',pick(JK.vtap),'#fff');try{bkT(700+Math.random()*300,.08,'sine',.04)}catch(_){}if(vt==10)try{ACH('touchV')}catch(_){}})}
  const quit=()=>{if(!alive)return;alive=false;mu.stop();o.remove();document.documentElement.classList.remove('gl');try{render()}catch(_){}};
  $$('#vbX').onclick=()=>{if(confirm('Quitter le combat final ? (Tu pourras le recommencer depuis la machine secrète.)'))quit()};
  const say=t=>new Promise(res=>{if(!alive)return;M.innerHTML='';const s=String(t);let i=0,done=false;const iv=setInterval(()=>{if(!alive){clearInterval(iv);return}i++;T.textContent=s.slice(0,i);if(i>=s.length)fin()},17);
@@ -1594,7 +1602,7 @@ function alPageHTML(P,i){let p=P[i];if(!p)return`<div class="al-page empty"></di
  if(p.items.every(x=>x.vid!=null?!vidOk(x.vid):x.idx>=RV))return`<div class="al-page"><div class="al-ch" style="visibility:hidden">·</div><div class="al-phs">${p.items.map(x=>x.vid!=null?vidFig(x.vid):`<figure class="al-ph lock"><div class="al-fr vide"><span>📷</span></div><figcaption>&nbsp;</figcaption></figure>`).join('')}</div><span class="al-n">${i+1}</span></div>`;
  p={...p,items:p.items.map(x=>x.vid==null&&x.idx>=RV?{idx:x.idx,lock:1}:x)};
  return`<div class="al-page">${p.first?`<div class="al-ch"><span>${p.ch.titre}</span>${p.ch.date?`<small>${p.ch.date}</small>`:''}</div>`:`<div class="al-ch sm"><span>${p.ch.titre}</span></div>`}
- <div class="al-phs ${p.items.length==2&&p.items.every(x=>x.src&&x.o=='p')?'duo':p.items.length==1?'solo':''}">${p.items.map(x=>x.vid!=null?vidFig(x.vid):x.lock?`<figure class="al-ph lock"><div class="al-fr vide"><span>📷</span></div><figcaption>&nbsp;</figcaption></figure>`:`<figure class="al-ph" onclick="event.stopPropagation();alZoom(${x.idx})"><div class="al-fr ${x.src?'':'vide'}">${x.src?`<img src="${x.src}" alt="" loading="lazy" style="object-position:${x.pos||'center'}">`:`<span>📷</span>`}<i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i></div><figcaption><b>${x.titre||''}</b>${x.date?`<small>${x.date}</small>`:''}${x.txt?`<em>${x.txt}</em>`:''}</figcaption></figure>`).join('')}</div><span class="al-n">${i+1}</span></div>`}
+ <div class="al-phs ${p.items.length==2&&p.items.every(x=>x.src&&x.o=='p')?'duo':p.items.length==1?'solo':''}">${p.items.map(x=>x.vid!=null?vidFig(x.vid):x.lock?`<figure class="al-ph lock"><div class="al-fr vide"><span>📷</span></div><figcaption>&nbsp;</figcaption></figure>`:`<figure class="al-ph" onclick="event.stopPropagation();alZoom(${x.idx})"><div class="al-fr ${x.src?'':'vide'}">${x.src?`<img src="${x.src}" alt="" loading="lazy" style="object-position:${x.pos||'center'}">`:`<span>📷</span>`}${/20(2[7-9]|[3-9]\d)|longtemps/.test(x.date||'')?'<span class="al-pred">🔮 Prédiction garantie à 97 %</span>':''}<i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i></div><figcaption><b>${x.titre||''}</b>${x.date?`<small>${x.date}</small>`:''}${x.txt?`<em>${x.txt}</em>`:''}</figcaption></figure>`).join('')}</div><span class="al-n">${i+1}</span></div>`}
 function bookView(){if(!feat(1)){$('#app').innerHTML=`<h1>Album</h1><div class="panel center"><p style="font-size:2.5rem;margin:0">🔒</p><p>L'album s'ouvre avec la case du 1er décembre.</p></div>`;return}const B=alS();alSize();if(window.__prevView!='book')B.open=0;
  $('#app').innerHTML=`<div class="al-wrap" id="alw"><div class="al-snow"></div><div class="al-stage" id="als">${B.open?alOpenHTML():alCoverHTML()}</div></div>`;
  if(B.open)alBind();else alCoverBind();
@@ -1652,6 +1660,7 @@ function alClose(){if(alBusy||window.__alClosing)return;window.__alClosing=1;ALB
   setTimeout(()=>{bk.classList.remove('reseal','thud','stamp');$('.bk-hint').style.opacity=1;window.__alClosing=0;alCoverBind()},2700)})})}
 function alZoom(i){const A=alPhotos().slice(0,alRev());if(!A[i])return;let o=document.getElementById('alz');if(!o){o=document.createElement('div');o.id='alz';document.body.appendChild(o)}
  const x=A[i];o.innerHTML=`<button class="alz-x" aria-label="Fermer">✕</button><div class="alz-in">${x.src?`<img src="${x.src}" alt="">`:`<div class="alz-v"><span>📷</span><small>Photo à venir</small></div>`}<p class="alz-t">${x.titre||''}</p>${x.date?`<p class="alz-c" style="color:#f2cf6e">${x.date}</p>`:''}${x.txt?`<p class="alz-c" style="font-size:1.15rem;margin-top:4px;color:#f4e6c8">${x.txt}</p>`:''}<p class="alz-c">${x.ch} · ${i+1} / ${A.length}</p></div>${i>0?`<button class="alz-a l">‹</button>`:''}${i<A.length-1?`<button class="alz-a r">›</button>`:''}`;
+ {const im=o.querySelector('.alz-in img');if(im){let n=0;im.onclick=e=>{e.stopPropagation();if(++n==3){const t=document.createElement('div');t.className='alz-stamp';t.innerHTML='✅ Photo approuvée par Valentin<small>(il est beau dessus, lui aussi)</small>';o.querySelector('.alz-in').appendChild(t);try{SFX('ok')}catch(_){}}}}}
  o.classList.add('on');const cl=()=>{o.classList.remove('on');setTimeout(()=>o.remove(),250)};
  o.querySelector('.alz-x').onclick=cl;o.onclick=e=>{if(e.target==o)cl()};const l=o.querySelector('.alz-a.l'),r=o.querySelector('.alz-a.r');if(l)l.onclick=e=>{e.stopPropagation();alZoom(i-1)};if(r)r.onclick=e=>{e.stopPropagation();alZoom(i+1)};
  let x0=null;o.onpointerdown=e=>x0=e.clientX;o.onpointerup=e=>{if(x0==null)return;const dx=e.clientX-x0;x0=null;if(dx<-50&&i<A.length-1)alZoom(i+1);else if(dx>50&&i>0)alZoom(i-1)}}
@@ -1713,6 +1722,8 @@ const ACHS=[
  {g:'Secrets',id:'candyMega',ic:'🌋',n:'Apocalypse sucrée',d:'Combine deux bombes chocolat à Candy Noël.',t:'D',s:'Deux chocolats valent mieux qu’un…'},
  {g:'Secrets',id:'grinch',ic:'🫠',n:'Grinch flambé',d:'Fais tomber le Grinch dans la lave.',t:'M',s:'Le Grinch n’aime pas du tout la chaleur…'},
  {g:'Secrets',id:'klaxon',ic:'📯',n:'Klaxonneuse',d:'Klaxonne 10 fois.',t:'F',s:'Dans certains jeux, on a le droit de faire du bruit…'},
+ {g:'Secrets',id:'lockTap',ic:'🚪',n:'Persévérante',d:'Tu as essayé d’ouvrir une case fermée 20 fois. Elle est toujours fermée.',t:'F',s:'Certaines portes restent fermées…'},
+ {g:'Secrets',id:'touchV',ic:'🫶',n:'Elle m’aime',d:'Tu n’as pas pu t’empêcher de le toucher.',t:'F',s:'Le boss final est très… tactile.'},
  {g:'Secrets',id:'persev',ic:'💪',n:'Jamais abandonner',d:'Réussis un jeu à ton dernier essai, ou après l’avoir perdu.',t:'M',s:'Tomber sept fois, se relever huit.',c:()=>Object.values(S.days).some(x=>x.late||(x.done&&!x.lost&&(x.fails||0)>=2))},
  {g:'Secrets',id:'night',ic:'🦉',n:'Oiseau de nuit',d:'Joue entre minuit et 5 h du matin.',t:'M',s:'Les hiboux, eux, ne dorment jamais…'},
  {g:'Secrets',id:'noel',ic:'🎅',n:'Le grand jour',d:'Ouvre le calendrier le 24 ou le 25 décembre.',t:'F',s:'Reviens un jour très spécial…',c:()=>{const d=new Date();return d.getMonth()==11&&(d.getDate()==24||d.getDate()==25)}}];
@@ -3255,7 +3266,7 @@ function wheel(){if(!feat(7)||wheelEnd()||S.wheel==dayKey())return;const n=WHEEL
  popup(`<h2>Roue de la chance</h2><div class="pin"></div><div class="wheel" id="wh" style="background:${bg}">${WHEEL.map((w,i)=>`<span style="transform:rotate(${i*360/n+360/n/2-90}deg) translate(70px,-.6em)">${wLab(w)}</span>`).join('')}</div><button id="spin" onclick="spin()">Tourner !</button>`)}
 function spin(){const n=WHEEL.length,k=Math.floor(Math.random()*n),w=$('#wh');S.wheel=dayKey();save();EV('wheel');$('#spin').disabled=true;
  w.style.transform=`rotate(${360*6-(k*360/n+360/n/2)}deg)`;const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
- setTimeout(()=>{const r=WHEEL[k];if(typeof r=='number')award(r,'roue de la chance');else if(r=='s15'||r=='s30'){S.scr+=+r.slice(1);save();toast(`+${r.slice(1)} 🔩`)}else if(r=='gem'){S.gem++;save();confetti();toast('+1 💎 Gemme !')}else{S.inv[r]++;save();toast(r=='hint'?'+1 💡 Indice':'+1 🃏 Joker')}
+ setTimeout(()=>{const r=WHEEL[k];if(r===Math.min(...WHEEL.filter(v=>typeof v=='number')))setTimeout(()=>toast('La roue a été truquée par Valentin. Toutes nos excuses. (Non.)'),1800);if(typeof r=='number')award(r,'roue de la chance');else if(r=='s15'||r=='s30'){S.scr+=+r.slice(1);save();toast(`+${r.slice(1)} 🔩`)}else if(r=='gem'){S.gem++;save();confetti();toast('+1 💎 Gemme !')}else{S.inv[r]++;save();toast(r=='hint'?'+1 💡 Indice':'+1 🃏 Joker')}
   $('#spin').outerHTML=`<p><b>${typeof r=='number'?'+'+r+' ⭐':r=='hint'?'Un indice 💡':r=='joker'?'Un joker 🃏':r=='gem'?'Une gemme 💎 !':'+'+r.slice(1)+' 🔩'}</b></p><button onclick="go('cal')">Super !</button>`},rm?300:3400)}
 
 /* ---------- Casino ---------- */
@@ -3270,7 +3281,8 @@ function cDraw(){let r=Math.random();for(let k=0;k<SLOT.length;k++){if((r-=SLOT[
 function cPhoto(){const P=CONTENU.photos||[];if(!P.length)return'';const k=[5,10,25,50,100].indexOf(cBet);return P[((k<0?5:k)*7+2)%P.length]}
 function cSet(n){if(cBusy)return;if(n!=S.pts&&n>S.pts)return;cBet=Math.max(1,Math.round(n));casinoView()}
 function cLog(t){S.clog=[t,...(S.clog||[])].slice(0,6);save()}
-function casinoView(){
+const _casinoFoot='<p class="muted center" style="font-size:.72rem;margin-top:18px;opacity:.8">Jouer comporte des risques : endettement, isolement et dépendance aux bisous. Appelez le 09-BISOUS.</p>';
+function casinoView(){setTimeout(()=>{if(view=='casino'&&!document.getElementById('cfoot')){const p=document.createElement('div');p.id='cfoot';p.innerHTML=_casinoFoot;$('#app').appendChild(p)}},0);
  if(!feat(14)){app.innerHTML=`<h1>Casino</h1><div class="panel center"><p style="font-size:2.5rem;margin:0">🔒</p><p>Le casino ouvre avec la case du 14 décembre.</p></div>`;return}
  if(cBet>S.pts){const ch=[100,50,25,10,5].find(v=>v<=S.pts);cBet=ch||S.pts}if(!(S.inv.jeton>0))cJet=false;const can=S.pts>=5||cJet;
  app.innerHTML=`<h1>🎰 Casino</h1>
@@ -3294,7 +3306,7 @@ function casinoView(){
 function cTake(){if(cBusy)return false;if(cJet&&S.inv.jeton>0){S.inv.jeton--;save();cJetUsed=true;cBusy=true;return jetVal()}cJetUsed=false;if(S.pts<5)return false;const b=Math.min(cBet,S.pts);cBet=b;S.pts-=b;save();hdr();$('.csolde b').textContent='⭐ '+S.pts;cBusy=true;return b}
 function cWin(b,m,label){const g=Math.round(b*m);cBusy=false;if(g>0){S.pts+=g;save();hdr()}
  const net=g-(cJetUsed?0:b);cLog(`${cJetUsed?'🎟️ ':''}${label} · mise ${b} → ${g?'+'+g:'0'} ⭐ <b class="${net>0?'cw':net<0?'cl':''}">(${net>0?'+':''}${net})</b>`);
- if(m>=8){confetti();toast(`🤑 JACKPOT ! +${g} ⭐`)}else if(net>0){toast(`🎉 Gagné ! +${g} ⭐`);if(m>=3)confetti()}else if(g>0)toast(`Tu récupères ${g} ⭐`);else toast('Perdu… 😬');setTimeout(casinoView,m>=10?1400:900)}
+ if(m>=8){confetti();toast(`🤑 JACKPOT ! +${g} ⭐`)}else if(net>0){toast(`🎉 Gagné ! +${g} ⭐`);if(m>=3)confetti()}else if(g>0)toast(`Tu récupères ${g} ⭐`);else{toast('Perdu… 😬');if(b>=20)setTimeout(()=>toast('Peut-être que si tu fais les yeux doux à Valentin, il trouvera un moyen de te rendre ton argent 🥺'),1300)}setTimeout(casinoView,m>=10?1400:900)}
 function cSpin(){const b=cTake();if(!b)return;const n=RL.length,a=360/n,k=Math.floor(Math.random()*n),w=$('#cwh'),pick=cCol;$('#cgo').disabled=true;
  const target=360-(k*a+a/2),cur=((cRot%360)+360)%360;cRot+=360*6+((target-cur+360)%360);const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
  w.style.transition=rm?'none':'transform 5s cubic-bezier(.1,.7,.12,1)';w.style.transform=`rotate(${cRot}deg)`;const bl=$('.rball');if(bl&&!rm)bl.animate([{transform:'rotate(0deg)'},{transform:'rotate(-1440deg)'}],{duration:4200,easing:'cubic-bezier(.2,.6,.3,1)'});G={casino:RL[k]};
@@ -3313,7 +3325,9 @@ function shopView(){if(!feat(1)){app.innerHTML=`<h1>Boutique</h1><div class="pan
  const it=x=>{if(x.id=='voix'&&!(CONTENU.voix||[]).length)return`<div class="item"><div class="ic">${x.ic}</div><div class="tx"><b>${esc(x.n)}</b><small>Bientôt disponible…</small></div><button class="alt sm" disabled>Bientôt</button></div>`;const lk=x.day&&!feat(x.day),own=x.k=='own'&&S.own.includes(x.id),cnt=x.k=='inv'?S.inv[x.id]:0;
   return`<div class="item"><div class="ic">${x.ic}</div><div class="tx"><b>${esc(x.n)}</b><small>${esc(x.d||'Bon à échanger avec moi')}${cnt?` · tu en as ${cnt}`:''}</small></div>${lk?`<button class="alt sm" disabled>🔒 Jour ${x.day}</button>`:own?`<button class="sm deco ${S[x.id]!==false?'':'alt'}" onclick="togDeco('${x.id}')" aria-pressed="${S[x.id]!==false}">${S[x.id]!==false?'✓ Activé':'Désactivé'}</button>`:`<button class="sm" ${S.pts<x.p?'disabled':''} onclick="buy('${x.id}')">${x.p} ⭐</button>`}</div>`};
  app.innerHTML=`<h1>Boutique</h1><p class="center">Tu as <b>${S.pts} ⭐</b> à dépenser.</p>
- <h2>💌 Bons à échanger avec moi</h2><div class="shop">${CONTENU.bons.map(b=>it({...b,k:'bon'})).join('')}</div>`}
+ <h2>💌 Bons à échanger avec moi</h2><div class="shop">${CONTENU.bons.map(b=>it({...b,k:'bon'})).join('')}</div>
+ <h2>🛒 Articles spéciaux</h2><div class="shop"><div class="item"><div class="ic">🧦</div><div class="tx"><b>Valentin qui ne laisse pas traîner ses vêtements sales par terre</b><small>999 999 ⭐ · épuisé depuis 2025</small></div><button class="alt sm" disabled>Épuisé</button></div>${unl()>=1?`<div class="item"><div class="ic">🌙</div><div class="tx"><b>Une nuit sans que Valentin ne te demande de te mettre toute nue</b><small>Article introuvable</small></div><button class="alt sm" disabled>Introuvable</button></div>`:''}<div class="item"><div class="ic">🕳️</div><div class="tx"><b>Rien</b><small>Vraiment rien. Garanti.</small></div><button class="sm" onclick="buyNothing()">0 ⭐</button></div></div>`}
+function buyNothing(){try{SFX('ok');slog('🕳️','Achète… rien')}catch(_){}popup(`<h2>🕳️ Rien</h2><p>Félicitations, tu possèdes maintenant… <b>rien</b>.</p><p class="muted">Valentin aussi offre souvent ça.</p><button onclick="closePop()">Merci ?</button>`)}
 function togDeco(id){S[id]=S[id]===false;save();snowCount();toast(S[id]?'Décoration activée ✨':'Décoration désactivée');if(id=='voix'&&S[id])ding();render()}
 function buy(id){const x=SHOP.find(s=>s.id==id)||{...CONTENU.bons.find(b=>b.id==id),k:'bon'};if(!x||S.pts<x.p)return;
  if(x.k=='bon')return popup(`<h2>${x.ic} ${esc(x.n)}</h2><p>Échanger <b>${x.p} ⭐</b> contre ce bon ?</p><button onclick="buyOk('${id}')">Oui, je le veux !</button><button class="alt" onclick="closePop()">Annuler</button>`);buyOk(id)}
@@ -3384,11 +3398,11 @@ function meView(){if(!feat(1)){app.innerHTML=`<h1>Mes trésors</h1><div class="p
   app.innerHTML=`<h1>Mes trésors</h1>
  <div class="panel center"><div style="font-size:2rem"><span class="lvpic" style="background-image:url(${lvlPic(L)})"></span></div><h2 style="margin:0">Niveau ${L+1} · ${LEVELS[L][1]}</h2><div class="bar"><i style="width:${pc}%"></i></div><p class="muted" style="margin:0">${nx?`${S.earned}/${nx[0]} ⭐ gagnés pour le niveau suivant`:'Niveau maximum !'} · Chaque niveau offre un 💡 et 2 💎</p>
   <div class="lvls">${LEVELS.map((l,i)=>`<div class="lvi ${i<=L?'ok':''} ${i==L?'cur':''}"><span class="lvpic sm" style="background-image:url(${lvlPic(i)})"></span><small>${i+1}</small><b>${i<=L?esc(l[1]):'???'}</b><em>${l[0]} ⭐</em></div>`).join('')}</div></div>
- ${achHTML()}${plHTML()}${statsHTML()}${syncHTML()}<h2>💌 Mes bons</h2>${S.bons.length?S.bons.map((b,i)=>`<div class="bon ${b.used?'used':''}"><div class="ic">${b.ic}</div><div class="tx"><b>${esc(b.n)}</b><br><small>${b.used?'Utilisé':'À utiliser quand tu veux'}</small></div>${b.used?'':`<button class="sm" onclick="showBon(${i})">Utiliser</button>`}</div>`).join(''):'<p class="muted">Pas encore de bon : fais un tour à la boutique !</p>'}
+ ${achHTML()}${plHTML()}${statsHTML()}${syncHTML()}<h2>💌 Mes bons</h2>${S.bons.length?S.bons.map((b,i)=>`<div class="bon ${b.used?'used':''}"><div class="ic">${b.ic}</div><div class="tx"><b>${esc(b.n)}</b><br><small>${b.used?'Utilisé':'À utiliser quand tu veux'}</small><br><small class="muted" style="font-size:.7rem"><i>*Valable uniquement si Valentin est de bonne humeur (il l’est toujours avec toi).</i></small></div>${b.used?'':`<button class="sm" onclick="showBon(${i})">Utiliser</button>`}</div>`).join(''):'<p class="muted">Pas encore de bon : fais un tour à la boutique !</p>'}
  <h2>🎒 Mes bonus</h2><div class="panel">🔩 Pièces : <b>${S.scr}</b> · 💎 Gemmes : <b>${S.gem}</b><br>💡 Indices : <b>${S.inv.hint}</b> · 🃏 Jokers : <b>${S.inv.joker}</b> · ✨ Points doublés : <b>${S.inv.dbl}</b> · 🎟️ Jetons : <b>${S.inv.jeton||0}</b><br>🔓 Cases en avance : <b>${S.inv.early}</b> ${S.inv.early&&nextEarly()?`<button class="sm" onclick="useEarly()">Ouvrir le jour ${nextEarly()}</button>`:''}</div>
  <h2>⚙️ Réglages</h2><div class="panel">
   ${SHOP.filter(x=>x.k=='own'&&S.own.includes(x.id)).map(x=>`<p><label><input type="checkbox" ${S[x.id]!==false?'checked':''} onchange="S['${x.id}']=this.checked;save();snowCount();${x.id=='voix'?'ding()':'render()'}"> ${x.ic} ${esc(x.n)}</label></p>`).join('')||'<p class="muted" style="margin:0">Fabrique des décorations au 🧪 labo pour les activer ici.</p>'}
-  <p><label><input type="checkbox" ${S.sound!==false?'checked':''} onchange="S.sound=this.checked;save();if(this.checked)SFX('ok')"> 🔊 Sons des mini-jeux</label></p><p><label><input type="checkbox" ${S.music!==false?'checked':''} onchange="S.music=this.checked;save()"> 🎵 Musique pendant les mini-jeux</label></p><p><label><input type="checkbox" ${S.bgm!==false?'checked':''} onchange="S.bgm=this.checked;save();if(this.checked)bgm();else MUS.stop()"> 🎶 Musique d'ambiance dans le calendrier</label></p>${APP.web()&&!APP.standalone()?'<p><button class="alt" onclick="closePop();installScreen(true)">📲 Installer l’appli sur cet appareil</button></p>':''}</div>`}
+  <p><label><input type="checkbox" ${S.sound!==false?'checked':''} onchange="S.sound=this.checked;save();if(this.checked)SFX('ok')"> 🔊 Sons des mini-jeux</label></p><p><label><input type="checkbox" ${S.music!==false?'checked':''} onchange="S.music=this.checked;save()"> 🎵 Musique pendant les mini-jeux</label></p><p><label><input type="checkbox" ${S.bgm!==false?'checked':''} onchange="S.bgm=this.checked;save();if(this.checked)bgm();else MUS.stop()"> 🎶 Musique d'ambiance dans le calendrier</label></p><p><label><input type="checkbox" onchange="if(this.checked){const c=this;setTimeout(()=>{c.checked=false},600);toast('Impossible : fonctionnalité intégrée au produit 🤷')}"> 🔇 Couper les blagues nulles de Valentin</label></p><p><label><input type="checkbox" onchange="if(this.checked){const c=this;toast('Mode adulte responsable : activé…');setTimeout(()=>{c.checked=false;toast('On a essayé. Ça n’a pas tenu.')},2000)}"> 🧑‍💼 Mode adulte responsable</label></p>${APP.web()&&!APP.standalone()?'<p><button class="alt" onclick="closePop();installScreen(true)">📲 Installer l’appli sur cet appareil</button></p>':''}</div>`}
 function showBon(i){const b=S.bons[i];popup(`<div style="font-size:3rem">${b.ic}</div><h2>BON POUR</h2><p style="font:700 1.3rem Georgia,serif">${esc(b.n)}</p><p class="muted">Montre ce bon pour en profiter 💝</p><button onclick="S.bons[${i}].used=true;slog('💝','Utilise le bon '+S.bons[${i}].n);save();closePop();meView();toast('Bon utilisé, profite bien !')">Marquer comme utilisé</button><button class="alt" onclick="closePop()">Pas encore</button>`)}
 const nextEarly=()=>{for(let d=unl()+1;d<=23;d++)if(!S.early.includes(d))return d;return 0};
 function useEarly(){const d=nextEarly();if(!d||S.inv.early<1)return;S.inv.early--;S.early.push(d);save();toast(`🔓 Le jour ${d} est ouvert !`);go('cal');tapDay(d)}
@@ -3399,6 +3413,9 @@ function importBox(){popup(`<h2>Coller un code</h2><p class="muted">La progressi
 function importCode(){try{const v=$('#ic').value.trim().replace(/^AVENT-/,''),o=JSON.parse(decodeURIComponent(escape(atob(v))));if(!Array.isArray(o.opened))throw 0;Object.assign(S,o,{sim:0});save();closePop();toast('Progression restaurée ✅');snowCount();go('cal')}catch(e){toast('Code invalide 😕')}}
 
 /* ---------- Mode test caché (toucher 7 fois la photo) ---------- */
+{let bt=0,bl=0;document.addEventListener('pointerdown',e=>{if(view!='cal')return;const t=e.target;if(t.closest('button,a,input,.day,.panel,header,nav,#pop,.toast,#gwin'))return;const n=Date.now();bt=n-bl<1500?bt+1:1;bl=n;if(bt==15){bt=0;toast('❄️ Bravo, tu as trouvé le flocon le plus inutile du site. Il ne sert à rien, comme Valentin.')}},true)}
+{const b=document.createElement('div');b.id='boot';b.innerHTML=`<div class="bt-in"><div class="bt-ic">🎄</div><p>${pick(JK.boot)}</p><div class="bt-bar"><i></i></div></div>`;document.body.appendChild(b);const rm=()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)};b.onclick=rm;setTimeout(rm,1500);
+ setTimeout(()=>{const r=Math.random();if(r<1/30)toast('💌 Rappel : Valentin t’aime. Fin du message.');else if(r<2/30)toast('🔔 Valentin a faim. Ce n’est pas une nouvelle, c’est juste un rappel.')},2600)}
 let taps=[];$('#logo').onclick=()=>{const n=Date.now();taps=taps.filter(x=>n-x<3000);taps.push(n);if(taps.length>=7){taps=[];popup(`<h2>🔐 Accès secret</h2><input type="text" id="pin" inputmode="numeric" placeholder="Code"><p><button onclick="if($('#pin').value==CONTENU.codeSecret)admin();else toast('Code faux')">Entrer</button><button class="alt" onclick="closePop()">Annuler</button></p>`)}};
 function askWipe(){popup('<h2>Tout effacer ?</h2><p>Toute la progression de cet appareil sera supprimée.</p><button onclick="wipe()">Oui, tout effacer</button><button class="alt" onclick="admin()">Annuler</button>')}
 function wipe(){try{localStorage.removeItem(KEY);localStorage.removeItem('avent_img')}catch(e){}location.reload()}
@@ -3447,7 +3464,7 @@ function place(){const bd=$('#bd');if(!bd)return;S.perm.forEach((id,pos)=>{const
 function stats(){if(!$('#st'))return;
  $('#st').textContent=S.done?(S.auto?'Puzzle résolu automatiquement.':'Bravo, puzzle terminé !'):solvedPos()?`Tout est en place ! Ouvre les ${24-S.opened.length} dernières cases pour révéler la surprise.`:''}
 function slide(pos){if(S.done)return;const E=N-1,e=S.perm.indexOf(E),r=Math.floor(pos/C),c=pos%C,er=Math.floor(e/C),ec=e%C;if(pos==e||(r!=er&&c!=ec))return;U.push([...S.perm]);if(U.length>300)U.shift();
- const st=r==er?(pos<e?-1:1):(pos<e?-C:C);let cu=e;while(cu!=pos){const nx=cu+st;S.perm[cu]=S.perm[nx];cu=nx}S.perm[pos]=E;S.moves++;S.started=true;place();stats();save();chk()}
+ const st=r==er?(pos<e?-1:1):(pos<e?-C:C);let cu=e;while(cu!=pos){const nx=cu+st;S.perm[cu]=S.perm[nx];cu=nx}S.perm[pos]=E;S.moves++;if(S.moves==150&&!S.done)setTimeout(()=>toast('150 coups… Valentin, lui, aurait déjà jeté le téléphone par la fenêtre.'),300);S.started=true;place();stats();save();chk()}
 addEventListener('keydown',e=>{if(view=='day'&&G&&G.key&&!e.target.closest('input,textarea')){if(e.key.startsWith('Arrow'))e.preventDefault();G.key(e.key=='Enter'?'⏎':e.key=='Backspace'?'⌫':e.key)}});
 addEventListener('keydown',e=>{if(view!='puz'||S.done||!e.key.startsWith('Arrow')||!$('#bd'))return;e.preventDefault();const k=e.key,ep=S.perm.indexOf(N-1);
  if(k=='ArrowLeft'&&ep%C<C-1)slide(ep+1);if(k=='ArrowRight'&&ep%C>0)slide(ep-1);if(k=='ArrowUp'&&ep+C<N)slide(ep+C);if(k=='ArrowDown'&&ep>=C)slide(ep-C)});
@@ -3793,7 +3810,7 @@ function labView(){
   ${CONSO.filter(k=>S.inv[k]>0).map(k=>{const x=itm(k);return`<div class="stk"><div class="ic">${x.ic}</div><div class="tx"><b>${esc(x.n)}</b> × ${S.inv[k]}</div><button class="alt sm" onclick="recycle('${k}')">♻️ +${Math.floor(RCP[k].c/2)} 🔩</button></div>`}).join('')||'<p class="muted" style="margin:6px 0 0">Ton entrepôt est vide. Lance une production !</p>'}
 </div>`;
  labSig=labState()}
-function mCard(M){const s=mState(M),m=LBM(M.id);let b='';
+function mCard(M){const s=mState(M),m=LBM(M.id);let b='';const strike=s=='idle'&&M.id!='secret'&&[...(dayKey()+M.id)].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7)%9==0;
  if(s=='broken')b=`<button class="sm" onclick="event.stopPropagation();repair('${M.id}')" ${S.scr<M.cost?'disabled':''}>${M.cost?`🔧 ${M.cost} 🔩`:'Allumer'}</button>`;
  else if(s=='done')b=`<button class="sm glow" onclick="event.stopPropagation();collect('${M.id}')">Récupérer</button>`;
  else if(s=='idle'&&!allMade(M))b=`<button class="sm" onclick="event.stopPropagation();mOpen('${M.id}')">${M.conv?'Convertir':'Produire'}</button>`;
@@ -3801,7 +3818,7 @@ function mCard(M){const s=mState(M),m=LBM(M.id);let b='';
  else if(s=='rep'||s=='run'){const sp=span(M);b=bar(sp[0],sp[1])}
  return`<div class="mc ${s} ${M.id=='secret'?'secret':''}" style="--a:${MCOL[M.id]}" ${s=='lock'?`onclick="mOpen('${M.id}')"`:`onclick="mOpen('${M.id}')" role="button" tabindex="0"`} aria-label="${esc(M.n)}">
   ${m.lv>1?`<span class="lv">${'★'.repeat(m.lv)}</span>`:''}
-  ${port(M,58)}<div class="plate">${s=='lock'&&M.id=='secret'?'???':esc(M.n)}</div>${s=='broken'||s=='lock'||s=='idle'?'':chip(M,1)}${b}</div>`}
+  ${strike?'<span class="mstrk">✊ En grève — revendication : plus de câlins</span>':''}${port(M,58)}<div class="plate">${s=='lock'&&M.id=='secret'?'???':esc(M.n)}</div>${s=='broken'||s=='lock'||s=='idle'?'':chip(M,1)}${b}</div>`}
 function mPanel(id){const M=MOF(id),m=LBM(id),s=mState(M),t=Date.now(),sp=span(M);
  let h=`<div class="mpan" data-id="${id}" style="--a:${MCOL[id]}"><button class="mx" onclick="closePop();curM=null" aria-label="Fermer">✕</button>
  <div class="mhead"><div class="mgear a">⚙️</div><div class="mgear b">⚙️</div>${port(M,96)}</div>
@@ -3810,7 +3827,7 @@ function mPanel(id){const M=MOF(id),m=LBM(id),s=mState(M),t=Date.now(),sp=span(M
 
  ${M.conv?`<div class="mbal"><span>⭐ <b>${S.pts}</b></span><span>🔩 <b>${S.scr}</b></span></div>`:`<div class="mbal"><span>🔩 <b>${S.scr}</b></span><span>💎 <b>${S.gem}</b></span><span>📦 <b>${stock()}/${S.cap}</b></span></div>`}`;
  if(s=='broken')h+=`<div class="msec"><div class="mbig">🔧</div><p>Cette machine est hors service.${M.rep?`<br>Réparation : <b>${M.rep} h</b>`:''}</p><button class="big" ${S.scr<M.cost?'disabled':''} onclick="repair('${id}')">${M.cost?`Réparer · ${M.cost} 🔩`:'Allumer la machine'}</button>${S.scr<M.cost?`<p class="why">Il te manque ${M.cost-S.scr} 🔩</p>`:''}</div>`;
- else if(s=='rep'||s=='run'){const g=gemCost(sp[1]-t);h+=`<div class="msec"><p class="mlbl">${s=='rep'?'🔧 Réparation en cours':`Fabrication : <b>${itm(m.job.it).ic} ${esc(itm(m.job.it).n)}</b>`}</p><div class="mtime cd" data-e="${sp[1]}">${fmtT(sp[1]-t)}</div>${bar(sp[0],sp[1])}
+ else if(s=='rep'||s=='run'){const g=gemCost(sp[1]-t);h+=`<div class="msec"><p class="mlbl">${s=='rep'?'🔧 Réparation en cours':`Fabrication : <b>${itm(m.job.it).ic} ${esc(itm(m.job.it).n)}</b>`}</p><p class="muted" style="margin:-4px 0 6px;font-size:.85rem"><i>${esc(pick(JK.lab))}</i></p><div class="mtime cd" data-e="${sp[1]}">${fmtT(sp[1]-t)}</div>${bar(sp[0],sp[1])}
   <button class="big gembtn" ${S.gem<g?'disabled':''} onclick="speedUp('${id}')">⚡ Finir maintenant · ${g} 💎</button>${S.gem<g?`<p class="why">Il te faut ${g} 💎 (tu en as ${S.gem})</p>`:'<p class="muted" style="font-size:.8rem;margin:4px 0 0">1 💎 par heure restante</p>'}</div>`}
  else if(s=='done')h+=`<div class="msec ready"><div class="mbig">${itm(m.job.it).ic}</div><p><b>C'est prêt !</b></p><button class="big glow" onclick="collect('${id}')">Récupérer</button></div>`;
  if(s!='broken'){const lk=s=='rep'?'En réparation':(s=='run'||s=='done')?'Atelier occupé':'';
