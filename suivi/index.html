@@ -59,6 +59,8 @@ button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--li
 .ck{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line)}.ck input{width:20px;height:20px;accent-color:#ff7ab6}
 .frm textarea{width:100%;margin-top:10px;font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--line);border-radius:12px;padding:8px;min-height:54px;resize:vertical}
 .frm .go{width:100%;margin-top:10px;padding:12px;border-radius:14px;font-weight:700;background:var(--or);color:#2a1205;border:0}
+.cell .bm{position:absolute;top:2px;right:3px;font-size:.7rem}
+.leg span:last-child:before{display:none}
 .sub{color:var(--mut);font-size:.78rem;margin:12px 0 4px;font-weight:700}
 </style>
 </head>
@@ -66,13 +68,15 @@ button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--li
 <div class="wrap">
  <div class="top"><h1>🎄 Suivi de Célestine</h1><span class="tag" id="room"></span></div>
  <div class="err" id="err"></div>
- <div class="card"><div class="live"><span class="dot" id="dot"></span><div><b id="st">Connexion…</b><small id="st2"></small></div></div><div id="game"></div></div>
+ <div class="card"><div class="live"><span class="dot" id="dot"></span><div><b id="st">Connexion…</b><small id="st2"></small></div></div><div id="game"></div><div id="fin"></div></div>
  <div class="card"><h2>🎮 Actions</h2><div class="acts"><button class="big atk" id="bAtk">😈 Lancer une attaque</button><button class="big gft" id="bGift">🎁 Envoyer un cadeau</button></div><div id="form"></div><div id="sent"></div></div>
  <div class="card"><h2>⭐ Ses compteurs</h2><div class="tiles" id="tiles"></div><div class="lvl"><span id="lvn"></span><div class="bar"><i id="lvb"></i></div><span class="muted" id="lvp"></span></div></div>
  <div class="card"><h2>📅 Le calendrier</h2><div class="grid" id="grid"></div>
-  <div class="leg"><span style="--c:#ffffff22">Fermée</span><span style="--c:#6bb6ff">Ouverte</span><span style="--c:#3ddc84">Réussi</span><span style="--c:#ff5c7a">Raté</span></div></div>
+  <div class="leg"><span style="--c:#ffffff22">Fermée</span><span style="--c:#6bb6ff">Ouverte</span><span style="--c:#3ddc84">Réussi</span><span style="--c:#ff5c7a">Raté</span><span>👹 boss · 🏆 boss battu</span></div></div>
+ <div class="card"><h2>👹 Les boss</h2><div class="list" id="boss"></div></div>
  <div class="card"><h2>🛍️ Ses bons</h2><div class="list" id="bons"></div></div>
  <div class="card"><h2>🧩 Puzzle &amp; niveau secret</h2><div id="puz"></div></div>
+ <div class="card"><h2>⚙️ Ses réglages</h2><div id="prefs"></div></div>
  <div class="card log"><h2 style="justify-content:space-between"><span>📜 Activité</span><button id="clr" title="Effacer l'historique">🗑️</button></h2><div id="log"></div></div>
  <p class="muted" style="text-align:center;font-size:.75rem">Mise à jour en direct · ne partage pas ce lien</p>
 </div>
@@ -81,6 +85,8 @@ const BASE='https://calendrier-celestine-default-rtdb.europe-west1.firebasedatab
 const ROOM=new URLSearchParams(location.search).get('room')||'c';
 const URL0=BASE+ROOM;
 const LEVELS=[[0,"Célesteenager"],[110,"Célestinhaler"],[270,"Célestinégalable"],[460,"Célestinestimable"],[680,"Célestinattendue"],[940,"Célestinachevable"],[1230,"Célestinoubliable"],[1540,"Célestinévitable"],[1900,"Célestinouïe"],[2300,"Célestinarrêtable"]];
+const BOSS={4:"⛄ Le Bonhomme de neige géant",8:"😈 Le Grinch voleur",11:"🦌 Rodolphe, le renne DJ",15:"👸 La Reine des glaces",19:"🧌 Le Troll des neiges",22:"👻 Le Fantôme de Noël"};
+const LANG={fr:"🇫🇷 Français",en:"🇬🇧 English",br:"⠃⠗⠁⠊⠇⠇⠑ Braille"};
 const TITLES={1:"Memorizotto",2:"Colony Flow",3:"Mots mêlés pimentés",4:"Flappy Célestine",5:"La hutte de Panoramix",6:"Mastermindiens",7:"Zip",8:"Dj Snake",9:"Flèches en fuite",10:"Picross",11:"Simontagne",12:"Le sudokunnilingus",13:"Œil de lynx",14:"La tour de cadeaux",15:"Block blaster",16:"Notre mot fléché",17:"Libère la voiture",18:"Candy Noël",19:"2048",20:"Les 7 différences",21:"Relier les points",22:"Sauve Célestine",23:"Tu me connais par cœur ?",24:"Puzzle final"};
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
 let DB={},seen=new Set(),first=true;
@@ -90,21 +96,21 @@ function patch(p,v){for(const k in v)setPath(p.replace(/\/$/,'')+'/'+k,v[k])}
 const ago=t=>{const s=Math.max(0,Math.round((Date.now()-t)/1000));if(s<60)return'à l\'instant';const m=Math.round(s/60);if(m<60)return`il y a ${m} min`;const h=Math.round(m/60);if(h<24)return`il y a ${h} h`;return`il y a ${Math.round(h/24)} j`};
 const hm=t=>new Date(t).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 const dur=t=>{const s=Math.max(0,Math.round((Date.now()-t)/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-const VIEWS={cal:'le calendrier',day:'une case du calendrier',puz:'le puzzle',shop:'la boutique',lab:'le labo',casino:'le casino',book:"l'album",me:'ses trésors'};
+const VIEWS={cal:'le calendrier',day:'une case du calendrier',puz:'le puzzle',shop:'la boutique',lab:'le labo',casino:'le casino',book:"l'album",me:'ses trésors',set:'les paramètres'};
 function renderLive(){const L=DB.live,dot=$('#dot');if(!L){dot.className='dot';$('#st').textContent='Pas encore de nouvelles';$('#st2').textContent="Elle n'a pas encore ouvert la nouvelle version de l'appli.";$('#game').innerHTML='';return}
  const fresh=Date.now()-L.at<75000;const on=fresh&&L.vis;dot.className='dot'+(on?' on':fresh?' bg':'');
  $('#st').textContent=on?'Sur l\'appli en ce moment':fresh?'Appli ouverte en arrière-plan':'Hors ligne';
  $('#st2').textContent=on?`Sur ${VIEWS[L.view]||'l\'appli'}`+(L.sim?` · mode test jour ${L.sim}`:''):`Vue ${ago(L.at)} (${hm(L.at)})`;
- $('#game').innerHTML=on&&L.game?`<div class="game">🎮 <b>Joue au jour ${L.game.d} · ${esc(L.game.t)}</b>${L.game.pr?' <span class="tag">entraînement</span>':''}<br><small class="muted">depuis <span id="gdur">${dur(L.game.at)}</span></small></div>`:''}
+ $('#game').innerHTML=on&&L.game?`<div class="game">🎮 <b>Joue au jour ${L.game.d} · ${esc(L.game.t)}</b>${L.game.pr?' <span class="tag">entraînement</span>':''}${L.game.boss?' <span class="tag test">combat final</span>':''}<br><small class="muted">depuis <span id="gdur">${dur(L.game.at)}</span></small></div>`:''}
 function renderState(){const s=DB.state;if(!s){$('#tiles').innerHTML='<p class="muted">En attente des premières données…</p>';return}
- const inv=s.inv||{};const T=[['⭐',s.pts,'étoiles'],['🔩',s.scr,'clés'],['💎',s.gem,'gemmes'],['🥚',`${s.eggs}/24`,'œufs'],['🏆',`${s.ach}/${s.achT||'?'}`,'succès'],['🔥',s.streak,'flammes'],['💡',inv.hint||0,'indices'],['🃏',inv.joker||0,'jokers']];
+ const inv=s.inv||{};const T=[['⭐',s.pts,'étoiles'],['🔩',s.scr,'clés'],['💎',s.gem,'gemmes'],['🥚',`${s.eggs}/24`,'œufs'],['🏆',`${s.ach}/${s.achT||'?'}`,'succès'],['🔥',s.streak,'flammes'],['💡',inv.hint||0,'indices'],['🃏',inv.joker||0,'jokers'],['👹',`${Object.keys(s.boss||{}).length}/6`,'boss battus'],['🎬',`${s.vids||0}/${s.vidT||6}`,'vidéos'],['📸',`${s.alb||0}/${s.albT||'?'}`,'souvenirs'],['💾',(s.saves||[]).length,'parties en pause']];
  $('#tiles').innerHTML=T.map(([i,v,l])=>`<div class="tile"><b>${i} ${esc(v)}</b><small>${l}</small></div>`).join('');
  const L=Math.max(0,(s.lvl||1)-1),nx=LEVELS[L+1];$('#lvn').innerHTML=`<b>Niv. ${L+1}</b> · ${esc(s.lvlN||LEVELS[L][1])}`;
  $('#lvb').style.width=(nx?Math.min(100,(s.earned-LEVELS[L][0])/(nx[0]-LEVELS[L][0])*100):100)+'%';$('#lvp').textContent=nx?`${s.earned}/${nx[0]} ⭐ gagnées`:`${s.earned} ⭐ · max !`;
  const op=new Set(s.opened||[]),D=s.days||{};let g='';const last=Math.max(0,...op);
  for(let d=1;d<=24;d++){const x=D[d]||{},c=x.d&&!x.l?'ok':x.l?'ko':op.has(d)?'op':'';const mx=3+(x.e||0);
   const info=x.d&&!x.l?`${x.s}⭐${x.f?`<br>${x.f+1}e essai`:''}`:x.l?'perdu':op.has(d)&&x.f?`<span class="h">${'❤️'.repeat(Math.max(0,mx-x.f))}${'🖤'.repeat(x.f)}</span>`:op.has(d)?'à jouer':'';
-  g+=`<div class="cell ${c} ${d==last?'now':''}" title="${esc(TITLES[d])}"><b>${d}</b>${info}</div>`}
+  const bb=BOSS[d]?`<span class="bm">${(s.boss||{})[d]?'🏆':'👹'}</span>`:'';g+=`<div class="cell ${c} ${d==last?'now':''}" title="${esc(TITLES[d])}${BOSS[d]?' · boss : '+esc(BOSS[d]):''}">${bb}<b>${d}</b>${info}</div>`}
  $('#grid').innerHTML=g;
  const B=(s.bons||[]).slice().sort((a,b)=>(a.u-b.u)||(b.at-a.at));
  $('#bons').innerHTML=B.length?B.map(b=>`<div class="row ${b.u?'used':''}"><span class="ic">${esc(b.ic)}</span><span class="tx">${esc(b.n)}</span><span class="tm">${b.u?'✅ utilisé':'🎁 à offrir'}${b.at?' · '+new Date(b.at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}</span></div>`).join(''):'<p class="muted" style="margin:0">Aucun bon acheté pour l\'instant.</p>';
@@ -112,6 +118,12 @@ function renderState(){const s=DB.state;if(!s){$('#tiles').innerHTML='<p class="
  $('#puz').innerHTML=`<div class="row"><span class="ic">🧩</span><span class="tx">${P.diff?`${DN[P.diff]||P.diff} · ${P.done?'<b>terminé</b> ✅':`${P.ok}/24 pièces en place`}`:'Difficulté pas encore choisie'}</span><span class="tm">${P.moves?P.moves+' coups':''}</span></div>
   <div class="row" style="margin-top:6px"><span class="ic">🌟</span><span class="tx">Niveau secret : ${s.secret&&s.secret.done?`terminé · score ${s.secret.score}`:'pas encore fait'}</span></div>
   ${s.sim?`<p class="muted" style="margin:8px 0 0;font-size:.8rem">⚠️ L'appli est en mode test (jour ${s.sim} simulé).</p>`:''}<p class="muted" style="margin:8px 0 0;font-size:.75rem">Dernière synchro ${ago(s.at)}</p>`}
+function renderBoss(){const s=DB.state;const el=$('#boss');if(!s){el.innerHTML='';return}const B=s.boss||{},T=s.bossTry||{};
+ let h=Object.keys(BOSS).map(d=>`<div class="row ${B[d]?'':'used'}"><span class="ic">${B[d]?'🏆':'⏳'}</span><span class="tx">${esc(BOSS[d])} <small class="muted">· jour ${d}</small></span><span class="tm">${B[d]?'battu · '+new Date(B[d]).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):(T[d]?T[d]+' essai'+(T[d]>1?'s':''):'pas encore')}</span></div>`).join('');
+ h+=`<div class="row" style="margin-top:8px;${s.vb?'background:#f2c45a22;border:1px solid #f2c45a66':''}"><span class="ic">${s.vb?'👑':s.machine?'😈':'🔒'}</span><span class="tx"><b>Boss final : Valentin</b><br><small class="muted">${s.vb?'Battu ! Jeu terminé 🎉':s.machine?'Débloqué dans la machine secrète':'Pas encore débloqué (machine secrète du 24)'}</small></span><span class="tm">${s.vb?new Date(s.vb).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+hm(s.vb):''}</span></div>`;
+ el.innerHTML=h;
+ const st=s.set||{};$('#prefs').innerHTML=`<div class="row"><span class="ic">🌍</span><span class="tx">Langue : <b>${LANG[s.lang||'fr']||s.lang}</b></span></div><div class="row" style="margin-top:6px"><span class="ic">☀️</span><span class="tx">Luminosité ${st.lum??100} % · texte ${({s:'petit',n:'normal',l:'grand'})[st.fsz||'n']}${st.warm?' · lumière douce':''}</span></div><div class="row" style="margin-top:6px"><span class="ic">🔊</span><span class="tx">Sons ${st.snd===false?'coupés':'activés'} · musique ${st.mus===false?'coupée':'activée'}</span></div>${(s.saves||[]).length?`<div class="row" style="margin-top:6px"><span class="ic">💾</span><span class="tx">Parties en pause : ${(s.saves||[]).map(k=>'jour '+String(k).replace(/\D/g,'')).join(', ')}</span></div>`:''}`;
+ $('#fin').innerHTML=s.vb?`<div class="game" style="background:#f2c45a22;border-color:#f2c45a88">👑 <b>Jeu terminé !</b> Elle a battu Valentin le ${new Date(s.vb).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})} à ${hm(s.vb)}.</div>`:''}
 function renderLog(){const L=Object.entries(DB.log||{}).map(([k,v])=>({k,...v})).sort((a,b)=>b.at-a.at).slice(0,150);
  if(!L.length){$('#log').innerHTML='<p class="muted" style="margin:0">Rien pour l\'instant.</p>';return}
  let h='',lastD='';for(const e of L){const dd=new Date(e.at).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});if(dd!=lastD){h+=`<div class="day">${dd}</div>`;lastD=dd}
@@ -141,7 +153,7 @@ function renderSent(){const C=Object.entries(DB.cmd||{}).map(([k,v])=>({k,...v})
  $('#sent').innerHTML='<div class="sub">Derniers envois</div>'+C.map(c=>{const what=[...Object.entries(c.items||{}).map(([k,v])=>{const x=IT.find(i=>i[0]==k);return(x?x[1]:k)+' '+v}),...(c.bons||[]).map(b=>b.ic+' '+b.n)].join(', ')||'un petit mot';
   return`<div class="row"><span class="ic">${c.type=='attack'?'😈':'🎁'}</span><span class="tx">${esc(c.done?(c.done.res||'rien'):what)}${c.done&&c.type=='attack'?`<br><small class="muted">elle a tapé ${c.done.taps} fois</small>`:''}</span><span class="tm">${c.done?'✅ '+hm(c.done.at):'⏳ en attente'}</span></div>`}).join('')}
 $('#bAtk').onclick=()=>openForm('attack');$('#bGift').onclick=()=>openForm('gift');
-function render(){renderLive();renderState();renderLog();renderSent();first=false}
+function render(){renderLive();renderState();renderBoss();renderLog();renderSent();first=false}
 setInterval(()=>{renderLive();const g=$('#gdur');if(g&&DB.live&&DB.live.game)g.textContent=dur(DB.live.game.at)},1000);
 function connect(){let es;try{es=new EventSource(URL0+'.json')}catch(e){return fail()}
  const on=ev=>{try{const m=JSON.parse(ev.data);if(ev.type=='put')setPath(m.path,m.data);else patch(m.path,m.data);$('#err').style.display='none';render()}catch(e){console.error(e)}};
