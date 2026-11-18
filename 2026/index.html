@@ -1261,7 +1261,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795011595';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795011922';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -4060,7 +4060,7 @@ function story(id,cb,tst){const D=STORY[id];if(!D){cb&&cb();return}S.story=S.sto
  c.onclick=()=>{if(typing){clearInterval(iv);typing=false;(D.l[i][0]=='n'?N:BU).textContent=full;return}show()};setTimeout(show,600)}
 setInterval(()=>{try{if(typeof view!='undefined'&&(view=='cal'||view=='me'))storyCheck()}catch(_){}},2500);
 function storyAll(){const L=STORD.filter(k=>k!='epi');let i=0;const nx=()=>{if(i<L.length){const k=L[i++];return story(k,nx,1)}window.__afterCredits=()=>story('epi',()=>toast('📖 Fin de l’histoire (mode test)'),1);vBoss(1,1,1)};nx()}
-function storyBusy(){return !!(document.getElementById('storyo')||document.getElementById('boot')||document.getElementById('vbo')||document.getElementById('gwin')&&document.getElementById('gwin').offsetParent||($('#pop')&&$('#pop').innerHTML.trim())||document.getElementById('alnew')||document.getElementById('vco')||document.body.classList.contains('playing'))}
+function storyBusy(){return !!(instPend()||document.getElementById('storyo')||document.getElementById('boot')||document.getElementById('vbo')||document.getElementById('gwin')&&document.getElementById('gwin').offsetParent||($('#pop')&&$('#pop').innerHTML.trim())||document.getElementById('alnew')||document.getElementById('vco')||document.body.classList.contains('playing'))}
 const puzOk=()=>Object.values(S.puzWon||{}).some(Boolean)||!!(S.done&&(S.opened||[]).length>=24);
 function storyCheck(){try{if(storyBusy())return;S.story=S.story||{};const sd=S.story,op=S.opened||[];let id=null;
  let ne=0;try{ne=eggs().length}catch(_){}const lost=Object.values(S.days||{}).some(x=>x&&(x.fails>0||x.lost));
