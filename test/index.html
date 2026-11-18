@@ -1261,7 +1261,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795010225';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795011595';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1515,11 +1515,14 @@ const WHEEL=[2,5,8,10,15,25,"hint","joker","s15","s30","gem"];
 const wLab=w=>typeof w=="number"?w+"⭐":{hint:"💡",joker:"🃏",s15:"15🔩",s30:"30🔩",gem:"💎"}[w];
 
 /* ---------- État ---------- */
+/* Une sauvegarde impossible à la date réelle (jour simulé, cases futures, fin déjà jouée) vient de tests : on repart de zéro. */
+function staleSave(o){try{const[y,m,d]=today(),ru=y>YEAR?24:(y<YEAR||m<12)?0:Math.min(d,24),E=o.early||[];
+ return (o.sim||0)>0||(o.opened||[]).some(n=>n>ru&&!E.includes(n))||(ru<24&&!!(o.vbDone||o.secretDone||Object.values(o.puzWon||{}).some(Boolean)))}catch(_){return false}}
 const KEY='avent_test';try{localStorage.removeItem('avent_v3');localStorage.removeItem('avent_v4')}catch(e){}
 let S={pts:0,earned:0,opened:[],map:[],days:{},carnet:{},streak:0,lastStreak:0,inv:{hint:0,joker:0,dbl:0,early:0,jeton:0},early:[],scr:0,gem:0,cap:2,lab:{},own:[],bons:[],theme:"sapin",sound:true,storm:false,wheel:"",sim:0,lvl:0,
  diff:null,perm:[],moves:0,t:0,started:false,done:false,auto:false,best:{},puzWon:{}};
 let view='cal',cur=0,U=[],G={};
-try{const o=JSON.parse(localStorage.getItem(KEY)||'{}');Object.assign(S,o);S.inv=Object.assign({hint:0,joker:0,dbl:0,early:0,jeton:0},o.inv||{})}catch(e){}
+try{let o=JSON.parse(localStorage.getItem(KEY)||'{}');if(!CONTENU.modeTest&&staleSave(o)){o={};localStorage.removeItem(KEY);localStorage.removeItem('avent_img')}Object.assign(S,o);S.inv=Object.assign({hint:0,joker:0,dbl:0,early:0,jeton:0},o.inv||{})}catch(e){}
 let IMG=DEF_IMG;try{IMG=localStorage.getItem('avent_img')||DEF_IMG}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}try{syncState()}catch(_){}}
 /* ---------- Suivi en direct (Firebase) ---------- */
