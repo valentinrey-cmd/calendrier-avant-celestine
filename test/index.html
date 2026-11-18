@@ -1064,7 +1064,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794992778';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794993506';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1617,7 +1617,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
    let p=0,last=performance.now(),t0=performance.now(),over=false;
    return await new Promise(done=>{const end=v=>{if(over)return;over=true;done(v)};
     L.addEventListener('pointerdown',e=>{e.preventDefault();if(over)return;{p-=.05;C.classList.remove('vbtg');void C.offsetWidth;C.classList.add('vbtg');try{bkT(400+Math.random()*80,.03,'triangle',.03)}catch(_){}}});
-    const loop=t=>{if(over||!alive)return;const dt=Math.min(.05,(t-last)/1000);last=t;const pull=.32+Math.min(.06,(t-t0)/1000*.003);p+=pull*dt;{const ne=Math.round(st.floor+200*Math.max(0,Math.min(1,(p+1)/2)));if(ne!==st.e){st.e=ne;hp()}}V.classList.toggle('vbpull',Math.sin(t/90)>0);
+    const loop=t=>{if(over||!alive)return;const dt=Math.min(.05,(t-last)/1000);last=t;const pull=.40+Math.min(.1,(t-t0)/1000*.0035);p+=pull*dt;{const ne=Math.round(st.floor+200*Math.max(0,Math.min(1,(p+1)/2)));if(ne!==st.e){st.e=ne;hp()}}V.classList.toggle('vbpull',Math.sin(t/90)>0);
      if(p<=-1){over=true;dmgV(st.e-st.floor,V);V.classList.add('fall');el('div','vb-splash','PLOUF ! 🍫');try{bkT(140,.6,'sine',.08,60)}catch(_){}setTimeout(()=>done('ok'),1300);return}
      if(p>=1){p=0;word('Gagné 😎','b');if(ouch(12,C))return end('lose')}
      const kx=W/2+p*W*.3;knot.style.left=kx+'px';GI.style.width=((1-p)/2*100)+'%';C.style.left=(W*.13+p*W*.06)+'px';V.style.left=(W*.87+p*W*.06)+'px';
@@ -3729,7 +3729,7 @@ function importBox(){popup(`<h2>Coller un code</h2><p class="muted">La progressi
 function importCode(){try{const v=$('#ic').value.trim().replace(/^AVENT-/,''),o=JSON.parse(decodeURIComponent(escape(atob(v))));if(!Array.isArray(o.opened))throw 0;Object.assign(S,o,{sim:0});save();closePop();toast('Progression restaurée ✅');snowCount();go('cal')}catch(e){toast('Code invalide 😕')}}
 
 /* ---------- Mode test caché (toucher 7 fois la photo) ---------- */
-{let bt=0,bl=0;document.addEventListener('pointerdown',e=>{if(view!='cal')return;const t=e.target;if(t.closest('button,a,input,.day,.panel,header,nav,#pop,.toast,#gwin'))return;const n=Date.now();bt=n-bl<1500?bt+1:1;bl=n;if(bt==15){bt=0;toast('❄️ Bravo, tu as trouvé le flocon le plus inutile du site. Il ne sert à rien, comme Valentin.')}},true)}
+{let bt=0,bl=0;document.addEventListener('pointerdown',e=>{if(view!='cal')return;const t=e.target;if(t.closest('button,a,input,.day,.panel,header,nav,#pop,.toast,#gwin'))return;const n=Date.now();bt=n-bl<1500?bt+1:1;bl=n;},true)}
 {const b=document.createElement('div');b.id='boot';b.innerHTML=`<div class="bt-in"><div class="bt-ic">🎄</div><p>${pick(JK.boot)}</p><div class="bt-bar"><i></i></div></div>`;document.body.appendChild(b);const rm=()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)};b.onclick=rm;setTimeout(rm,1500);
  setTimeout(()=>{const r=Math.random();if(r<1/30)toast('💌 Rappel : Valentin t’aime. Fin du message.');else if(r<2/30)toast('🔔 Valentin a faim. Ce n’est pas une nouvelle, c’est juste un rappel.')},2600)}
 let taps=[];$('#logo').onclick=()=>{const n=Date.now();taps=taps.filter(x=>n-x<3000);taps.push(n);if(taps.length>=7){taps=[];popup(`<h2>🔐 Accès secret</h2><input type="text" id="pin" inputmode="numeric" placeholder="Code"><p><button onclick="if($('#pin').value==CONTENU.codeSecret)admin();else toast('Code faux')">Entrer</button><button class="alt" onclick="closePop()">Annuler</button></p>`)}};
