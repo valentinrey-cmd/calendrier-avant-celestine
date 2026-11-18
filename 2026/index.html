@@ -1190,7 +1190,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794995718';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794996315';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1781,7 +1781,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
    const V=dancer(VIMG.v,'🕺','vb-dv vv'),C=dancer(VIMG.c,'💃','vb-dc'),AR=el('div','vb-arw'),TB=el('div','vb-tb','<i></i>'),TI=TB.firstChild,CB=el('div','vb-combo','');
    const N=30,per=PER/N;let i=0,cur=null,sx=0,sy=0,tm=0,combo=0;const OPP={u:'d',d:'u',l:'r',r:'l'};const DI=[['↑','u'],['↓','d'],['←','l'],['→','r']];
    return await new Promise(done=>{
-    const next=()=>{if(!alive)return;if(i>=N){cur=null;return setTimeout(()=>done('ok'),500)}i++;const k=DI[Math.floor(Math.random()*4)],rr=Math.random(),fake=i>2&&rr<.2,rev=!fake&&i>5&&rr<.45,win=Math.max(.5,1.0-i*.028);
+    const next=()=>{if(!alive)return;if(i>=N){cur=null;return setTimeout(()=>done('ok'),500)}i++;const k=DI[Math.floor(Math.random()*4)],rr=Math.random(),fake=i>2&&rr<.2,rev=!fake&&i>5&&rr<.45,win=Math.max(.72,1.05-i*.016);
      cur={dir:rev?OPP[k[1]]:k[1],fake,rev,t0:performance.now(),win};AR.className='vb-arw in'+(fake?' fk':rev?' rv':'');AR.innerHTML=fake?'🙃':rev?k[0]+'<small>INVERSE</small>':k[0];V.className='vb-dv vv vb-dn2 m'+k[1];TI.style.transition='none';TI.style.width='100%';void TI.offsetWidth;TI.style.transition=`width ${win}s linear`;TI.style.width='0%';
      try{bkT(fake?330:660,.08,'square',.05)}catch(_){}clearTimeout(tm);tm=setTimeout(()=>{if(cur&&cur.t0)res(null)},win*1000)};
     const res=d=>{if(!cur||!alive)return;const c=cur;cur=null;clearTimeout(tm);const ok=c.fake?d==null:d==c.dir;AR.className='vb-arw '+(ok?'ok':'ko');
