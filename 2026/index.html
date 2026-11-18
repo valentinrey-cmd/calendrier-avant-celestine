@@ -1261,7 +1261,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795014956';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795016185';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1644,7 +1644,7 @@ function result(d,pr,ok,why){const D=DAYS[d];SFX(ok?'win':'lose');try{const s0=S
  if(ok){const f=st.fails||0;let n=[40,30,20][f]||10,m=D.x2?2:1;if(S.dblOn==d&&S.inv.dbl>0){S.inv.dbl--;S.dblOn=0;m*=2;toast('✨ Points doublés !')}n*=m;
   Object.assign(st,{done:true,lost:false,score:n});S.scr+=25;award(n,'jeu réussi · +25 🔩');flameWin(d);ding();confetti();splash(true);if(bossCfg(d)&&!(S.boss||{})[d])setTimeout(()=>bossOffer(d),1400);startBox(d,`Bravo, réussi ${f?`au ${f+1}e essai`:'du premier coup'} ! 🎉`)}
  else{st.fails=(st.fails||0)+1;const max=3+(st.extra||0);if(st.fails>=max){st.done=true;st.lost=true;flameLost(d);splash(false);}
-  save();startBox(d,`Raté : ${esc(why)}.${st.lost?'':` Il te reste ${max-st.fails} essai${max-st.fails>1?'s':''}.`}<br><small class="muted"><i>${esc(pick(JK.lose))}</i></small>`)}
+  save();if(!(S.story||{}).lose1){const tl=(n)=>{if((S.story||{}).lose1||n>40)return;if(storyBusy()||document.getElementById('spl'))return setTimeout(()=>tl(n+1),700);story('lose1')};setTimeout(()=>tl(0),900)}startBox(d,`Raté : ${esc(why)}.${st.lost?'':` Il te reste ${max-st.fails} essai${max-st.fails>1?'s':''}.`}<br><small class="muted"><i>${esc(pick(JK.lose))}</i></small>`)}
  save()}
 function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=$('#spl');if(old)old.remove();const u=PH[Math.floor(Math.random()*PH.length)],d=document.createElement('div');
  d.id='spl';d.className='spl '+(win?'w':'l');d.setAttribute('role','dialog');d.setAttribute('aria-label',win?'You win':'You lose');
