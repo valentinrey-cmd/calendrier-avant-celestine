@@ -1191,9 +1191,9 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .st-boss.off-r{transform:translateX(170%)}.st-boss.talk{animation:stelf .45s ease-in-out infinite alternate}.st-boss.dim{opacity:.6}
 .st-title{position:absolute;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);font:800 .78rem system-ui;color:#ffd76a;letter-spacing:.06em;white-space:nowrap;opacity:.9}
 #storyo .vb-nar{top:7%}
-.st-glow{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:70px;animation:stglow 1.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 24px #ffd76a)}
+.st-glow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:70px;animation:stglow 1.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 24px #ffd76a)}
 @keyframes stglow{to{transform:translate(-50%,-56%) scale(1.15);filter:drop-shadow(0 0 40px #ffd76a)}}
-.st-clue{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:90px;animation:vbkob .5s cubic-bezier(.2,1.8,.4,1) both}
+.st-clue{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:90px;animation:vbkob .5s cubic-bezier(.2,1.8,.4,1) both}
 .st-crumb{position:absolute;bottom:20%;font-size:22px;opacity:0;animation:stcrumb .5s ease-out forwards}
 @keyframes stcrumb{from{opacity:0;transform:translateY(-20px)}to{opacity:1}}
 .vb-cut.flash{animation:stflash .6s}
@@ -1202,6 +1202,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .st-run{position:absolute;left:-15%;top:58%;font-size:54px;animation:strun 2s ease-in-out forwards}
 .st-run::after{content:'💨';position:absolute;left:-40px;top:6px;font-size:30px}
 @keyframes strun{0%{left:-15%}100%{left:115%;transform:translateY(-10px)}}
+#storyo .vb-bub,#storyo .vb-nar,.vb-cut .vb-bub,.vb-cut .vb-nar{z-index:6}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -1219,7 +1220,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795000365';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795000461';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
