@@ -948,7 +948,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794987115';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794987317';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -3512,7 +3512,7 @@ function setOpt(k,v){S[k]=v;save();applyDisp();if(k=='fxbg')snowCount()}
 function setView(){const ck=(k,lbl,extra)=>`<p><label><input type="checkbox" ${S[k]!==false&&(S[k]!==undefined||!extra)?'checked':''} onchange="${extra||`setOpt('${k}',this.checked)`}"> ${lbl}</label></p>`,
  L=S.lang||'fr',b=S.lum==null?100:S.lum,deco=SHOP.filter(x=>x.k=='own'&&S.own.includes(x.id));
  app.innerHTML=`<h1>⚙️ Paramètres</h1>
- <h2>🌍 Langue</h2><div class="panel"><div class="row setl" data-notr><button class="${L=='fr'?'':'alt'}" onclick="setLang('fr')">🇫🇷 Français</button><button class="${L=='en'?'':'alt'}" onclick="setLang('en')">🇬🇧 English</button><button class="${L=='br'?'':'alt'}" onclick="setLang('br')">⠃⠗⠁⠊⠇⠇⠑ Braille</button></div>${L=='br'?'<p data-notr style="margin:6px 0 0;font-size:.85rem">🙈 Pour revenir : touche « 🇫🇷 Français » juste au-dessus.</p>':''}<p class="muted" style="margin:6px 0 0;font-size:.85rem">La langue change tout le calendrier. L'application va se recharger.</p></div>
+ <h2>🌍 Langue</h2><div class="panel"><div class="row setl" data-notr><button class="${L=='fr'?'':'alt'}" onclick="setLang('fr')">🇫🇷 Français</button><button class="${L=='en'?'':'alt'}" onclick="setLang('en')">🇬🇧 English</button><button class="${L=='br'?'':'alt'}" onclick="setLang('br')">⠃⠗⠁⠊⠇⠇⠑ Braille</button></div><p class="muted" style="margin:6px 0 0;font-size:.85rem">La langue change tout le calendrier. L'application va se recharger.</p></div>
  <h2>🔊 Son et vibrations</h2><div class="panel">
   <p><label><input type="checkbox" ${S.sound!==false?'checked':''} onchange="S.sound=this.checked;save();if(this.checked)SFX('ok')"> 🔊 Sons des mini-jeux</label></p>
   <p><label><input type="checkbox" ${S.music!==false?'checked':''} onchange="S.music=this.checked;save()"> 🎵 Musique pendant les mini-jeux</label></p>
