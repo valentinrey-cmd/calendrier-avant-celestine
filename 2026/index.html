@@ -1190,7 +1190,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1794996315';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1794998637';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1458,7 +1458,7 @@ function instPend(){try{return !!document.getElementById('inst')||(APP.web()&&!A
 function syncSnap(){let L=0;try{L=lvl()}catch(_){}let A=0;try{A=Object.keys(achS()).length}catch(_){}let E=0;try{E=eggs().length}catch(_){}
  const D={};for(const k in S.days||{}){const x=S.days[k]||{};D[k]={d:x.done?1:0,l:x.lost?1:0,f:x.fails||0,s:x.score||0,e:x.extra||0}}
  return{at:Date.now(),sim:S.sim||0,pts:S.pts,earned:S.earned,lvl:L+1,lvlN:LEVELS[L][1],scr:S.scr||0,gem:S.gem||0,inv:S.inv||{},eggs:E,ach:A,achT:(typeof ACHS!='undefined'?ACHS.length:0),opened:S.opened||[],days:D,streak:S.streak||0,
-  bons:(S.bons||[]).map(b=>({ic:b.ic,n:b.n,u:b.used?1:0,at:b.at||0})),own:S.own||[],puz:{diff:S.diff||null,done:!!S.done,auto:!!S.auto,moves:S.moves||0,t:S.t||0,ok:(S.perm||[]).filter((v,i)=>v==i).length},secret:S.secret?{done:!!S.secret.done,score:S.secret.score||0}:null}}
+  bons:(S.bons||[]).map(b=>({ic:b.ic,n:b.n,u:b.used?1:0,at:b.at||0})),own:S.own||[],puz:{diff:S.diff||null,done:!!S.done,auto:!!S.auto,moves:S.moves||0,t:S.t||0,ok:(S.perm||[]).filter((v,i)=>v==i).length},secret:S.secret?{done:!!S.secret.done,score:S.secret.score||0}:null,boss:S.boss||{},bossTry:S.bossTry||{},vids:(()=>{try{return vidN()}catch(_){return 0}})(),vidT:((CONTENU.videos||[]).length),alb:(()=>{try{return alRev()}catch(_){return 0}})(),albT:(()=>{try{return alTotal()}catch(_){return 0}})(),vb:S.vbDone||0,machine:S.secretDone?1:0,puzWon:S.puzWon||{},lang:S.lang||'fr',saves:Object.keys(S.vsave||{}),set:{lum:S.lum==null?100:S.lum,fsz:S.fsz||'n',warm:!!S.warm,snd:S.sound!==false,mus:S.music!==false}}}
 function syncState(){clearTimeout(syncT);syncT=setTimeout(()=>syncReq('state','PUT',syncSnap()),1500)}
 function syncLive(g){try{const o={at:Date.now(),view:typeof view!='undefined'?view:'',vis:document.hidden?0:1,sim:S.sim||0};if(g!==undefined)window.__lg=g;if(window.__lg)o.game=window.__lg;syncReq('live','PUT',o)}catch(_){}}
 function slog(ic,txt){syncReq('log','POST',{at:Date.now(),ic,txt,sim:S.sim||0})}
@@ -1631,7 +1631,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
  const st=window.__vbst={e:800,eM:800,floor:600,c:100,cM:100,part:sp,mk:0,it:{choco:2,photo:1,chaus:1},stun:0,charm:0,pout:0,ult:0,heal:0,msg:1,turn:0};
  const hp=()=>{const pe=Math.max(0,st.e)/st.eM,pc=Math.max(0,st.c)/st.cM;$$('#vbE').style.width=pe*100+'%';$$('#vbC').style.width=pc*100+'%';$$('#vbE').style.background=pe>.5?'#3ddc84':pe>.2?'#f3c623':'#ff3d6e';$$('#vbC').style.background=pc>.5?'#3ddc84':pc>.2?'#f3c623':'#ff3d6e';$$('#vbEt').textContent=Math.max(0,Math.ceil(st.e))+' / '+st.eM;$$('#vbCt').textContent=Math.max(0,Math.ceil(st.c))+' / '+st.cM};hp();
  {let vt=0;const ve=$$('#vbSE img');ve.style.cursor='pointer';ve.addEventListener('pointerdown',e=>{if(!alive)return;e.stopPropagation();vt++;pop('e',pick(JK.vtap),'#fff');try{bkT(700+Math.random()*300,.08,'sine',.04)}catch(_){}if(vt==10)try{ACH('touchV')}catch(_){}})}
- const quit=()=>{if(!alive)return;alive=false;mu.stop();o.remove();document.documentElement.classList.remove('gl');try{render()}catch(_){}};
+ const quit=()=>{if(!alive)return;alive=false;try{syncLive(null);slog('🚪',`Quitte le boss final (partie ${st.part}/4)`)}catch(_){}mu.stop();o.remove();document.documentElement.classList.remove('gl');try{render()}catch(_){}};
  $$('#vbX').onclick=()=>{if(confirm('Quitter le combat final ? (Tu pourras le recommencer depuis la machine secrète.)'))quit()};
  const say=t=>new Promise(res=>{if(!alive)return;M.innerHTML='';const s=String(t);let i=0,done=false;const iv=setInterval(()=>{if(!alive){clearInterval(iv);return}i++;T.textContent=s.slice(0,i);if(i>=s.length)fin()},17);
   const fin=()=>{if(done)return;done=true;clearInterval(iv);T.innerHTML=esc(s)+'<span class="vb-nx">▼</span>';B.onclick=()=>{B.onclick=null;res()}};B.onclick=()=>fin()});
@@ -1696,7 +1696,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
   if(!st.heal&&st.e<=st.eM-120){st.heal=1;await say('VALENTIN se cache sous un plaid et regarde une série…');heal('e',15);await say('Il récupère 15 PV.');return}
   if(!VMQ.length)VMQ=shuf(VMP);const v=VMQ.pop();for(const x of v.l)await say(x);if(v.charm)st.charm=1;let d=rnd(v.d[0],v.d[1]);if(st.pout&&d){d=Math.round(d*.5);await say('Il s’excuse à moitié… dégâts réduits.')}st.pout=0;if(d)hurt('c',d)};
  const PARTS=[null,{t:'⚔️ Le combat',s:'Choisis tes attaques et touche au bon moment 💗',m:['b24','b11']},{t:'💃 Duel de danse',s:'Refais ses pas en glissant le doigt · 🙃 = ne bouge pas · INVERSE = glisse dans l’autre sens',m:['b27','b24','b11']},{t:'🛋️ Bataille de polochons',s:'Touche sa tête pour lui lancer un oreiller · ◀ ▶ pour esquiver',m:['b28','b24','b11']},{t:'🪢 Tir à la corde',s:'Tape le plus vite possible pour le tirer dans le chocolat !',m:['b29','b24','b11']}];
- const partStart=async k=>{o.dataset.part=k;if(st.mk!==k){try{mu.stop()}catch(_){}mu=vMusic(PARTS[k].m);st.mk=k}st.e=st.eM-200*(k-1);st.floor=st.eM-200*k;hp();
+ const partStart=async k=>{o.dataset.part=k;try{syncLive({d:24,t:'😈 Boss final · Partie '+k+' '+PARTS[k].t,at:Date.now(),boss:1});slog('😈',`Boss final : partie ${k}/4 (${PARTS[k].t})${test?' (test)':''}`)}catch(_){}if(st.mk!==k){try{mu.stop()}catch(_){}mu=vMusic(PARTS[k].m);st.mk=k}st.e=st.eM-200*(k-1);st.floor=st.eM-200*k;hp();
   if(k>1){const fl=document.createElement('div');fl.className='vb-flash';o.appendChild(fl);setTimeout(()=>fl.remove(),900);try{bkT(90,.8,'sawtooth',.07,300)}catch(_){}}
   if(k>1&&st.c<70){st.c=70;hp()}
   const b=document.createElement('div');b.className='vb-pban';b.innerHTML=`<small>PARTIE ${k} / 4</small><b>${PARTS[k].t}</b><span>${PARTS[k].s}</span>`;o.appendChild(b);try{bkT(520,.25,'triangle',.05,780)}catch(_){}
@@ -1823,7 +1823,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
      const kx=W/2+p*W*.3;knot.style.left=kx+'px';GI.style.width=((1-p)/2*100)+'%';C.style.left=(W*.13+p*W*.06)+'px';V.style.left=(W*.87+p*W*.06)+'px';
      requestAnimationFrame(loop)};requestAnimationFrame(loop)})}];
   const v=await rounds[IDX]();if(!alive)return;fin(v=='lose'?'lose':'ok')});
- const lose=async()=>{B.style.display='none';{const TA=['','Valentin garde le chocolat… et fait la danse de la victoire.','Valentin est sacré roi du dancefloor. 👑','Ensevelie sous les oreillers… Valentin construit un fort en ton honneur. 🏰','Tu as fini en fondue. Valentin te trouve délicieuse. 😋'][st.part]||'';
+ const lose=async()=>{try{slog('💀',`Perd la partie ${st.part}/4 du boss final`)}catch(_){}B.style.display='none';{const TA=['','Valentin garde le chocolat… et fait la danse de la victoire.','Valentin est sacré roi du dancefloor. 👑','Ensevelie sous les oreillers… Valentin construit un fort en ton honneur. 🏰','Tu as fini en fondue. Valentin te trouve délicieuse. 😋'][st.part]||'';
   const f=document.createElement('div');f.className='vb-lose';f.innerHTML=`<div class="vb-lconf"></div><img class="vb-lc" src="${VIMG.c}" alt=""><div class="vb-ldn"><img class="vv" src="${VIMG.v}" alt=""><span>🕺</span></div><b class="vb-lt">PERDU…</b><p>${esc(TA)}</p><button class="vb-lgo">Continuer</button>`;o.appendChild(f);
   const cf=f.querySelector('.vb-lconf');for(let i=0;i<18;i++){const e=document.createElement('span');e.textContent=['😜','🍫','🎉','😈'][i%4];e.style.left=Math.random()*100+'%';e.style.animationDelay=(Math.random()*1.5)+'s';cf.appendChild(e)}
   try{bkT(392,.18,'square',.05);setTimeout(()=>bkT(330,.18,'square',.05),200);setTimeout(()=>bkT(262,.5,'square',.05),400)}catch(_){}
@@ -1834,7 +1834,7 @@ function vBoss(test,sp){if(document.getElementById('vbo'))return;sp=Math.max(1,M
   const sp=$$('#vbSE'),im=sp.querySelector('img'),r=im.getBoundingClientRect(),sr=sp.getBoundingClientRect(),N=5;im.style.visibility='hidden';try{bkT(120,1,'sawtooth',.06,40);setTimeout(()=>bkT(180,.6,'square',.07,40),300)}catch(_){}
   for(let i=0;i<N*N;i++){const p=document.createElement('i');p.className='vb-sh';const w=r.width/N,h=r.height/N,x=i%N,y=Math.floor(i/N);p.style.cssText=`left:${r.left-sr.left+x*w}px;top:${r.top-sr.top+y*h}px;width:${w}px;height:${h}px;background-image:url(${VIMG.v});background-size:${r.width}px ${r.height}px;background-position:${-x*w}px ${-y*h}px`;sp.appendChild(p);
    requestAnimationFrame(()=>requestAnimationFrame(()=>{p.style.transform=`translate(${(x-N/2+.5)*70+(Math.random()-.5)*90}px,${(y-N/2+.5)*70+(Math.random()-.5)*90-40}px) rotate(${(Math.random()-.5)*720}deg) scale(.4)`;p.style.opacity=0}))}
-  try{confetti()}catch(_){}S.vbDone=Date.now();save();try{snowCount()}catch(_){}try{ACH('bossV')}catch(_){}try{slog('💘','A battu le boss final Valentin !')}catch(_){}
+  try{confetti()}catch(_){}S.vbDone=Date.now();save();try{snowCount()}catch(_){}try{syncLive(null);syncState()}catch(_){}try{ACH('bossV')}catch(_){}try{slog('💘','A battu le boss final Valentin !')}catch(_){}
   await wait(1800);if(!alive)return;alive=false;o.classList.add('out');mu.stop();setTimeout(()=>{o.remove();document.documentElement.classList.remove('gl');vCredits()},700)};
  run()}
 function vCredits(){if(document.getElementById('vcr'))return;const mu=vMusic(['b25','b11','b24']);const D=Object.values(S.days||{}),won=D.filter(x=>x&&x.done&&!x.lost).length,eggs=(()=>{try{return achEggs()}catch(_){return 0}})(),bo=Object.keys(S.boss||{}).length,ach=Object.keys((()=>{try{return achS()}catch(_){return{}}})()).length;
