@@ -1521,7 +1521,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .cn-fade{position:absolute;inset:0;background:#000;z-index:30;pointer-events:none;animation:cnFadeIn .65s ease-out forwards}
 @keyframes cnFadeIn{to{opacity:0}}
 .vb-cut.cine.out{animation:cnIrisOut .45s ease-in both!important}
-.vb-cover{position:absolute;inset:0;background:#000;z-index:60;opacity:0;pointer-events:none;transition:opacity .45s}
+.vb-cover{position:absolute;inset:0;background:#000;z-index:44;opacity:0;pointer-events:none;transition:opacity .45s}
 .vb-cover.on{opacity:1;transition:none}
 </style></head><body>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -1540,7 +1540,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795095420';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795095892';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
