@@ -1465,7 +1465,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795079399';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795081996';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1803,7 +1803,7 @@ function dayView(){closeGame();const d=cur,D=DAYS[d];RUN++;
  app.innerHTML=`<button class="alt sm" onclick="go('cal')">← Calendrier</button><h1>Jour ${d} · ${esc(D.t)}</h1>
  <div class="center">${D.bonus?`<span class="ribbon">${D.ev||'🎁'} +${D.bonus} ⭐ en cadeau</span> `:''}${D.x2?`<span class="ribbon">✨ Points ×2</span> `:''}${D.unlock?`<span class="ribbon">${D.bonus||!D.ev?'🔓':D.ev} ${esc(D.unlock)}</span> `:''}${d==3?'<span class="ribbon">🧪 Le laboratoire ouvre</span> ':''}${MACH.filter(M=>M.day==d).map(M=>`<span class="ribbon">${M.ic} Nouvelle machine : ${esc(M.id=='secret'?'la machine secrète':M.n)}</span> `).join('')}</div>
  <div class="panel"><p class="center">${eggRules(d,RULES[D.g](D.p))}</p>${recLine(D.g)}<div class="hud"><span id="lives"></span><span id="tmr"></span></div><div id="game"></div><div id="gmsg" class="center"></div></div>`;startBox(d)}
-function startBox(d,msg){document.body.classList.remove('playing');try{$('#lives').style.display=''}catch(_){}const hk=document.getElementById('hk');if(hk)hk.remove();const st=S.days[d]||{},max=3+(st.extra||0),f=Math.min(st.fails||0,max);$('#game').innerHTML='';$('#tmr').textContent='';
+function startBox(d,msg){document.body.classList.remove('playing');if(!$('#game')||!$('#lives'))return;try{$('#lives').style.display=''}catch(_){}const hk=document.getElementById('hk');if(hk)hk.remove();const st=S.days[d]||{},max=3+(st.extra||0),f=Math.min(st.fails||0,max);$('#game').innerHTML='';$('#tmr').textContent='';
  $('#lives').textContent=st.done&&!st.lost?'':'Essais : '+'❤️'.repeat(max-f)+'🖤'.repeat(f);
  let h=msg?`<p style="font-size:1.1rem">${msg}</p>`:'';
  if(st.done&&!st.lost)h+=`<p><span class="ribbon">✅ Réussi : ${st.score} ⭐</span></p>${bossBtn(d)}<button class="alt" onclick="launch(${d},1)">${vLoad(d,1)?'▶ Reprendre ma partie (entraînement)':'Rejouer pour le plaisir'}</button>`;
