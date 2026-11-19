@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.webkit.*;
+import android.os.Build;
 
 public class MainActivity extends Activity {
   static final String URL = "https://valentinrey-cmd.github.io/calendrier-avant-celestine/suivi/?app=1";
@@ -41,10 +42,23 @@ public class MainActivity extends Activity {
       }
     });
     w.setWebChromeClient(new WebChromeClient());
+    w.addJavascriptInterface(new Bridge(), "SuiviAndroid");
+    PollJob.channel(this);
+    PollJob.schedule(this);
+    if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != android.content.pm.PackageManager.PERMISSION_GRANTED)
+      requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 7);
     if (b != null) w.restoreState(b); else w.loadUrl(URL);
   }
   @Override protected void onSaveInstanceState(Bundle o) { super.onSaveInstanceState(o); w.saveState(o); }
   @Override public void onBackPressed() { if (w.canGoBack()) w.goBack(); else moveTaskToBack(true); }
   @Override protected void onPause() { super.onPause(); w.onPause(); CookieManager.getInstance().flush(); }
-  @Override protected void onResume() { super.onResume(); w.onResume(); w.evaluateJavascript("try{window.dispatchEvent(new Event('focus'))}catch(e){}", null); }
+  @Override protected void onResume() { super.onResume(); w.onResume(); new Thread(() -> { try { PollJob.check(MainActivity.this, true); } catch (Exception e) { } }).start(); w.evaluateJavascript("try{window.dispatchEvent(new Event('focus'))}catch(e){}", null); }
+
+  class Bridge {
+    @JavascriptInterface public void setTest(boolean on) { getSharedPreferences("suivi", 0).edit().putBoolean("test", on).apply(); }
+    @JavascriptInterface public boolean getTest() { return getSharedPreferences("suivi", 0).getBoolean("test", false); }
+    @JavascriptInterface public boolean notifOk() { return Build.VERSION.SDK_INT < 33 || checkSelfPermission("android.permission.POST_NOTIFICATIONS") == android.content.pm.PackageManager.PERMISSION_GRANTED; }
+    @JavascriptInterface public void askNotif() { if (Build.VERSION.SDK_INT >= 33) runOnUiThread(() -> requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 7)); }
+    @JavascriptInterface public void testNotif() { java.util.List<String> l = new java.util.ArrayList<>(); l.add("🔔 Les notifications marchent !"); PollJob.notify(MainActivity.this, "c", l); }
+  }
 }

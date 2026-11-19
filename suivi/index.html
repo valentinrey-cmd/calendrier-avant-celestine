@@ -69,6 +69,8 @@ button{font:inherit;color:inherit;background:#ffffff14;border:1px solid var(--li
  <div class="top"><h1>🎄 Suivi de Célestine</h1><span class="tag" id="room"></span></div>
  <div class="err" id="err"></div>
  <div class="card"><div class="live"><span class="dot" id="dot"></span><div><b id="st">Connexion…</b><small id="st2"></small></div></div><div id="game"></div><div id="fin"></div></div>
+ <div class="card"><h2>🔔 Notifications</h2><div id="nbox"></div></div>
+ <div class="card" id="bcard" hidden><h2>📊 Bilan de l'aventure</h2><div id="bbox"></div></div>
  <div class="card"><h2>🎮 Actions</h2><div class="acts"><button class="big atk" id="bAtk">😈 Lancer une attaque</button><button class="big gft" id="bGift">🎁 Envoyer un cadeau</button></div><div id="form"></div><div id="sent"></div></div>
  <div class="card"><h2>⭐ Ses compteurs</h2><div class="tiles" id="tiles"></div><div class="lvl"><span id="lvn"></span><div class="bar"><i id="lvb"></i></div><span class="muted" id="lvp"></span></div></div>
  <div class="card"><h2>📅 Le calendrier</h2><div class="grid" id="grid"></div>
@@ -118,7 +120,7 @@ function renderState(){const s=DB.state;if(!s){$('#tiles').innerHTML='<p class="
  $('#puz').innerHTML=`<div class="row"><span class="ic">🧩</span><span class="tx">${P.diff?`${DN[P.diff]||P.diff} · ${P.done?'<b>terminé</b> ✅':`${P.ok}/24 pièces en place`}`:'Difficulté pas encore choisie'}</span><span class="tm">${P.moves?P.moves+' coups':''}</span></div>
   <div class="row" style="margin-top:6px"><span class="ic">🌟</span><span class="tx">Niveau secret : ${s.secret&&s.secret.done?`terminé · score ${s.secret.score}`:'pas encore fait'}</span></div>
   ${s.sim?`<p class="muted" style="margin:8px 0 0;font-size:.8rem">⚠️ L'appli est en mode test (jour ${s.sim} simulé).</p>`:''}<p class="muted" style="margin:8px 0 0;font-size:.75rem">Dernière synchro ${ago(s.at)}</p>`}
-function renderBoss(){const s=DB.state;const el=$('#boss');if(!s){el.innerHTML='';return}const B=s.boss||{},T=s.bossTry||{};
+function renderBoss(){try{renderBilan()}catch(e){}const s=DB.state;const el=$('#boss');if(!s){el.innerHTML='';return}const B=s.boss||{},T=s.bossTry||{};
  let h=Object.keys(BOSS).map(d=>`<div class="row ${B[d]?'':'used'}"><span class="ic">${B[d]?'🏆':'⏳'}</span><span class="tx">${esc(BOSS[d])} <small class="muted">· jour ${d}</small></span><span class="tm">${B[d]?'battu · '+new Date(B[d]).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):(T[d]?T[d]+' essai'+(T[d]>1?'s':''):'pas encore')}</span></div>`).join('');
  h+=`<div class="row" style="margin-top:8px;${s.vb?'background:#f2c45a22;border:1px solid #f2c45a66':''}"><span class="ic">${s.vb?'👑':s.machine?'😈':'🔒'}</span><span class="tx"><b>Boss final : Valentin</b><br><small class="muted">${s.vb?'Battu ! Jeu terminé 🎉':s.machine?'Débloqué dans la machine secrète':'Pas encore débloqué (machine secrète du 24)'}</small></span><span class="tm">${s.vb?new Date(s.vb).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+hm(s.vb):''}</span></div>`;
  el.innerHTML=h;
@@ -163,6 +165,17 @@ function connect(){let es;try{es=new EventSource(URL0+'.json')}catch(e){return f
 function fail(m){const e=$('#err');e.textContent=m||'Connexion perdue, nouvel essai…';e.style.display='block'}
 $('#clr').onclick=async()=>{if(!confirm("Effacer tout l'historique d'activité ?"))return;try{await fetch(URL0+'/log.json',{method:'DELETE'})}catch(e){alert('Impossible pour le moment')}};
 connect();
+
+function renderNotif(){const el=$('#nbox');const A=window.SuiviAndroid;if(!A){el.innerHTML='<p class="muted" style="margin:0">Installe l\'appli de suivi Android pour recevoir une notification quand elle joue.</p>';return}
+ let ok=true,tst=false;try{ok=A.notifOk();tst=A.getTest()}catch(e){}
+ el.innerHTML=`<p style="margin:0 0 8px">${ok?'✅ Activées':'⚠️ Bloquées par le téléphone'} · tu es prévenu (dans les 15 min environ) quand elle <b>ouvre une case</b>, <b>lance ou réussit un jeu</b>, <b>bat un boss</b> ou <b>accuse quelqu'un</b>.</p>
+ <div class="acts">${ok?'<button class="big" id="nT">🔔 Tester</button>':'<button class="big" id="nA">🔓 Autoriser les notifications</button>'}</div>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.85rem"><input type="checkbox" id="nS" ${tst?'checked':''}> Aussi pour le site de test (notifications marquées [test])</label>`;
+ const t=$('#nT');if(t)t.onclick=()=>{try{A.testNotif()}catch(e){}};const a=$('#nA');if(a)a.onclick=()=>{try{A.askNotif()}catch(e){}setTimeout(renderNotif,3000)};$('#nS').onchange=e=>{try{A.setTest(e.target.checked)}catch(_){}}}
+function renderBilan(){const s=DB.state,c=$('#bcard');if(!s||!s.vb){c.hidden=true;return}c.hidden=false;const D=s.days||{},V=Object.entries(D),done=V.filter(([d,x])=>x.d&&!x.l),fails=V.reduce((a,[d,x])=>a+(x.f||0),0),first=done.filter(([d,x])=>!x.f).length,hard=V.slice().sort((a,b)=>(b[1].f||0)-(a[1].f||0))[0],bt=Object.values(s.bossTry||{}).reduce((a,b)=>a+b,0),E=s.enq||{};
+ const T=[['📅',done.length+'/24','jeux réussis'],['🎯',first,'du premier coup'],['💔',fails,'essais ratés'],['⚔️',bt,'combats de boss'],['⚖️',s.acc??'?','erreurs à l\'accusation'],['❌',E.x??'?','suspects barrés'],['🧵',E.l??'?','fils rouges'],['📝',E.n??'?','notes'],['🥚',s.eggs+'/24','œufs']];
+ $('#bbox').innerHTML=`<div class="tiles">${T.map(([i,v,l])=>`<div class="tile"><b>${i} ${esc(v)}</b><small>${l}</small></div>`).join('')}</div>${hard&&hard[1].f?`<p style="margin:8px 0 0">😤 Jour le plus dur : <b>${hard[0]} · ${esc(TITLES[hard[0]]||'')}</b> (${hard[1].f} échecs)</p>`:''}${s.rev?`<p style="margin:6px 0 0">🔦 Elle t'a démasqué le <b>${new Date(s.rev).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</b> à ${hm(s.rev)}</p>`:''}<p style="margin:6px 0 0">👑 Boss final battu le <b>${new Date(s.vb).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</b> à ${hm(s.vb)}</p>`}
+renderNotif();addEventListener('focus',renderNotif);
 </script>
 </body>
 </html>
