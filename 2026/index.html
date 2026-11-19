@@ -1579,7 +1579,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795111871';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795112114';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -4455,7 +4455,7 @@ function setView(){const ck=(k,lbl,extra)=>`<p><label><input type="checkbox" ${S
  <h2>🎄 Décorations</h2><div class="panel">${deco.map(x=>`<p><label><input type="checkbox" ${S[x.id]!==false?'checked':''} onchange="S['${x.id}']=this.checked;save();snowCount();${x.id=='voix'?'ding()':''}"> ${x.ic} ${esc(x.n)}</label></p>`).join('')||'<p class="muted" style="margin:0">Fabrique des décorations au 🧪 labo pour les activer ici.</p>'}</div>
  <h2>😜 Options spéciales</h2><div class="panel"><p><label><input type="checkbox" onchange="if(this.checked){const c=this;setTimeout(()=>{c.checked=false},600);toast('Impossible : fonctionnalité intégrée au produit 🤷')}"> 🔇 Couper les blagues nulles de Valentin</label></p><p><label><input type="checkbox" onchange="if(this.checked){const c=this;toast('Mode adulte responsable : activé…');setTimeout(()=>{c.checked=false;toast('On a essayé. Ça n’a pas tenu.')},2000)}"> 🧑‍💼 Mode adulte responsable</label></p></div>
  <h2>📲 Appli et sauvegarde</h2>${APP.web()&&!APP.standalone()?'<div class="panel"><button class="alt" onclick="installScreen(true)">📲 Installer l’appli sur cet appareil</button></div>':''}${syncHTML()}
- <h2>ℹ️ À propos</h2><div class="panel center"><p style="margin:0">🎄 Calendrier 2026 Célestine</p><p class="muted" style="margin:4px 0 0;font-size:.85rem">Fait avec ❤️ par Valentin, pour Célestine.<br>${isFinite(+APPV)?'Version du '+new Date(APPV*1000).toLocaleDateString(L=='en'?'en-GB':'fr-FR'):''}</p></div>
+ <h2>ℹ️ À propos</h2><div class="panel center"><p style="margin:0">🎄 Calendrier 2026 Célestine</p><p class="muted" style="margin:4px 0 0;font-size:.85rem">Fait avec ❤️ par Valentin, pour Célestine.<br>${isFinite(+APPV)?(()=>{const d=new Date(APPV*1000),z={timeZone:'Europe/Paris'};let a,b;try{a=d.toLocaleDateString(L=='en'?'en-GB':'fr-FR',z);b=d.toLocaleTimeString('fr-FR',{...z,hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(_){a=d.toLocaleDateString();b=d.toLocaleTimeString()}return(L=='en'?'Version from ':'Version du ')+a+(L=='en'?' at ':' à ')+b})():''}</p></div>
  <p class="center"><button onclick="go('cal')">← Calendrier</button></p>`}
 try{applyDisp()}catch(_){}
 /* ---------- 📖 L'histoire du calendrier ---------- */
