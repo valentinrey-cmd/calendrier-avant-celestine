@@ -1275,13 +1275,13 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .enq-h{margin:12px 0 6px;font-size:.88rem;font-weight:700}.enq-h small{font-weight:400;opacity:.7}
 .enq-i div{flex:1;text-align:left}.enq-i small{display:block;font-size:.7rem;opacity:.7}
 /* ================= 🎬 CINÉ ================= */
-.vb-cut.cine{background:#000!important;--cam:0;--sx:50%;--sy:50%;animation:cnIris .9s cubic-bezier(.6,0,.3,1) both}
+.vb-cut.cine{background:#000!important;--cam:0;--sx:50%;--sy:50%;animation:cnIris .6s ease-out both}
 .vb-cut.cine.out{animation:cnIrisOut .5s cubic-bezier(.6,0,.4,1) both;transition:none;opacity:1}
-@keyframes cnIris{from{clip-path:circle(0% at 50% 45%)}to{clip-path:circle(120% at 50% 45%)}}
-@keyframes cnIrisOut{from{clip-path:circle(120% at 50% 45%)}to{clip-path:circle(0% at 50% 45%)}}
+@keyframes cnIris{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes cnIrisOut{from{opacity:1}to{opacity:0;transform:scale(.98)}}
 .vb-cut.cine .vb-cdeco{display:none}
-.cn-bg{position:absolute;left:0;right:0;top:8%;bottom:23%;z-index:0;overflow:hidden;pointer-events:none}
-.cn-l{position:absolute;inset:-4% -8%;transform:translateX(calc(var(--cam) * var(--d) * 22px)) scale(calc(1 + var(--d) * .04));transition:transform 1.4s cubic-bezier(.3,.7,.3,1);animation:cnDrift 18s ease-in-out infinite alternate}
+.cn-bg{contain:layout paint;position:absolute;left:0;right:0;top:8%;bottom:23%;z-index:0;overflow:hidden;pointer-events:none}
+.cn-l{will-change:transform;position:absolute;inset:-4% -8%;transform:translateX(calc(var(--cam) * var(--d) * 22px)) scale(calc(1 + var(--d) * .04));transition:transform 1.4s cubic-bezier(.3,.7,.3,1);animation:cnDrift 18s ease-in-out infinite alternate}
 .cn-l svg{width:100%;height:100%;display:block}
 @keyframes cnDrift{from{translate:calc(var(--d) * -6px) 0}to{translate:calc(var(--d) * 6px) calc(var(--d) * -4px)}}
 .cn-pt{position:absolute;inset:0;width:100%;height:100%}
@@ -1458,7 +1458,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795077376';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795078832';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -1904,7 +1904,7 @@ function vBoss(test,sp,so){if(document.getElementById('vbo'))return;sp=Math.max(
  {let vt=0;const ve=$$('#vbSE img');ve.style.cursor='pointer';ve.addEventListener('pointerdown',e=>{if(!alive)return;e.stopPropagation();vt++;pop('e',pick(JK.vtap),'#fff');try{bkT(700+Math.random()*300,.08,'sine',.04)}catch(_){}if(vt==10)try{ACH('touchV')}catch(_){}})}
  const quit=()=>{if(!alive)return;alive=false;try{syncLive(null);slog('🚪',`Quitte le boss final (partie ${st.part}/4)`)}catch(_){}mu.stop();o.remove();document.documentElement.classList.remove('gl');try{render()}catch(_){}};
  $$('#vbX').onclick=()=>{if(confirm('Quitter le combat final ? (Tu pourras le recommencer depuis la machine secrète.)'))quit()};
- const say=t=>new Promise(res=>{if(!alive)return;M.innerHTML='';const s=String(t);let i=0,done=false;const iv=setInterval(()=>{if(!alive){clearInterval(iv);return}i++;T.textContent=s.slice(0,i);if(i>=s.length)fin()},17);
+ const say=t=>new Promise(res=>{if(!alive)return;M.innerHTML='';const s=String(t);let i=0,done=false;const iv=setInterval(()=>{if(!alive){clearInterval(iv);return}i++;T.textContent=s.slice(0,i);try{CINE.blip(/^VALENTIN/.test(s)?'v':/^CÉLESTINE/.test(s)?'c':'x',i,s[i-1],null)}catch(_){}if(i>=s.length)fin()},17);
   const fin=()=>{if(done)return;done=true;clearInterval(iv);T.innerHTML=esc(s)+'<span class="vb-nx">▼</span>';B.onclick=()=>{B.onclick=null;res()}};B.onclick=()=>fin()});
  const choose=(q,opts)=>new Promise(res=>{B.onclick=null;T.textContent=q;M.innerHTML=`<div class="vb-g">${opts.map((x,k)=>`<button data-k="${k}" ${x.dis?'disabled':''}>${x.t}${x.n!=null?` <small>×${x.n}</small>`:''}</button>`).join('')}</div>`;M.querySelectorAll('button').forEach(b=>b.onclick=e=>{e.stopPropagation();try{SFX('tap')}catch(_){}res(+b.dataset.k)})});
  const timing=()=>new Promise(res=>{B.onclick=null;T.textContent='Touche l’écran quand le curseur est dans le rose foncé 💗 !';M.innerHTML='<div class="vb-tm"><div class="vb-z"></div><div class="vb-z2"></div><i id="vbK"></i></div>';const K=$$('#vbK'),t0=performance.now();let done=false,raf;
@@ -4323,7 +4323,7 @@ const CINE=(()=>{
  /* voix « charabia » : une syllabe chantée par lettre (voyelles imitées par des formants) */
  const FOR={a:[800,1250],e:[450,1900],i:[300,2300],o:[480,850],u:[320,1650]},VW='aeiou';
  const vowelOf=ch=>{const c=ch.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();if(!/[a-z]/.test(c))return null;if(VW.includes(c))return c;if(c=='y')return'i';return VW[(c.charCodeAt(0)*7)%5]};
- const VOICE={c:[330,1.12],v:[150,.95],e:[440,1.2],b:[125,.9],shadow:[105,.85]};
+ const VOICE={c:[330,1.12],v:[150,.95],e:[440,1.2],b:[125,.9],shadow:[105,.85],x:[210,1]};
  const BOSSV={'⛄':118,'😈':150,'🦌':135,'👸':290,'🧌':85,'👻':210,'🎅':110};
  let lastV=-1;
  const blip=(w,j,ch,c)=>{if(w=='n'||!ch)return;const v=vowelOf(ch);if(!v)return;const A=ac();if(!A)return;const now=A.currentTime;if(now-lastV<.055)return;lastV=now;
@@ -4336,11 +4336,11 @@ const CINE=(()=>{
    mx.gain.value=.6;o.connect(b1);o.connect(b2);b1.connect(g);b2.connect(g);g.connect(mx).connect(A.destination);o.start(now);o.stop(now+.09);
    if(/[sfzcj]/i.test(ch))nz(A,now,.04,4500,6000,2,.05)}catch(_){}};
  /* ---------- particules ---------- */
- function parts(cv,cfg){const x=cv.getContext('2d');let P=[],run=true;const R=()=>{cv.width=cv.clientWidth*(devicePixelRatio>1?1.5:1);cv.height=cv.clientHeight*(devicePixelRatio>1?1.5:1)};R();
+ function parts(cv,cfg){const x=cv.getContext('2d');let P=[],run=true;const R=()=>{cv.width=cv.clientWidth;cv.height=cv.clientHeight};R();
   const add=(k,n)=>{for(let i=0;i<n;i++)P.push({k,x:Math.random(),y:Math.random(),z:rnd(.4,1),s:rnd(0,6.28),v:rnd(.5,1)})};
   if(cfg.snow)add('snow',cfg.snow);if(cfg.embers)add('emb',cfg.embers);if(cfg.spark)add('spk',cfg.spark);if(cfg.hearts)add('hrt',cfg.hearts);if(cfg.dust)add('dst',cfg.dust);
   const red=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  (function lp(){if(!run||!cv.isConnected)return;const w=cv.width,h=cv.height,sc=w/400;x.clearRect(0,0,w,h);const t=performance.now()/1000;
+  (function lp(){if(!run||!cv.isConnected)return;if(!cv.offsetParent){setTimeout(()=>requestAnimationFrame(lp),400);return}const w=cv.width,h=cv.height,sc=w/400;x.clearRect(0,0,w,h);const t=performance.now()/1000;
    for(const p of P){const z=p.z;if(p.k=='snow'){p.y+=.0012*z*p.v;p.x+=Math.sin(t*.8+p.s)*.0006;if(p.y>1.02){p.y=-.02;p.x=Math.random()}x.globalAlpha=.5+z*.5;x.fillStyle='#fff';x.beginPath();x.arc(p.x*w,p.y*h,(1+z*2.6)*sc,0,7);x.fill()}
     else if(p.k=='emb'){p.y-=.0016*p.v;p.x+=Math.sin(t*2+p.s)*.0008;if(p.y<-.02){p.y=1.02;p.x=rnd(.05,.45)}x.globalAlpha=Math.max(0,Math.min(1,p.y))*.9;x.fillStyle=p.s>3?'#ffb03a':'#ff6a1a';x.beginPath();x.arc(p.x*w,p.y*h,(1+z*2)*sc,0,7);x.fill()}
     else if(p.k=='spk'){const a=(Math.sin(t*3+p.s*5)+1)/2;x.globalAlpha=a;x.fillStyle=['#ff3df2','#3dd5ff','#ffe03d','#fff'][Math.floor(p.s)%4];const r=(1+z*3)*sc;x.fillRect(p.x*w-r/2,p.y*h*.75-r/2,r,r)}
@@ -4392,7 +4392,8 @@ function openAnim(d,cb){const done=()=>{if(!o.isConnected)return;clearTimeout(T)
  T=setTimeout(done,2300)}
 function cnArena(o){try{const ar=o.querySelector('.vb-ar');if(!ar)return;const w=document.createElement('div');w.className='cn-arena';ar.insertBefore(w,ar.firstChild);
  const M={1:'salon',2:'disco',3:'room',4:'snow',5:'choco'},up=()=>{const sc=M[o.dataset.part||'1']||'salon';if(w.dataset.cn!=sc)CINE.build(w,sc)};up();
- new MutationObserver(up).observe(o,{attributes:true,attributeFilter:['data-part']})}catch(_){}}
+ new MutationObserver(up).observe(o,{attributes:true,attributeFilter:['data-part']});
+ const hide=()=>{w.style.display=o.querySelector(':scope > .vb-cut')?'none':''};hide();new MutationObserver(hide).observe(o,{childList:true})}catch(_){}}
 
 const SHADE=CINE.SHADOW;
 function story(id,cb,tst){const D=STORY[id];if(!D){cb&&cb();return}S.story=S.story||{};if(!tst&&!S.story[id]){S.story[id]=Date.now();save();try{slog('📖','Histoire : '+D.t)}catch(_){}}
