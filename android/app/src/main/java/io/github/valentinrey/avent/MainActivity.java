@@ -38,6 +38,8 @@ public class MainActivity extends Activity {
     s.setAllowFileAccess(true);
     s.setCacheMode(WebSettings.LOAD_DEFAULT);
     s.setTextZoom(100);
+    s.setUseWideViewPort(true);
+    s.setLoadWithOverviewMode(true);
     s.setUserAgentString(s.getUserAgentString() + " AventApp/1");
     w.setOverScrollMode(View.OVER_SCROLL_NEVER);
     w.setWebViewClient(new WebViewClient() {
