@@ -1810,7 +1810,7 @@ html.sm-lock #dimz,html.sm-lock #warmz{z-index:9997!important}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795161922';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795167008';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -5331,7 +5331,7 @@ function funWanted(){funLog('Regarde l’avis de recherche du chat');const o=fun
 {const CV=calView;calView=function(){const r=CV.apply(this,arguments);try{
  const a=document.getElementById('app');if(a&&!a.querySelector('.fw-mini')){const m=document.createElement('button');m.className='fw-mini';m.type='button';m.innerHTML='<b>WANTED</b><span>🐈</span><small>Récompense : 3 croquettes</small>';m.onclick=funWanted;a.appendChild(m)}
  setTimeout(()=>{try{funSleep()}catch(_){}},400)}catch(_){}return r}}
-setInterval(()=>{try{if(window.__funCalDone||!funIdle())return;window.__funCalDone=1;setTimeout(()=>{try{if(!funIdle()){window.__funCalDone=0;return}if((S.story||{}).pro&&!S.detCard)return funCard();if(!funD('upd')&&Math.random()<.14)funUpd()}catch(_){}},2500)}catch(_){}},3000);
+let funCardW=0;setInterval(()=>{try{if(!funIdle()){funCardW=0;return}if((S.story||{}).pro&&!S.detCard){if(++funCardW>=2){funCardW=0;funCard()}return}funCardW=0;if(window.__funCalDone)return;window.__funCalDone=1;setTimeout(()=>{try{if(!funIdle()){window.__funCalDone=0;return}if(!funD('upd')&&Math.random()<.14)funUpd()}catch(_){}},2500)}catch(_){}},2000);
 setInterval(()=>{try{if(funIdle()&&!document.hidden&&Math.random()<.07)funCat()}catch(_){}},20000);
 
 if(!instPend()){try{smOpen()}catch(e){console.error(e)}}
