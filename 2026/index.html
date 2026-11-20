@@ -1810,7 +1810,7 @@ html.sm-lock #dimz,html.sm-lock #warmz{z-index:9997!important}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795161083';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795161922';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -4956,7 +4956,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
  /* flocons et chocolats qui tombent */
  {const F=Q('.sm-fall');for(let i=0;i<34;i++){const e=document.createElement('i');e.textContent=i%7==0?'🍫':i%5==0?'⭐':'❄';e.style.left=(Math.random()*100)+'%';e.style.fontSize=(10+Math.random()*16)+'px';e.style.animationDuration=(6+Math.random()*8)+'s';e.style.animationDelay=(-Math.random()*12)+'s';e.style.opacity=.4+Math.random()*.6;F.appendChild(e)}}
  try{MUS.play('jingle',.035)}catch(_){}
- let cgu=!!S.cguOk;try{cgu=cgu||!!localStorage.getItem('avent_cgu')}catch(_){}let diff=null;
+ let cgu=!!S.cguOk,cguNext=null;try{cgu=cgu||!!localStorage.getItem('avent_cgusig')}catch(_){}try{cgu=cgu||!!localStorage.getItem('avent_cgu')}catch(_){}let diff=null;
  /* écran titre */
  Q('.sm-title').addEventListener('click',()=>{snd('swish');bip(880);scr('menu');log('écran titre passé')});
  /* panneaux */
@@ -5011,7 +5011,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
    <p class="sm-small">En acceptant, tu reconnais avoir lu ces conditions (personne ne les lit, on sait).</p></div>
    <label class="sm-ck"><input type="checkbox" class="sm-ckb" ${SIG?'checked disabled':''}> J’ai tout lu (c’est faux, mais on te croit)</label>
    <div class="sm-sigw"><p class="sm-sigl">✍️ Signature :</p>${SIG?`<img class="sm-sigi" src="${SIG}" alt=""><p class="sm-small">Lu et approuvé le ${sigD()}</p>`:'<canvas class="sm-sig" width="600" height="220"></canvas><button class="sm-tg sm-sigc">Effacer</button>'}</div>`,
-   SIG?[['✅ Déjà signé',()=>scr('menu')]]:[['✅ J’accepte',b=>{if(!Q('.sm-ckb').checked){toastM('☝️ Coche d’abord la case. On sait que tu n’as pas lu.');return}if(!sigInk){toastM('✍️ Il faut signer en bas du document.');Q('.sm-sig').scrollIntoView({behavior:'smooth',block:'center'});return}try{const u=Q('.sm-sig').toDataURL('image/png');localStorage.setItem('avent_cgusig',u);localStorage.setItem('avent_cgudate',String(Date.now()))}catch(_){}cgu=true;S.cguOk=Date.now();save();try{localStorage.setItem('avent_cgu','1')}catch(_){}log('CGU acceptées');snd('ding');toastM('📜 Merci ! Tu viens de signer pour 24 jours d’enquête.');scr('menu')}],['🙅 Je refuse',b=>{toastM('🙅 Refus refusé. 😇')},'alt sm-run']]);
+   SIG?[['✅ Déjà signé',()=>{cgu=true;try{localStorage.setItem('avent_cgu','1')}catch(_){}const nx=cguNext;cguNext=null;nx?nx():scr('menu')}]]:[['✅ J’accepte',b=>{if(!Q('.sm-ckb').checked){toastM('☝️ Coche d’abord la case. On sait que tu n’as pas lu.');return}if(!sigInk){toastM('✍️ Il faut signer en bas du document.');Q('.sm-sig').scrollIntoView({behavior:'smooth',block:'center'});return}try{const u=Q('.sm-sig').toDataURL('image/png');localStorage.setItem('avent_cgusig',u);localStorage.setItem('avent_cgudate',String(Date.now()))}catch(_){}cgu=true;S.cguOk=Date.now();save();try{localStorage.setItem('avent_cgu','1')}catch(_){}log('CGU acceptées');snd('ding');toastM('📜 Merci ! Tu viens de signer pour 24 jours d’enquête.');{const nx=cguNext;cguNext=null;nx?setTimeout(nx,600):scr('menu')}}],['🙅 Je refuse',b=>{toastM('🙅 Refus refusé. 😇')},'alt sm-run']]);
    if(!SIG){const cv=Q('.sm-sig'),x=cv.getContext('2d');x.lineWidth=5;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#1d2a6b';let dn=0,lp=null;const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};cv.style.touchAction='none';
     cv.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();dn=1;lp=pt(e);try{cv.setPointerCapture(e.pointerId)}catch(_){}});cv.addEventListener('pointermove',e=>{if(!dn)return;e.preventDefault();const q=pt(e);x.beginPath();x.moveTo(lp[0],lp[1]);x.lineTo(q[0],q[1]);x.stroke();lp=q;sigInk++});const up=()=>{dn=0};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
     Q('.sm-sigc').onclick=e=>{e.stopPropagation();x.clearRect(0,0,cv.width,cv.height);sigInk=0}}
@@ -5029,13 +5029,12 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
   new(){if(anySave){bip(500);panel('▶️ Nouvelle partie',`<p class="sm-c">Choisis un emplacement libre :</p>${[1,2,3].map(n=>sUsed(n)?`<div class="sm-slot empty"><span class="ic">🍫</span><span><b>Emplacement ${n}</b><small>Occupé${n==SVSL?' · en cours':''}</small></span></div>`:`<button class="sm-slot" data-new="${n}"><span class="ic">✨</span><span><b>Emplacement ${n}</b><small>Vide · commencer une nouvelle partie ici</small></span></button>`).join('')}${[1,2,3].every(sUsed)?'<p class="sm-small center">Les 3 emplacements sont pris. Efface une sauvegarde dans 💾 Continuer pour faire de la place.</p>':''}`,[['← Retour',()=>scr('menu'),'alt']]);
     Q('.sm-pc').querySelectorAll('[data-new]').forEach(b=>b.onclick=e=>{e.stopPropagation();const n=+b.dataset.new;snd('ding');log('nouvelle partie (emplacement '+n+')');if(n==SVSL)A.new0();else swap(n,'new0')});return}
    A.new0()},
-  new0(){if(!window.__mysOk)return mysGate(()=>A.new0());if(!cgu){bip(220);toastM('📜 Tu dois d’abord accepter les conditions générales.');setTimeout(()=>A.cgu(),700);return}
+  new0(){if(!window.__mysOk)return mysGate(()=>A.new0());if(!cgu){bip(220);toastM('📜 Tu dois d’abord accepter les conditions générales.');cguNext=()=>A.new0();setTimeout(()=>A.cgu(),700);return}
    panel('🎯 Choisis la difficulté',`<div class="sm-dif">${[['🍼','Facile','Pour les débutantes'],['🎄','Normal','Comme prévu'],['🔥','Experte','Pour les vraies détectives'],['💀','Célestine','Le mode ultime']].map(([i,t,d])=>`<button data-d="${t}"><span>${i}</span><b>${t}</b><small>${d}</small></button>`).join('')}</div>`,[['← Retour',()=>scr('menu'),'alt']]);
    Q('.sm-pc').querySelectorAll('[data-d]').forEach(b=>b.onclick=e=>{e.stopPropagation();diff=b.dataset.d;snd('ding');log('difficulté choisie : '+diff);
     panel('🎯 '+diff,`<p class="sm-c big">Bon choix ! 👌</p><p class="sm-c">${diff=='Normal'?'L’enquête t’attend. 🕵️‍♀️':'Tu es sûre ? 😏'}</p>`,[['↩️ Non, je change',()=>{log('change de difficulté');A.new0()},'alt'],['✅ Oui, c’est parti !',()=>loadGo()]])})}};
- o.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();bip(600);A[b.dataset.go]()}));
- if(at=='new'){scr('menu');A.new0();setTimeout(()=>toastM('Peut-être essayer le mode Normal ? 😅'),500)}
- else if(at=='new0'){scr('menu');A.new0()}else if(at=='load'){scr('load');setTimeout(()=>loadGo(1),0)}else if(at=='menu'){scr('menu')}
+ o.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();bip(600);cguNext=null;A[b.dataset.go]()}));
+ if(at){if(at=='load')scr('load');else scr('menu');setTimeout(()=>{if(at=='new'){A.new0();setTimeout(()=>toastM('Peut-être essayer le mode Normal ? 😅'),500)}else if(at=='new0')A.new0();else if(at=='load')loadGo(1)},0)}
  /* faux chargement */
  const TIPS=['Astuce : le chocolat ne se mange pas tout seul.','Astuce : un alibi, ça se vérifie.','Astuce : tout le monde ment un peu. Même le chat.','Astuce : note tout ce que tu trouves sur ton tableau.','Astuce : les lutins ne savent pas garder un secret.','Astuce : ne fais confiance à personne… sauf à Pépin.'];
  const mysGate=go=>{if(window.__mysOk||window.__mysSkip)return go();MDB.all().then(o=>{const n=Object.keys(o||{}).filter(k=>o[k]&&o[k].blob).length;if(n){window.__mysOk=1;return go()}
