@@ -1810,7 +1810,7 @@ html.sm-lock #dimz,html.sm-lock #warmz{z-index:9997!important}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795183709';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795184225';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2207,7 +2207,7 @@ const BOSSCOST=10;
 const BRULES={
  4:["👆 Glisse le doigt pour déplacer Célestine en bas de l'écran.","❤️ Tes cœurs partent tout seuls vers le haut : vise le bonhomme de neige pour lui enlever des PV (sa barre est en haut).","❄️ Esquive toutes ses attaques. Tu as <b>6 vies</b>.","😡 Quand il perd la moitié de ses PV, il accélère… puis il s'énerve !","⏱️ Tu as 2 min 40. 💡 L'indice donne une vie en plus.","🌨️ Il a plein d’attaques : boules de neige, éventail, glaçons, mini-bonshommes, puis carotte et blizzard, et une boule géante quand il s’énerve. La ligne rouge ⚠️ annonce la carotte."],
  8:["🐍 C'est le Snake du jour : glisse le doigt pour tourner (ou flèches du clavier).","🎁 Mange les cadeaux pour grandir… avant que le Grinch ne te les vole !","⭐ Attrape une étoile : pendant 6 s tu as le super-pouvoir 🌈, le Grinch a peur 😱 et s'enfuit.","💥 Fonce sur lui avec le super-pouvoir pour lui enlever 1 PV (<b>3 PV</b> en tout). Sans super-pouvoir, s'il te touche tu perds une vie.","⚫ Évite les bords, ta queue et son charbon. Tu as <b>3 vies</b>. 💡 L'indice donne le super-pouvoir."],
- 11:["🎹 C’est un Piano Tiles sur « Carol of the Bells » 🔔 : l’orchestre joue en fond, et <b>c’est toi qui joues la mélodie</b>.","👆 Chaque tuile est une note : touche-la quand elle arrive sur la <b>ligne dorée</b>, de bas en haut. Pile au bon moment = <b>PARFAIT ✨</b>.","✨ Tuiles dorées <b>×2</b> : deux notes en même temps, touche les deux. 🩷 Tuiles longues : <b>garde le doigt appuyé</b> jusqu’à ce qu’elles soient remplies.","⚡ À chaque tour du morceau, le tempo accélère.","💔 Case blanche, note ratée ou tuile longue lâchée trop tôt = 1 💜 en moins (tu en as <b>3</b>). 15 notes d’affilée te rendent 1 💜. Rodolphe a <b>110 PV</b>. 💡 L’indice te rend 1 💜."],
+ 11:["🎹 C’est un Piano Tiles sur « Jingle Bells » version disco-funk 🪩 : le groupe joue en fond, et <b>c’est toi qui joues la mélodie</b>.","👆 Chaque tuile est une note : touche-la quand elle arrive sur la <b>ligne dorée</b>, de bas en haut. Pile au bon moment = <b>PARFAIT ✨</b>.","✨ Tuiles dorées <b>×2</b> : deux notes en même temps, touche les deux. 🩷 Tuiles longues : <b>garde le doigt appuyé</b> jusqu’à ce qu’elles soient remplies.","⚡ À chaque tour du morceau, le tempo accélère.","💔 Case blanche, note ratée ou tuile longue lâchée trop tôt = 1 💜 en moins (tu en as <b>3</b>). 15 notes d’affilée te rendent 1 💜. Rodolphe a <b>110 PV</b>. 💡 L’indice te rend 1 💜."],
  15:["👆 Glisse le doigt pour bouger la luge, touche pour lancer la boule.","🧊 Casse le mur de glace et touche la Reine avec la boule (<b>14 PV</b>).","🎁 Parfois un bonus tombe (cercle doré) : ↔️ grande luge, ✨ multi-boules, 🔥 boule de feu, ❤️ vie.","⚠️ Évite les malus (cercle rouge) : 🤏 mini-luge, 🙃 commandes inversées. Et ses stalactites 🧊 gèlent ta luge !","❤️ Si toutes les boules tombent, tu perds une vie (<b>3 vies</b>). 💡 L'indice donne une vie."],
  19:["🏃 Célestine court toute seule : touche l'écran pour sauter, deux fois pour un double saut.","🎄⛄ Saute par-dessus les obstacles et évite les cailloux 🪨 qui volent.","🍬 Tu te rapproches du troll tout le temps. Les bonbons te font aller plus vite, mais tu peux le rattraper même sans.","❤️ Tu as <b>3 vies</b> : chaque obstacle touché t'en coûte une. À la 3ᵉ, le troll s'échappe ! Rattrape-le (barre pleine) en moins de 2 min 15.","💡 L'indice te rapproche d'un coup."],
  22:["🏠 Le fantôme apparaît aux fenêtres de la maison en pain d'épice.","👆 Touche-le vite avant qu'il disparaisse : <b>15 PV</b> à lui enlever en 45 secondes.","🚫 Ne touche jamais les habitants (🎅 🤶 🧝 🦌 ⛄ 🐈) : tu perds une vie (<b>3 vies</b>).","🌫️ De temps en temps il crée du brouillard, et il accélère quand il faiblit.","💡 L'indice dissipe le brouillard et donne une vie."]};
@@ -2215,7 +2215,7 @@ const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Le Bonhomme de neige géant',ic:'☃️',g:'bossfight',p:{hp:60,time:160,lives:6,sp:.62,atk:1.7,ic:'☃️',n:'Bonhomme de neige géant'}},
  8:{n:'Le Grinch voleur',ic:'😈',g:'snake',p:{n:13,goal:999,speed:175,grinch:{hp:3,lives:3,gtick:.42,pow:6}}},
- 11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'bpiano',quiet:1,p:{hp:110,lives:3,time:130,bpm0:132,bpmMax:160,bpmUp:12}},
+ 11:{n:'Rodolphe, le renne DJ',ic:'🦌',g:'bpiano',quiet:1,p:{hp:110,lives:3,time:130,bpm0:120,bpmMax:140,bpmUp:10}},
  15:{n:'La Reine des glaces',ic:'👸',g:'bbreak',p:{hp:14,time:170,lives:3,pw:86,v:310,vmax:420}},
  19:{n:'Le Troll des neiges',ic:'🧌',g:'brun',p:{gap0:105,gapMax:165,close:1.25,hitGap:8,candy:7,v:240,time:135,lives:3}},
  22:{n:'Le Fantôme de Noël',ic:'👻',g:'bwhack',p:{hp:15,lives:3,time:45}}};return C[d]||null}
@@ -5241,25 +5241,25 @@ function importCode(){try{const v=$('#ic').value.trim().replace(/^AVENT-/,''),o=
 
 /* ---------- Mode test caché (toucher 7 fois la photo) ---------- */
 {let bt=0,bl=0;document.addEventListener('pointerdown',e=>{if(view!='cal')return;const t=e.target;if(t.closest('button,a,input,.day,.panel,header,nav,#pop,.toast,#gwin'))return;const n=Date.now();bt=n-bl<1500?bt+1:1;bl=n;},true)}
-/* 🎹 Rodolphe le DJ : Piano Tiles sur « Carol of the Bells » (mélodie = tuiles, accompagnement en fond) */
+/* 🎹 Rodolphe le DJ : Piano Tiles disco-funk sur « Jingle Bells » (mélodie = tuiles, groupe en fond) */
 try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
  const {W,x,P}=bcv(el,"Chaque tuile est une <b>note de la mélodie</b> : touche-les quand elles passent la ligne lumineuse. Dorées = <b>deux à la fois</b>, longues = <b>garde le doigt appuyé</b> !");
  const LW=360,LH=540,COLS=4,CW=LW/COLS,TH=112,TOP=84,HIT=LH-74;
  let AC=null;try{if(S.sound!==false)AC=window.__voxAC||(window.__voxAC=new (window.AudioContext||window.webkitAudioContext)());if(AC&&AC.state=='suspended')AC.resume()}catch(_){AC=null}
  /* ---------- partition ---------- */
- const MOT=(a,b,c,d)=>[[a,1],[b,.5],[c,.5],[d,1]];
- const SEC=[
-  {k:'A',bars:[MOT(70,69,70,67),MOT(70,69,70,67),MOT(70,69,70,67),MOT(70,69,70,67)]},
-  {k:'B',bars:[MOT(74,72,74,70),MOT(74,72,74,70),MOT(74,72,74,70),MOT(74,72,74,70)]},
-  {k:'C',bars:[[[79,.5],[79,.5],[79,.5],[77,.5],[75,.5],[74,.5]],[[72,.5],[72,.5],[72,.5],[70,.5],[69,.5],[67,.5]],[[79,.5],[79,.5],[79,.5],[77,.5],[75,.5],[74,.5]],[[72,.5],[72,.5],[72,.5],[70,.5],[69,.5],[67,.5]]]},
-  {k:'A',bars:[MOT(70,69,70,67),MOT(70,69,70,67),MOT(70,69,70,67),MOT(70,69,70,67)]},
-  {k:'D',bars:[MOT(74,70,72,74),MOT(74,70,72,74),[[67,3,'h']],[[62,1],[66,1],[67,1]]]}];
- const LOOPB=SEC.reduce((a,s)=>a+s.bars.length,0)*3;
- const secAt=bar=>{let b=bar%(LOOPB/3);for(const s of SEC){if(b<s.bars.length)return s.k;b-=s.bars.length}return'A'};
- const chart=loop=>{const out=[];let t=loop*LOOPB,prevL=-1;
-  SEC.forEach(s=>{const ps=[...new Set(s.bars.flat().map(n=>n[0]))].sort((a,b)=>a-b);s.bars.forEach((bar,bi)=>{bar.forEach((n,ni)=>{const[m,d,h]=n;const r=ps.indexOf(m);let l=ps.length<=1?1:Math.min(3,Math.floor(r*4/ps.length));l=(l+(bi%2)+loop)%4;if(l==prevL&&out.length&&out[out.length-1].m!=m)l=(l+1)%4;
-   const dbl=ni==0&&(s.k=='B'||s.k=='C'||(s.k=='A'&&loop>0)||s.k=='D')&&bi%2==0&&d<3;const hold=h=='h'||d>=2;
-   const nt={t,m,d,l,type:hold?'h':dbl?'d':'n'};if(dbl){nt.l2=(l+2)%4;nt.m2=m-(s.k=='C'?5:3)}out.push(nt);prevL=l;t+=d})})});return out};
+ // « Jingle Bells » (refrain), en do majeur, en temps ; d ≥ 3 = tuile longue
+ const nE=64,nF=65,nG=67,nC=60,nD=62,nA=69,nC6=72;
+ const BARS=[[[nE,1],[nE,1],[nE,2]],[[nE,1],[nE,1],[nE,2]],[[nE,1],[nG,1],[nC,1.5],[nD,.5]],[[nE,4]],[[nF,1],[nF,1],[nF,1.5],[nF,.5]],[[nF,1],[nE,1],[nE,1],[nE,.5],[nE,.5]],[[nE,1],[nD,1],[nD,1],[nE,1]],[[nD,2],[nG,2]],
+  [[nE,1],[nE,1],[nE,2]],[[nE,1],[nE,1],[nE,2]],[[nE,1],[nG,1],[nC,1.5],[nD,.5]],[[nE,4]],[[nF,1],[nF,1],[nF,1.5],[nF,.5]],[[nF,1],[nE,1],[nE,1],[nE,.5],[nE,.5]],[[nG,1],[nG,1],[nF,1],[nD,1]],[[nC,4]]];
+ // pont groovy (riff syncopé) entre deux refrains
+ const RIFF=[[[nC6,.5],[nA,.5],[nG,.5],[nE,.5],[nG,1],[nE,1]],[[nF,.5],[nA,.5],[nC6,.5],[nA,.5],[nG,2]],[[nE,.5],[nG,.5],[nA,.5],[nG,.5],[nE,1],[nD,1]],[[nD,.75],[nE,.75],[nG,.5],[nA,2]]];
+ const SEC=[{k:'A',bars:BARS},{k:'R',bars:RIFF}];
+ const LOOPB=SEC.reduce((a,s)=>a+s.bars.length,0)*4;
+ const secAt=bar=>{let b=bar%(LOOPB/4);for(const s of SEC){if(b<s.bars.length)return s.k;b-=s.bars.length}return'A'};
+ const chart=loop=>{const out=[];let t=loop*LOOPB,prevL=-1,prevM=0;
+  SEC.forEach(s=>{s.bars.forEach((bar,bi)=>{bar.forEach((n,ni)=>{const[m,d]=n;let l=m>prevM?(prevL+1)%4:m<prevM?(prevL+3)%4:prevL;if(prevL<0)l=1;if(m==prevM&&d<=1&&Math.random()<.5)l=(prevL+2)%4;
+   const hold=d>=3,dbl=!hold&&ni==0&&bi%2==0&&(loop>0||s.k=='R'||bi>=8);
+   const nt={t,m,d,l,type:hold?'h':dbl?'d':'n'};if(dbl){nt.l2=(l+2)%4;nt.m2=m-(m>=nG?3:4)}out.push(nt);prevL=l;prevM=m;t+=d})})});return out};
  /* ---------- son ---------- */
  let MX=null,RV=null,NB=null;
  const bus=()=>{if(MX)return MX;const c=AC.createDynamicsCompressor();c.threshold.value=-16;c.ratio.value=3;const g=AC.createGain();g.gain.value=.6;
@@ -5275,17 +5275,26 @@ try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
  const kick=(t,v)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(40,t+.14);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.connect(g).connect(bus());o.start(t);o.stop(t+.4)};
  const nz=(t,d,f,q,vol,type)=>{const s=AC.createBufferSource(),fl=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noiseB();fl.type=type||'bandpass';fl.frequency.value=f;fl.Q.value=q;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl).connect(g).connect(bus());s.start(t,Math.random()*.5);s.stop(t+d+.02)};
  const timp=(t,m,v)=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(hz(m)*1.05,t);o.frequency.exponentialRampToValueAtTime(hz(m),t+.08);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.9);o.connect(g).connect(bus());o.start(t);o.stop(t+1)};
- const PROG=[{b:43,c:[55,58,62]},{b:41,c:[53,58,62]},{b:39,c:[51,55,58]},{b:38,c:[50,54,57]}];
- const accStep=(s,t,spb)=>{const bar=Math.floor(s/6),i=s%6,loop=Math.floor(bar/(LOOPB/3)),sec=secAt(bar),P2=PROG[bar%4],big=loop>0||sec=='C'||sec=='D';
-  if(i==0){bass(t,P2.b,spb*2.8,.26);pad(t,P2.c,spb*3,sec=='A'&&!loop?.022:.03);kick(t,big?.8:.55);if(sec!='A'||loop)bell(t,P2.c[2]+24,.06);if(big&&bar%2==0)timp(t,P2.b+12,.25)}
-  if(i==2||i==4){kick(t,.0001);nz(t,.06,5000,1,big?.12:.07,'highpass');if(big)bass(t,P2.b+12,spb*.9,.12)}
-  if(i%2==1&&(sec!='A'||loop))nz(t,.03,9000,.8,.06,'highpass');
-  if(sec=='C'&&i==3)nz(t,.15,1500,.9,.25);
-  if(sec=='D'&&bar%4==3&&i==0){timp(t,P2.b+12,.4);bell(t,79,.08)}};
+ const CHD={C:{b:36,c:[60,64,67]},F:{b:41,c:[60,65,69]},G:{b:43,c:[59,62,67]},D:{b:38,c:[57,62,66]},Am:{b:45,c:[60,64,69]}};
+ const PROGA=['C','C','C','C','F','C','D','G','C','C','C','C','F','C','G','C'],PROGR=['Am','F','C','G'];
+ const lead=(t,m,dur,vol)=>{const f=hz(m),g=AC.createGain(),lp=AC.createBiquadFilter();lp.type='lowpass';lp.Q.value=4;lp.frequency.setValueAtTime(5000,t);lp.frequency.exponentialRampToValueAtTime(1200,t+dur*.8);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);g.connect(lp).connect(bus());
+  [['square',0,.5],['sawtooth',7,.5],['sawtooth',-7,.5]].forEach(([ty,dt,a])=>{const o=AC.createOscillator(),og=AC.createGain();o.type=ty;o.frequency.value=f;o.detune.value=dt;og.gain.value=a;o.connect(og).connect(g);o.start(t);o.stop(t+dur+.05)})};
+ const stab=(t,ms,dur,vol)=>ms.forEach(m=>{const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.value=hz(m);lp.type='lowpass';lp.frequency.setValueAtTime(3200,t);lp.frequency.exponentialRampToValueAtTime(500,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.004);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(lp).connect(g).connect(bus());o.start(t);o.stop(t+dur+.05)});
+ const fbass=(t,m,dur,vol)=>{const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.value=hz(m);lp.type='lowpass';lp.Q.value=8;lp.frequency.setValueAtTime(1400,t);lp.frequency.exponentialRampToValueAtTime(220,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(lp).connect(g).connect(bus());o.start(t);o.stop(t+dur+.05);const s=AC.createOscillator(),sg=AC.createGain();s.type='sine';s.frequency.value=hz(m);sg.gain.setValueAtTime(vol*.8,t);sg.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(sg).connect(bus());s.start(t);s.stop(t+dur+.05)};
+ const BASSP=[0,null,12,null,0,null,7,12,0,null,12,null,10,null,7,null];
+ const accStep=(s,t,spb)=>{const bar=Math.floor(s/16),i=s%16,loop=Math.floor(bar/(LOOPB/4)),bl=bar%(LOOPB/4),sec=secAt(bar),ch=CHD[sec=='R'?PROGR[(bl-16)%4]:PROGA[bl%16]],s16=spb/4,lv=loop+(bl>=8&&sec=='A'?1:0);
+  if(i%4==0)kick(t,.9);
+  if(i==4||i==12){nz(t,.16,1600,.7,.55);nz(t,.1,3200,1,.35)}
+  if(i%2==0)nz(t,.03,9500,.7,.09,'highpass');if(i%4==2)nz(t,.14,8000,.6,.16,'highpass');if(lv>=1&&i%2==1)nz(t,.02,11000,.7,.05,'highpass');
+  const bp=BASSP[i];if(bp!=null)fbass(t,ch.b+bp,s16*1.6,.3);
+  if([2,6,10,14].includes(i)||(lv>=1&&[3,11].includes(i)))stab(t,ch.c,s16*1.2,.045);
+  if(i==0&&bl%4==0){nz(t,1.2,6000,.4,.18,'highpass');stab(t,ch.c.map(m=>m+12),spb*.9,.04)}
+  if(bl%4==3&&i>=12){nz(t,.08,2000,.8,.18+.05*(i-12))}
+  if(sec=='R'&&i%4==3)stab(t,[ch.c[2]+12],s16*1.4,.05)};
  /* ---------- horloge ---------- */
  const bpmL=l=>Math.min(p.bpmMax,p.bpm0+l*p.bpmUp);let bt=null,nextT=0,step=0,Q=[];
  const startMusic=()=>{if(!AC)return;nextT=AC.currentTime+.06;step=0;Q=[{t:nextT,b:0,bpm:bpmL(0)}];
-  const tick=()=>{if(id!=RUN||st=='dead'||st=='won'){clearInterval(bt);return}while(nextT<AC.currentTime+.15){const b=step/2,l=Math.floor(b/LOOPB),bpm=bpmL(l),spb=60/bpm;accStep(step,nextT,spb);Q.push({t:nextT,b,bpm});nextT+=spb/2;step++}};tick();bt=setInterval(tick,25)};
+  const tick=()=>{if(id!=RUN||st=='dead'||st=='won'){clearInterval(bt);return}while(nextT<AC.currentTime+.15){const b=step/4,l=Math.floor(b/LOOPB),bpm=bpmL(l),spb=60/bpm;accStep(step,nextT,spb);Q.push({t:nextT,b,bpm});nextT+=spb/4;step++}};tick();bt=setInterval(tick,25)};
  let beat=0,clk0=0;const beatNow=()=>{if(!AC)return(performance.now()/1000-clk0)*p.bpm0/60;const t=AC.currentTime;while(Q.length>1&&Q[1].t<=t)Q.shift();const q=Q[0];return q?q.b+Math.max(0,t-q.t)*q.bpm/60:beat};
  /* ---------- tuiles ---------- */
  let st='ready',rows=[],loopN=0,hp=p.hp,lives=p.lives,fx=[],bHit=0,combo=0,judge=null;
@@ -5299,7 +5308,7 @@ try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
  const hit=(n,r)=>{hp-=n;combo++;bHit=performance.now();if(combo%15==0&&lives<p.lives)lives++;
   if(r){const off=Math.abs(beat-r.c);judge=off<.15?{t:'PARFAIT ✨',c:'#ffd34d'}:off<.35?{t:'BIEN 👍',c:'#7be08a'}:{t:'OK',c:'#b07cff'};judge.at=performance.now()}
   if(hp<=0&&st=='play'){hp=0;st='won';try{SFX('ok')}catch(_){}setTimeout(()=>{if(id==RUN)win()},1200)}};
- const playNote=(m,len)=>{if(!AC)return;try{piano(AC.currentTime,m,Math.max(.6,len||.9),.32)}catch(_){}};
+ const playNote=(m,len)=>{if(!AC)return;try{lead(AC.currentTime,m+12,Math.max(.25,len||.4),.16);piano(AC.currentTime,m+12,Math.max(.4,len||.6),.12)}catch(_){}};
  const bad=()=>{if(!AC)return;try{const t=AC.currentTime;[0,1].forEach(i=>piano(t,47+i,0.4,.12))}catch(_){}};
  const holds={};
  const begin=()=>{st='play';clk0=performance.now()/1000;startMusic();timer(p.time,()=>{if(st=='play'){st='dead';fail('le morceau est fini avant le renne ⏱️')}},id)};
@@ -5312,7 +5321,7 @@ try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
   if(st=='ready'){begin();}
   const m=r.t=='d'&&r.L[1]==lane?r.m2:r.m;
   if(r.t=='h'){r.ok[lane]=1;r.hold={pid:e.pointerId,b0:beat,prog:0};holds[e.pointerId]=r;playNote(m,r.len*60/bpmL(0)+.4);try{W.setPointerCapture(e.pointerId)}catch(_){}return}
-  r.ok[lane]=1;playNote(m,r.len>=1?1.1:.7);spark(lane*CW+CW/2,Math.min(HIT,Math.max(TOP+20,py)),r.t=='d'?'#ffd34d':'#b07cff');hit(1,r);
+  r.ok[lane]=1;playNote(m,r.len>=1?.45:.28);spark(lane*CW+CW/2,Math.min(HIT,Math.max(TOP+20,py)),r.t=='d'?'#ffd34d':'#b07cff');hit(1,r);
   if(r.L.every(l=>r.ok[l]))r.done=1};
  const rel=e=>{const r=holds[e.pointerId];if(!r)return;delete holds[e.pointerId];if(r.done||r.miss)return;const pr=r.hold?r.hold.prog:0;r.hold=null;
   if(pr>=.5){r.done=1;hit(2,null);spark(r.L[0]*CW+CW/2,HIT-20,'#ff7ab6')}else{r.miss=1;bad();lose('tuile longue lâchée trop tôt 🎹')}};
@@ -5342,11 +5351,11 @@ try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
   if(judge&&now-judge.at<450){const k=(now-judge.at)/450;x.save();x.globalAlpha=1-k;x.fillStyle=judge.c;x.font='900 '+(24-k*6)+'px system-ui';x.textAlign='center';x.shadowColor='#000';x.shadowBlur=8;x.fillText(judge.t,LW/2,HIT-36-k*28);x.restore()}
   const hg=x.createLinearGradient(0,0,0,TOP);hg.addColorStop(0,'#2a1b5e');hg.addColorStop(1,'#140b2e');x.fillStyle=hg;x.fillRect(0,0,LW,TOP);x.fillStyle='#ffd34d44';x.fillRect(0,TOP-2,LW,2);
   const sh=now-bHit<140?Math.sin(now/12)*4:0;x.font='42px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText('🦌',38+sh,44-4*bf);x.font='22px system-ui';x.fillText('🎧',38+sh,22-4*bf);
-  x.font='26px system-ui';x.fillText('🔔',322,40+Math.sin(now/200)*3);
+  x.font='26px system-ui';x.fillText('🪩',322,40+Math.sin(now/200)*3);
   x.fillStyle='#000a';rr(80,20,196,14,7);x.fill();const bg=x.createLinearGradient(82,0,278,0);bg.addColorStop(0,'#ff4f7b');bg.addColorStop(1,'#ffd34d');x.fillStyle=now-bHit<120?'#fff':bg;rr(82,22,Math.max(0,192*hp/p.hp),10,5);x.fill();
   x.fillStyle='#ffd0dc';x.font='800 12px system-ui';x.fillText('Rodolphe, le renne DJ',178,48);x.font='14px system-ui';x.fillText('💜'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),178,68);x.textBaseline='alphabetic';
   if(combo>=5){x.save();x.fillStyle='#ffd34d';x.font='900 '+(20+Math.min(10,combo/5))+'px system-ui';x.textAlign='center';x.shadowColor='#ff4f7b';x.shadowBlur=12;x.fillText(combo+' combo !',LW/2,TOP+32);x.restore()}
-  if(st=='ready'){x.fillStyle='#000c';rr(LW/2-150,TOP+50,300,76,14);x.fill();x.fillStyle='#fff';x.font='800 15px system-ui';x.textAlign='center';x.fillText('🎶 « Carol of the Bells »',LW/2,TOP+80);x.font='600 13px system-ui';x.fillText('👆 Touche START pour commencer',LW/2,TOP+104)}
+  if(st=='ready'){x.fillStyle='#000c';rr(LW/2-150,TOP+50,300,76,14);x.fill();x.fillStyle='#fff';x.font='800 15px system-ui';x.textAlign='center';x.fillText('🎶 « Jingle Bells » version disco-funk',LW/2,TOP+80);x.font='600 13px system-ui';x.fillText('👆 Touche START pour commencer',LW/2,TOP+104)}
   if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,LW,LH)}};
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.033,(now-(loop.t||now))/1000);loop.t=now;fx.forEach(f=>{f.t+=dt;if(!f.bad){f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=300*dt}});fx=fx.filter(f=>f.bad?f.t<.4:f.t<.6);
   if(st=='play'){beat=LEAD+beatNow();
@@ -5356,6 +5365,8 @@ try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
    if(rows.length&&rows[rows.length-1].c<beat+14)addLoop();rows=rows.filter(r=>top(r)<LH+40||(r.hold&&!r.done))}
   draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>{const r=act();return{r:r?{t:r.t,L:r.L,ok:r.ok,y:top(r),h:r.len*TH,hold:!!r.hold,c:r.c}:null,beat,hp,lives,st,bpm:bpmL(Math.floor((beat-LEAD)/LOOPB))}},hint:()=>{if(id!=RUN||st!='play')return false;if(lives>=p.lives)return'Tu as déjà tout ton groove 💜';lives++;return true}}}}catch(e){console.error(e)}
+
+
 
 
 
