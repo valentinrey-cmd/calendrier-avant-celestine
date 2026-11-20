@@ -25,10 +25,10 @@ public class MainActivity extends Activity {
     super.onCreate(b);
     Window win = getWindow();
     win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    win.setStatusBarColor(Color.parseColor("#ff9cc6"));
-    win.setNavigationBarColor(Color.parseColor("#ff9cc6"));
+    win.setStatusBarColor(Color.parseColor("#0c1035"));
+    win.setNavigationBarColor(Color.parseColor("#0c1035"));
     w = new WebView(this);
-    w.setBackgroundColor(Color.parseColor("#ff9cc6"));
+    w.setBackgroundColor(Color.parseColor("#0c1035"));
     setContentView(w);
     WebSettings s = w.getSettings();
     s.setJavaScriptEnabled(true);
