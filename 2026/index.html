@@ -1810,7 +1810,7 @@ html.sm-lock #dimz,html.sm-lock #warmz{z-index:9997!important}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795167008';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795167787';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -4970,7 +4970,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
    Q('.sm-pc').querySelectorAll('[data-slot]').forEach(b=>b.onclick=e=>{e.stopPropagation();const n=+b.dataset.slot;snd('ding');mysGate(()=>{log('continue la partie (emplacement '+n+')');if(n==SVSL)loadGo(1);else swap(n,'load')})});
    Q('.sm-pc').querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();const n=+b.dataset.del;bip(300);
     panel('🗑️ Effacer l’emplacement '+n,`<p class="sm-c big">Tout effacer ? 😱</p><p class="sm-c">Toute la progression de cet emplacement sera supprimée. Impossible de revenir en arrière.</p>`,[['Non, garder',()=>A.load(),'alt'],['Oui, tout effacer',()=>{log('sauvegarde effacée (emplacement '+n+')');try{localStorage.removeItem(slotKey(n))}catch(_){}
-     if(n==SVSL){window.__noSave=1;try{sessionStorage.setItem('smGo',[1,2,3].some(k=>k!=n&&sUsed(k))?'load':'menu')}catch(_){}location.reload();return}
+     if(n==SVSL){window.__noSave=1;try{sessionStorage.setItem('smGo','slots');sessionStorage.setItem('smToast','🗑️ Emplacement '+n+' effacé.')}catch(_){}location.reload();return}
      toastM('🗑️ Emplacement '+n+' effacé.');if([1,2,3].some(sUsed))A.load();else{o.classList.remove('has');scr('menu')}}]])})},
   quit(){panel('❌ Quitter',`<p class="sm-c">Tu veux vraiment quitter ? 🥺</p>`,[['Oui',()=>panel('❌ Quitter',`<p class="sm-c">Vraiment vraiment ? Il y a du chocolat en jeu. 🍫</p>`,[['Oui, sûre',()=>{log('a essayé de quitter');panel('🔒 Quitter',`<p class="sm-c">Désolé, la porte du Pôle Nord est fermée à clé.</p><p class="sm-c">Il va falloir finir l’enquête. 🕵️‍♀️</p>`,[['D’accord… 😤',()=>scr('menu')]])},'alt'],['Non, je reste',()=>scr('menu')]])],['Non',()=>scr('menu'),'alt']])},
   opt(){const L=S.lang||'fr',on=k=>S[k]!==false,lum=S.lum==null?100:S.lum,deco=SHOP.filter(x=>x.k=='own'&&(S.own||[]).includes(x.id));
@@ -5034,7 +5034,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
    Q('.sm-pc').querySelectorAll('[data-d]').forEach(b=>b.onclick=e=>{e.stopPropagation();diff=b.dataset.d;snd('ding');log('difficulté choisie : '+diff);
     panel('🎯 '+diff,`<p class="sm-c big">Bon choix ! 👌</p><p class="sm-c">${diff=='Normal'?'L’enquête t’attend. 🕵️‍♀️':'Tu es sûre ? 😏'}</p>`,[['↩️ Non, je change',()=>{log('change de difficulté');A.new0()},'alt'],['✅ Oui, c’est parti !',()=>loadGo()]])})}};
  o.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();bip(600);cguNext=null;A[b.dataset.go]()}));
- if(at){if(at=='load')scr('load');else scr('menu');setTimeout(()=>{if(at=='new'){A.new0();setTimeout(()=>toastM('Peut-être essayer le mode Normal ? 😅'),500)}else if(at=='new0')A.new0();else if(at=='load')loadGo(1)},0)}
+ if(at){if(at=='load')scr('load');else scr('menu');setTimeout(()=>{if(at=='new'){A.new0();setTimeout(()=>toastM('Peut-être essayer le mode Normal ? 😅'),500)}else if(at=='new0')A.new0();else if(at=='load')loadGo(1);else if(at=='slots'){if(anySave)A.load();else{o.classList.remove('has');scr('menu')}}try{const t=sessionStorage.getItem('smToast');if(t){sessionStorage.removeItem('smToast');setTimeout(()=>toastM(t),300)}}catch(_){}},0)}
  /* faux chargement */
  const TIPS=['Astuce : le chocolat ne se mange pas tout seul.','Astuce : un alibi, ça se vérifie.','Astuce : tout le monde ment un peu. Même le chat.','Astuce : note tout ce que tu trouves sur ton tableau.','Astuce : les lutins ne savent pas garder un secret.','Astuce : ne fais confiance à personne… sauf à Pépin.'];
  const mysGate=go=>{if(window.__mysOk||window.__mysSkip)return go();MDB.all().then(o=>{const n=Object.keys(o||{}).filter(k=>o[k]&&o[k].blob).length;if(n){window.__mysOk=1;return go()}
