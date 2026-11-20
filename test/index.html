@@ -24,11 +24,11 @@ window.I18N=(()=>{let on=false,BR=false;try{const lg=JSON.parse(localStorage.get
  return{on:()=>on&&!BR,br:()=>BR,tr}})();
 </script>
 
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Calendrier 2026 Célestine"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#12382b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" type="image/png" href="icon-192.png"><meta name="apple-mobile-web-app-title" content="Opération Chocolat"><meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="color-scheme" content="dark only">
 <meta name="darkreader-lock">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Caveat:wght@600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-<meta name="robots" content="noindex"><title>Calendrier 2026 Célestine</title>
+<meta name="robots" content="noindex"><title>Opération Chocolat</title>
 <style>
 :root{--g:#12382b;--g2:#1c5240;--r:#7a1f33;--o:#d9b45f;--c:#fbf5e6;--t:#2b1d16;--ok:#2f8f5b;--ko:#b3263e}
 :root[data-bg=rose]{--g:#8a2a5c;--g2:#e06a9e;--r:#b8235a}
@@ -1688,7 +1688,7 @@ html.sm-lock #dimz,html.sm-lock #warmz{z-index:9997!important}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795127402';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795156054';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
