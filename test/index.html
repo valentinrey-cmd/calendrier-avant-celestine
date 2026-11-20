@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr"><head><script>(function(){const R=document.documentElement;const f=()=>{const W=innerWidth,H=innerHeight,k=Math.min(W/440,H/860),tab=Math.min(W,H)>=600&&k>1.06;R.style.setProperty('--W',W+'px');R.style.setProperty('--H',H+'px');R.style.setProperty('--tk',tab?k.toFixed(3):'1');R.classList.toggle('tab',tab)};f();addEventListener('resize',f);addEventListener('orientationchange',()=>setTimeout(f,300))})();</script><meta charset="utf-8"><script>
+<html lang="fr"><head><script>(function(){const R=document.documentElement;const f=()=>{const W=innerWidth,H=innerHeight,k=Math.min(W/440,H/860),tab=Math.min(W,H)>=600&&k>1.06;R.style.setProperty('--W',W+'px');R.style.setProperty('--H',H+'px');R.style.setProperty('--tk',tab?k.toFixed(3):'1');R.classList.toggle('tab',tab);R.classList.toggle('tabp',tab&&H>W);try{window.calFit&&calFit()}catch(_){}};f();addEventListener('resize',f);addEventListener('orientationchange',()=>setTimeout(f,300))})();</script><meta charset="utf-8"><script>
 /* ---------- Langue (FR / EN) ---------- */
 window.I18N=(()=>{let on=false,BR=false;try{const lg=JSON.parse(localStorage.getItem('avent_test')||'{}').lang;on=lg==='en'||lg==='br';BR=lg==='br'}catch(_){}
  const BM='⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵',brl=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[a-z]/gi,c=>BM[c.toLowerCase().charCodeAt(0)-97]).replace(/[0-9]/g,d=>BM[(+d+9)%10]);
@@ -1804,6 +1804,15 @@ html.tab #storyo,html.tab #vbo,html.tab #smo,html.tab #pre,html.tab .fun-ov,html
 .dth{margin:0;font-size:.9rem;text-align:left}.dtm{font-size:.82rem;margin:.4em 0 0}
 html.tab #gwin .gwbox{width:100%;max-width:none}
 html.tab .fbw canvas{width:min(100%,calc((var(--H) / var(--tk) - 190px)*.667))}
+
+html.tabp main{max-width:none}
+html.tabp main .cal{grid-template-columns:repeat(4,1fr);gap:12px}
+html.tabp main .cal .day{aspect-ratio:auto;height:var(--calh,auto);font-size:2.4rem;border-radius:18px;border-width:3px}
+html.tabp main .cal .day.done{font-size:1.5rem;padding:8px 10px}
+html.tabp main .cal .day .ev{width:34px;height:34px;font-size:1.3rem;top:-9px;right:-9px}
+html.tabp main .cal .day .ck{font-size:1.4rem;bottom:6px;right:9px}
+html.tabp main .cal .bsb{width:36px;height:36px;font-size:1.25rem;bottom:-10px;left:-10px}
+html.tabp{font-size:118%}
 </style></head><body><div id="pre" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(#0c1035,#2a1b5e 55%,#4a2a6e);color:#fff;overflow:hidden;font-family:system-ui,-apple-system,sans-serif"><div class="sm-scr sm-title on" style="transition:none"><div class="sm-logo"><span class="sm-choc">🍫</span><h1><span>OPÉRATION</span><b>CHOCOLAT</b></h1><p class="sm-sub">Une enquête de Noël</p></div><p class="sm-press">Touche l’écran pour commencer</p><p class="sm-foot">© 2026 Pôle Nord Studios · v24.12</p></div></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -1821,7 +1830,7 @@ html.tab .fbw canvas{width:min(100%,calc((var(--H) / var(--tk) - 190px)*.667))}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795200205';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795200514';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2137,7 +2146,9 @@ function closePop(){$('#pop').innerHTML=''}
 const pcs=p=>`background-image:url(${IMG});background-size:400% 600%;background-position:${p%4/3*100}% ${Math.floor(p/4)/5*100}%`;
 function finHTML(){if(!S.vbDone)return'';const d=new Date(S.vbDone),ds=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'}),nb=Object.keys(S.boss||{}).filter(k=>S.boss[k]).length;
  return`<div class="panel finb"><div class="fbig">🏆</div><b>Jeu terminé !</b><p>${window.I18N&&I18N.on()?`On ${esc(ds)}, Célestine defeated Valentin… with love 💘`:`Le ${esc(ds)}, Célestine a vaincu Valentin… par amour 💘`}</p><p class="muted" style="font-size:.85rem">👹 ${nb}/6 boss battus · ✅ ${Object.values(S.days).filter(x=>x.done&&!x.lost).length} jeux réussis · 🏅 ${Object.keys(S.ach||{}).length} succès</p><div class="row"><button class="sm" onclick="vCredits()">🎬 Revoir le générique</button></div></div>`}
-function calView(){if(new Date().getHours()<5&&!window.__nightMsg){window.__nightMsg=1;setTimeout(()=>toast('Il est tard… Valentin dort déjà, lui (il ronfle) 😴'),700)}const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
+function calFit(){const R=document.documentElement,c=document.querySelector('main .cal');if(!c)return;if(!R.classList.contains('tabp')){c.style.removeProperty('--calh');return}
+ requestAnimationFrame(()=>{const k=+getComputedStyle(R).getPropertyValue('--tk')||1,top=(c.getBoundingClientRect().top+scrollY),nv=document.getElementById('tabs'),nh=nv&&getComputedStyle(nv).position=='fixed'?nv.offsetHeight:70,av=innerHeight-top-nh-14,gap=parseFloat(getComputedStyle(c).rowGap)||8,rows=Math.ceil(24/4),h=Math.max(c.children[0]?c.children[0].offsetWidth*.5:80,(av-gap*(rows-1))/rows);c.style.setProperty('--calh',h.toFixed(1)+'px')})}
+function calView(){setTimeout(calFit,0);if(new Date().getHours()<5&&!window.__nightMsg){window.__nightMsg=1;setTimeout(()=>toast('Il est tard… Valentin dort déjà, lui (il ronfle) 😴'),700)}const u=unl(),n=S.opened.length,dn=Object.values(S.days).filter(x=>x.done&&!x.lost).length;
  app.innerHTML=`<h1 class="calh">Calendrier de l'Avent<button class="infob" onclick="calHelp()" aria-label="Les règles">i</button></h1>${S.vbDone?'<div class="fintw"><span class="fintg">🏆 TERMINÉ</span></div>':''}
  <div class="panel"><div class="row" style="justify-content:space-between;margin:0"><span>📅 ${n}/24 cases</span><span>✅ ${dn} jeux réussis</span><span>🔥 ${flames()} flamme${flames()>1?'s':''}</span></div><div class="bar"><i style="width:${n/24*100}%"></i></div>
  ${u==0?`<p class="center muted" style="margin:4px 0">Les cases s'ouvrent à partir du 1er décembre, à minuit. Patience… 🎅</p>`:''}</div>${finHTML()}${(S.story||{}).pro?`<p class="center" style="margin:4px 0 10px"><button class="alt sm" onclick="enqOpen()">🕵️ Carnet d’enquête · ${CLUES.filter(c=>(S.story||{})[c[0]]).length}/${CLUES.length} indices</button></p>`:''}
