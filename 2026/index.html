@@ -1840,6 +1840,25 @@ html.tab.tabp{font-size:118%}
 .rec{display:flex;flex-direction:column;gap:6px}.rec-h,.rec-r{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:6px;align-items:center}
 .rec-h b{font-size:.78rem;text-align:center;opacity:.8}.rec-r span{display:flex;align-items:center;gap:6px;min-width:0}.rec-r span img,.rec-r span .sus-e{width:34px;height:34px;flex:none}.rec-r small{font-weight:700;font-size:.8rem;overflow:hidden;text-overflow:ellipsis}
 .rec-r select{width:100%;min-width:0;padding:7px 4px;border-radius:10px;font-size:.8rem;border:2px solid #c9a86a;background:#fffaf0;color:#3a2a14}
+
+#ytm .ytx{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-top:6px}
+#ytm .ytx .ytc{font-size:1rem;padding:6px}
+#ytm .ytzz{font-size:.62rem;opacity:.85}
+#ytm .ytvl{display:flex;align-items:center;gap:4px;flex:1;max-width:130px;font-size:.85rem}
+#ytm .ytvo{flex:1;min-width:0;accent-color:#ff7ab6}
+#ytm .ytrp.on,#ytm .ytsh.on{color:#ff9cc6;text-shadow:0 0 8px #ff7ab6}
+#ytm .ytrp:not(.on),#ytm .ytsh:not(.on){opacity:.55}
+#ytm .ytq{margin-top:8px;max-height:34vh;overflow:auto;text-align:left;background:#0005;border-radius:12px;padding:6px}
+#ytm .ytq>b{display:block;font-size:.78rem;margin:2px 4px 4px;opacity:.85}
+#ytm .ytqi{display:grid;grid-template-columns:22px 1fr;grid-template-rows:auto auto;column-gap:6px;width:100%;text-align:left;background:none;border:0;box-shadow:none;color:#fff;padding:5px 4px;margin:0;min-height:0;border-radius:8px}
+#ytm .ytqi span{grid-row:1/3;align-self:center;opacity:.6;font-size:.75rem;text-align:center}#ytm .ytqi b{font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#ytm .ytqi small{font-size:.68rem;opacity:.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ytm .ytqi:active{background:#ffffff1a}
+.pl .plhd{display:flex;gap:8px;margin-bottom:8px}.pl .plhd button{flex:1;margin:0}
+.pl .plres{width:100%;margin:0 0 8px;font-size:.85rem}
+.pl .pltb{display:flex;gap:6px;overflow-x:auto;margin-bottom:8px}.pl .pltb button{flex:none;margin:0;padding:6px 12px;min-height:0;font-size:.8rem;border-radius:999px;background:#ffffff14;box-shadow:none;border:1px solid #ffffff33;color:inherit}.pl .pltb button.on{background:#ff7ab6;color:#fff;border-color:#ff7ab6}
+.pl .plq{width:100%;box-sizing:border-box;margin:0 0 8px;padding:9px 12px;border-radius:12px;border:1px solid #ffffff33;background:#0003;color:inherit;font-size:.9rem}
+.pl .plf{flex:none;min-height:0;min-width:0;padding:6px;margin:0;background:none;border:0;box-shadow:none;font-size:1rem}
+.pl .plt{cursor:pointer;text-align:left}
 </style></head><body><div id="pre" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(#0c1035,#2a1b5e 55%,#4a2a6e);color:#fff;overflow:hidden;font-family:system-ui,-apple-system,sans-serif"><div class="sm-scr sm-title on" style="transition:none"><div class="sm-logo"><span class="sm-choc">🍫</span><h1><span>OPÉRATION</span><b>CHOCOLAT</b></h1><p class="sm-sub">Une enquête de Noël</p></div><p class="sm-press">Touche l’écran pour commencer</p><p class="sm-foot">© 2026 Pôle Nord Studios · v24.12</p></div></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div id="banner"></div>
@@ -1857,7 +1876,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795218238';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795250463';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -4673,7 +4692,18 @@ function songName(f){let n=String(f||'').replace(/^.*[\\/]/,'').replace(/\.[a-z0
  n=n.replace(/[\(\[][^\)\]]*(official|audio|video|lyric|clip|visuali[sz]er|hq|hd|remaster|explicit|paroles|music)[^\)\]]*[\)\]]/ig,'').replace(/^\s*\d{1,3}\s*[-.)_ ]\s*/,'').replace(/\s{2,}/g,' ').trim();
  const m=n.match(/^(.+?)\s+[-–—]\s+(.+)$/);return m?{t:m[2].trim(),a:m[1].trim()}:{t:n,a:''}}
 function songOf(d,def){def=def||{t:'Musique',a:''};try{const f=YTM.name(d);if(f){const r=songName(f);if(r.t)return r}}catch(_){}return def}
-function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[],u=unl(),n=L.filter(x=>!x.jour||x.jour<=u).length;return`<h2>🎵 Notre playlist <small class="muted" style="font-size:.8rem">${n}/${L.length}</small></h2><div class="panel pl">${n?'':'<p class="muted center" style="margin:0">Les chansons arrivent avec les cases du calendrier 🎁</p>'}${L.map((x,i)=>{if(x.jour&&x.jour>u)return'';const sg=songOf(x.jour,{t:x.titre,a:x.artiste||''});return`<div class="plr"><span class="pln">${i+1}</span><div class="plt"><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`}).join('')}</div>`}
+function plHTML(){if(!S.own.includes('playlist'))return'';const L=CONTENU.playlist||[],u=unl(),n=L.filter(x=>!x.jour||x.jour<=u).length;return`<h2>🎵 Notre musique <small class="muted" style="font-size:.8rem">${n}/${L.length}</small></h2><div class="panel pl" id="plbox">${plInner()}</div>`}
+function plInner(){const L=CONTENU.playlist||[],u=unl(),tab=window.__plTab||'all',q=(window.__plQ||'').toLowerCase().trim(),P=S.mplays||{},F=S.mfav||{};
+ let I=[...L.keys()].filter(i=>!L[i].jour||L[i].jour<=u);const nAll=I.length,nFav=I.filter(i=>F[L[i].jour]).length;
+ const sg=i=>songOf(L[i].jour,{t:L[i].titre,a:L[i].artiste||''});
+ if(tab=='fav')I=I.filter(i=>F[L[i].jour]);if(tab=='top')I=I.filter(i=>P[L[i].jour]).sort((a,b)=>(P[L[b].jour]||0)-(P[L[a].jour]||0));
+ if(q)I=I.filter(i=>{const g=sg(i);return(g.t+' '+(g.a||'')+' '+(L[i].mot||'')).toLowerCase().includes(q)});
+ const last=S.mlast&&!YTM.on()?L.find(x=>String(x.jour)==String(S.mlast.j)):null;
+ return`${nAll?`<div class="plhd"><button onclick="YTM.playCtx(window.__plTab=='fav'?'fav':'all')">🔀 Aléatoire</button><button class="alt" onclick="S.shuf=false;save();YTM.playCtx(window.__plTab=='fav'?'fav':'all')">▶ Tout lire</button></div>${last?`<button class="plres" onclick="YTM.resume()">⏯ Reprendre <b>${esc(songOf(last.jour,{t:last.titre}).t)}</b> à ${Math.floor((S.mlast.p||0)/60)}:${String(Math.floor((S.mlast.p||0)%60)).padStart(2,'0')}</button>`:''}
+ <div class="pltb">${[['all','Tout',nAll],['fav','❤️ Favoris',nFav],['top','🔥 Les plus écoutées','']].map(([k,l,c])=>`<button class="${tab==k?'on':''}" onclick="window.__plTab='${k}';plRefresh()">${l}${c!==''?` <small>${c}</small>`:''}</button>`).join('')}</div>
+ <input class="plq" type="search" placeholder="🔎 Rechercher un titre, un artiste…" value="${esc(window.__plQ||'')}" oninput="window.__plQ=this.value;plRefresh(1)">`:'<p class="muted center" style="margin:0">Les chansons arrivent avec les cases du calendrier 🎁</p>'}
+ <div class="pll">${I.length?I.map(i=>{const x=L[i],g=sg(i),f=!!F[x.jour],pl=P[x.jour]||0;return`<div class="plr"><span class="pln">${tab=='top'?'🔥':i+1}</span><div class="plt" onclick="plTap(${i})"><b>${esc(g.t)}</b><small>${esc(g.a)}${pl?` · ${pl} écoute${pl>1?'s':''}`:''}</small>${x.mot?`<em>${esc(x.mot)}</em>`:''}</div><button class="plf" onclick="YTM.favTog(${JSON.stringify(String(x.jour))});plRefresh();YTM.refreshUI()" aria-label="Favori">${f?'❤️':'🤍'}</button><button class="plf" onclick="YTM.qAdd(${i})" aria-label="Lire ensuite">➕</button><button class="plp" onclick="plTap(${i})" aria-label="Écouter">${YTM.li==i?'⏸':'▶'}</button></div>`}).join(''):nAll?`<p class="muted center" style="margin:8px 0">${tab=='fav'?'Touche 🤍 sur une chanson pour l’ajouter à tes favoris.':tab=='top'?'Écoute des chansons : les préférées apparaîtront ici.':'Aucun résultat.'}</p>`:''}</div>`}
+function plRefresh(keepFocus){const b=document.getElementById('plbox');if(!b)return;if(keepFocus){const l=b.querySelector('.pll');if(l){const t=document.createElement('div');t.innerHTML=plInner();l.replaceWith(t.querySelector('.pll'));return}}b.innerHTML=plInner()}
 
 function calHelp(){const C=a=>`<div class="chips">${a.map(([l,v])=>`<span><small>${l}</small><b>${v}</b></span>`).join('')}</div>`;
  const R=(ic,t,txt,ch)=>`<div class="rl"><div class="rlh"><span class="rli">${ic}</span><b>${t}</b></div><p>${txt}</p>${ch?C(ch):''}</div>`;
@@ -6013,36 +6043,74 @@ const YTM=(()=>{const au=new Audio();au.preload='auto';let URLS={},BL={},COV={},
  const fmt2=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
  function ui(sg,ctrl,k){const big=!!(box&&box.classList.contains('big'));if(box)box.remove();key=String(k||'');box=document.createElement('div');box.id='ytm';if(big)box.classList.add('big');
   box.innerHTML=`<div class="ytbig"><div class="ytcov"><span>🎵</span></div><div class="ytt"><b>${esc(sg.t)}</b><small>${esc(sg.a||'')}</small></div><input type="range" class="ytsk" min="0" max="1000" value="0" aria-label="Avancer dans la musique"><div class="yttm"><span class="ytcu">0:00</span><span class="ytdu">0:00</span></div>
-   <div class="ytbtn">${ctrl?`<button class="ytc ytsh ${S.shuf?'on':''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>`:''}<button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button>${ctrl?'<span class="ytc ytsp"></span>':''}</div></div>
+   <div class="ytbtn">${ctrl?`<button class="ytc ytsh ${S.shuf!==false?'on':''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>`:''}<button class="ytc" data-a="${ctrl?'-1':'-10'}">${ctrl?'⏮':'↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl?'1':'10'}">${ctrl?'⏭':'10↻'}</button>${ctrl?`<button class="ytc ytrp ${mrep()?'on':''}" data-a="r" aria-label="Répéter">${mrep()==2?'🔂':'🔁'}</button>`:''}</div>${ctrl?`<div class="ytx"><button class="ytc ytfv" data-a="f" aria-label="Favori">${isFav(k)?'❤️':'🤍'}</button><button class="ytc ytzb" data-a="z" aria-label="Minuteur de sommeil">🌙<small class="ytzz">${slpTxt()}</small></button><button class="ytc" data-a="q" aria-label="File d’attente">📃</button><button class="ytc" data-a="l" aria-label="Bibliothèque">📚</button><label class="ytvl">🔊<input type="range" class="ytvo" min="0" max="100" value="${Math.round((S.mvol==null?85:S.mvol))}" aria-label="Volume"></label></div><div class="ytq" hidden></div>`:''}</div>
    <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a||'')}</button>${ctrl?'<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>':''}<button class="ytc" data-a="x">✕</button></div>`;document.body.appendChild(box);
   const tg=()=>box.classList.toggle('big');box.querySelector('.ytl').onclick=tg;box.querySelector('.ytcov').onclick=tg;box.querySelector('.ytt').onclick=tg;
-  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='s'){S.shuf=!S.shuf;save();if(S.shuf)mkOrd();b.classList.toggle('on',S.shuf);toast(S.shuf?'🔀 Ordre aléatoire':'➡️ Dans l\'ordre')}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
+  box.querySelectorAll('.ytc').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a;if(a=='x'){const m=mode;stop();if(m=='list')try{bgm()}catch(_){}}else if(a=='p'){if(au.paused)au.play().catch(()=>{});else au.pause()}else if(a=='s'){S.shuf=S.shuf===false;save();ORD=[];b.classList.toggle('on',S.shuf!==false);toast(S.shuf!==false?'🔀 Lecture aléatoire : jamais deux fois la même avant d’avoir tout écouté':'➡️ Lecture dans l\'ordre');qPaint()}
+   else if(a=='r'){S.mrep=(mrep()+1)%3;save();b.classList.toggle('on',!!S.mrep);b.textContent=S.mrep==2?'🔂':'🔁';toast(['➡️ Pas de répétition','🔁 Répéter toute la playlist','🔂 Répéter ce titre'][S.mrep])}
+   else if(a=='f'){favTog(key);b.textContent=isFav(key)?'❤️':'🤍';try{plRefresh()}catch(_){}}
+   else if(a=='z'){slpNext();const z=box.querySelector('.ytzz');if(z)z.textContent=slpTxt()}
+   else if(a=='q'){const q=box.querySelector('.ytq');q.hidden=!q.hidden;qPaint()}
+   else if(a=='l'){box.classList.remove('big');popup(plHTML())}else if(a=='10'||a=='-10'){try{au.currentTime=Math.max(0,Math.min((au.duration||0)-.5,au.currentTime+(+a)))}catch(_){}}else next(+a)});
   const sk=box.querySelector('.ytsk');let drag=false;sk.oninput=()=>{drag=true;const d=au.duration||0;box.querySelector('.ytcu').textContent=fmt2(sk.value/1000*d)};sk.onchange=()=>{const d=au.duration||0;if(d)au.currentTime=sk.value/1000*d;drag=false};sk._drag=()=>drag;
   const pb=box.querySelector('[data-a="p"]');if(pb&&au.paused===false)pb.textContent='⏸';
+  const vo=box.querySelector('.ytvo');if(vo)vo.oninput=e=>{e.stopPropagation();S.mvol=+vo.value;BV=S.mvol/100;setV()};if(vo)vo.onchange=()=>save();
   const setCov=u=>{const c=box&&box.querySelector('.ytcov');if(c&&u){c.style.backgroundImage=`url(${u})`;c.classList.add('img')}};
   if(COV[key]!==undefined)setCov(COV[key]);else if(BL[key])id3Cover(BL[key]).then(u=>{COV[key]=u;setCov(u)})}
- au.ontimeupdate=()=>{if(!box)return;const sk=box.querySelector('.ytsk');if(!sk||(sk._drag&&sk._drag()))return;const d=au.duration||0;sk.value=d?au.currentTime/d*1000:0;box.querySelector('.ytcu').textContent=fmt2(au.currentTime);box.querySelector('.ytdu').textContent=fmt2(d)};
- au.onplay=()=>{if(box){box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='⏸');box.classList.remove('tap')}};
- au.onpause=()=>{if(box)box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='▶')};
- au.onended=()=>{if(mode=='list')next(1)};
+ au.ontimeupdate=()=>{if(mode=='list'){if(Date.now()-lastSync>15000)msync();if(slp&&slp!=='end'&&Date.now()>=slp){slp=0;au.pause();toast('🌙 Bonne nuit !')}if(box&&slp){const z=box.querySelector('.ytzz');if(z)z.textContent=slpTxt()}}if(!box)return;const sk=box.querySelector('.ytsk');if(!sk||(sk._drag&&sk._drag()))return;const d=au.duration||0;sk.value=d?au.currentTime/d*1000:0;box.querySelector('.ytcu').textContent=fmt2(au.currentTime);box.querySelector('.ytdu').textContent=fmt2(d)};
+ au.onplay=()=>{if(box){box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='⏸');box.classList.remove('tap')}msync()};au.onseeked=()=>msync();
+ au.onpause=()=>{if(box)box.querySelectorAll('[data-a="p"]').forEach(b=>b.textContent='▶');msync();try{if(mode=='list'){S.mlast={j:(L_()[li]||{}).jour,p:au.currentTime||0};save()}}catch(_){}};
+ au.onended=()=>{if(mode=='list')next(1,1)};
  let G=null,BV=1,DK=1;function route(){if(G)return;try{const C=window.__eggAC||(window.__eggAC=new (window.AudioContext||window.webkitAudioContext)());if(C.state==='suspended')C.resume();const src=C.createMediaElementSource(au);G=C.createGain();src.connect(G);G.connect(C.destination)}catch(_){G=null}}
  function setV(){const v=Math.max(0,Math.min(1,BV*DK));if(G){au.volume=1;try{G.gain.value=v}catch(_){}}else au.volume=v}
  function go(url,vol,loop){try{MUS.stop();MUS._bg=0}catch(_){}try{if(ALBM.on)ALBM.stop(.3)}catch(_){}au.src=url;au.loop=!!loop;BV=vol;route();setV();au.currentTime=0;const p=au.play();if(p&&p.catch)p.catch(()=>{if(box)box.classList.add('tap')})}
- function stop(){if(!document.getElementById('storyo'))DK=1;try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
+ function stop(){if(mode=='list'){try{S.mlast={j:(L_()[li]||{}).jour,p:au.currentTime||0};save()}catch(_){}mstop()}if(!document.getElementById('storyo'))DK=1;try{au.pause();au.removeAttribute('src');au.load()}catch(_){}if(box){box.remove();box=null}const was=mode;mode='';if(was=='list'){try{plMark()}catch(_){}}}
  const has=d=>!!URLS[String(d)];
  function start(d){if(mode=='game'&&key===String(d)&&box)return true;if(mode=='game')stop();if(S.music===false||!S.own.includes('playlist')||!has(d))return false;if(mode=='list')stop();mode='game';try{MUS.stop()}catch(_){}
   const sg=songOf(d,SONGS[d]||{t:'Musique',a:''});ui(sg,0,d);go(URLS[String(d)],DAYS[d]&&DAYS[d].g=='simon'?.25:.85,1);return true}
  function stopGame(){if(mode=='game')stop()}
- function list(i,keep){if(!keep)ORD=[];const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}mode='list';ui(songOf(x.jour,{t:x.titre,a:x.artiste}),1,x.jour);go(URLS[String(x.jour)],.85,0);try{plMark()}catch(_){}}
- let ORD=[],op=0;
- function mkOrd(){const L=CONTENU.playlist||[];const c=[...Array(L.length).keys()].filter(j=>has(L[j].jour)&&L[j].jour<=unl()&&j!=li);for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]]}ORD=[li,...c];op=0}
- function next(dir){const L=CONTENU.playlist||[],n=L.length;if(!n)return;const ok=j=>has(L[j].jour)&&L[j].jour<=unl();
-  if(S.shuf){if(!ORD.length||ORD[op]!==li||L.some((x,j)=>ok(j)&&!ORD.includes(j))){const k=ORD.indexOf(li);if(k>=0&&!L.some((x,j)=>ok(j)&&!ORD.includes(j)))op=k;else mkOrd()}
-   op=((op+dir)%ORD.length+ORD.length)%ORD.length;return list(ORD[op],1)}
-  for(let s2=1;s2<=n;s2++){const j=((li+dir*s2)%n+n)%n;if(ok(j))return list(j)}}
- document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode){const m=mode;stop();window.__ytmResume=m=='game'?key:0}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(view=='day'&&String(cur)==String(d))start(d)}});
- addEventListener('pagehide',()=>{if(mode)stop()});
- return{boss(k){k=String(k);if(S.music===false||!has(k))return false;if(mode)stop();mode='game';key=k;try{MUS.stop()}catch(_){}const sg=songOf(k,SONGS[k]||{t:'Boss',a:''});ui(sg,0,k);go(URLS[k],.85,1);return true},duck(f){DK=f;setV()},hold(){if(mode&&!au.paused){au.pause();return 1}return 0},unhold(){if(mode){const p=au.play();if(p&&p.catch)p.catch(()=>{})}},get gday(){return mode=='game'?key:null},start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,name,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
+ function list(i,keep,back){if(!keep){ctx='all';HIST.push(li);ORD=ORD.filter(j=>j!==i)}const L=CONTENU.playlist||[],x=L[i];if(!x||(x.jour&&x.jour>unl()))return;if(!has(x.jour)){toast('🎵 Cette chanson n\'est pas encore sur cet appareil');return}li=i;try{MUS.stop();MUS._bg=0}catch(_){}if(HIST.length>60)HIST.splice(0,HIST.length-60);const wasL=mode=='list';mode='list';ui(songOf(x.jour,{t:x.titre,a:x.artiste}),1,x.jour);go(URLS[String(x.jour)],S.mvol==null?.85:S.mvol/100,0);S.mplays=S.mplays||{};S.mplays[x.jour]=(S.mplays[x.jour]||0)+1;S.mlast={j:x.jour,p:0};ORD=ORD.filter(j=>j!==i);S.mord=ORD.slice();save();try{plMark()}catch(_){}setTimeout(msync,300);qPaint()}
+ let ORD=[],Q=[],HIST=[],slp=0,ctx='all';
+ const mrep=()=>S.mrep==null?1:S.mrep;
+ const L_=()=>CONTENU.playlist||[];
+ const okI=j=>{const x=L_()[j];return x&&has(x.jour)&&x.jour<=unl()&&(ctx!='fav'||isFav(x.jour))};
+ const avail=()=>[...L_().keys()].filter(okI);
+ const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+ function ordFill(){const A=avail();if(!ORD.length&&Array.isArray(S.mord))ORD=S.mord.filter(j=>A.includes(j));ORD=ORD.filter(j=>A.includes(j)&&j!==li);if(!ORD.length){ORD=shuf(A.filter(j=>j!==li))}S.mord=ORD.slice();return ORD}
+ function upcoming(n){const A=avail(),out=[...Q];if(S.shuf!==false){out.push(...ordFill())}else{const k=A.indexOf(li);for(let i=1;i<=A.length&&out.length<n;i++){const j=A[(k+i)%A.length];if(j!==li)out.push(j)}}return out.slice(0,n)}
+ function next(dir,auto){const A=avail();if(!A.length)return;
+  if(auto&&mrep()==2)return list(li,1,1);
+  if(auto&&slp==='end'){slp=0;au.pause();toast('🌙 Bonne nuit !');return}
+  if(dir<0){if(au.currentTime>4){au.currentTime=0;return}if(HIST.length)return list(HIST.pop(),1,1);if(S.shuf===false){const k=A.indexOf(li);return list(A[(k-1+A.length)%A.length],1,1)}au.currentTime=0;return}
+  if(Q.length){HIST.push(li);return list(Q.shift(),1)}
+  if(S.shuf!==false){if(!ORD.length&&Array.isArray(S.mord))ORD=S.mord.slice();let O=ORD.filter(j=>A.includes(j)&&j!==li);if(!O.length){if(auto&&mrep()==0){au.pause();toast('🎵 Tout a été écouté !');return}O=shuf(A.slice());if(O[0]===li&&O.length>1)[O[0],O[1]]=[O[1],O[0]]}const j=O.shift();ORD=O;S.mord=O.slice();HIST.push(li);return list(j,1)}
+  const k=A.indexOf(li);let p=k+1;if(p>=A.length){if(auto&&mrep()==0){au.pause();toast('🎵 Fin de la playlist');return}p=0}HIST.push(li);return list(A[p],1)}
+ function playCtx(c,first){ctx=c||'all';const A=avail();if(!A.length){toast(ctx=='fav'?'🤍 Aucun favori pour l’instant':'🎵 Aucune chanson disponible');return}ORD=[];S.mord=null;Q=[];HIST=[];
+  if(first==null){if(S.shuf===false)first=A[0];else first=A[Math.floor(Math.random()*A.length)]}li=first;ORD=shuf(A.filter(j=>j!==first));S.mord=ORD.slice();list(first,1)}
+ function qAdd(i){if(!okI(i)&&!(has((L_()[i]||{}).jour)))return;Q.push(i);toast('➕ Ajouté à la file : '+((songOf(L_()[i].jour,{t:L_()[i].titre})||{}).t||''));qPaint()}
+ function qPaint(){const q=box&&box.querySelector('.ytq');if(!q||q.hidden)return;const U=upcoming(12);q.innerHTML=`<b>📃 À suivre${S.shuf!==false?' · 🔀':''}</b>${U.length?U.map((j,n)=>{const x=L_()[j],sg=songOf(x.jour,{t:x.titre,a:x.artiste||''});return`<button class="ytqi" data-j="${j}"><span>${n<Q.length?'➕':n+1}</span><b>${esc(sg.t)}</b><small>${esc(sg.a)}</small></button>`}).join(''):'<small>Rien à suivre</small>'}`;q.querySelectorAll('.ytqi').forEach(e=>e.onclick=ev=>{ev.stopPropagation();const j=+e.dataset.j;Q=Q.filter(z=>z!==j);ORD=ORD.filter(z=>z!==j);HIST.push(li);list(j,1)})}
+ const SLP=[0,15,30,45,60,'end'];
+ function slpNext(){const i=SLP.indexOf(slp===0?0:slp==='end'?'end':slp._m);const nx=SLP[(i+1)%SLP.length];if(nx===0){slp=0;toast('🌙 Minuteur désactivé')}else if(nx==='end'){slp='end';toast('🌙 Arrêt à la fin de ce titre')}else{slp=new Number(Date.now()+nx*60000);slp._m=nx;toast(`🌙 Arrêt dans ${nx} min`)}}
+ function slpTxt(){if(!slp)return'';if(slp==='end')return' fin';return' '+Math.max(1,Math.ceil((slp-Date.now())/60000))+'′'}
+ function isFav(j){return!!(S.mfav||{})[String(j)]}
+ function favTog(j){S.mfav=S.mfav||{};j=String(j);if(S.mfav[j])delete S.mfav[j];else S.mfav[j]=Date.now();save();toast(S.mfav[j]?'❤️ Ajouté aux favoris':'🤍 Retiré des favoris')}
+ /* --- notification, écran verrouillé, casque --- */
+ const CB64={};function cover64(k){if(CB64[k]!==undefined)return Promise.resolve(CB64[k]);const u=COV[k];if(!u){if(COV[k]===null)CB64[k]='';return Promise.resolve('')}return new Promise(res=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const m=Math.min(im.width,im.height);g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,256,256);CB64[k]=c.toDataURL('image/jpeg',.82).split(',')[1]}catch(_){CB64[k]=''}res(CB64[k])};im.onerror=()=>{CB64[k]='';res('')};im.src=u})}
+ let lastSync=0;
+ function msync(){if(mode!='list')return;lastSync=Date.now();const x=L_()[li];if(!x)return;const sg=songOf(x.jour,{t:x.titre,a:x.artiste||''}),k=String(x.jour);
+  try{if('mediaSession' in navigator){const art=COV[k]?[{src:COV[k],sizes:'512x512'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}];navigator.mediaSession.metadata=new MediaMetadata({title:sg.t,artist:sg.a||'',album:'Opération Chocolat',artwork:art});navigator.mediaSession.playbackState=au.paused?'paused':'playing';if(au.duration&&isFinite(au.duration))navigator.mediaSession.setPositionState({duration:au.duration,position:Math.min(au.currentTime,au.duration),playbackRate:1})}}catch(_){}
+  try{if(window.AventAndroid&&AventAndroid.mediaUpdate){const send=c=>AventAndroid.mediaUpdate(sg.t,sg.a||'',!au.paused,(au.currentTime||0)*1000,(isFinite(au.duration)?au.duration:0)*1000,c);if(CB64[k]!==undefined)send(CB64[k]);else{send('');cover64(k).then(c=>{if(c&&mode=='list'&&String((L_()[li]||{}).jour)==k)send(c)})}}}catch(_){}}
+ function mstop(){try{if('mediaSession' in navigator){navigator.mediaSession.metadata=null;navigator.mediaSession.playbackState='none'}}catch(_){}try{window.AventAndroid&&AventAndroid.mediaStop&&AventAndroid.mediaStop()}catch(_){}}
+ try{if('mediaSession' in navigator){const H=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(_){}};H('play',()=>window.__mediaCmd('play'));H('pause',()=>window.__mediaCmd('pause'));H('nexttrack',()=>window.__mediaCmd('next'));H('previoustrack',()=>window.__mediaCmd('prev'));H('seekto',d=>window.__mediaCmd('seek:'+Math.round((d.seekTime||0)*1000)));H('stop',()=>window.__mediaCmd('pause'))}}catch(_){}
+ window.__mediaCmd=c=>{c=String(c);if(c.startsWith('seek:')){try{au.currentTime=(+c.slice(5))/1000;msync()}catch(_){}return}
+  if(c=='play'){if(mode){const p=au.play();if(p&&p.catch)p.catch(()=>{})}else if(S.mlast)resume();return}
+  if(c=='pause'){if(mode)au.pause();return}if(c=='toggle'){if(au.paused)window.__mediaCmd('play');else au.pause();return}
+  if(c=='next'){if(mode=='list')next(1);return}if(c=='prev'){if(mode=='list')next(-1);return}
+  if(c=='stop'){if(mode=='list'){stop();try{bgm()}catch(_){}}return}};
+ function resume(){const m=S.mlast;if(!m)return;const L=L_();const i=L.findIndex(x=>String(x.jour)==String(m.j));if(i<0||!okI(i))return;list(i,1);try{au.currentTime=m.p||0}catch(_){}}
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode=='game'){stop();window.__ytmResume=key}else if(mode=='list'){msync();try{S.mlast={j:(L_()[li]||{}).jour,p:au.currentTime||0};save()}catch(_){}}}else if(window.__ytmResume){const d=window.__ytmResume;window.__ytmResume=0;if(view=='day'&&String(cur)==String(d))start(d)}});
+ addEventListener('pagehide',()=>{if(mode=='game')stop();else if(mode=='list'){try{S.mlast={j:(L_()[li]||{}).jour,p:au.currentTime||0};save()}catch(_){}}});
+ return{playCtx,qAdd,isFav,favTog,resume,upcoming,refreshUI(){if(box&&mode=='list'){const f=box.querySelector('.ytfv');if(f)f.textContent=isFav(key)?'❤️':'🤍'}qPaint()},boss(k){k=String(k);if(S.music===false||!has(k))return false;if(mode)stop();mode='game';key=k;try{MUS.stop()}catch(_){}const sg=songOf(k,SONGS[k]||{t:'Boss',a:''});ui(sg,0,k);go(URLS[k],.85,1);return true},duck(f){DK=f;setV()},hold(){if(mode&&!au.paused){au.pause();return 1}return 0},unhold(){if(mode){const p=au.play();if(p&&p.catch)p.catch(()=>{})}},get gday(){return mode=='game'?key:null},start,stop,stopGame,list,has,refresh,count:()=>Object.keys(URLS).length,name,on:()=>!!mode,get li(){return mode=='list'?li:-1}}})();
 
 /* ---------- Fichier mystère : un seul fichier qui contient toutes les musiques ---------- */
 function musMatch(name){const n=nrm(name.replace(/\.[^.]+$/,''));let best=null,bl=0;for(const k in SONGS){const t=nrm(SONGS[k].t.replace(/\(.*?\)/g,''));if(t&&(n.includes(t)||n.replace(/ /g,'').includes(t.replace(/ /g,'')))&&t.length>bl){best=k;bl=t.length}}return best}
@@ -6086,7 +6154,7 @@ async function musImport(input){const files=[...input.files];input.value='';if(!
  await YTM.refresh();toast(`🎵 ${ok} fichier${ok>1?'s':''} importé${ok>1?'s':''}`);musAdmin();if(miss.length)setTimeout(()=>appAlert('Pas reconnus (utilise le bouton 📂 de la bonne ligne) :\n'+miss.join('\n')),300)}
 async function musDel(d){try{await MDB.del(d)}catch(_){}await YTM.refresh();musAdmin()}
 addEventListener('change',e=>{if(e.target.classList&&e.target.classList.contains('mpick'))musImport(e.target)});
-function plMark(){document.querySelectorAll('.plr').forEach((r,i)=>{const on=YTM.li==i;r.classList.toggle('play',on);const b=r.querySelector('.plp');if(b)b.textContent=on?'⏸':'▶'})}
+function plMark(){try{if(document.getElementById('plbox')&&!document.activeElement?.classList?.contains('plq'))plRefresh()}catch(_){}document.querySelectorAll('.plr').forEach((r,i)=>{const on=YTM.li==i;r.classList.toggle('play',on);const b=r.querySelector('.plp');if(b)b.textContent=on?'⏸':'▶'})}
 function plTap(i){if(YTM.li==i){YTM.stop();try{bgm()}catch(_){}}else YTM.list(i)}
 /* ---------- Effets sonores (synthétisés, discrets) ---------- */
 const SFX=(()=>{let A=null,M=null;const ctx=()=>{if(!A){try{A=new (window.AudioContext||window.webkitAudioContext)();M=A.createGain();M.gain.value=.55;M.connect(A.destination)}catch(_){A=null}}if(A&&A.state=='suspended')A.resume();return A};
