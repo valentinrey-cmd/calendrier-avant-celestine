@@ -103,7 +103,7 @@ public class MusicService extends Service {
     MediaMetadata.Builder mb = new MediaMetadata.Builder()
       .putString(MediaMetadata.METADATA_KEY_TITLE, title)
       .putString(MediaMetadata.METADATA_KEY_ARTIST, artist)
-      .putString(MediaMetadata.METADATA_KEY_ALBUM, "Opération Chocolat")
+      .putString(MediaMetadata.METADATA_KEY_ALBUM, "Dossier n°24")
       .putLong(MediaMetadata.METADATA_KEY_DURATION, dur);
     if (cover != null) mb.putBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART, cover);
     ms.setMetadata(mb.build());
@@ -116,7 +116,7 @@ public class MusicService extends Service {
     nb.setSmallIcon(R.mipmap.ic_launcher)
       .setContentTitle(title)
       .setContentText(artist)
-      .setSubText("Opération Chocolat")
+      .setSubText("Dossier n°24")
       .setContentIntent(ms.getController().getSessionActivity())
       .setDeleteIntent(act(A_CLOSE, 14))
       .setVisibility(Notification.VISIBILITY_PUBLIC)
