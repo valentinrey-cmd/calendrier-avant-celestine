@@ -1951,7 +1951,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795456021';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795458831';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2350,19 +2350,19 @@ function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=
 const BOSSCOST=10;
 const BRULES={
  4:["🎙️ Noémie n’a pas le temps : ses ongles sèchent. Pour placer tes questions, esquive tout ce qu’elle t’envoie.","👆 Glisse le doigt pour déplacer Célestine en bas de l’écran. Tes questions ❓ partent toutes seules vers le haut : vise Noémie.","💅 Esquive ses reproches, ses gouttes de vernis, ses flacons et sa lime… Tu as <b>6 vies</b>.","😤 À la moitié, elle accélère… puis elle se vexe et sort le pot de gel géant. La ligne rouge ⚠️ annonce la lime.","⏱️ Tu as 2 min 40. 💡 L’indice donne une vie en plus. Ensuite : trouve sa contradiction."],
- 8:["🍕 Emma noie le poisson sous les assiettes : glisse le doigt pour trancher les plats qu’elle t’envoie (1 point chacun, ⭐ = 3).","😤 Chaque plat que tu rates lui redonne de l’assurance ! Et ne tranche JAMAIS une preuve 📄 du dossier (3 vies).","🫧 Bonus dans des bulles : ⏸️ temps figé, 🔥 lame de feu (×2, les preuves ne risquent rien), ⚡ éclair qui tranche tout, 💚 une vie.","👜 Plus tard : des sacs à trancher 4 fois. Puis elle file aux toilettes à travers l’écran : tranche-la au passage (+8) !","✨ 4 d’un coup = 🌟 FRÉNÉSIE. À la fin, brise sa version pour la faire craquer. 💡 L’indice redonne une vie. Ensuite : trouve sa contradiction."],
- 11:["🎹 Edgar impose son rythme, la bouche pleine. Cale-toi sur son tempo, sur « Garde à vue », un morceau électro rapide. <b>C’est toi qui joues la mélodie</b>.","👆 Chaque tuile est une note : touche-la quand elle arrive sur la <b>ligne dorée</b>. Pile au bon moment = <b>PARFAIT ✨</b>.","✨ Tuiles dorées <b>×2</b> : deux notes en même temps. 🩷 Tuiles longues : <b>garde le doigt appuyé</b>.","⚡ À chaque tour du morceau, le tempo accélère.","💔 Note ratée ou tuile lâchée trop tôt = 1 💜 en moins (tu en as <b>3</b>). 15 notes d’affilée te rendent 1 💜. 💡 L’indice te rend 1 💜. Ensuite : trouve sa contradiction."],
- 15:["📂 Le récit de Nora a l’air solide. Casse-le brique par brique avec la balle, en déplaçant le dossier.","👆 Glisse le doigt pour bouger le dossier, touche pour lancer la balle. Touche Nora avec la balle (<b>14 PV</b>).","🎁 Parfois un bonus tombe (cercle doré) : ↔️ gros dossier, ✨ multi-balles, 🔥 balle de feu, ❤️ vie.","⚠️ Évite les malus (cercle rouge) : 🤏 mini-dossier, 🙃 commandes inversées. Et ses diversions ☕ bloquent ton dossier !","❤️ Si toutes les balles tombent, tu perds une vie (<b>3 vies</b>). 💡 L’indice donne une vie. Ensuite : trouve sa contradiction."],
- 19:["🏃‍♀️ Sandrine s’enfuit dans la réserve de la pharmacie ! Touche l’écran pour sauter, deux fois pour un double saut.","📦🛒 Saute par-dessus les cartons et les chariots, et évite les flacons 🧴 qui dégringolent des étagères.","💊 Sandrine prend de l’avance. Les 💊 t’accélèrent, mais tu peux la rattraper même sans.","❤️ Tu as <b>3 vies</b>. Rattrape-la (barre pleine) en moins de 2 min 15.","💡 L’indice te rapproche d’un coup. Ensuite : trouve sa contradiction."],
- 22:["🎙️ Valentin sourit, s’étire, regarde ailleurs. Ses hésitations 😅 apparaissent une seconde et disparaissent.","👆 Touche-les vite : <b>15</b> hésitations à attraper en 45 secondes.","🚫 Ne touche pas ses phrases sincères ✅ : tu perds une vie (<b>3 vies</b>).","🥱 De temps en temps il bâille et tout devient flou. Il accélère quand il fatigue.","💡 L’indice dissipe le flou et donne une vie. Ensuite : trouve sa contradiction."]};
+ 8:["👁️ Emma te fait passer un test de vue. Sur chaque planche, une lettre est différente des autres : touche-la !","⏱️ Chaque planche a son chrono. Trop lent ou mauvaise lettre = 1 ❤️ en moins (<b>3 vies</b>).","😎 Plus ça avance, plus les lettres sont petites et floues. Et parfois Emma enlève ses lunettes : tout devient TRÈS flou.","👓 Quand ses lunettes apparaissent sur la planche, attrape-les : vision nette pendant 5 secondes.","🎯 Lis <b>15 planches</b> pour la faire craquer. 💡 L’indice donne une vie et une vision nette. Ensuite : trouve sa contradiction."],
+ 11:["🌯 Edgar a faim. Il ne parlera qu’avec un kebab dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>4 vies</b>). Esquive-les !","🥛 La sauce blanche remplace n’importe quel ingrédient.","🎯 Sers-lui <b>5 kebabs</b> (de plus en plus garnis). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
+ 15:["🧪 Nora refait le TP de vendredi sous tes yeux. À toi de remplir les tubes à la pipette.","👆 Garde le doigt appuyé pour verser, lâche quand le niveau est dans la <b>zone verte</b>.","⚠️ Chaque liquide est différent : le sirop coule lentement, le réactif bleu par à-coups, et certains coulent encore un peu après avoir lâché !","😬 Nora te pousse le coude et le néon grésille… Pile au milieu de la zone = PARFAIT ✨ (compte double).","🎯 <b>12 tubes</b>, <b>3 vies</b> (débordement ou trop lent). 💡 L’indice donne une vie et élargit la zone. Ensuite : trouve sa contradiction."],
+ 19:["💊 Samedi, la pharmacie déborde. Sandrine veut bien parler… si tu l’aides au comptoir.","👆 Lis ce que veut chaque client (fièvre, rhume, gorge…) et touche le bon produit sur l’étagère.","⏳ Sous chaque client, sa patience. S’il part sans rien, ou si tu donnes un produit que personne n’a demandé = 1 ❤️ en moins (<b>3 vies</b>).","🙋 Certains viennent juste discuter : ne leur donne rien, ils repartiront tout seuls. Et Sandrine range parfois la livraison… l’étagère change de place !","🎯 Sers <b>16 clients</b>. 💡 L’indice donne une vie et calme tout le monde. Ensuite : trouve sa contradiction."],
+ 22:["🚇 « J’ai mon métro ! » Valentin file en pleine audition. Suis-le dans les couloirs de Bellecour !","👆 Touche à gauche ou à droite de l’écran (ou glisse) pour changer de couloir.","🧳🎸🚧 Évite les valises, les musiciens et les travaux. Aux portillons ⛔, passe par celui qui est ouvert 🟢.","☕ = coup de boost, 🎫 = raccourci. Chaque choc = 1 ❤️ en moins et il reprend de l’avance (<b>3 vies</b>).","🎯 Remplis la barre pour le rattraper avant son métro. 💡 L’indice te rapproche et donne une vie. Ensuite : trouve sa contradiction."]};
 const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Noémie',ic:'💅',who:'noemie',g:'bossfight',p:{hp:60,time:160,lives:6,sp:.62,atk:1.7,ic:'💅',who:'noemie',n:'Noémie'}},
- 8:{n:'Emma',ic:'👁️',who:'emma',g:'bslice',p:{hp:80,lives:3,time:150}},
- 11:{n:'Edgar',ic:'🌯',who:'edgar',g:'bpiano',quiet:1,p:{hp:160,lives:3,time:130,bpm0:150,bpmMax:166,bpmUp:8}},
- 15:{n:'Nora',ic:'🧪',who:'nora',g:'bbreak',p:{hp:14,time:170,lives:3,pw:86,v:310,vmax:420}},
- 19:{n:'Sandrine',ic:'💊',who:'sandrine',g:'brun',p:{gap0:105,gapMax:165,close:1.25,hitGap:8,candy:7,v:240,time:135,lives:3}},
- 22:{n:'Valentin (témoin)',ic:'💼',who:'valentin',g:'bwhack',p:{hp:15,lives:3,time:45}}};return C[d]||null}
+ 8:{n:'Emma',ic:'👁️',who:'emma',g:'bvue',p:{hp:15,lives:3,time:120}},
+ 11:{n:'Edgar',ic:'🌯',who:'edgar',g:'bkebab',p:{hp:5,lives:4,time:150}},
+ 15:{n:'Nora',ic:'🧪',who:'nora',g:'bpipette',p:{hp:12,lives:3,time:120}},
+ 19:{n:'Sandrine',ic:'💊',who:'sandrine',g:'bcomptoir',p:{hp:16,lives:3,time:120}},
+ 22:{n:'Valentin (témoin)',ic:'🚇',who:'valentin',g:'bmetro',p:{lives:3,time:100,v:260,rate:.014}}};return C[d]||null}
 function bossBtn(d){const B=bossCfg(d);if(!B)return'';if((S.boss||{})[d])return`<p><span class="ribbon">🎙️ Audition faite · 🎬 vidéo débloquée</span></p>${AUD[d]&&!(S.aud||{})[d]?`<p><button class="alt" onclick="audGo(${d})">🗂️ Trouver sa contradiction</button></p>`:''}`;const n=(S.bossTry||{})[d]||0;
  return`<button class="bossb" onclick="launchBoss(${d})">🎙️ Auditionner : ${esc(B.n)} <small>(gratuit, autant de fois que tu veux)</small></button><p class="muted" style="font-size:.85rem;margin-top:0">Son audition débloque une 🎬 vidéo mystère de votre album.</p>`}
 function bossDev(d){if(CONTENU.syncRoom!='t'||!bossCfg(d))return'';const B=bossCfg(d);return`<div class="bossdev"><b>🧪 Mode test</b> · boss de cette case : ${B.ic} ${B.n}<br><button class="alt sm" onclick="launchBoss(${d},1)">▶ Tester le boss (gratuit, débloque la vidéo)</button>${(S.boss||{})[d]||(S.bossTry||{})[d]?`<button class="alt sm" onclick="bossReset(${d})">↺ Remettre ce boss à zéro</button>`:''}</div>`}
@@ -2371,7 +2371,7 @@ function bossKO(B,cb){const box=document.getElementById('gwin');if(!box){cb();re
  o.innerHTML=`<div class="bko-fl"></div><div class="bko-b">${B.who?`<img src="${bpicSrc(B.who)}" alt="" style="width:1.6em;height:1.6em;border-radius:50%;object-fit:cover;border:4px solid #ffd34d">`:B.ic}</div>${Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2+Math.random()*.2,r=110+Math.random()*140;return`<span class="bko-p" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r).toFixed(0)}px;--d:${(Math.random()*.25).toFixed(2)}s">${PT[i%PT.length]}</span>`}).join('')}<div class="bko-t">ÇA CRAQUE !</div><div class="bko-v">🎙️ ${esc(B.n)} est prêt${/^(Noémie|Emma|Nora|Sandrine)/.test(B.n)?'e':''} à parler !<small>Touche pour continuer</small></div>`;
  box.appendChild(o);try{bkT(110,1,'sawtooth',.05,45);setTimeout(()=>{bkT(160,.6,'square',.07,40);bkT(900,.5,'sawtooth',.03,90)},850);[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>bkT(f,i==4?.9:.22,'triangle',.07),1150+i*130))}catch(_){}
  setTimeout(()=>{try{confetti()}catch(_){}},1150);const t0=performance.now();let done=0;const go=()=>{if(done)return;done=1;o.remove();cb()};o.onclick=()=>{if(performance.now()-t0>1800)go()};setTimeout(go,4200)}
-const BTAUNT={4:'« Mes ongles sèchent, là. »',8:'« Lis la dernière ligne, si tu peux. »',11:'« Je peux finir mon kebab ? »',15:'« J’ai un partiel, moi. »',19:'« J’ai une livraison ! »',22:'« C’est pour la forme, hein ? »'};
+const BTAUNT={4:'« Mes ongles sèchent, là. »',8:'« Tu devrais prendre rendez-vous, toi. »',11:'« Je vais me commander un tacos, laisse. »',15:'« Zéro à ce TP. Désolée. »',19:'« Laisse, je vais servir moi-même. »',22:'« Bon, je l’ai raté, mon métro ! »'};
 function bossLose(B,d,cb){const box=document.getElementById('gwin');if(!box){cb();return}try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}
  const o=document.createElement('div');o.className='bko blo';o.innerHTML=`<div class="blo-b">${B.ic}</div><div class="blo-ha">HA</div><div class="blo-ha h2">HA</div><div class="blo-ha h3">HA !</div>${Array.from({length:14},(_,i)=>`<span class="blo-h" style="left:${(4+i*7)%96}%;--d:${(i*0.17%1.2).toFixed(2)}s;--r:${(i%2?1:-1)*(20+i*9)}deg">💔</span>`).join('')}<div class="blo-t">PERDU…</div><div class="bko-v">${esc(B.n)} t’a battue !<em>${BTAUNT[d]||''}</em><small>Touche pour continuer</small></div>`;
  box.appendChild(o);try{[392,370,349,330].forEach((f,i)=>setTimeout(()=>bkT(f,i==3?1.1:.42,'sawtooth',.045,i==3?f*.8:0),i*430));[0,180,360].forEach(t=>setTimeout(()=>bkT(260,.12,'square',.04,200),600+t))}catch(_){}
@@ -2950,11 +2950,11 @@ function alZoom(i){const A=alPhotos().slice(0,alRev());if(!A[i])return;let o=doc
 /* ---------- Succès ---------- */
 const ACHS=[
  {g:'Boss',id:'boss4',ic:'💅',n:'Vernis craquelé',d:'Fais craquer Noémie en audition (jour 4).',t:'M'},
- {g:'Boss',id:'boss8',ic:'👁️',n:'Vision claire',d:'Fais craquer Emma en audition (jour 8).',t:'M'},
- {g:'Boss',id:'boss11',ic:'🌯',n:'Kebab confisqué',d:'Fais craquer Edgar en audition (jour 11).',t:'M'},
- {g:'Boss',id:'boss15',ic:'🧪',n:'Récit en miettes',d:'Fais craquer Nora en audition (jour 15).',t:'M'},
- {g:'Boss',id:'boss19',ic:'💊',n:'Course en réserve',d:'Rattrape Sandrine dans la réserve (jour 19).',t:'M'},
- {g:'Boss',id:'boss22',ic:'💼',n:'Témoin gênant',d:'Fais craquer Valentin en audition (jour 22).',t:'M'},
+ {g:'Boss',id:'boss8',ic:'👁️',n:'Dix dixièmes',d:'Réussis le test de vue d’Emma (jour 8).',t:'M'},
+ {g:'Boss',id:'boss11',ic:'🌯',n:'Sauce blanche',d:'Sers 5 kebabs parfaits à Edgar (jour 11).',t:'M'},
+ {g:'Boss',id:'boss15',ic:'🧪',n:'Main sûre',d:'Réussis le TP de chimie avec Nora (jour 15).',t:'M'},
+ {g:'Boss',id:'boss19',ic:'💊',n:'Rush du samedi',d:'Tiens le comptoir de la pharmacie avec Sandrine (jour 19).',t:'M'},
+ {g:'Boss',id:'boss22',ic:'🚇',n:'Correspondance',d:'Rattrape Valentin dans le métro Bellecour (jour 22).',t:'M'},
  {g:'Boss',id:'bossV',ic:'💘',n:'Vaincu par amour',d:'Accuse le bon coupable et bats le boss final.',t:'L',s:1},
  {g:'Aventure',id:'histoire',ic:'📖',n:'Affaire classée',d:'Termine toute l’histoire, du prologue à l’épilogue.',t:'L',s:1,c:()=>!!(S.story||{}).epi},
  {g:'Aventure',id:'first_case',ic:'🎄',n:'Premier pas',d:'Ouvre ta première case du calendrier.',t:'F',c:()=>S.opened.length>=1},
@@ -4976,7 +4976,8 @@ Object.assign(STORY,{
   ['b','Lisez la dernière ligne du tableau, lieutenant. …Non, je plaisante. Quoique. 👁️'],
   ['e','Jeudi, au resto, vous avez eu le sac de Célestine sur les genoux.',{fx:'ein'}],
   ['b','Et vous, vous avez eu un café sur votre cravate ce matin. On a tous nos secrets.'],
-  ['e','Elle noie le poisson sous les assiettes. Tranchez dans ses détours.',{fx:'shake'}]]},
+  ['b','Je vous propose un marché : vous passez mon test de vue. Si vous le réussissez, je parle. 👓'],
+  ['e','Célestine… c’est à vous. Je n’ai pas mes lunettes.',{fx:'shake'}]]},
  w8:{t:'Audition · Emma',sc:'audit',p:'emma',l:[
   ['n','Emma croise les bras.',{fx:'bin'}],
   ['b','Très bien. Ma version de jeudi soir.'],
@@ -4986,7 +4987,8 @@ Object.assign(STORY,{
   ['b','J’ai pas eu le temps de dîner, ça vous dérange pas ? 🌯'],
   ['e','Le sac de votre sœur est resté tout le week-end dans votre entrée.',{fx:'ein'}],
   ['b','Et moi j’étais dans ma chambre. Comme un ange.'],
-  ['e','Il impose son rythme. Calez-vous dessus et ne le lâchez pas.',{fx:'shake'}]]},
+  ['b','Je parle le ventre plein, pas avant. Fais-m’en un. Sans erreur.'],
+  ['e','Célestine… derrière la broche. Il ne lâchera rien sinon.',{fx:'shake'}]]},
  w11:{t:'Audition · Edgar',sc:'audit',p:'edgar',l:[
   ['n','Edgar repose son kebab.',{fx:'bin'}],
   ['b','Ok, ok. Mon week-end, minute par minute.'],
@@ -4996,18 +4998,20 @@ Object.assign(STORY,{
   ['b','J’ai un partiel dans trois jours, je n’ai vraiment pas le temps… 📚'],
   ['e','Vendredi, au TP, vous étiez juste à côté de Célestine.',{fx:'ein'}],
   ['b','Comme toute la promo. On est quarante, lieutenant.'],
-  ['e','Son récit tient debout. Cassez-le brique par brique.',{fx:'shake'}]]},
+  ['b','Vous voulez savoir ce que j’ai fait au TP ? Refaites-le avec moi. Tube par tube.'],
+  ['e','Une blouse, une pipette… à vous, Célestine.',{fx:'shake'}]]},
  w15:{t:'Audition · Nora',sc:'audit',p:'nora',l:[
   ['n','Nora range ses fiches.',{fx:'bin'}],
   ['b','D’accord. Mon vendredi matin.'],
   ['e','Une photo d’Erika vaut mieux qu’un long discours.',{fx:'ein'}]]},
  b19:{t:'Audition · Sandrine',sc:'pharma',p:'sandrine',l:[
   ['n','Pharmacie de Reyrieux. Sandrine file entre les rayons, un carton de crèmes dans les bras.',{fx:'bin'}],
-  ['b','Pas maintenant, j’ai une livraison ! 📦'],
-  ['e','Madame, attendez ! …Elle s’enfuit dans la réserve.',{fx:'ein'}],
-  ['e','Célestine, rattrapez-la !',{fx:'shake'}]]},
+  ['b','Pas maintenant, j’ai six clients et une livraison ! 📦'],
+  ['e','Madame, juste deux minutes…',{fx:'ein'}],
+  ['b','Aidez-moi au comptoir, et je vous parle. Célestine, tu connais la boutique !'],
+  ['e','Célestine, passez derrière le comptoir !',{fx:'shake'}]]},
  w19:{t:'Audition · Sandrine',sc:'pharma',p:'sandrine',l:[
-  ['n','Sandrine s’arrête enfin, essoufflée, au fond de la réserve.',{fx:'bin'}],
+  ['n','Le dernier client sort. Sandrine souffle enfin.',{fx:'bin'}],
   ['b','Bon, bon. Mon samedi, puisque vous insistez.'],
   ['e','Vérifiez ses dires. Les messages ne mentent pas.',{fx:'ein'}]]},
  b22:{t:'Audition · Valentin (témoin)',sc:'audit',l:[
@@ -5015,10 +5019,11 @@ Object.assign(STORY,{
   ['v','C’est pour la forme, hein ? Je vis avec elle, j’allais forcément y passer. 😅'],
   ['e','Exactement. Pour la forme.',{fx:'ein'}],
   ['c','Il me regarde à peine…',{fx:'cin'}],
-  ['e','Ses hésitations apparaissent et disparaissent. Attrapez-les.',{fx:'shake'}]]},
+  ['v','Bon… je peux y aller ? J’ai mon métro. 🚇',{fx:'vout'}],
+  ['e','Il… il est parti ?! Célestine, suivez-le !',{fx:'shake'}]]},
  w22:{t:'Audition · Valentin (témoin)',sc:'audit',l:[
-  ['n','Valentin se redresse.',{fx:'vin'}],
-  ['v','Mon vendredi, alors. Rien de spécial.'],
+  ['n','Quai de la ligne D. Valentin s’arrête, essoufflé.',{fx:'vin'}],
+  ['v','Ok, ok… Mon vendredi, alors. Rien de spécial.'],
   ['e','Rien de spécial. Je note.',{fx:'ein'}]]},
  s5:{t:'Rapport · La BU',sc:'fac',l:[
   ['n','Fac de pharma, site Rockefeller. Pépin arrive en imperméable au milieu des étudiants en blouse.',{fx:'ein'}],
@@ -6132,6 +6137,193 @@ try{GAMES.bslice=function(p,el,win,fail){const id=RUN;
   draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>({fin:!!fin,st,hp,lives,objs:objs.filter(o=>!o.dead).map(o=>({x:o.x,y:o.y,r:o.r,coal:o.coal,gold:o.gold,vy:o.vy}))}),
   hint:()=>{if(id!=RUN||st!='play')return false;if(lives>=p.lives)return'Tu as déjà toutes tes vies 💚';lives++;return true}}}}catch(e){console.error(e)}
+/* 👁️ Emma : le test de vue (trouver la lettre intruse, de plus en plus floue) */
+try{GAMES.bvue=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Trouve la lettre différente des autres avant la fin du chrono. Plus ça avance, plus c’est flou 👓");
+ const PAIRS=[['E','F'],['O','Q'],['C','G'],['P','R'],['M','N'],['I','J'],['V','Y'],['U','V'],['B','8'],['D','O'],['K','X'],['H','N'],['W','V'],['T','I']];
+ const QU=['Ligne suivante.','Plus petit…','Tu louches ?','Sans plisser les yeux !','Ne t’approche pas de l’écran.','Lis-moi ça.','Hmm… intéressant.'];
+ let st='ready',hp=p.hp,lives=p.lives,R=null,bHit=0,bad=0,glass=0,naked=0,nakedT=9,gl=null,glT=6,quip=QU[0],qT=0,T=0,show=null;
+ const BX=24,BY=150,BW=312,BH=300;
+ const k=()=>1-hp/p.hp;
+ const round=()=>{const n=[3,4,4,5,5,6][Math.min(5,Math.floor(k()*6))],pr=PAIRS[Math.floor(Math.random()*PAIRS.length)],sw=Math.random()<.5;R={n,a:sw?pr[1]:pr[0],b:sw?pr[0]:pr[1],odd:Math.floor(Math.random()*n*n),t:0,lim:6.5-3*k(),jit:Array.from({length:n*n},()=>[(Math.random()-.5)*4,(Math.random()-.5)*4])};if(Math.random()<.5){quip=QU[Math.floor(Math.random()*QU.length)];qT=2.2}};
+ const blur=()=>glass>0?0:Math.min(5,.4+k()*3)+(naked>0?3:0);
+ const lose=why=>{lives--;bad=performance.now();try{SFX('bad')}catch(_){}show={i:R.odd,t:.7};quip=why;qT=1.6;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Emma t’a déclarée « bonne pour les lunettes »')},900)}};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';round();timer(p.time,()=>{if(st=='play'){st='dead';fail(`il restait ${hp} lignes à lire`)}},id);return}if(st!='play'||show)return;const q=P(e);
+  if(gl&&Math.hypot(q[0]-gl.x,q[1]-gl.y)<34){gl=null;glass=5;naked=0;try{SFX('ok')}catch(_){}quip='Hé ! Rends-moi mes lunettes ! 👓';qT=1.8;return}
+  const c=R.n,cs=BW/c,cx=Math.floor((q[0]-BX)/cs),cy=Math.floor((q[1]-BY)/(BH/c));if(cx<0||cy<0||cx>=c||cy>=c)return;const i=cy*c+cx;
+  if(i==R.odd){hp--;bHit=performance.now();try{SFX('ok')}catch(_){}show={i,t:.35,ok:1};if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},800)}}else lose('Non. Ça, c’est un '+R.a+'.')};
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);glass=Math.max(0,glass-dt);naked=Math.max(0,naked-dt);
+  if(show){show.t-=dt;if(show.t<=0){show=null;if(st=='play')round()}return}
+  R.t+=dt;if(R.t>=R.lim)lose('Trop lent ! Patient suivant.');
+  nakedT-=dt;if(nakedT<=0){nakedT=10+Math.random()*5;naked=3.2;quip='J’enlève mes lunettes, tiens. Pour voir. 😎';qT=2}
+  glT-=dt;if(glT<=0&&!gl){glT=11+Math.random()*6;gl={x:50+Math.random()*260,y:170+Math.random()*260,t:4}}if(gl){gl.t-=dt;if(gl.t<=0)gl=null}};
+ const letter=(ch,X,Y,s,b,col)=>{x.font=`700 ${s}px Georgia,serif`;x.textAlign='center';x.textBaseline='middle';x.fillStyle=col;if(b<=.2){x.fillText(ch,X,Y);return}x.globalAlpha=.32;for(const [dx,dy] of [[0,0],[b,0],[-b,0],[0,b],[0,-b],[b*.7,b*.7],[-b*.7,-b*.7]])x.fillText(ch,X+dx,Y+dy);x.globalAlpha=1};
+ const draw=now=>{x.fillStyle='#e9eef2';x.fillRect(0,0,360,540);x.fillStyle='#d7dfe6';for(let i=0;i<360;i+=40)x.fillRect(i,0,1,540);
+  bpic(x,'emma',58,66,72,now-bHit<200?'#53c07a':now-bad<250?'#ff3d6e':'#7fb8ff',st=='won');if(naked>0)bemo(x,'👓',58,120,26);
+  if(qT>0){x.fillStyle='#fff';x.beginPath();x.roundRect(104,40,240,44,12);x.fill();x.font='italic 600 13px system-ui';x.textAlign='left';x.fillStyle='#2b3a4a';x.fillText(quip.slice(0,34),114,63)}
+  x.fillStyle='#fff';x.shadowColor='#0003';x.shadowBlur=10;x.beginPath();x.roundRect(BX-8,BY-10,BW+16,BH+20,10);x.fill();x.shadowBlur=0;
+  if(R){const c=R.n,cs=BW/c,rs=BH/c,b=blur(),sz=Math.min(cs,rs)*(.66-.18*k());
+   for(let i=0;i<c*c;i++){const X=BX+(i%c+.5)*cs+R.jit[i][0],Y=BY+(Math.floor(i/c)+.5)*rs+R.jit[i][1];
+    if(show&&show.i==i){x.fillStyle=show.ok?'#53c07a44':'#ffd34d77';x.beginPath();x.arc(X,Y,sz*.7,0,7);x.fill()}
+    letter(i==R.odd?R.b:R.a,X,Y,sz,b,'#1b2430')}
+   x.fillStyle='#0002';x.fillRect(BX,BY+BH+16,BW,8);x.fillStyle=R.t>R.lim*.7?'#ff3d6e':'#7fb8ff';x.fillRect(BX,BY+BH+16,BW*Math.max(0,1-R.t/R.lim),8)}
+  if(gl){bemo(x,'👓',gl.x,gl.y+Math.sin(T*6)*3,40);x.font='800 11px system-ui';x.fillStyle='#e0457b';x.textAlign='center';x.fillText('ses lunettes !',gl.x,gl.y+28)}
+  if(glass>0){x.font='800 13px system-ui';x.fillStyle='#2f8f5b';x.textAlign='center';x.fillText(`👓 Vision nette : ${Math.ceil(glass)} s`,180,138)}
+  if(now-bad<250){x.fillStyle='#ff000033';x.fillRect(0,0,360,540)}
+  x.fillStyle='#2b3a4a';x.fillRect(0,482,360,58);bbar(x,hp,p.hp,`👁️ Emma · encore ${hp} planche${hp>1?'s':''}`,now-bHit<200,490);x.font='17px system-ui';x.textAlign='left';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),8,24);
+  if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ G={dbg:()=>({R,gl,show,st,hp,lives}),hint:()=>{if(st!='play')return false;lives++;glass=6;return true}}}}catch(e){console.error(e)}
+
+/* 🌯 Edgar : kebab express (attraper les ingrédients de sa commande dans l'ordre) */
+try{GAMES.bkebab=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Glisse le doigt pour déplacer la galette. Attrape SEULEMENT le prochain ingrédient de la commande, évite les autres !");
+ const ING=[['🥩','viande'],['🥗','salade'],['🍅','tomates'],['🧅','oignons'],['🧀','fromage'],['🌶️','harissa'],['🍟','frites']];
+ const QU=['Sauce blanche, toujours.','Plus vite, j’ai faim !','Les frites DEDANS, hein.','J’ai sauté le goûter, là.','Tu le fais exprès ?','Ça sent bon…'];
+ let st='ready',hp=p.hp,lives=p.lives,px=180,tx=180,F=[],sp=.9,ord=[],got=0,stack=[],bHit=0,bad=0,quip='Un kebab. Vite. 🌯',qT=2.5,serve=0,T=0,len=3,inv=0;
+ const order=()=>{const a=[...ING.keys()].sort(()=>Math.random()-.5);ord=a.slice(0,len);got=0;stack=[];len=Math.min(5,len+1)};
+ const spawn=()=>{const need=ord[got],r=Math.random();let i;if(r<.45)i=need;else if(r<.51)i=-1;else{do{i=Math.floor(Math.random()*ING.length)}while(i==need)}F.push({i,x:30+Math.random()*300,y:-20,v:(140+120*(1-hp/p.hp))*(.85+Math.random()*.3),r:(Math.random()-.5)*3,a:0})};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';order();timer(p.time,()=>{if(st=='play'){st='dead';fail(`Edgar attend encore ${hp} kebab${hp>1?'s':''}`)}},id)}tx=P(e)[0]};
+ W.onpointermove=e=>{if(e.buttons||e.pointerType=='touch')tx=P(e)[0]};
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);px+=(Math.max(30,Math.min(330,tx))-px)*Math.min(1,dt*14);
+  if(serve>0){serve-=dt;if(serve<=0){if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},500);return}order()}return}
+  sp-=dt;if(sp<=0){spawn();sp=Math.max(.5,.9-.4*(1-hp/p.hp))*(.8+Math.random()*.4)}
+  for(const f of F){f.y+=f.v*dt;f.a+=f.r*dt;
+   const top=470-stack.length*14;if(!f.done&&Math.abs(f.y-top)<18&&Math.abs(f.x-px)<44){f.done=1;
+    if(f.i==ord[got]||f.i==-1){stack.push(f.i==-1?'🥛':ING[f.i][0]);got++;try{SFX('ok')}catch(_){}if(f.i==-1){quip='La sauce blanche, ça compte !';qT=1.4}
+     if(got>=ord.length){hp--;bHit=performance.now();serve=1.1;F=[];quip=['Mmmh… PARFAIT. 🤤','Ok… celui-là, il est bon.','Encore un ! J’ai encore faim.'][hp%3];qT=1.6;try{bkT(660,.15,'triangle',.06);setTimeout(()=>bkT(990,.25,'triangle',.06),120)}catch(_){}}}
+    else if(!inv){lives--;inv=.8;bad=performance.now();try{SFX('bad')}catch(_){}quip=`Des ${ING[f.i][1]} ?! J’ai rien demandé !`;qT=1.6;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Edgar a fait « beurk » et il est parti manger ailleurs')},800)}}}}
+  F=F.filter(f=>!f.done&&f.y<560);if(Math.random()<dt*.15){quip=QU[Math.floor(Math.random()*QU.length)];qT=1.8}};
+ const draw=now=>{const g=x.createLinearGradient(0,0,0,540);g.addColorStop(0,'#3a2418');g.addColorStop(1,'#1c120c');x.fillStyle=g;x.fillRect(0,0,360,540);
+  x.fillStyle='#ffcf4a22';x.fillRect(0,116,360,5);x.font='800 11px system-ui';x.fillStyle='#ffcf4a88';x.textAlign='center';x.fillText('🌯 KEBAB DU 8e · OUVERT TARD',150,110);
+  bpic(x,'edgar',300,50,62,now-bHit<200?'#53c07a':now-bad<250?'#ff3d6e':'#ffcf4a',st=='won');
+  if(qT>0){x.fillStyle='#fff';x.beginPath();x.roundRect(110,128,240,30,10);x.fill();x.font='italic 600 12px system-ui';x.textAlign='left';x.fillStyle='#3a2418';x.fillText(quip.slice(0,36),118,148)}
+  x.fillStyle='#fffaf0';x.beginPath();x.roundRect(10,10,170,78,10);x.fill();x.font='800 11px system-ui';x.fillStyle='#7a3b12';x.textAlign='left';x.fillText('🧾 COMMANDE D’EDGAR',18,26);
+  ord.forEach((i,j)=>{bemo(x,ING[i][0],28+j*31,56,24);if(j<got){x.strokeStyle='#2f8f5b';x.lineWidth=3;x.beginPath();x.moveTo(18+j*31,56);x.lineTo(38+j*31,56);x.stroke()}if(j==got&&!serve){x.strokeStyle='#e0457b';x.lineWidth=2;x.strokeRect(14+j*31,40,28,32)}});
+  for(const f of F){x.save();x.translate(f.x,f.y);x.rotate(f.a);bemo(x,f.i==-1?'🥛':ING[f.i][0],0,0,34);x.restore()}
+  const by=482;x.save();if(inv>0&&Math.floor(now/80)%2)x.globalAlpha=.4;x.fillStyle='#e8c27a';x.beginPath();x.ellipse(px,by,52,14,0,0,7);x.fill();x.fillStyle='#d9a85a';x.beginPath();x.ellipse(px,by+3,46,9,0,0,7);x.fill();
+  stack.forEach((e,j)=>bemo(x,e,px+(j%2?8:-8),by-12-j*14,26));x.restore();
+  if(serve>0){bemo(x,'🌯',180,300,90*(1+(1.1-serve)*.3));x.font='900 26px system-ui';x.fillStyle='#ffcf4a';x.textAlign='center';x.fillText('SERVI !',180,380)}
+  if(now-bad<250){x.fillStyle='#ff000033';x.fillRect(0,0,360,540)}
+  bbar(x,hp,p.hp,`🌯 Edgar · encore ${hp} kebab${hp>1?'s':''}`,now-bHit<200,500);x.font='17px system-ui';x.textAlign='right';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),352,106);
+  if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ G={dbg:()=>({F,ord,got,px,st,hp,lives,stack,serve}),key:k=>{if(k=='ArrowLeft')tx=px-60;if(k=='ArrowRight')tx=px+60},hint:()=>{if(st!='play')return false;lives++;F=F.filter(f=>f.i==ord[got]);return true}}}}catch(e){console.error(e)}
+
+/* 🧪 Nora : le TP de chimie (remplir le tube à la pipette, pile dans la zone) */
+try{GAMES.bpipette=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Garde le doigt appuyé pour remplir le tube, lâche pile dans la zone verte. Attention : certains liquides coulent encore un peu après !");
+ const LQ=[{n:'Eau distillée',c:'#7fd3ff',r:.22,in:0},{n:'Sirop',c:'#ff9a3c',r:.11,in:0},{n:'Solution rose',c:'#ff7aa8',r:.3,in:.05},{n:'Réactif bleu',c:'#5a7bff',r:.18,pulse:1,in:.02},{n:'Mousse verte',c:'#6ee07a',r:.26,in:.07}];
+ const QU=['Tu peux me passer la pipette ?','Le prof regarde ! 👀','C’était 2 ou 3 mL ?','J’ai pas révisé ce TP…','Fais pas déborder, hein.'];
+ let st='ready',hp=p.hp,lives=p.lives,tb=null,hold=0,lv=0,carry=0,bHit=0,bad=0,res=null,quip='On a deux heures de TP. 🧪',qT=2.5,bump=0,flick=0,evT=6,T=0,drops=[];
+ const tube=()=>{const k=1-hp/p.hp,L=LQ[Math.floor(Math.random()*Math.min(LQ.length,2+Math.floor(k*4)))],w=.17-.09*k,c=.35+Math.random()*.45;tb={L,lo:c-w/2,hi:c+w/2,t:0,lim:9-3*k};lv=0;carry=0};
+ const finish=()=>{if(res||!tb)return;if(lv>=tb.lo&&lv<=tb.hi){const per=Math.abs(lv-(tb.lo+tb.hi)/2)<(tb.hi-tb.lo)*.18;hp=Math.max(0,hp-(per?2:1));bHit=performance.now();res={ok:1,per,t:.8};try{SFX('ok')}catch(_){}if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},900)}}};
+ const ko=why=>{lives--;bad=performance.now();res={ok:0,t:.9,why};try{SFX('bad')}catch(_){}if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('le TP a fini en mousse sur la paillasse')},900)}};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';tube();timer(p.time,()=>{if(st=='play'){st='dead';fail(`il restait ${hp} tubes à remplir`)}},id);return}if(st=='play'&&!res)hold=1};
+ W.onpointerup=W.onpointercancel=()=>{if(hold){hold=0;if(tb&&tb.L.in)carry=tb.L.in}};
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);flick=Math.max(0,flick-dt);
+  if(res){res.t-=dt;if(res.t<=0){res=null;if(st=='play')tube()}return}
+  tb.t+=dt;let r=tb.L.r*(tb.L.pulse?(.35+Math.abs(Math.sin(T*4))*1.3):1);
+  if(hold){lv+=r*dt;if(Math.random()<dt*14)drops.push({y:118,v:0,c:tb.L.c})}else if(carry>0){const d=Math.min(carry,r*dt);lv+=d;carry-=d;if(carry<=0&&lv>=tb.lo)finish()}
+  else if(lv>=tb.lo&&lv<=tb.hi)finish();
+  if(lv>tb.hi)ko(lv>1?'Ça déborde !!! 🫧':'Trop rempli !');else if(tb.t>tb.lim&&!hold)ko('Trop lent, le prof ramasse les tubes.');
+  evT-=dt;if(evT<=0){evT=6+Math.random()*4;if(Math.random()<.5){bump=.5;quip='Pardon !! Je t’ai poussé le coude 😬';qT=1.6;if(hold)lv+=.04}else{flick=2;quip='Le néon du labo grésille… 💡';qT=1.6}}
+  bump=Math.max(0,bump-dt);for(const d of drops){d.v+=900*dt;d.y+=d.v*dt}drops=drops.filter(d=>d.y<470-lv*300);if(!hold&&Math.random()<.02)quip=QU[Math.floor(Math.random()*QU.length)],qT=1.6};
+ const draw=now=>{x.fillStyle='#eef6f2';x.fillRect(0,0,360,540);x.fillStyle='#cfe3da';x.fillRect(0,470,360,70);x.fillStyle='#b9d4c8';x.fillRect(0,470,360,4);
+  bpic(x,'nora',60,62,70,now-bHit<200?'#53c07a':now-bad<250?'#ff3d6e':'#7a5cff',st=='won');
+  if(qT>0){x.fillStyle='#fff';x.beginPath();x.roundRect(104,36,244,40,12);x.fill();x.font='italic 600 12.5px system-ui';x.textAlign='left';x.fillStyle='#2b3a4a';x.fillText(quip.slice(0,36),114,61)}
+  const sh=bump>0?Math.sin(now/20)*6*bump:0;x.save();x.translate(sh,0);
+  // pipette
+  x.fillStyle='#ffffffcc';x.strokeStyle='#8aa';x.lineWidth=2;x.beginPath();x.roundRect(172,84,16,40,6);x.fill();x.stroke();x.fillStyle=hold?'#e0457b':'#c8d';x.beginPath();x.roundRect(168,72,24,16,6);x.fill();
+  if(tb){for(const d of drops){x.fillStyle=d.c;x.beginPath();x.arc(180,d.y,3,0,7);x.fill()}
+   const TX=130,TY=130,TW=100,TH=340;x.fillStyle='#ffffff99';x.strokeStyle='#7a9a90';x.lineWidth=3;x.beginPath();x.roundRect(TX,TY,TW,TH,[0,0,24,24]);x.fill();
+   const lh=Math.min(1.08,lv)*300;x.save();x.beginPath();x.roundRect(TX,TY,TW,TH,[0,0,24,24]);x.clip();const gq=x.createLinearGradient(0,470-lh,0,470);gq.addColorStop(0,tb.L.c);gq.addColorStop(1,tb.L.c+'aa');x.fillStyle=gq;x.fillRect(TX,470-lh,TW,lh);
+   if(lv>tb.hi||(res&&!res.ok)){for(let i=0;i<14;i++){x.fillStyle='#fff';x.beginPath();x.arc(TX+8+i*7,470-lh-4+Math.sin(now/90+i)*5,6+(i%3)*2,0,7);x.fill()}}x.restore();x.stroke();
+   if(!flick||Math.floor(now/90)%3==0){x.fillStyle='#53c07a44';x.fillRect(TX-14,470-tb.hi*300,TW+28,(tb.hi-tb.lo)*300);x.strokeStyle='#2f8f5b';x.lineWidth=2;x.strokeRect(TX-14,470-tb.hi*300,TW+28,(tb.hi-tb.lo)*300);bemo(x,'▶',TX-24,470-(tb.lo+tb.hi)*150,16);bemo(x,'◀',TX+TW+24,470-(tb.lo+tb.hi)*150,16)}
+   x.fillStyle='#7a9a90';for(let g=0;g<=10;g++){x.fillRect(TX+TW-16,470-g*30,g%5?8:16,2)}
+   x.font='800 14px system-ui';x.textAlign='center';x.fillStyle='#2b3a4a';x.fillText(`${tb.L.n}${tb.L.in?' · coule après ⚠️':''}${tb.L.pulse?' · par à-coups':''}`,180,488);
+   x.fillStyle='#0002';x.fillRect(40,494,280,5);x.fillStyle=tb.t>tb.lim*.7?'#ff3d6e':'#7a5cff';x.fillRect(40,494,280*Math.max(0,1-tb.t/tb.lim),5)}
+  x.restore();
+  if(res){x.font='900 26px system-ui';x.textAlign='center';x.fillStyle=res.ok?'#2f8f5b':'#c4213f';x.fillText(res.ok?(res.per?'PARFAIT ✨ ×2':'BIEN ✅'):res.why,180,300)}
+  if(now-bad<250){x.fillStyle='#ff000033';x.fillRect(0,0,360,540)}
+  x.fillStyle='#24443a';x.fillRect(0,502,360,38);bbar(x,hp,p.hp,`🧪 Nora · encore ${hp} tube${hp>1?'s':''}`,now-bHit<200,506);x.font='17px system-ui';x.textAlign='left';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),8,24);
+  if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ G={dbg:()=>({tb,lv,res,st,hp,lives,carry}),key:k=>{if(k==' '&&st=='play'&&!res){hold=1;setTimeout(()=>{hold=0},120)}},hint:()=>{if(st!='play')return false;lives++;if(tb){const w=tb.hi-tb.lo;tb.lo-=w*.3;tb.hi+=w*.3}return true}}}}catch(e){console.error(e)}
+
+/* 💊 Sandrine : le comptoir de la pharmacie (servir le bon produit à chaque client) */
+try{GAMES.bcomptoir=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Lis ce que veut chaque client et touche le bon produit sur l’étagère avant qu’il s’impatiente. Ne sers pas ceux qui viennent juste discuter !");
+ const IT=[{e:'🌡️',k:'fievre',l:'Fièvre'},{e:'🧻',k:'rhume',l:'Rhume'},{e:'🍬',k:'gorge',l:'Gorge'},{e:'🩹',k:'bobo',l:'Bobo'},{e:'🧴',k:'peau',l:'Peau sèche'},{e:'🍼',k:'bebe',l:'Bébé'}];
+ const ASK={fievre:['🤒 J’ai 38,5 !','🥵 Je suis brûlant','🤒 Mon fils est chaud'],rhume:['🤧 Atchoum !','🤧 Mon nez coule','🤧 Je renifle depuis lundi'],gorge:['😷 Mal à la gorge','🗣️ J’ai plus de voix','😷 Ça gratte ici'],bobo:['🤕 Je me suis coupé','🔪 L’épluche-légumes…','🦵 Je suis tombée à vélo'],peau:['🥶 Mes mains gercent','🧤 J’ai la peau sèche','💋 Mes lèvres craquent'],bebe:['👶 C’est pour mon petit','🍼 Le bébé a faim','👶 Pour ma petite-fille']};
+ const CHAT=['🙋 Je viens dire bonjour !','☁️ Il fait gris, hein ?','📰 Vous avez vu le match ?','🐈 Mon chat va bien, merci.'];
+ const FACES=['👵','👴','👨','🧔','👩','🧑‍🎓','👷','🤵','👩‍🦳','🧑‍🦱'];
+ const SL=[70,180,290];let st='ready',hp=p.hp,lives=p.lives,C=[null,null,null],shelf=[...IT.keys()],spT=.5,bHit=0,bad=0,quip='Samedi, 9 h. Les clients arrivent ! 🏃‍♀️',qT=2.5,shuf=0,shT=22,T=0,pops=[];
+ const k=()=>1-hp/p.hp;
+ const spawn=()=>{const fr=C.map((c,i)=>c?-1:i).filter(i=>i>=0);if(!fr.length)return;const s=fr[Math.floor(Math.random()*fr.length)],chat=Math.random()<.14,it=IT[Math.floor(Math.random()*IT.length)],arr=chat?CHAT:ASK[it.k];C[s]={f:FACES[Math.floor(Math.random()*FACES.length)],k:chat?null:it.k,t:arr[Math.floor(Math.random()*arr.length)],pat:0,lim:(chat?4.5:10-4.5*k())*(.9+Math.random()*.25),in:0}};
+ const hurt=why=>{lives--;bad=performance.now();quip=why;qT=1.6;try{SFX('bad')}catch(_){}if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('la file d’attente est sortie dans la rue')},900)}};
+ const btn=i=>{const c=i%3,r=Math.floor(i/3);return[20+c*110,392+r*72,100,64]};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';timer(p.time,()=>{if(st=='play'){st='dead';fail(`il restait ${hp} clients à servir`)}},id);return}if(st!='play'||shuf>0)return;const q=P(e);
+  for(let i=0;i<6;i++){const [bx,by,bw,bh]=btn(i);if(q[0]>bx&&q[0]<bx+bw&&q[1]>by&&q[1]<by+bh){const it=IT[shelf[i]];let best=-1;C.forEach((c,j)=>{if(c&&!c.gone&&c.k==it.k&&(best<0||c.lim-c.pat<C[best].lim-C[best].pat))best=j});
+   if(best>=0){const c=C[best];c.gone=1;c.ok=1;c.end=.6;hp--;bHit=performance.now();pops.push({x:SL[best],y:200,t:1,e:'💶'});try{SFX('ok')}catch(_){}quip=['Merci, bonne journée !','Parfait, merci !','Ah, enfin ! 😌'][hp%3];qT=1.2;if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},900)}}
+   else{const ch=C.findIndex(c=>c&&!c.gone&&!c.k);hurt(ch>=0?'Il voulait juste discuter, lui…':`Personne n’a demandé ${it.e} !`)}return}}};
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);for(const o of pops){o.t-=dt;o.y-=40*dt}pops=pops.filter(o=>o.t>0);
+  if(shuf>0){shuf-=dt;if(shuf<=0)shelf.sort(()=>Math.random()-.5);return}
+  shT-=dt;if(shT<=0){shT=20+Math.random()*8;shuf=1.2;quip='📦 Sandrine range la livraison… tout a bougé !';qT=2.2}
+  spT-=dt;if(spT<=0){spawn();spT=(2.2-1.1*k())*(.7+Math.random()*.6)}
+  C.forEach((c,i)=>{if(!c)return;c.in=Math.min(1,c.in+dt*4);if(c.gone){c.end-=dt;if(c.end<=0)C[i]=null;return}c.pat+=dt;if(c.pat>=c.lim){c.gone=1;c.end=.6;if(c.k){c.angry=1;hurt('😡 Un client part sans rien !')}else{c.bye=1}}})};
+ const draw=now=>{x.fillStyle='#f2fbf6';x.fillRect(0,0,360,540);x.fillStyle='#2f8f5b';x.fillRect(0,0,360,34);x.font='900 14px system-ui';x.textAlign='center';x.fillStyle='#fff';x.fillText('✚ PHARMACIE · REYRIEUX ✚',180,23);
+  bpic(x,'sandrine',38,72,52,now-bHit<200?'#53c07a':now-bad<250?'#ff3d6e':'#2f8f5b',st=='won');
+  if(qT>0){x.fillStyle='#fff';x.strokeStyle='#cde';x.beginPath();x.roundRect(72,52,280,36,10);x.fill();x.stroke();x.font='italic 600 12px system-ui';x.textAlign='left';x.fillStyle='#24443a';x.fillText(quip.slice(0,42),82,75)}
+  x.fillStyle='#d9b48a';x.fillRect(0,300,360,26);x.fillStyle='#b8905e';x.fillRect(0,322,360,6);
+  C.forEach((c,i)=>{if(!c)return;const X=SL[i],a=c.gone?Math.max(0,c.end/.6):c.in;x.save();x.globalAlpha=a;bemo(x,c.angry?'😡':c.ok?'😊':c.f,X,262+(1-c.in)*30,52);
+   x.fillStyle=c.k?'#fff':'#fff7d6';x.strokeStyle='#9bb';x.beginPath();x.roundRect(X-54,134,108,80,10);x.fill();x.stroke();x.beginPath();x.moveTo(X-8,214);x.lineTo(X,224);x.lineTo(X+8,214);x.fill();
+   const t=c.t,sp=t.indexOf(' ');bemo(x,t.slice(0,sp),X,158,24);x.font='600 11px system-ui';x.textAlign='center';x.fillStyle='#24443a';const w=t.slice(sp+1);const ws=w.split(' ');let l1='',l2='';for(const z of ws){if((l1+' '+z).length<=16&&!l2)l1=(l1?l1+' ':'')+z;else l2=(l2?l2+' ':'')+z}x.fillText(l1,X,186);x.fillText(l2.slice(0,17),X,201);
+   if(!c.gone){const f=1-c.pat/c.lim;x.fillStyle='#0002';x.fillRect(X-40,290,80,6);x.fillStyle=f<.3?'#ff3d6e':f<.6?'#ffb347':'#53c07a';x.fillRect(X-40,290,80*f,6)}x.restore()});
+  for(const o of pops){x.globalAlpha=o.t;bemo(x,o.e,o.x,o.y,28);x.globalAlpha=1}
+  x.fillStyle='#e7efe9';x.fillRect(0,340,360,200);x.font='800 12px system-ui';x.textAlign='center';x.fillStyle='#4a6a5a';x.fillText('ÉTAGÈRE · touche le bon produit',180,376);
+  for(let i=0;i<6;i++){const [bx,by,bw,bh]=btn(i),it=IT[shelf[i]],j=shuf>0?Math.sin(now/40+i)*6:0;x.fillStyle='#fff';x.strokeStyle='#2f8f5b';x.lineWidth=2;x.beginPath();x.roundRect(bx+j,by,bw,bh,12);x.fill();x.stroke();bemo(x,shuf>0?'📦':it.e,bx+bw/2+j,by+26,28);x.font='700 11px system-ui';x.fillStyle='#24443a';x.fillText(shuf>0?'…':it.l,bx+bw/2+j,by+54)}
+  if(now-bad<250){x.fillStyle='#ff000033';x.fillRect(0,0,360,540)}
+  x.fillStyle='#24443a';x.fillRect(0,92,360,38);bbar(x,hp,p.hp,`💊 Sandrine · encore ${hp} client${hp>1?'s':''}`,now-bHit<200,95);x.font='16px system-ui';x.textAlign='right';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),354,334);
+  if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ G={dbg:()=>({C,shelf,IT,shuf,st,hp,lives}),hint:()=>{if(st!='play')return false;lives++;C.forEach(c=>{if(c&&!c.gone)c.pat=0});return true}}}}catch(e){console.error(e)}
+
+/* 🚇 Valentin : course dans les couloirs du métro Bellecour (3 voies) */
+try{GAMES.bmetro=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Touche à gauche ou à droite (ou glisse) pour changer de couloir. Évite la foule et rattrape Valentin avant son métro !");
+ const OB=['🧳','🎸','🚧','🛴','👨‍👩‍👧','🧍','🛒','📦'],LX=[80,180,280],EX=['J’ai mon métro !','Je change juste à Bellecour !','C’est pour la forme, hein !','Tu m’as vu ? Non.','Je suis pressé, c’est tout !'];
+ let st='ready',lane=1,ln=1,gap=0,v=p.v,O=[],spT=1,inv=0,bad=0,bHit=0,lives=p.lives,vl=1,vlT=2,T=0,quip=EX[0],qT=2,scroll=0,boost=0,sx=null,gates=12;
+ const k=()=>gap;
+ const spawn=()=>{if(gates<=0){gates=12+Math.random()*6;const open=Math.floor(Math.random()*3);for(let i=0;i<3;i++)if(i!=open)O.push({l:i,y:-40,e:'⛔',gate:1});O.push({l:open,y:-40,e:'🟢',free:1});return}
+  const n=Math.random()<.35+.3*k()?2:1,ls=[0,1,2].sort(()=>Math.random()-.5).slice(0,n);for(const l of ls)O.push({l,y:-40-Math.random()*20,e:OB[Math.floor(Math.random()*OB.length)],mv:Math.random()<.15?1:0});
+  if(Math.random()<.3){const fl=[0,1,2].find(l=>!ls.includes(l));if(fl!=null)O.push({l:fl,y:-90,e:Math.random()<.5?'☕':'🎫',bon:1})}};
+ const mv=d=>{if(st=='play')lane=Math.max(0,Math.min(2,lane+d))};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';timer(p.time,()=>{if(st=='play'){st='dead';fail('les portes du métro se sont refermées sur Valentin')}},id);return}sx=P(e)[0]};
+ W.onpointerup=e=>{if(sx==null)return;const q=P(e)[0],d=q-sx;if(Math.abs(d)>25)mv(d>0?1:-1);else mv(q<180?-1:1);sx=null};
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);boost=Math.max(0,boost-dt);ln+=(lane-ln)*Math.min(1,dt*16);
+  const sp=v*(1+.5*k())*(boost?1.25:1);scroll=(scroll+sp*dt)%60;gap=Math.min(1,gap+dt*(p.rate+(boost?p.rate*1.5:0)));
+  if(gap>=1){st='won';bHit=performance.now();quip='Ok ok ! Je… changeais juste de métro. 😅';qT=3;setTimeout(()=>{if(id==RUN)win()},1100);return}
+  spT-=dt;if(spT<=0){spawn();gates--;spT=Math.max(.55,1.05-.45*k())*(.85+Math.random()*.3)}
+  for(const o of O){o.y+=sp*dt;if(o.mv&&o.y>60&&!o.mvd&&o.y<300){o.mvd=1;o.tl=o.l==1?(Math.random()<.5?0:2):1}if(o.tl!=null)o.lx=(o.lx==null?LX[o.l]:o.lx)+(LX[o.tl]-(o.lx==null?LX[o.l]:o.lx))*Math.min(1,dt*3);
+   const ox=o.lx!=null?o.lx:LX[o.l];if(!o.hit&&Math.abs(o.y-440)<26&&Math.abs(ox-(80+ln*100))<40){o.hit=1;
+    if(o.bon){if(o.e=='☕'){boost=2.5;quip='☕ Un café et ça repart !';qT=1.2}else{gap=Math.min(1,gap+.05);quip='🎫 Pas besoin de faire la queue !';qT=1.2}try{SFX('ok')}catch(_){}}
+    else if(o.free){}
+    else if(!inv){lives--;inv=1.1;bad=performance.now();gap=Math.max(0,gap-.07);try{SFX('bad')}catch(_){}quip=o.gate?'Bip ! Portillon fermé ⛔':['Pardon madame !','Aïe, la valise…','Désolée monsieur !'][lives%3];qT=1.3;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Célestine s’est perdue dans la correspondance')},900)}}}}
+  O=O.filter(o=>o.y<580);vlT-=dt;if(vlT<=0){vlT=1.4+Math.random()*1.5;vl=Math.floor(Math.random()*3);if(Math.random()<.4){quip=EX[Math.floor(Math.random()*EX.length)];qT=1.6}}};
+ const draw=now=>{x.fillStyle='#d8d2c4';x.fillRect(0,0,360,540);
+  x.fillStyle='#efe9da';x.beginPath();x.moveTo(100,100);x.lineTo(260,100);x.lineTo(360,540);x.lineTo(0,540);x.fill();
+  x.strokeStyle='#c8bfac';x.lineWidth=2;for(let y=100+scroll*(440/600)%44;y<540;y+=44){const t=(y-100)/440,l=100-100*t,r=260+100*t;x.beginPath();x.moveTo(l,y);x.lineTo(r,y);x.stroke()}
+  for(const t of [1/3,2/3]){x.beginPath();x.moveTo(100+160*t,100);x.lineTo(360*t,540);x.stroke()}
+  x.fillStyle='#e6007e';x.fillRect(0,0,360,40);x.font='900 15px system-ui';x.textAlign='center';x.fillStyle='#fff';x.fillText('Ⓜ BELLECOUR · Correspondance ⓐ ⓓ',180,26);
+  x.fillStyle='#1d3b8b';x.fillRect(0,40,100,22);x.fillStyle='#e30613';x.fillRect(260,40,100,22);x.font='800 11px system-ui';x.fillStyle='#fff';x.fillText('Ligne A ⬅',50,55);x.fillText('➡ Ligne D',310,55);
+  const vx=100+(vl+.5)*160/3;bpic(x,'valentin',vx,128+gap*150,34+gap*40,now-bHit<300?'#53c07a':'#f3c623',st=='won');
+  if(qT>0){x.fillStyle='#fff';x.beginPath();x.roundRect(40,68,280,24,8);x.fill();x.font='italic 600 12px system-ui';x.fillStyle='#333';x.fillText(quip.slice(0,44),180,85)}
+  for(const o of [...O].sort((a,b)=>a.y-b.y)){if(o.hit&&!o.bon&&!o.gate)continue;if(o.hit&&o.bon)continue;const t=Math.max(0,(o.y-100)/440),ox=o.lx!=null?o.lx:LX[o.l],X=180+(ox-180)*(.45+.55*t),s=22+30*t;if(o.y<100||o.y>492)continue;if(o.gate){x.fillStyle='#55555588';x.fillRect(X-s*.9,o.y-s*.5,s*1.8,s)}bemo(x,o.e,X,o.y,s)}
+  x.save();if(inv>0&&Math.floor(now/90)%2)x.globalAlpha=.35;bemo(x,'🏃‍♀️',80+ln*100,446,50);x.restore();
+  if(boost){x.font='800 12px system-ui';x.fillStyle='#7a3b12';x.textAlign='center';x.fillText('☕ BOOST',80+ln*100,410)}
+  if(now-bad<250){x.fillStyle='#ff000033';x.fillRect(0,0,360,540)}
+  x.fillStyle='#000a';x.beginPath();x.roundRect(60,500,240,16,8);x.fill();x.fillStyle='#e6007e';x.beginPath();x.roundRect(62,502,236*gap,12,6);x.fill();x.font='800 12px system-ui';x.textAlign='center';x.fillStyle='#333';x.fillText(`🏃‍♀️ ${Math.round(gap*100)} % · rattrape Valentin`,180,532);
+  x.font='16px system-ui';x.textAlign='left';x.fillText('❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(Math.max(0,p.lives-lives)),6,90);
+  if(st=='ready')bready(x);if(st=='dead'){x.fillStyle='#b3122e55';x.fillRect(0,0,360,540)}};
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ G={dbg:()=>({O,lane,st,gap,lives}),key:k=>{if(k=='ArrowLeft')mv(-1);if(k=='ArrowRight')mv(1)},hint:()=>{if(st!='play')return false;gap=Math.min(.95,gap+.15);lives++;return true}}}}catch(e){console.error(e)}
+
 /* 🎹 Rodolphe le DJ : Piano Tiles sur « Turbo Renne », morceau électro rapide original (mélodie = tuiles) */
 try{GAMES.bpiano=function(p,el,win,fail){const id=RUN;
  const {W,x,P}=bcv(el,"Chaque tuile est une <b>note de la mélodie</b> : touche-les quand elles passent la ligne lumineuse. Dorées = <b>deux à la fois</b>, longues = <b>garde le doigt appuyé</b> !");
