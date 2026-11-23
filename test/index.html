@@ -1951,7 +1951,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795461072';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795474924';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2351,7 +2351,7 @@ const BOSSCOST=10;
 const BRULES={
  4:["🎙️ Noémie n’a pas le temps : ses ongles sèchent. Pour placer tes questions, esquive tout ce qu’elle t’envoie.","👆 Glisse le doigt pour déplacer Célestine en bas de l’écran. Tes questions ❓ partent toutes seules vers le haut : vise Noémie.","💅 Esquive ses reproches, ses gouttes de vernis, ses flacons et sa lime… Tu as <b>6 vies</b>.","😤 À la moitié, elle accélère… puis elle se vexe et sort le pot de gel géant. La ligne rouge ⚠️ annonce la lime.","⏱️ Tu as 2 min 40. 💡 L’indice donne une vie en plus. Ensuite : trouve sa contradiction."],
  8:["👁️ Emma te fait passer un test de vue. Sur chaque planche, une lettre est différente des autres : touche-la !","⏱️ Chaque planche a son chrono. Trop lent ou mauvaise lettre = 1 ❤️ en moins (<b>3 vies</b>).","😎 Plus ça avance, plus les lettres sont petites et floues. Et parfois Emma enlève ses lunettes : tout devient TRÈS flou.","👓 Quand ses lunettes apparaissent sur la planche, attrape-les : vision nette pendant 5 secondes.","🎯 Lis <b>18 planches</b> pour la faire craquer. 💡 L’indice donne une vie et une vision nette. Ensuite : trouve sa contradiction."],
- 11:["🌯 Edgar a faim. Il ne parlera qu’avec un kebab dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>4 vies</b>). Esquive-les !","🥛 La sauce blanche remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 kebabs</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
+ 11:["🌯 Edgar a faim. Il ne parlera qu’avec un kebab dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>3 vies</b>). Esquive-les !","🥛 La sauce blanche remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 kebabs</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
  15:["📚 Nora révise son partiel… et te met au défi : ses fiches, à toute vitesse.","👉 Glisse la fiche à <b>droite si c’est VRAI</b>, à <b>gauche si c’est FAUX</b> (ou touche les boutons en bas).","⏱️ Chaque fiche a son chrono, de plus en plus court. Mauvaise réponse ou trop lent = 1 ❤️ en moins (<b>3 vies</b>).","🔄 Attention au <b>MODE PIÈGE</b> : pendant quelques secondes, il faut répondre l’INVERSE. Et certaines fiches arrivent à l’envers 🙃.","🎯 <b>22 fiches</b> pour la faire craquer. 💡 L’indice donne une vie et annule le mode piège. Ensuite : trouve sa contradiction."],
  19:["💊 Samedi, la pharmacie déborde. Sandrine veut bien parler… si tu l’aides au comptoir.","👆 Lis ce que veut chaque client (fièvre, rhume, gorge…) et touche le bon produit sur l’étagère.","⏳ Sous chaque client, sa patience. S’il part sans rien, ou si tu donnes un produit que personne n’a demandé = 1 ❤️ en moins (<b>3 vies</b>).","🙋 Certains viennent juste discuter : ne leur donne rien, ils repartiront tout seuls. Et Sandrine range parfois la livraison… l’étagère change de place !","🎯 Sers <b>20 clients</b>. 💡 L’indice donne une vie et calme tout le monde. Ensuite : trouve sa contradiction."],
  22:["🚇 « J’ai mon métro ! » Valentin file en pleine audition. Suis-le dans les couloirs de Bellecour !","👆 Touche à gauche ou à droite de l’écran (ou glisse) pour changer de couloir.","🧳🎸🚧 Évite les valises, les musiciens et les travaux. Aux portillons ⛔, passe par celui qui est ouvert 🟢.","☕ = coup de boost, 🎫 = raccourci. Chaque choc = 1 ❤️ en moins et il reprend de l’avance (<b>3 vies</b>).","🎯 Remplis la barre pour le rattraper avant son métro. 💡 L’indice te rapproche et donne une vie. Ensuite : trouve sa contradiction."]};
@@ -2359,7 +2359,7 @@ const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Noémie',ic:'💅',who:'noemie',g:'bossfight',p:{hp:72,time:160,lives:6,sp:.62,atk:1.7,ic:'💅',who:'noemie',n:'Noémie'}},
  8:{n:'Emma',ic:'👁️',who:'emma',g:'bvue',p:{hp:18,lives:3,time:120}},
- 11:{n:'Edgar',ic:'🌯',who:'edgar',g:'bkebab',p:{hp:6,lives:4,time:170}},
+ 11:{n:'Edgar',ic:'🌯',who:'edgar',g:'bkebab',p:{hp:6,lives:3,time:140}},
  15:{n:'Nora',ic:'📚',who:'nora',g:'bfiches',p:{hp:22,lives:3,time:100}},
  19:{n:'Sandrine',ic:'💊',who:'sandrine',g:'bcomptoir',p:{hp:20,lives:3,time:120}},
  22:{n:'Valentin (témoin)',ic:'🚇',who:'valentin',g:'bmetro',p:{lives:3,time:100,v:290,rate:.013}}};return C[d]||null}
@@ -4962,16 +4962,25 @@ Object.assign(STORY,{
   ['c','Et le Dr Rodolphe, il peut analyser mes photos ?',{fx:'cin'}],
   ['e','Il peut agrandir un grain de poussière jusqu’à en lire la date de naissance. Gardez-le en tête. 🔬']]},
  b4:{t:'Audition · Noémie',sc:'audit',p:'noemie',l:[
+  ['n','Commissariat du 8e. Pépin punaise une story Instagram au tableau.',{fx:'ein'}],
+  ['e','Mardi soir, chez Noémie, vous avez enlevé votre bracelet pour la pose d’ongles. Pendant une heure, il était posé sur SA table.'],
+  ['c','Noémie ? C’est ma meilleure amie…',{fx:'cin'}],
+  ['e','Raison de plus pour commencer par elle. Je l’ai convoquée. Elle vient… avec ses vernis. 💅'],
   ['n','Salle d’audition n°2. Noémie s’assoit, ses ongles impeccables tapotent la table : tac, tac, tac.',{fx:'bin'}],
   ['b','Je viens de faire une pose complète, j’ai vingt minutes avant que ça sèche mal. On peut faire vite ?'],
   ['e','Madame, mardi, le bracelet était chez vous.',{fx:'ein'}],
   ['b','Et alors ? C’est moi qui te le cherche, ton bracelet, ou c’est toi ? 💅'],
+  ['b','Encore une question et je te lance mes flacons de vernis. Je te préviens.'],
   ['e','Elle esquive et vous envoie tout ce qui lui tombe sous la main. Esquivez, et placez vos questions.',{fx:'shake'}]]},
  w4:{t:'Audition · Noémie',sc:'audit',p:'noemie',l:[
   ['n','Noémie souffle sur ses ongles.',{fx:'bin'}],
   ['b','Bon. Je te redis tout, tranquillement.'],
   ['e','Une de ses phrases ne colle pas avec le dossier. Laquelle ?',{fx:'ein'}]]},
  b8:{t:'Audition · Emma',sc:'audit',p:'emma',l:[
+  ['n','Commissariat, jour 8. Pépin pose une photo sur le bureau.',{fx:'ein'}],
+  ['e','Jeudi, au resto. Pendant que vous étiez aux toilettes, Emma avait votre sac sur les genoux. Et un étui à lunettes ouvert devant elle.'],
+  ['c','Emma ? Elle ne porte même pas de lunettes…',{fx:'cin'}],
+  ['e','Justement. Je l’ai convoquée. Elle arrive directement de son cabinet.'],
   ['n','Emma entre en blouse blanche, entre deux patients.',{fx:'bin'}],
   ['b','Lisez la dernière ligne du tableau, lieutenant. …Non, je plaisante. Quoique. 👁️'],
   ['e','Jeudi, au resto, vous avez eu le sac de Célestine sur les genoux.',{fx:'ein'}],
@@ -4983,17 +4992,26 @@ Object.assign(STORY,{
   ['b','Très bien. Ma version de jeudi soir.'],
   ['e','Comparez avec les photos de la soirée.',{fx:'ein'}]]},
  b11:{t:'Audition · Edgar',sc:'audit',p:'edgar',l:[
+  ['n','Jour 11. Pépin relit un SMS de Valérie, la maman de Célestine.',{fx:'ein'}],
+  ['e','Vendredi soir, Edgar a pris 20 € dans votre porte-monnaie. Et votre sac a passé la nuit dans l’entrée, à Reyrieux.'],
+  ['c','Mon frère ?! …Bon, les 20 €, ça lui ressemble. 🙄',{fx:'cin'}],
+  ['e','Je l’ai convoqué à 19 h. Il est arrivé à 20 h 15. Affamé.'],
   ['n','Edgar arrive avec un kebab à moitié mangé.',{fx:'bin'}],
   ['b','J’ai pas eu le temps de dîner, ça vous dérange pas ? 🌯'],
   ['e','Le sac de votre sœur est resté tout le week-end dans votre entrée.',{fx:'ein'}],
   ['b','Et moi j’étais dans ma chambre. Comme un ange.'],
-  ['b','Je parle le ventre plein, pas avant. Fais-m’en un. Sans erreur.'],
+  ['n','En bas du commissariat, il y a le kebab du 8e. Le patron est parti en pause… la broche tourne toute seule.'],
+  ['b','Je parle le ventre plein, pas avant. Descends, et fais-m’en un. Sans erreur.'],
   ['e','Célestine… derrière la broche. Il ne lâchera rien sinon.',{fx:'shake'}]]},
  w11:{t:'Audition · Edgar',sc:'audit',p:'edgar',l:[
   ['n','Edgar repose son kebab.',{fx:'bin'}],
   ['b','Ok, ok. Mon week-end, minute par minute.'],
   ['e','Il y a un mensonge là-dedans. Et votre mère a la mémoire longue.',{fx:'ein'}]]},
  b15:{t:'Audition · Nora',sc:'audit',p:'nora',l:[
+  ['n','Jour 15. Une photo Snapchat d’Erika est punaisée au tableau.',{fx:'ein'}],
+  ['e','Vendredi, 8 h 50, en TP. Nora tient votre trousse rose dans ses mains. Celle où vous pensiez avoir rangé le bracelet.'],
+  ['c','Nora ? Elle a toujours le nez dans ses fiches…',{fx:'cin'}],
+  ['e','Elle passe entre deux sessions de BU. Avec ses fiches, évidemment.'],
   ['n','Nora entre avec ses fiches de révision sous le bras.',{fx:'bin'}],
   ['b','J’ai un partiel dans trois jours, je n’ai vraiment pas le temps… 📚'],
   ['e','Vendredi, au TP, vous étiez juste à côté de Célestine.',{fx:'ein'}],
@@ -5005,6 +5023,10 @@ Object.assign(STORY,{
   ['b','D’accord. Mon vendredi matin.'],
   ['e','Une photo d’Erika vaut mieux qu’un long discours.',{fx:'ein'}]]},
  b19:{t:'Audition · Sandrine',sc:'pharma',p:'sandrine',l:[
+  ['n','Jour 19. Pépin relit un message de samedi sur le téléphone de Célestine.',{fx:'ein'}],
+  ['e','« J’ai pris un peu de ta crème pour les mains. » Samedi à 14 h, Sandrine a ouvert votre casier. Votre sac était dedans.'],
+  ['c','Sandrine ? Elle m’a tout appris à la pharmacie…',{fx:'cin'}],
+  ['e','Elle refuse de venir au commissariat : « le samedi, c’est le rush ». Alors on va chez elle.'],
   ['n','Pharmacie de Reyrieux. Sandrine file entre les rayons, un carton de crèmes dans les bras.',{fx:'bin'}],
   ['b','Pas maintenant, j’ai six clients et une livraison ! 📦'],
   ['e','Madame, juste deux minutes…',{fx:'ein'}],
@@ -5015,6 +5037,10 @@ Object.assign(STORY,{
   ['b','Bon, bon. Mon samedi, puisque vous insistez.'],
   ['e','Vérifiez ses dires. Les messages ne mentent pas.',{fx:'ein'}]]},
  b22:{t:'Audition · Valentin (témoin)',sc:'audit',l:[
+  ['n','Jour 22. Dernière convocation sur le bureau de Pépin.',{fx:'ein'}],
+  ['e','Vendredi, vous êtes partie à 7 h 55. Valentin, lui, est parti à 8 h 55. Une heure seul dans l’appartement.'],
+  ['c','Valentin ? Il vit avec moi, il n’a aucune raison de…',{fx:'cin'}],
+  ['e','Simple vérification. Tout le monde passe en audition. Lui aussi.'],
   ['n','Dernière audition. Valentin s’assoit en souriant.',{fx:'vin'}],
   ['v','C’est pour la forme, hein ? Je vis avec elle, j’allais forcément y passer. 😅'],
   ['e','Exactement. Pour la forme.',{fx:'ein'}],
@@ -6206,12 +6232,12 @@ try{GAMES.bkebab=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Glis
  const QU=['Sauce blanche, toujours.','Plus vite, j’ai faim !','Les frites DEDANS, hein.','J’ai sauté le goûter, là.','Tu le fais exprès ?','Ça sent bon…','Maman m’attend pour dîner. Chut.'];
  let st='ready',hp=p.hp,lives=p.lives,px=180,tx=180,F=[],sp=.9,ord=[],got=0,stack=[],bHit=0,bad=0,quip='Un kebab. Vite. 🌯',qT=2.5,serve=0,T=0,len=3,inv=0,pf=[];
  const order=()=>{const a=[...ING.keys()].sort(()=>Math.random()-.5);ord=a.slice(0,len);got=0;stack=[];len=Math.min(5,len+1)};
- const spawn=()=>{const need=ord[got],r=Math.random();let i;if(r<.4)i=need;else if(r<.45)i=-1;else{do{i=Math.floor(Math.random()*ING.length)}while(i==need)}F.push({i,x:40+Math.random()*290,y:170,v:(165+150*(1-hp/p.hp))*(.85+Math.random()*.35),r:(Math.random()-.5)*3,a:0,w:Math.random()<.15*(1-hp/p.hp)+.03?(Math.random()<.5?-1:1)*60:0})};
+ const spawn=()=>{const need=ord[got],r=Math.random();let i;if(r<.35)i=need;else if(r<.4)i=-1;else{do{i=Math.floor(Math.random()*ING.length)}while(i==need)}F.push({i,x:40+Math.random()*290,y:170,v:(185+165*(1-hp/p.hp))*(.85+Math.random()*.35),r:(Math.random()-.5)*3,a:0,w:Math.random()<.2*(1-hp/p.hp)+.05?(Math.random()<.5?-1:1)*60:0})};
  W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';order();timer(p.time,()=>{if(st=='play'){st='dead';fail(`Edgar attend encore ${hp} kebab${hp>1?'s':''}`)}},id)}tx=P(e)[0]};
  W.onpointermove=e=>{if(e.buttons||e.pointerType=='touch')tx=P(e)[0]};
  const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);px+=(Math.max(40,Math.min(330,tx))-px)*Math.min(1,dt*14);for(const o of pf){o.t-=dt;o.y-=50*dt}pf=pf.filter(o=>o.t>0);
   if(serve>0){serve-=dt;if(serve<=0){if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},500);return}order()}return}
-  sp-=dt;if(sp<=0){spawn();sp=Math.max(.45,.85-.4*(1-hp/p.hp))*(.8+Math.random()*.4)}
+  sp-=dt;if(sp<=0){spawn();sp=Math.max(.42,.8-.38*(1-hp/p.hp))*(.8+Math.random()*.4)}
   for(const f of F){f.y+=f.v*dt;f.a+=f.r*dt;if(f.w){f.x+=f.w*dt;if(f.x<30||f.x>330)f.w=-f.w}
    const top=470-stack.length*13;if(!f.done&&Math.abs(f.y-top)<18&&Math.abs(f.x-px)<46){f.done=1;
     if(f.i==ord[got]||f.i==-1){stack.push(f.i==-1?'🥛':ING[f.i][0]);got++;pf.push({x:px,y:top-20,t:.6,e:'+1'});try{SFX('ok')}catch(_){}if(f.i==-1){quip='La sauce blanche, ça compte !';qT=1.4}
@@ -6341,75 +6367,80 @@ try{GAMES.bcomptoir=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"L
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>({C,shelf,IT,shuf,st,hp,lives}),hint:()=>{if(st!='play')return false;lives++;C.forEach(c=>{if(c&&!c.gone)c.pat=0});return true}}}}catch(e){console.error(e)}
 
-/* 🚇 Valentin : poursuite en 3D dans les couloirs du métro Bellecour */
+/* 🚇 Valentin : poursuite dans les couloirs du métro Bellecour (v3 : douce et fluide) */
 try{GAMES.bmetro=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Touche à gauche ou à droite (ou glisse) pour changer de couloir. Évite la foule et rattrape Valentin avant son métro !");
- const VX=180,VY=150,PY=470,FAR=70,LO=[-110,0,110];
- const kz=D=>1/(1+Math.max(-.9,D)/7);
- const sy=D=>VY+(PY-VY)*kz(D),sx=(o,D)=>VX+o*kz(D);
+ const VX=180,VY=168,PY=470,FAR=60,N=-1.3,HW=170,H=400;
+ const kz=D=>1/(1+Math.max(-.95,D)/7),pt=(o,D,h)=>{const k=kz(D);return[VX+o*k,VY+(PY-VY)*k-h*k]};
+ const fog=D=>Math.max(0,Math.min(1,(FAR-D)/14));
  const OB=['🧳','🎸','🚧','🛴','🛒','📦','🧍','👨‍👩‍👧'],EX=['J’ai mon métro !','Je change juste à Bellecour !','C’est pour la forme, hein !','Tu m’as vu ? Non.','Je suis pressé, c’est tout !','Ligne D, ligne D…'];
- const POST=[['BELLECOUR','#1d3557','#fff'],['FÊTE DES LUMIÈRES','#f4a261','#2b1a0e'],['LIGNE D →','#2a9d4a','#fff'],['← LIGNE A','#d62828','#fff'],['PRESQU’ÎLE','#6a4c93','#fff'],['TCL','#e63946','#fff']];
+ const POST=[['BELLECOUR','#2b4c7e','#fff'],['LUMIÈRES','#d9884a','#2b1a0e'],['LIGNE D','#3f8f5b','#fff'],['LIGNE A','#b8404a','#fff'],['PRESQU’ÎLE','#6a5a93','#fff']];
+ // décor fixe pré-dessiné une seule fois (aucun scintillement)
+ const off=document.createElement('canvas');off.width=720;off.height=1080;const o=off.getContext('2d');o.scale(2,2);
+ {const q=(a,b,c,d,f)=>{o.fillStyle=f;o.beginPath();o.moveTo(...a);o.lineTo(...b);o.lineTo(...c);o.lineTo(...d);o.fill()};
+  o.fillStyle='#1c2236';o.fillRect(0,0,360,540);
+  let g=o.createLinearGradient(0,0,0,VY);g.addColorStop(0,'#232a40');g.addColorStop(1,'#3a4160');q(pt(-HW,FAR,H),pt(HW,FAR,H),pt(HW,N,H),pt(-HW,N,H),g);
+  for(const s of [-1,1]){g=o.createLinearGradient(VX+s*HW*kz(N),0,VX,0);g.addColorStop(0,'#b8a888');g.addColorStop(1,'#efe5cf');q(pt(s*HW,FAR,0),pt(s*HW,FAR,H),pt(s*HW,N,H),pt(s*HW,N,0),g);
+   g=o.createLinearGradient(VX+s*HW*kz(N),0,VX,0);g.addColorStop(0,'#2d4f86');g.addColorStop(1,'#6f8fc4');q(pt(s*HW,FAR,58),pt(s*HW,N,58),pt(s*HW,N,74),pt(s*HW,FAR,74),g);
+   q(pt(s*HW,FAR,0),pt(s*HW,N,0),pt(s*HW,N,18),pt(s*HW,FAR,18),'#00000022')}
+  g=o.createLinearGradient(0,VY,0,540);g.addColorStop(0,'#a3a29e');g.addColorStop(1,'#5d5c5a');q(pt(-HW,FAR,0),pt(HW,FAR,0),pt(HW,N,0),pt(-HW,N,0),g);
+  o.strokeStyle='#ffffff30';o.lineWidth=2;for(const l of [-55,55]){o.beginPath();o.moveTo(...pt(l,FAR,0));o.lineTo(...pt(l,N,0));o.stroke()}
+  const fg=o.createRadialGradient(VX,VY-10,2,VX,VY-10,110);fg.addColorStop(0,'#fff3d0');fg.addColorStop(.35,'#fff3d066');fg.addColorStop(1,'#fff3d000');o.fillStyle=fg;o.fillRect(0,40,360,260)}
+ const glow=document.createElement('canvas');glow.width=glow.height=64;{const gx=glow.getContext('2d'),gg=gx.createRadialGradient(32,32,0,32,32,32);gg.addColorStop(0,'#fff6d8cc');gg.addColorStop(1,'#fff6d800');gx.fillStyle=gg;gx.fillRect(0,0,64,64)}
  let st='ready',lane=1,ln=1,gap=0,O=[],spT=1,inv=0,bad=0,bHit=0,lives=p.lives,vl=1,vln=1,vlT=2,T=0,quip=EX[0],qT=2,run=0,boost=0,sx0=null,gates=10,dist=0;
  const k=()=>gap;
- const spawn=()=>{if(gates<=0){gates=9+Math.random()*5;const open=Math.floor(Math.random()*3);for(let i=0;i<3;i++)O.push({l:i,D:FAR,gate:1,open:i==open});return}
+ const spawn=()=>{if(gates<=0){gates=9+Math.random()*5;const op=Math.floor(Math.random()*3);for(let i=0;i<3;i++)O.push({l:i,D:FAR,gate:1,open:i==op});return}
   const n=Math.random()<.42+.33*k()?2:1,ls=[0,1,2].sort(()=>Math.random()-.5).slice(0,n);for(const l of ls)O.push({l,D:FAR+Math.random()*4,e:OB[Math.floor(Math.random()*OB.length)],mv:Math.random()<.18+.15*k()?1:0});
   if(Math.random()<.28){const fl=[0,1,2].find(l=>!ls.includes(l));if(fl!=null)O.push({l:fl,D:FAR+8,e:Math.random()<.55?'☕':'🎫',bon:1})}};
  const mv=d=>{if(st=='play')lane=Math.max(0,Math.min(2,lane+d))};
  W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';timer(p.time,()=>{if(st=='play'){st='dead';fail('les portes du métro se sont refermées sur Valentin')}},id);return}sx0=P(e)[0]};
  W.onpointerup=e=>{if(sx0==null)return;const q=P(e)[0],d=q-sx0;if(Math.abs(d)>25)mv(d>0?1:-1);else mv(q<180?-1:1);sx0=null};
- const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);boost=Math.max(0,boost-dt);ln+=(lane-ln)*Math.min(1,dt*14);vln+=(vl-vln)*Math.min(1,dt*5);
-  const sp=p.v*(1+.45*k())*(boost?1.3:1)/10;run+=dt*(boost?16:11);dist+=sp*dt;gap=Math.min(1,gap+dt*(p.rate+(boost?p.rate*1.4:0)));
+ const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);boost=Math.max(0,boost-dt);ln+=(lane-ln)*(1-Math.exp(-dt*12));vln+=(vl-vln)*(1-Math.exp(-dt*4));
+  const sp=p.v*(1+.45*k())*(boost?1.3:1)/10;run+=dt*(boost?13:10);dist+=sp*dt;gap=Math.min(1,gap+dt*(p.rate+(boost?p.rate*1.4:0)));
   if(gap>=1){st='won';bHit=performance.now();quip='Ok ok ! Je… changeais juste de métro. 😅';qT=3;setTimeout(()=>{if(id==RUN)win()},1100);return}
   spT-=dt;if(spT<=0){spawn();gates--;spT=Math.max(.5,1-.45*k())*(.85+Math.random()*.3)}
-  for(const o of O){o.D-=sp*dt;if(o.mv&&o.D<40&&o.D>15&&!o.tl){o.tl=1;o.to=o.l==1?(Math.random()<.5?0:2):1}if(o.tl){o.l+=(o.to-o.l)*Math.min(1,dt*2.4)}
-   const ol=o.l;if(!o.hit&&Math.abs(o.D)<1.6&&Math.abs(ol-ln)<.55){o.hit=1;
+  for(const o of O){o.D-=sp*dt;if(o.mv&&o.D<40&&o.D>15&&!o.tl){o.tl=1;o.to=o.l==1?(Math.random()<.5?0:2):1}if(o.tl){o.l+=(o.to-o.l)*(1-Math.exp(-dt*2.4))}
+   if(!o.hit&&Math.abs(o.D)<1.6&&Math.abs(o.l-ln)<.55){o.hit=1;
     if(o.bon){if(o.e=='☕'){boost=2.5;quip='☕ Un café et ça repart !';qT=1.2}else{gap=Math.min(1,gap+.05);quip='🎫 Pas besoin de faire la queue !';qT=1.2}try{SFX('ok')}catch(_){}}
     else if(o.gate&&o.open){}
     else if(!inv){lives--;inv=1.1;bad=performance.now();gap=Math.max(0,gap-.08);try{SFX('bad')}catch(_){}quip=o.gate?'Bip ! Portillon fermé ⛔':['Pardon madame !','Aïe, la valise…','Désolée monsieur !'][lives%3];qT=1.3;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Célestine s’est perdue dans la correspondance')},900)}}}}
-  O=O.filter(o=>o.D>-3);vlT-=dt;if(vlT<=0){vlT=1.3+Math.random()*1.4;vl=Math.floor(Math.random()*3);if(Math.random()<.4){quip=EX[Math.floor(Math.random()*EX.length)];qT=1.6}}};
- const person=(X,Y,s,coat,hair,ph,skin)=>{x.save();x.translate(X,Y);x.scale(s,s);x.fillStyle='#0003';x.beginPath();x.ellipse(0,0,22,6,0,0,7);x.fill();
-  const a=Math.sin(ph)*.6;x.fillStyle='#2b2b3a';x.save();x.translate(-7,-34);x.rotate(a);x.fillRect(-4,0,8,34);x.restore();x.save();x.translate(7,-34);x.rotate(-a);x.fillRect(-4,0,8,34);x.restore();
-  x.fillStyle=coat;x.beginPath();x.roundRect(-17,-82,34,52,[12,12,6,6]);x.fill();x.save();x.translate(-17,-76);x.rotate(-a*.8);x.fillRect(-6,0,8,34);x.restore();x.save();x.translate(17,-76);x.rotate(a*.8);x.fillRect(-2,0,8,34);x.restore();
+  O=O.filter(o=>o.D>-3);vlT-=dt;if(vlT<=0){vlT=1.6+Math.random()*1.4;vl=Math.floor(Math.random()*3);if(Math.random()<.4){quip=EX[Math.floor(Math.random()*EX.length)];qT=1.8}}};
+ const person=(X,Y,s,coat,hair,ph,skin)=>{x.save();x.translate(X,Y);x.scale(s,s);x.fillStyle='#0000002a';x.beginPath();x.ellipse(0,0,22,6,0,0,7);x.fill();
+  const a=Math.sin(ph)*.5,b=Math.abs(Math.cos(ph))*3;x.translate(0,-b);x.fillStyle='#2b2b3a';x.save();x.translate(-7,-34);x.rotate(a);x.beginPath();x.roundRect(-4,0,8,34,3);x.fill();x.restore();x.save();x.translate(7,-34);x.rotate(-a);x.beginPath();x.roundRect(-4,0,8,34,3);x.fill();x.restore();
+  x.fillStyle=coat;x.save();x.translate(-17,-76);x.rotate(-a*.7);x.beginPath();x.roundRect(-6,0,8,32,4);x.fill();x.restore();x.save();x.translate(17,-76);x.rotate(a*.7);x.beginPath();x.roundRect(-2,0,8,32,4);x.fill();x.restore();x.beginPath();x.roundRect(-17,-82,34,52,[12,12,6,6]);x.fill();
   x.fillStyle=skin||'#f1c9a5';x.fillRect(-4,-88,8,8);x.fillStyle=hair;x.beginPath();x.arc(0,-98,13,0,7);x.fill();x.restore()};
- const draw=now=>{
-  // couloir 3D : sol, murs carrelés, plafond à néons, affiches
-  const H=420,N=-1.25,pt=(o,D,h)=>{const k=kz(D);return[VX+o*k,VY+(PY-VY)*k-h*k]};
-  const quad=(a,b,c,d,col)=>{x.fillStyle=col;x.beginPath();x.moveTo(...a);x.lineTo(...b);x.lineTo(...c);x.lineTo(...d);x.fill()};
-  const line=(a,b)=>{x.beginPath();x.moveTo(...a);x.lineTo(...b);x.stroke()};
-  x.fillStyle='#0d1018';x.fillRect(0,0,360,540);
-  quad(pt(-175,FAR,0),pt(175,FAR,0),pt(175,N,0),pt(-175,N,0),'#7d7a76');
-  const ph2=dist%3;x.strokeStyle='#6d6a66';for(let D=FAR-ph2;D>N;D-=3){x.lineWidth=Math.max(.5,2*kz(D));line(pt(-175,D,0),pt(175,D,0))}
-  for(const o of [-55,55])for(let D=FAR-ph2;D>N;D-=3){x.strokeStyle='#ffd34d';x.lineWidth=Math.max(1,4*kz(D));line(pt(o,D,0),pt(o,Math.max(N,D-1.4),0))}
-  for(const side of [-1,1]){const o=side*175;quad(pt(o,FAR,0),pt(o,FAR,H),pt(o,N,H),pt(o,N,0),'#f1e7d0');
-   x.strokeStyle='#d6c9ad';x.lineWidth=1;for(let h=30;h<H;h+=30)line(pt(o,FAR,h),pt(o,N,h));
-   const ph=dist%2.5;for(let D=FAR-ph;D>N;D-=2.5){x.lineWidth=Math.max(.5,1.4*kz(D));line(pt(o,D,0),pt(o,D,H))}
-   quad(pt(o,FAR,62),pt(o,N,62),pt(o,N,80),pt(o,FAR,80),'#1f5fbf');
-   const ph4=dist%16,pi=Math.floor(dist/16);for(let D=FAR-ph4,j=0;D>N+5;D-=16,j++){const P0=POST[(pi+j+(side>0?3:0))%POST.length];quad(pt(o,D,120),pt(o,D-5,120),pt(o,D-5,230),pt(o,D,230),P0[1]);
-    const k2=kz(D-5);if(k2>.28){const a=pt(o,D,175),b=pt(o,D-5,175);x.save();x.fillStyle=P0[2];x.font=`900 ${Math.round(12*k2)}px system-ui`;x.textAlign='center';x.fillText(P0[0],(a[0]+b[0])/2,(a[1]+b[1])/2+4*k2);x.restore()}}}
-  quad(pt(-175,FAR,H),pt(175,FAR,H),pt(175,N,H),pt(-175,N,H),'#262b38');
-  const ph3=dist%6;for(let D=FAR-ph3;D>N+1;D-=6){x.save();x.shadowColor='#fffbe0';x.shadowBlur=14*kz(D);quad(pt(-30,D,H),pt(30,D,H),pt(30,D-1.5,H),pt(-30,D-1.5,H),'#fffbe8');x.restore()}
-  // brume au fond
-  const fg=x.createRadialGradient(VX,VY+10,4,VX,VY+10,120);fg.addColorStop(0,'#fff6d8cc');fg.addColorStop(1,'#fff6d800');x.fillStyle=fg;x.fillRect(0,40,360,240);
-  // objets triés du fond vers l'avant, avec Valentin
-  const items=O.filter(o=>!(o.hit&&(o.bon||!o.gate))).map(o=>({o,D:o.D}));const vD=4+(1-gap)*34;items.push({v:1,D:vD});items.sort((a,b)=>b.D-a.D);
-  for(const it of items){const D=it.D,kk=kz(D);if(D>FAR||sy(D)>540)continue;
-   if(it.v){const X=sx((vln-1)*110,D);person(X,sy(D),kk*1.05,'#1d4e89','#3a2a1e',run*1.15,'#e9c09b');bpic(x,'valentin',X,sy(D)-130*kk,Math.max(18,46*kk),now-bHit<300?'#53c07a':'#f3c623',st=='won');
-    if(qT>0)NBX.bub(x,Math.max(6,Math.min(354-220,X-110)),Math.max(44,sy(D)-130*kk-70),220,quip,{tail:Math.max(20,Math.min(340,X)),up:0});continue}
-   const o=it.o,X=sx((o.l-1)*110,D),Y=sy(D);
-   if(o.gate){const w=80*kk,h=70*kk;x.fillStyle='#5b6170';x.fillRect(X-w/2,Y-h,w*.25,h);x.fillRect(X+w/4,Y-h,w*.25,h);x.fillStyle=o.open?'#2ecc71':'#e74c3c';x.beginPath();x.arc(X-w*.375,Y-h*.85,5*kk,0,7);x.fill();if(!o.open){x.fillStyle='#c0392bcc';x.fillRect(X-w/4,Y-h*.6,w/2,10*kk)}else{x.fillStyle='#2ecc7133';x.fillRect(X-w/4,Y-h,w/2,h)}continue}
-   x.fillStyle='#0003';x.beginPath();x.ellipse(X,Y,26*kk,7*kk,0,0,7);x.fill();if(o.bon){x.fillStyle='#ffd34d44';x.beginPath();x.arc(X,Y-34*kk,30*kk,0,7);x.fill()}bemo(x,o.e,X,Y-34*kk,Math.max(8,64*kk))}
-  // Célestine (de dos)
-  const cX=VX+(ln-1)*110;x.save();if(inv>0&&Math.floor(now/90)%2)x.globalAlpha=.35;person(cX,PY+30,1.05,'#a3324f','#5a3a24',run*1.3);x.restore();
-  if(boost){x.strokeStyle='#ffffff88';x.lineWidth=2;for(let i=0;i<10;i++){const a=i/10*Math.PI*2+T;x.beginPath();x.moveTo(VX+Math.cos(a)*120,VY+Math.sin(a)*120);x.lineTo(VX+Math.cos(a)*260,VY+Math.sin(a)*260);x.stroke()}}
+ const quad=(a,b,c,d)=>{x.beginPath();x.moveTo(...a);x.lineTo(...b);x.lineTo(...c);x.lineTo(...d);x.fill()};
+ const draw=now=>{x.drawImage(off,0,0,360,540);
+  // repères en mouvement, discrets : joints du sol, piliers, néons, affiches (apparition en fondu)
+  const s8=dist%8;for(let D=FAR-s8;D>N;D-=8){x.globalAlpha=.1*fog(D);x.fillStyle='#000';quad(pt(-HW,D,0),pt(HW,D,0),pt(HW,D-.35,0),pt(-HW,D-.35,0))}
+  const s10=dist%10;for(let D=FAR-s10;D>N;D-=10){const f=fog(D);x.globalAlpha=.08*f;x.fillStyle='#3a2a10';for(const s of [-1,1])quad(pt(s*HW,D,0),pt(s*HW,D,H),pt(s*HW,D-1.2,H),pt(s*HW,D-1.2,0));
+   x.globalAlpha=f*.9;x.fillStyle='#fff8e2';quad(pt(-26,D,H),pt(26,D,H),pt(26,D-1.6,H),pt(-26,D-1.6,H));const c=pt(0,D-.8,H),w=110*kz(D);x.globalAlpha=f*.7;x.drawImage(glow,c[0]-w/2,c[1]-w/4,w,w/2)}
+  const s20=dist%20,pi=Math.floor(dist/20);for(let D=FAR-s20,j=0;D>N+5;D-=20,j++)for(const s of [-1,1]){const P0=POST[(pi+j+(s>0?2:0))%POST.length];x.globalAlpha=fog(D);x.fillStyle=P0[1];quad(pt(s*HW,D,110),pt(s*HW,D-6,110),pt(s*HW,D-6,220),pt(s*HW,D,220));
+   const k2=kz(D-3);if(k2>.32){const a=pt(s*HW,D-3,162);x.save();x.translate(a[0],a[1]);x.scale(k2*.55,k2);x.fillStyle=P0[2];x.font='900 18px system-ui';x.textAlign='center';x.fillText(P0[0].slice(0,12),0,6);x.restore()}}
+  x.globalAlpha=1;
+  // objets et Valentin, du fond vers l'avant, en fondu depuis le fond
+  const items=O.filter(o=>!(o.hit&&(o.bon||!o.gate))).map(o=>({o,D:o.D}));const vD=4+(1-gap)*34;items.push({v:1,D:vD});items.sort((a,b)=>b.D-a.D);let vxy=null;
+  for(const it of items){const D=it.D,kk=kz(D);if(D>FAR)continue;x.globalAlpha=fog(D);
+   if(it.v){const X=VX+(vln-1)*110*kk,Y=VY+(PY-VY)*kk;person(X,Y,kk*1.05,'#2b5c9a','#3a2a1e',run*1.1,'#e9c09b');x.globalAlpha=1;bpic(x,'valentin',X,Y-128*kk,Math.max(20,44*kk),now-bHit<300?'#53c07a':'#f3c623',st=='won');vxy=[X,Y-128*kk];continue}
+   const o=it.o,X=VX+(o.l-1)*110*kk,Y=VY+(PY-VY)*kk;
+   if(o.gate){const w=84*kk,h=66*kk;x.fillStyle='#6b7183';x.beginPath();x.roundRect(X-w/2,Y-h,w*.24,h,4*kk);x.fill();x.beginPath();x.roundRect(X+w/4+w*.01,Y-h,w*.24,h,4*kk);x.fill();x.fillStyle=o.open?'#43d17a':'#e8505b';x.beginPath();x.arc(X-w*.38,Y-h*.85,4*kk+1,0,7);x.fill();
+    if(!o.open){x.fillStyle='#d9434ecc';x.beginPath();x.roundRect(X-w/4,Y-h*.6,w/2,9*kk,4*kk);x.fill()}else{x.fillStyle='#43d17a2a';x.fillRect(X-w/4,Y-h,w/2,h)}continue}
+   x.fillStyle='#0000002a';x.beginPath();x.ellipse(X,Y,26*kk,7*kk,0,0,7);x.fill();if(o.bon){x.drawImage(glow,X-36*kk,Y-70*kk,72*kk,72*kk)}bemo(x,o.e,X,Y-34*kk,Math.max(8,64*kk))}
+  x.globalAlpha=1;
+  // Célestine, de dos
+  const cX=VX+(ln-1)*110;x.save();if(inv>0)x.globalAlpha=.45+.35*Math.sin(now/70);person(cX,PY+34,1.05,'#a3324f','#5a3a24',run*1.25);x.restore();
+  if(boost){const g=x.createRadialGradient(180,300,120,180,300,330);g.addColorStop(0,'#ffcf4a00');g.addColorStop(1,'#ffcf4a44');x.fillStyle=g;x.fillRect(0,0,360,540)}
+  // bulle fixe en haut, avec une flèche vers Valentin
+  if(qT>0&&vxy){x.save();x.globalAlpha=Math.min(1,qT*3);NBX.bub(x,76,48,276,quip,{});x.strokeStyle='#ffffffcc';x.lineWidth=2;x.beginPath();x.moveTo(214,84);x.lineTo(vxy[0],Math.max(92,vxy[1]-26));x.stroke();x.restore()}
   // panneau de station
-  x.fillStyle='#14213d';x.fillRect(0,0,360,40);x.font='900 17px system-ui';x.textAlign='center';x.fillStyle='#fff';x.fillText('BELLECOUR',170,26);
-  for(const [t,c,X] of [['A','#d62828',58],['D','#2a9d4a',282]]){x.fillStyle=c;x.beginPath();x.arc(X,20,11,0,7);x.fill();x.font='900 13px system-ui';x.fillStyle='#fff';x.fillText(t,X,25)}
+  x.fillStyle='#14213d';x.fillRect(0,0,360,40);x.font='900 17px system-ui';x.textAlign='center';x.fillStyle='#fff';x.fillText('BELLECOUR',180,26);
+  for(const [t,c,X] of [['A','#d62828',62],['D','#2a9d4a',298]]){x.fillStyle=c;x.beginPath();x.arc(X,20,11,0,7);x.fill();x.font='900 13px system-ui';x.fillStyle='#fff';x.fillText(t,X,25)}
   NBX.flash(x,now,bad);
-  // plan de ligne = progression
-  x.fillStyle='#14213dee';x.fillRect(0,500,360,40);x.strokeStyle='#2a9d4a';x.lineWidth=6;x.beginPath();x.moveTo(30,516);x.lineTo(330,516);x.stroke();for(let i=0;i<=5;i++){x.fillStyle='#fff';x.beginPath();x.arc(30+i*60,516,4,0,7);x.fill()}
+  // plan de la ligne = progression
+  x.fillStyle='#14213df0';x.fillRect(0,500,360,40);x.strokeStyle='#2a9d4a';x.lineWidth=6;x.lineCap='round';x.beginPath();x.moveTo(30,516);x.lineTo(330,516);x.stroke();for(let i=0;i<=5;i++){x.fillStyle='#fff';x.beginPath();x.arc(30+i*60,516,4,0,7);x.fill()}
   bemo(x,'🏃‍♀️',30+300*gap,514,20);bpic(x,'valentin',330,516,20,'#f3c623');x.font='800 10px system-ui';x.fillStyle='#cfe';x.textAlign='center';x.fillText(`${Math.round(gap*100)} % · rattrape Valentin`,180,535);
   NBX.hearts(x,lives,p.lives,8,62);
   NBX.end(x,st)};
- const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
+ const loop=now=>{if(id!=RUN)return;const dt=Math.min(.04,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>({O,lane,st,gap,lives}),key:k=>{if(k=='ArrowLeft')mv(-1);if(k=='ArrowRight')mv(1)},hint:()=>{if(st!='play')return false;gap=Math.min(.95,gap+.15);lives++;return true}}}}catch(e){console.error(e)}
 
 /* 🎹 Rodolphe le DJ : Piano Tiles sur « Turbo Renne », morceau électro rapide original (mélodie = tuiles) */
