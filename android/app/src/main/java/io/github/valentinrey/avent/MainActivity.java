@@ -43,6 +43,8 @@ public class MainActivity extends Activity {
     s.setDatabaseEnabled(true);
     s.setMediaPlaybackRequiresUserGesture(false);
     s.setAllowFileAccess(true);
+    // hors connexion, la copie locale (file://) charge ses images et ses scripts entre eux
+    s.setAllowFileAccessFromFileURLs(true);
     s.setCacheMode(WebSettings.LOAD_NO_CACHE);
     w.clearCache(true);
     s.setTextZoom(100);

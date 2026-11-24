@@ -1,0 +1,112 @@
+# Dossier n°24 · Le bracelet aux cœurs roses
+
+Calendrier de l'Avent 2026 fait par Valentin pour sa copine Célestine : une enquête policière à Lyon. Il y a 24 cases, avec un mini-jeu par jour, 6 boss (des auditions de suspects), un boss final contre Valentin, un album photo, des œufs cachés, une boutique, un casino et un labo.
+
+- **Site :** https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/
+- **Version de test :** https://valentinrey-cmd.github.io/calendrier-avant-celestine/test/. Elle utilise **les mêmes fichiers** que le site, avec `?test` : les 24 cases sont ouvertes, le bouton 🧪 est là, la sauvegarde est séparée et le suivi passe par le salon « t ».
+- **Pour qui :** Célestine, sur sa tablette Apple, son téléphone et un PC (iPad/iPhone via un raccourci sur l'écran d'accueil, Android via l'APK).
+- **Valentin ne code pas :** il décrit les changements en français, et l'IA fait tout.
+
+## ⚠️ Règles pour toute IA qui travaille sur ce projet (Claude ou une autre)
+
+1. **Commence par lire ce fichier et les dernières entrées de [`JOURNAL.md`](JOURNAL.md).** Ne relis pas tout le code : la carte ci-dessous dit où se trouve chaque chose. Ouvre seulement les fichiers concernés (`grep -rn` est ton ami).
+2. **Après CHAQUE modification, ajoute une entrée en haut de `JOURNAL.md`** : la date, ce qui a changé (en français simple) et les fichiers touchés. C'est obligatoire, même pour une petite correction, et que tu sois Claude ou une autre IA. C'est ce qui permet à la prochaine session de reprendre vite.
+3. **Change le numéro de version à chaque modification**, avec le même nombre dans `2026/index.html` (`const APPV='…'`) et dans `2026/version.json`. La commande la plus simple est `python3 outils/verifier.py --nouvelle-version`. Sans ça, les applis de Célestine ne se mettent pas à jour toutes seules.
+4. **Lance `python3 outils/verifier.py` avant de pousser.** Il vérifie la version, la liste des fichiers, les noms en double et la syntaxe.
+5. **Nouveau fichier JS, CSS ou média ? Ajoute-le dans `2026/js/fichiers.js`**, au bon endroit, car l'ordre compte. `index.html` et le mode hors-ligne (`sw.js`) lisent cette liste.
+6. **Ne change rien de ce que Célestine voit sans que Valentin l'ait demandé.**
+7. **Ne touche pas à `2026/avent.apk` ni à `suivi/suivi.apk`.** Ils sont refaits automatiquement par GitHub Actions à chaque push (commits « APK Android mis à jour [skip ci] »).
+8. Écris les messages de commit en français, courts, dans le style de l'historique, par exemple `Air hockey : 5 buts gagnants`.
+9. Pousse directement sur `main`, sauf si Valentin demande autre chose. Le site se met à jour tout seul sur GitHub Pages.
+
+## Comment le code est fait (à savoir avant de modifier)
+
+- **Pas de framework ni de compilation :** c'est du HTML, du CSS et du JavaScript « classique ». Les fichiers sont chargés dans l'ordre de `2026/js/fichiers.js`. Tous partagent les **mêmes variables globales** : une fonction de `calendrier.js` peut appeler une fonction de `labo.js`.
+- **L'ordre de chargement compte :** du code qui s'exécute *au chargement*, en dehors d'une fonction, ne peut utiliser que ce qui a été chargé avant lui. Dans une fonction appelée plus tard, tout est disponible.
+- **Deux fichiers ne peuvent pas déclarer le même nom global** (`const`, `let`, `function`). `outils/verifier.py` le vérifie.
+- **Style :** le code est formaté avec Prettier (`printWidth 140`, guillemets simples). Les noms de variables sont courts et datent de l'écriture d'origine. Garde-les et ne renomme pas pour le plaisir.
+- **Textes :** tout est en français dans le code. La langue anglaise (Paramètres → Langue) traduit les textes à l'affichage grâce au dictionnaire `js/langue-anglais.js`, où la clé est le texte français exact. Si tu changes un texte, tu peux ajouter sa traduction. La « langue » Braille est une blague qui convertit tout.
+- **Sauvegarde :** l'état de la partie est l'objet global **`S`**, enregistré dans `localStorage` par `save()` (voir `js/etat.js`). La vraie partie utilise la clé `avent_v5`, la version de test `avent_test`, et il y a 3 emplacements de sauvegarde. **N'efface jamais un champ de `S`** : Célestine a peut-être déjà une partie en cours.
+- **Suivi en direct :** `syncLive()` et `slog()` envoient l'avancement de Célestine sur Firebase. Valentin le regarde avec l'appli « Suivi Célestine » (`suivi/`). Depuis le suivi, il peut aussi lancer des attaques du pickpocket et envoyer des cadeaux (`js/pickpocket.js`).
+- **Médias :** les photos, images et voix sont de vrais fichiers dans `2026/media/`. Leurs chemins sont regroupés dans `js/medias.js`, et dans `js/contenu.js` pour les photos du mémo et les voix. Les vidéos sont dans `2026/videos/`.
+
+## Carte : où trouver quoi (dossier `2026/`)
+
+| Je veux changer… | Fichier |
+|---|---|
+| La version (à chaque modif) | `index.html` (APPV) + `version.json` |
+| La liste et l'ordre des fichiers | `js/fichiers.js` |
+| Les réglages vraie version / version de test | `js/config.js` |
+| L'album photo (chapitres, légendes), les vidéos, la playlist, le code secret | `js/contenu.js` |
+| Les chemins des images et des photos | `js/medias.js` |
+| Les 24 cases : nom du jeu, réglages, difficulté, règles, boutique, roue | `js/jours.js` (`DAYS`, `RULES`, `SHOP`…) |
+| Un mini-jeu précis | `js/jeux/jXX-nom.js` (XX = numéro du jour) |
+| Le moteur des niveaux de « Sauve Célestine » (jour 22) | `js/jeux/j22-sauve-celestine-moteur.js` |
+| Le déroulement d'un jeu (essais, chrono, victoire, échec, indices, sauvegarde de partie) | `js/jeu-du-jour.js` |
+| Les boss (liste, règles, PV, lancement, K.O.) | `js/boss/boss.js`, `js/boss/lancement.js` |
+| Un boss précis | `js/boss/j04-noemie-combat.js`, `j08-emma-test-de-vue.js`, `j11-edgar-tacos.js`, `j15-nora-fiches.js`, `j19-sandrine-comptoir.js`, `j22-valentin-metro.js` |
+| Le boss final contre Valentin (4 parties, scènes, générique) | `js/boss/boss-final.js` |
+| L'histoire : scènes du lieutenant Pépin, prologue, rapports, épilogue | `js/histoire.js` (`STORY`, ordre dans `STORD`) |
+| Le moteur des cinématiques (décors, personnages, voix « charabia », ouverture des cases) | `js/cinematiques.js` |
+| L'enquête : suspects, pièces du dossier, auditions et aveux | `js/enquete/suspects-pieces.js` (`SUSP`, `PIECES`, `AUD`) |
+| Le plan de Lyon, le tableau en liège, les notes | `js/enquete/plan-liege-notes.js` |
+| L'affichage du dossier, le carnet, l'accusation | `js/enquete/dossier-accusation.js` |
+| Le bilan de fin d'aventure | `js/enquete/bilan.js` |
+| Le menu de démarrer (écran titre, CGU, sauvegardes, difficulté, options) | `js/menu-demarrer.js` |
+| Le calendrier (grille des cases, ouverture d'une case) | `js/calendrier.js`, aide : `js/aide-calendrier.js` |
+| Le puzzle (formulaire d'accusation en 24 morceaux) | `js/puzzle.js` |
+| Les points, la navigation entre onglets, les popups, les toasts | `js/interface.js` |
+| La date, la sauvegarde, la synchro du suivi | `js/etat.js` |
+| La boutique / la roue et le casino / le labo | `js/boutique.js` / `js/roue-casino.js` / `js/labo.js` |
+| Les succès | `js/succes.js` |
+| Les œufs cachés (indices, dessins, panier) / le niveau secret | `js/oeufs-indices.js`, `js/oeufs.js` / `js/niveau-secret.js` |
+| Les records, missions, coffres, tutos, transfert de progression | `js/records-missions-transfert.js` |
+| L'album photo (livre, pages, zoom) / les vidéos de l'album | `js/album.js` / `js/album-videos.js` |
+| La musique d'ambiance (synthétisée) / les chansons du jour, le fichier mystère, le lecteur | `js/musique.js` / `js/musiques-jeux.js` |
+| Les bruitages / la playlist et le pack de voix | `js/sons.js` / `js/playlist-voix.js` |
+| Les gags (fausse mise à jour, chat, pubs, carte de détective…) | `js/gags.js` |
+| Les Trésors (onglet 🎁) / les Paramètres | `js/tresors.js` / `js/parametres.js` |
+| Le mode admin (toucher 7 fois la photo en haut à gauche, puis code 2412) | `js/admin.js` |
+| L'écran d'installation de l'appli | `js/installation.js` (+ page `app.html`) |
+| La neige, les confettis | `js/neige-confettis.js` |
+| L'adaptation téléphone / tablette | `js/ecran.js` |
+| La mise à jour automatique de l'appli | `js/mise-a-jour.js` |
+| Le lancement final (dernière ligne exécutée) | `js/demarrage.js` |
+| Les petites fonctions communes (`$`, `esc`, `shuffle`) | `js/outils.js`, `js/jeux/_aides.js`, `js/boss/_aides-dessin.js` |
+| Les styles | `css/01-base.css` … `css/13-tablettes.css`, dans l'ordre d'origine. Pour trouver une classe : `grep -rn "nom-de-classe" 2026/css` |
+
+**Jeux par jour :**
+- 1 Memorizotto
+- 2 Colony Flow
+- 3 Mots mêlés pimentés
+- 4 Flappy Célestine (boss : Noémie)
+- 5 La hutte de Panoramix
+- 6 Air hockey contre Valentin
+- 7 Zip
+- 8 Bulles d'indices (boss : Emma)
+- 9 Flèches en fuite
+- 10 Picross
+- 11 Simontagne (boss : Edgar)
+- 12 Le sudokunnilingus
+- 13 Œil de lynx
+- 14 La tour de cadeaux
+- 15 Block blaster (boss : Nora)
+- 16 Notre mot fléché
+- 17 Libère la voiture
+- 18 Candy Noël
+- 19 2048 (boss : Sandrine)
+- 20 Les 7 différences
+- 21 Relier les points
+- 22 Sauve Célestine (boss : Valentin, témoin)
+- 23 Tu me connais par cœur ?
+- 24 Puzzle final, puis l'accusation et le boss final
+
+## Autres dossiers
+
+- `test/index.html` : une simple redirection vers `2026/?test`.
+- `suivi/` : le site et l'appli de suivi de Valentin. `suivi/installer/` sert à installer l'APK du suivi.
+- `android/` : l'appli Android du calendrier, une WebView qui ouvre le site. Hors connexion, elle affiche la copie de `2026/` intégrée à l'APK.
+- `android-suivi/` : l'appli Android du suivi.
+- `.github/workflows/` : la construction automatique des deux APK.
+- `index.html` (à la racine) : **l'ancien calendrier de 2025**. On le garde, n'y touche pas.
+- `outils/verifier.py` : les vérifications avant commit.
