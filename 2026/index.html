@@ -2040,7 +2040,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795533753';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795538741';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2413,12 +2413,12 @@ function splash(win){const PH=CONTENU.photos||[];if(!PH.length)return;const old=
 /* ---------- 👹 Les boss (ils gardent les vidéos de l'album) ---------- */
 
 const BRULES={
- 4:["🎙️ Noémie n’a pas le temps : ses ongles sèchent. Pour placer tes questions, esquive tout ce qu’elle t’envoie.","👆 Glisse le doigt pour déplacer Célestine en bas de l’écran. Tes questions ❓ partent toutes seules vers le haut : vise Noémie.","💅 Esquive ses reproches, ses gouttes de vernis, ses flacons et sa lime… Tu as <b>6 vies</b>.","😤 À la moitié, elle accélère… puis elle se vexe et sort le pot de gel géant. La ligne rouge ⚠️ annonce la lime.","⏱️ Tu as 2 min 40. 💡 L’indice donne une vie en plus. Ensuite : trouve sa contradiction."],
- 8:["👁️ Emma te fait passer un test de vue. Sur chaque planche, une lettre est différente des autres : touche-la !","⏱️ Chaque planche a son chrono. Trop lent ou mauvaise lettre = 1 ❤️ en moins (<b>3 vies</b>).","😎 Plus ça avance, plus les lettres sont petites et floues. Et parfois Emma enlève ses lunettes : tout devient TRÈS flou.","👓 Quand ses lunettes apparaissent sur la planche, attrape-les : vision nette pendant 5 secondes.","🎯 Lis <b>18 planches</b> pour la faire craquer. 💡 L’indice donne une vie et une vision nette. Ensuite : trouve sa contradiction."],
- 11:["🌯 Edgar a faim. Il ne parlera qu’avec un tacos dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>3 vies</b>). Esquive-les !","🫕 La sauce fromagère remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 tacos</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
- 15:["📚 Nora révise son partiel… et te met au défi : ses fiches, à toute vitesse.","👉 Glisse la fiche à <b>droite si c’est VRAI</b>, à <b>gauche si c’est FAUX</b> (ou touche les boutons en bas).","⏱️ Chaque fiche a son chrono, de plus en plus court. Mauvaise réponse ou trop lent = 1 ❤️ en moins (<b>3 vies</b>).","🔄 Attention au <b>MODE PIÈGE</b> : pendant quelques secondes, il faut répondre l’INVERSE. Et certaines fiches arrivent à l’envers 🙃.","🎯 <b>18 fiches</b> pour la faire craquer. 💡 L’indice donne une vie et annule le mode piège. Ensuite : trouve sa contradiction."],
- 19:["💊 Samedi, la pharmacie déborde. Sandrine veut bien parler… si tu l’aides au comptoir.","👆 Lis ce que veut chaque client (fièvre, rhume, gorge…) et touche le bon produit sur l’étagère.","⏳ Sous chaque client, sa patience. S’il part sans rien, ou si tu donnes un produit que personne n’a demandé = 1 ❤️ en moins (<b>3 vies</b>).","🙋 Certains viennent juste discuter : ne leur donne rien, ils repartiront tout seuls. Et Sandrine range parfois la livraison… l’étagère change de place !","🎯 Sers <b>20 clients</b>. 💡 L’indice donne une vie et calme tout le monde. Ensuite : trouve sa contradiction."],
- 22:["🚇 « J’ai mon métro ! » Valentin file en pleine audition. Suis-le dans les couloirs de Bellecour !","👆 Touche à gauche ou à droite de l’écran (ou glisse) pour changer de couloir.","🧳🎸🚧 Évite les valises, les musiciens et les travaux. Aux portillons ⛔, passe par celui qui est ouvert 🟢.","☕ = coup de boost, 🎫 = raccourci. Chaque choc = 1 ❤️ en moins et il reprend de l’avance (<b>4 vies</b>).","🎯 Remplis la barre pour le rattraper avant son métro. 💡 L’indice te rapproche et donne une vie. Ensuite : trouve sa contradiction."]};
+ 4:["🎙️ Noémie n’a pas le temps : ses ongles sèchent. Pour placer tes questions, esquive tout ce qu’elle t’envoie.","👆 Glisse le doigt pour déplacer Célestine en bas de l’écran. Tes questions ❓ partent toutes seules vers le haut : vise Noémie.","💅 Esquive ses reproches, ses gouttes de vernis, ses flacons et sa lime… Tu as <b>6 vies</b>.","😤 À la moitié, elle accélère… puis elle se vexe et sort le pot de gel géant. La ligne rouge ⚠️ annonce la lime.","⏱️ Tu as 2 min 40. 💡 L’indice donne une vie en plus. Ensuite : elle passe aux aveux."],
+ 8:["👁️ Emma te fait passer un test de vue. Sur chaque planche, une lettre est différente des autres : touche-la !","⏱️ Chaque planche a son chrono. Trop lent ou mauvaise lettre = 1 ❤️ en moins (<b>3 vies</b>).","😎 Plus ça avance, plus les lettres sont petites et floues. Et parfois Emma enlève ses lunettes : tout devient TRÈS flou.","👓 Quand ses lunettes apparaissent sur la planche, attrape-les : vision nette pendant 5 secondes.","🎯 Lis <b>18 planches</b> pour la faire craquer. 💡 L’indice donne une vie et une vision nette. Ensuite : elle passe aux aveux."],
+ 11:["🌯 Edgar a faim. Il ne parlera qu’avec un tacos dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>3 vies</b>). Esquive-les !","🫕 La sauce fromagère remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 tacos</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : il passe aux aveux."],
+ 15:["📚 Nora révise son partiel… et te met au défi : ses fiches, à toute vitesse.","👉 Glisse la fiche à <b>droite si c’est VRAI</b>, à <b>gauche si c’est FAUX</b> (ou touche les boutons en bas).","⏱️ Chaque fiche a son chrono, de plus en plus court. Mauvaise réponse ou trop lent = 1 ❤️ en moins (<b>3 vies</b>).","🔄 Attention au <b>MODE PIÈGE</b> : pendant quelques secondes, il faut répondre l’INVERSE. Et certaines fiches arrivent à l’envers 🙃.","🎯 <b>18 fiches</b> pour la faire craquer. 💡 L’indice donne une vie et annule le mode piège. Ensuite : elle passe aux aveux."],
+ 19:["💊 Samedi, la pharmacie déborde. Sandrine veut bien parler… si tu l’aides au comptoir.","👆 Lis ce que veut chaque client (fièvre, rhume, gorge…) et touche le bon produit sur l’étagère.","⏳ Sous chaque client, sa patience. S’il part sans rien, ou si tu donnes un produit que personne n’a demandé = 1 ❤️ en moins (<b>3 vies</b>).","🙋 Certains viennent juste discuter : ne leur donne rien, ils repartiront tout seuls. Et Sandrine range parfois la livraison… l’étagère change de place !","🎯 Sers <b>20 clients</b>. 💡 L’indice donne une vie et calme tout le monde. Ensuite : elle passe aux aveux."],
+ 22:["🚇 « J’ai mon métro ! » Valentin file en pleine audition. Suis-le dans les couloirs de Bellecour !","👆 Touche à gauche ou à droite de l’écran (ou glisse) pour changer de couloir.","🧳🎸🚧 Évite les valises, les musiciens et les travaux. Aux portillons ⛔, passe par celui qui est ouvert 🟢.","☕ = coup de boost, 🎫 = raccourci. Chaque choc = 1 ❤️ en moins et il reprend de l’avance (<b>4 vies</b>).","🎯 Remplis la barre pour le rattraper avant son métro. 💡 L’indice te rapproche et donne une vie. Ensuite : sa déposition."]};
 const BOSSD=[4,8,11,15,19,22];
 function bossCfg(d){const C={
  4:{n:'Noémie',ic:'💅',who:'noemie',g:'bossfight',p:{hp:72,time:160,lives:6,sp:.62,atk:1.7,ic:'💅',who:'noemie',n:'Noémie'}},
@@ -2427,7 +2427,7 @@ function bossCfg(d){const C={
  15:{n:'Nora',ic:'📚',who:'nora',g:'bfiches',p:{hp:18,lives:3,time:100}},
  19:{n:'Sandrine',ic:'💊',who:'sandrine',g:'bcomptoir',p:{hp:20,lives:3,time:120}},
  22:{n:'Valentin (témoin)',ic:'🚇',who:'valentin',g:'bmetro',p:{lives:4,time:110,v:265,rate:.0155}}};return C[d]||null}
-function bossBtn(d){const B=bossCfg(d);if(!B)return'';if((S.boss||{})[d])return`<p><span class="ribbon">🎙️ Audition faite · 🎬 vidéo débloquée</span></p>${AUD[d]&&!(S.aud||{})[d]?`<p><button class="alt" onclick="audGo(${d})">🗂️ Trouver sa contradiction</button></p>`:''}`;const n=(S.bossTry||{})[d]||0;
+function bossBtn(d){const B=bossCfg(d);if(!B)return'';if((S.boss||{})[d])return`<p><span class="ribbon">🎙️ Audition faite · 🎬 vidéo débloquée</span></p>${AUD[d]?`<p><button class="alt" onclick="audGo(${d})">🗣️ Relire ${d==22?'sa déposition':'ses aveux'}</button></p>`:''}`;const n=(S.bossTry||{})[d]||0;
  return`<button class="bossb" onclick="launchBoss(${d})">🎙️ Auditionner : ${esc(B.n)} <small>(gratuit, autant de fois que tu veux)</small></button><p class="muted" style="font-size:.85rem;margin-top:0">Son audition débloque une 🎬 vidéo mystère de votre album.</p>`}
 function bossDev(d){if(CONTENU.syncRoom!='t'||!bossCfg(d))return'';const B=bossCfg(d);return`<div class="bossdev"><b>🧪 Mode test</b> · boss de cette case : ${B.ic} ${B.n}<br><button class="alt sm" onclick="launchBoss(${d},1)">▶ Tester le boss (gratuit, débloque la vidéo)</button>${(S.boss||{})[d]||(S.bossTry||{})[d]?`<button class="alt sm" onclick="bossReset(${d})">↺ Remettre ce boss à zéro</button>`:''}</div>`}
 function bossKO(B,cb){const box=document.getElementById('gwin');if(!box){cb();return}try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}
@@ -2801,7 +2801,7 @@ function launchBoss(d,test){const B=bossCfg(d);if(!B)return;if(!(S.story||{})['b
  setTimeout(()=>{if(id!=RUN)return;const RL=BRULES[d]||[];g.innerHTML=`<div class="bossr"><p class="bri">${B.ic}</p><h3>Comment faire craquer ${esc(B.n)} ?</h3><ul>${RL.map(t=>`<li>${t}</li>`).join('')}</ul><button id="bgo">🎙️ J’ai compris, c’est parti !</button></div>`;$('#bgo').onclick=()=>{if(id!=RUN)return;if(!B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}let okm=false;try{okm=YTM.boss('b'+d)}catch(_){}if(!okm){try{MUS.play(({4:'filature',8:'pluie',11:'enquete',15:'noir',19:'lyon',22:'filature'})[d]||'enquete',.06)}catch(_){}}try{slog('🎵','Musique de boss (jour '+d+')'+(okm?'':' · mélodie de secours'))}catch(_){}}GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))}},1800)}
 function bossResult(d,ok,why,test){try{SFX(ok?'win':'lose')}catch(_){}
  if(test&&!ok){startBox(d,`Boss raté (test) : ${esc(why)}.`);return bossRetry(d,why,1)}
- if(ok){S.boss=S.boss||{};S.boss[d]=Date.now();if(!(S.story||{})['w'+d])S.storyQ='w'+d;save();try{ACH('boss'+d)}catch(_){}try{slog('🏆',`Boss du jour ${d} vaincu ! Vidéo ${vidN()} débloquée 🎬`)}catch(_){}ding();confetti();splash(true);startBox(d,'Audition réussie ! 🎙️');setTimeout(vidNew,1500)}
+ if(ok){S.boss=S.boss||{};S.boss[d]=Date.now();try{audGrant(d)}catch(_){}if(!(S.story||{})['w'+d])S.storyQ='w'+d;save();try{ACH('boss'+d)}catch(_){}try{slog('🏆',`Boss du jour ${d} vaincu ! Vidéo ${vidN()} débloquée 🎬`)}catch(_){}ding();confetti();splash(true);startBox(d,'Audition réussie ! 🎙️');setTimeout(vidNew,1500)}
  else{try{slog('💥',`Boss du jour ${d} raté : ${String(why||'').replace(/<[^>]+>/g,'')}`)}catch(_){}startBox(d,`${esc(bossCfg(d).n)} n’a pas craqué : ${esc(why)}. Tu peux retenter gratuitement.`);bossRetry(d,why,0)}}
 function bossRetry(d,why,test){const B=bossCfg(d);if(!B)return;setTimeout(()=>{popup(`<div class="center" style="font-size:3rem">${B.ic}</div><h2 class="center">🤐 ${esc(B.n)} n’a pas craqué…</h2><p class="center">${esc(String(why||'').replace(/<[^>]+>/g,''))}</p><p class="center muted">Tu peux le retenter tout de suite, c’est gratuit !</p><button onclick="closePop();launchBoss(${d},${test?1:0})">🔁 Recommencer l’audition</button><button class="alt" onclick="closePop()">Quitter</button>`)},500)}
 function vidNew(){if(document.getElementById('spl')){setTimeout(vidNew,1200);return}const k=vidN()-1,V=(CONTENU.videos||[])[k];if(!V)return;const ok=alOk();
@@ -4543,7 +4543,7 @@ Object.assign(STORY,{
   ['e','Nous revoilà. Voilà comment on va faire : moi, je cherche. Chaque jour, je vous transmets ce que je trouve : photos, messages, tickets, auditions.'],
   ['e','Vous lisez, vous croisez. Je ne conclus jamais à votre place.'],
   ['c','Et à la fin ?'],
-  ['e','Le 24, vous écrivez un nom sur un formulaire. Un seul nom. Une seule fois. ✍️'],
+  ['e','Le 24, vous écrivez le nom du coupable sur un formulaire. ✍️'],
   ['e','Dossier n°24 : ouvert.',{fx:'pop:📂'}]]},
  fiche:{t:'Le formulaire broyé',sc:'pole',l:[
   ['e','Célestine, on a un problème. Un gros. 😰',{fx:['ein','shake']}],
@@ -4574,10 +4574,10 @@ Object.assign(STORY,{
   ['b','Et alors ? C’est moi qui te le cherche, ton bracelet, ou c’est toi ? 💅'],
   ['b','Encore une question et je te lance mes flacons de vernis. Je te préviens.'],
   ['e','Elle esquive et vous envoie tout ce qui lui tombe sous la main. Esquivez, et placez vos questions.',{fx:'shake'}]]},
- w4:{t:'Déposition · Noémie',sc:'audit',p:'noemie',l:[
+ w4:{t:'Aveux · Noémie',sc:'audit',p:'noemie',l:[
   ['n','Noémie souffle sur ses ongles.',{fx:'bin'}],
-  ['b','Bon. Je te redis tout, tranquillement.'],
-  ['e','Une de ses phrases ne colle pas avec le dossier. Laquelle ?',{fx:'ein'}]]},
+  ['b','Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré.'],
+  ['e','Noté : mardi soir, le bracelet était de nouveau à votre poignet.',{fx:'ein'}]]},
  b8:{t:'Audition · Emma',sc:'audit',p:'emma',l:[
   ['n','Commissariat, jour 8. Pépin pose une photo sur le bureau.',{fx:'ein'}],
   ['e','Jeudi, au resto. Pendant que vous étiez aux toilettes, Emma avait votre sac sur les genoux. Et un étui à lunettes ouvert devant elle.'],
@@ -4589,10 +4589,10 @@ Object.assign(STORY,{
   ['b','Et vous, vous avez eu un café sur votre cravate ce matin. On a tous nos secrets.'],
   ['b','Je vous propose un marché : vous passez mon test de vue. Si vous le réussissez, je parle. 👓'],
   ['e','Célestine… c’est à vous. Je n’ai pas mes lunettes.',{fx:'shake'}]]},
- w8:{t:'Déposition · Emma',sc:'audit',p:'emma',l:[
+ w8:{t:'Aveux · Emma',sc:'audit',p:'emma',l:[
   ['n','Emma croise les bras.',{fx:'bin'}],
-  ['b','Très bien. Ma version de jeudi soir.'],
-  ['e','Comparez avec les photos de la soirée.',{fx:'ein'}]]},
+  ['b','Ok, j’ai pris ton sac. J’ai sorti tes lunettes pour tester tes verres avec mon appli : je voulais t’en offrir des nouvelles pour Noël. Ta correction a bougé, d’ailleurs. Et ton bracelet, tu l’avais au poignet, en face de moi.'],
+  ['e','Noté : jeudi soir, le bracelet était à votre poignet.',{fx:'ein'}]]},
  b11:{t:'Audition · Edgar',sc:'audit',p:'edgar',l:[
   ['n','Jour 11. Pépin relit un SMS de Valérie, la maman de Célestine.',{fx:'ein'}],
   ['e','Vendredi soir, Edgar a pris 20 € dans votre porte-monnaie. Et votre sac a passé la nuit dans l’entrée, à Reyrieux.'],
@@ -4605,10 +4605,10 @@ Object.assign(STORY,{
   ['n','En bas du commissariat, il y a un snack à tacos. Le patron est parti en pause… la plancha chauffe toute seule.',{fx:'pop:🌯'}],
   ['b','Je parle le ventre plein, pas avant. Descends, et fais-m’en un. Sans erreur.'],
   ['e','Célestine… derrière la broche. Il ne lâchera rien sinon.',{fx:'shake'}]]},
- w11:{t:'Déposition · Edgar',sc:'audit',p:'edgar',l:[
+ w11:{t:'Aveux · Edgar',sc:'audit',p:'edgar',l:[
   ['n','Edgar repose son tacos.',{fx:'bin'}],
-  ['b','Ok, ok. Mon week-end, minute par minute.'],
-  ['e','Il y a un mensonge là-dedans. Et votre mère a la mémoire longue.',{fx:'ein'}]]},
+  ['b','J’avoue : 20 balles pour un tacos. Mais j’ai retourné TOUT ton sac pour trouver le porte-monnaie. La trousse, les poches, tout. Il n’y avait aucun bracelet, j’en suis sûr.'],
+  ['e','Noté : quand il a fouillé votre sac, le bracelet n’y était déjà plus.',{fx:'ein'}]]},
  b15:{t:'Audition · Nora',sc:'audit',p:'nora',l:[
   ['n','Jour 15. Une photo Snapchat d’Erika est punaisée au tableau.',{fx:'ein'}],
   ['e','Vendredi, 8 h 50, en TP. Nora tient votre trousse rose dans ses mains. Celle où vous pensiez avoir rangé le bracelet.'],
@@ -4620,10 +4620,10 @@ Object.assign(STORY,{
   ['b','Comme toute la promo. On est quarante, lieutenant.'],
   ['b','Je réponds si vous tenez le rythme de mes révisions. Vrai ou faux, sans réfléchir.'],
   ['e','Des fiches de pharma… C’est votre rayon, Célestine. 📚',{fx:'shake'}]]},
- w15:{t:'Déposition · Nora',sc:'audit',p:'nora',l:[
+ w15:{t:'Aveux · Nora',sc:'audit',p:'nora',l:[
   ['n','Nora range ses fiches.',{fx:'bin'}],
-  ['b','D’accord. Mon vendredi matin.'],
-  ['e','Une photo d’Erika vaut mieux qu’un long discours.',{fx:'ein'}]]},
+  ['b','Oui, j’ai pris ta trousse à 8 h 45 pour ton correcteur… et j’ai copié tes résultats, pardon. Mais je te jure, il n’y avait pas de bracelet dedans. Juste des stylos et ton surligneur rose.'],
+  ['e','Noté : vendredi à 8 h 45, la trousse était déjà vide.',{fx:'ein'}]]},
  b19:{t:'Audition · Sandrine',sc:'pharma',p:'sandrine',l:[
   ['n','Jour 19. Pépin relit un message de samedi sur le téléphone de Célestine.',{fx:'ein'}],
   ['e','« J’ai pris un peu de ta crème pour les mains. » Samedi à 14 h, Sandrine a ouvert votre casier. Votre sac était dedans.'],
@@ -4634,10 +4634,10 @@ Object.assign(STORY,{
   ['e','Madame, juste deux minutes…',{fx:'ein'}],
   ['b','Aidez-moi au comptoir, et je vous parle. Célestine, tu connais la boutique !'],
   ['e','Célestine, passez derrière le comptoir !',{fx:'shake'}]]},
- w19:{t:'Déposition · Sandrine',sc:'pharma',p:'sandrine',l:[
+ w19:{t:'Aveux · Sandrine',sc:'pharma',p:'sandrine',l:[
   ['n','Le dernier client sort. Sandrine souffle enfin.',{fx:'bin'}],
-  ['b','Bon, bon. Mon samedi, puisque vous insistez.'],
-  ['e','Vérifiez ses dires. Les messages ne mentent pas.',{fx:'ein'}]]},
+  ['b','D’accord, j’ai ouvert ton casier pour ta crème. Mais il n’y avait que ton sac et ton manteau. Pas de bijou, rien qui brille.'],
+  ['e','Noté : rien dans le casier non plus.',{fx:'ein'}]]},
  b22:{t:'Audition · Valentin (témoin)',sc:'audit',l:[
   ['n','Jour 22. Dernière convocation sur le bureau de Pépin.',{fx:'ein'}],
   ['e','Vendredi, vous êtes partie à 7 h 55. Valentin, lui, est parti à 8 h 05. Dix minutes seul dans l’appartement.'],
@@ -4651,8 +4651,10 @@ Object.assign(STORY,{
   ['e','Il… il est parti ?! Célestine, suivez-le !',{fx:'shake'}]]},
  w22:{t:'Déposition · Valentin',sc:'audit',l:[
   ['n','Quai de la ligne D. Valentin s’arrête, essoufflé.',{fx:'vin'}],
-  ['v','Ok, ok… Mon vendredi, alors. Rien de spécial.'],
-  ['e','Rien de spécial. Je note.',{fx:'ein'}]]},
+  ['v','Mon vendredi ? Boulot, métro, Écully. Rien de spécial.'],
+  ['e','Rien du tout ? Même pas à Bellecour ?',{fx:'ein'}],
+  ['v','Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir.'],
+  ['e','« Un truc pour moi. » Je note.']]},
  s5:{t:'Rapport · La BU',sc:'fac',l:[
   ['n','Fac de pharma, site Rockefeller. Pépin arrive en imperméable au milieu des étudiants en blouse.',{fx:'ein'}],
   ['e','Mademoiselle Erika m’a envoyé une photo. Elle prend des photos de tout, apparemment.'],
@@ -4733,52 +4735,47 @@ Object.assign(STORY,{
   ['n','Le fax du labo crépite : ACCUSATION VALIDÉE. ✅',{fx:'clue'}],
   ['v','…Bon. D’accord. C’était moi. 😇'],
   ['c','Rends-le-moi. TOUT DE SUITE. 😤',{fx:'shake'}]]},
- verite:{t:'La vérité',sc:'salon',l:[
-  ['n','Raté… L’affaire est classée. Le soir du 24, Célestine rentre à l’appart, dépitée.',{fx:'cin'}],
-  ['n','Valentin est là. Il fait tourner quelque chose de doré entre ses doigts…',{fx:['vin','pop:💖']}],
-  ['c','VALENTIN ?! C’était TOI ?! 😱',{fx:'shake'}],
-  ['v','Pas mal, l’enquête. Presque. 😇'],
-  ['c','Rends-le-moi. TOUT DE SUITE. 😤',{fx:'shake'}]]},
+ 
  acc_noemie:{t:'Accusation · Noémie',sc:'audit',p:'noemie',l:[
   ['n','Noémie est convoquée. Elle lève les mains, ongles parfaits.',{fx:'bin'}],
   ['b','Je t’ai abîmé un cœur, d’accord ! Mais je te l’ai remis au poignet mardi soir. Tu l’avais mercredi, tu l’avais jeudi !'],
   ['c','…C’est vrai. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_emma:{t:'Accusation · Emma',sc:'audit',p:'emma',l:[
   ['n','Emma arrive avec un petit paquet cadeau.',{fx:'bin'}],
   ['b','Tes nouvelles lunettes. Je voulais te les offrir pour Noël. Et ton bracelet, tu l’avais au poignet pendant que je fouillais ton sac.'],
   ['c','…Je suis la pire. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_nora:{t:'Accusation · Nora',sc:'fac',p:'nora',l:[
   ['n','Nora pâlit au milieu de la BU.',{fx:'bin'}],
   ['b','J’ai copié tes résultats, pas ton bracelet ! Ta trousse était vide à 8 h 45 !'],
   ['c','…Oups. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_erika:{t:'Accusation · Erika',sc:'fac',p:'erika',l:[
   ['n','Erika sort son téléphone.',{fx:'bin'}],
   ['b','J’ai 2 000 photos de cette semaine. Tu veux que je te montre où j’étais à chaque minute ? 🤳'],
   ['c','…Non merci. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_eya:{t:'Accusation · Eya',sc:'night',p:'eya',l:[
   ['n','Eya éclate de rire.',{fx:'bin'}],
   ['b','Moi ?! C’est moi qui t’ai dit pour Bellecour ! Tu as lu mon message jusqu’au bout ?'],
   ['c','…Ah. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_edgar:{t:'Accusation · Edgar',sc:'ecully',p:'edgar',l:[
   ['n','Edgar ouvre la porte de Reyrieux, un tacos à la main.',{fx:'bin'}],
   ['b','J’ai piqué 20 balles, pas ton bracelet ! Il n’était même pas dans ton sac, je l’ai retourné en entier !'],
   ['c','…Rends-moi mes 20 €, au moins. 😒',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_parents:{t:'Accusation · Fabien et Valérie',sc:'ecully',p:'parents',l:[
   ['n','Valérie pose les mains sur les hanches. Fabien se cache derrière le journal.',{fx:'bin'}],
   ['b','Ma chérie. Je range ton sac depuis que tu as 12 ans. Il n’y avait AUCUN bijou dedans.'],
   ['c','…Pardon maman. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  acc_sandrine:{t:'Accusation · Sandrine',sc:'pharma',p:'sandrine',l:[
   ['n','Sandrine lâche son carton de crèmes.',{fx:'bin'}],
   ['b','J’ai pris de ta crème pour les mains ! C’est tout ! Ton casier, il n’y avait rien qui brille dedans !'],
   ['c','…Garde la crème. 😳',{fx:'cin'}],
-  ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
+  ['n','Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.',{fx:'shake'}]]},
  epi:{t:'Épilogue · Affaire résolue',sc:'pole',l:[
   ['n','Le lendemain matin, au commissariat du 8e.',{fx:'ein'}],
   ['e','Alors, Célestine ? Ce bracelet ?'],
@@ -4787,7 +4784,7 @@ Object.assign(STORY,{
   ['n','Le brigadier Gérald essuie une larme.',{fx:'pop:🥲'}],
   ['e','Joyeux Noël, Célestine. 🎄']]}
 });
-const STORD=['pro','fiche','lab','b4','w4','s5','egg1','lose1','b8','w8','s9','b11','w11','mid','casino','b15','w15','s17','b19','w19','s20','s21','b22','w22','eggs24','eve','fichok','mach','acc_valentin','verite','epi'];
+const STORD=['pro','fiche','lab','b4','w4','s5','egg1','lose1','b8','w8','s9','b11','w11','mid','casino','b15','w15','s17','b19','w19','s20','s21','b22','w22','eggs24','eve','fichok','mach','acc_valentin','epi'];
 
 Object.assign(STORY,{
  mode_facile:{t:'Mode Facile',sc:'pole',l:[
@@ -5273,7 +5270,7 @@ function storyCheck(){try{if(storyBusy())return;if(!window.__smSeen&&!instPend()
  try{if(sd.pro)pcNews()}catch(_){}
  const C=[['pro',true],['fiche',op.includes(1)],['lab',op.includes(3)],['s5',op.includes(5)],['egg1',ne>=1],['lose1',lost],['s9',op.includes(9)],['mid',op.includes(13)],['casino',op.includes(14)],['s17',op.includes(17)],['s20',op.includes(20)],['s21',op.includes(21)],['eggs24',ne>=24],['eve',op.includes(23)],['fichok',puzOk()],['epi',!!(S.vbDone&&S.finSeen)]];
  if(S.storyQ&&!sd[S.storyQ])id=S.storyQ;else{const f=C.find(([k,ok])=>ok&&!sd[k]);if(f)id=f[0]}
- if(S.storyQ&&sd[S.storyQ])S.storyQ=null;if(id){if(id==S.storyQ)S.storyQ=null;story(id,()=>{try{render()}catch(_){}if(id=='epi')setTimeout(bilanOpen,800);if(/^w\d+$/.test(id)&&AUD[+id.slice(1)]&&!(S.aud||{})[+id.slice(1)])setTimeout(()=>audGo(+id.slice(1)),350);else setTimeout(pcNews,600)})}}catch(_){}}
+ if(S.storyQ&&sd[S.storyQ])S.storyQ=null;if(id){if(id==S.storyQ)S.storyQ=null;story(id,()=>{try{render()}catch(_){}if(id=='epi')setTimeout(bilanOpen,800);if(/^w\d+$/.test(id))audGrant(+id.slice(1));setTimeout(pcNews,600)})}}catch(_){}}
 /* ================= 🗂️ ENQUÊTE · Le bracelet aux cœurs roses (dossier n°24) ================= */
 const SUSP=[
  {id:'noemie',n:'Noémie',img:'noemie',r:'La pote de Célestine',tr:['💅 Lui fait les ongles chez elle','🍕 Au resto jeudi soir','💼 Lance son entreprise d’ongles','💑 En couple avec Jean-Baptiste'],d:'Amie de lycée de Célestine. Mardi, le bracelet est resté une heure sur sa table.',dep:'« Pendant les ongles, tu as gardé ton bracelet au poignet. Je n’y ai pas touché. »',a:'Le bracelet était au poignet de Célestine le mercredi et le jeudi.'},
@@ -5499,8 +5496,8 @@ function pcNews(){try{const R=S.pcSeen=S.pcSeen||{};const N=PIECES.filter(p=>pcO
 function enqHTML(t){t=t||window.__enqT||'pc';if(t=='sus'&&0)t='pc';window.__enqT=t;const sd=S.story||{},X=S.enqX||{},on=PIECES.filter(pcOn),R=S.pcRead||{};
  const T=[['pc','📁 Pièces'],['aud','🎙️ Auditions'],['sus','🕵️ Suspects'],['fri','🗓️ Frise'],['map','🗺️ Carte'],['brd','📌 Tableau']];let B='';
  if(t=='pc')B=`<p class="enq-h"><small>Les pièces brutes du dossier. Pépin ne conclut jamais à ta place : croise-les.</small></p><div class="pc-list">${PIECES.filter(p=>!p.a).map(p=>pcOn(p)?`<button class="pc-it ${R[p.id]?'':'new'}" onclick="pieceOpen('${p.id}')"><span>${p.ic}</span><div><small>Jour ${p.d} · ${esc(p.src)}</small><b>${esc(p.t)}</b></div></button>`:`<div class="pc-it off"><span>🔒</span><div><small>Jour ${p.d}</small><b>Pièce à venir</b></div></div>`).join('')}</div>${noteHTML('_','Mes pistes, mes soupçons…')}`;
- if(t=='aud'){const A=S.aud||{};B=`<p class="enq-h"><small>Chaque audition s’ouvre en battant le boss du jour. Trouve la déclaration fausse et la pièce qui la contredit.</small></p>${Object.entries(AUD).map(([d,a])=>{const x=SUSP.find(z=>z.id==a.who),won=(S.boss||{})[d],done=A[d],g=PIECES.find(p=>p.id==a.gain);
-  return`<div class="au-c ${done?'done':''}"><div class="au-p">${susPic(x)}</div><div><small>Jour ${d}</small><b>${esc(a.n)}${a.who=='valentin'?' · témoin':''}</b>${done?`<q>${esc(g.body.replace(/^« | »$/g,''))}</q>`:won?`<button class="sm" onclick="audGo(${d})">🎙️ Reprendre l’audition</button>`:`<span class="pn">${+d<=unl()?'Bats le boss du jour pour l’auditionner.':'Pas encore convoqué·e.'}</span>`}</div></div>`}).join('')}`}
+ if(t=='aud'){const A=S.aud||{};B=`<p class="enq-h"><small>Chaque audition s’ouvre en battant le boss du jour : le suspect passe aux aveux.</small></p>${Object.entries(AUD).map(([d,a])=>{const x=SUSP.find(z=>z.id==a.who),won=(S.boss||{})[d],done=A[d],g=PIECES.find(p=>p.id==a.gain);
+  return`<div class="au-c ${done?'done':''}"><div class="au-p">${susPic(x)}</div><div><small>Jour ${d}</small><b>${esc(a.n)}${a.who=='valentin'?' · témoin':''}</b>${done?`<q>${esc(g.body.replace(/^« | »$/g,''))}</q>`:won?`<button class="sm" onclick="audGo(${d})">🗣️ Lire ${a.who=='valentin'?'sa déposition':'ses aveux'}</button>`:`<span class="pn">${+d<=unl()?'Bats le boss du jour pour l’auditionner.':'Pas encore convoqué·e.'}</span>`}</div></div>`}).join('')}`}
  if(t=='sus')B=`<p class="enq-h"><small>Touche une fiche pour la lire. Barre toi-même les innocents.</small></p><div class="enq-su">${SUSP.map(x=>{const out=!!X[x.id],g=sd.rev&&x.id=='valentin';return`<button class="enq-s ${out?'out':''} ${g?'guilty':''}" onclick="susOpen('${x.id}')">${susPic(x)}<b>${esc(x.n)}</b><small>${g?'COUPABLE 💖':out?'Barré·e':'Suspect'}</small></button>`}).join('')}</div>`;
  if(t=='fri'){const E=[];on.forEach(p=>(p.ev||[]).forEach(e=>E.push([e[0],e[1],e[2],p.ic])));E.sort((a,b)=>a[0]<b[0]?-1:1);
   B=`<p class="enq-h"><small>Les faits datés tirés de tes pièces, dans l’ordre. Les trous, c’est à toi de les combler.</small></p><div class="enq-fr">${E.map(e=>`<div class="enq-fi"><span>${e[3]}</span><div><small>${esc(e[1])}</small><b>${esc(e[2])}</b></div></div>`).join('')||'<p class="muted">Rien pour l’instant.</p>'}</div>${noteHTML('fri','Ma frise : ce qui s’est passé entre ces heures…')}`}
@@ -5511,31 +5508,17 @@ function enqOpen(t){popup(`<h2>🕵️ Dossier n°24</h2>${enqHTML(t)}${window._
 function susToggle(id){S.enqX=S.enqX||{};if(S.enqX[id])delete S.enqX[id];else S.enqX[id]=1;save();try{SFX(S.enqX[id]?'tap':'ok')}catch(_){}susOpen(id)}
 function susOpen(id){const x=SUSP.find(z=>z.id==id);if(!x)return;const sd=S.story||{},out=!!(S.enqX||{})[id],g=sd.rev&&x.id=='valentin',L=PIECES.filter(p=>p.a&&p.who==id&&pcOn(p));
  popup(`<div class="sus-f ${out?'out':''}"><div class="sus-ph">${susPic(x)}${g?'<span class="sus-st g">COUPABLE</span>':out?'<span class="sus-st">BARRÉ·E</span>':''}</div><h2 style="margin:.3em 0 0">${esc(x.n)}</h2><p class="muted" style="margin:2px 0 8px">${esc(x.r)}</p><div class="sus-tr">${x.tr.map(t=>`<span>${esc(t)}</span>`).join('')}</div><p style="margin:10px 0">${esc(x.d)}</p><div class="sus-al s sus-dep"><b>🗣️ Sa première déclaration</b><q>${esc(x.dep)}</q>${L.map(p=>`<q><small>🆕 ${esc(p.t)}</small>${esc(p.body)}</q>`).join('')}</div>${noteHTML(x.id)}${g?'<p class="sus-al g">💖 Il a tout avoué. Voleur de bracelet !</p>':`<button class="${out?'':'alt'}" onclick="susToggle('${id}')">${out?'↩️ Remettre dans les suspects':'❌ Barrer : innocent·e'}</button>`}<button class="alt" onclick="enqOpen('sus')">← Retour au dossier</button></div>`)}
-/* ---------- l'audition : trouver la contradiction ---------- */
-let AUDT=null;
-function audGo(d){d=+d;const a=AUD[d];if(!a)return;window.__audD=d;S.aud=S.aud||{};if(S.aud[d]){window.__audD=null;return pieceOpen(a.gain)}
- const st=window.__audS&&window.__audS.d==d?window.__audS:(window.__audS={d,pat:3,end:Date.now()+180000,sel:null});const x=SUSP.find(z=>z.id==a.who);
- clearInterval(AUDT);AUDT=setInterval(()=>{const e=document.getElementById('au-t');if(!e){clearInterval(AUDT);return}const r=Math.max(0,st.end-Date.now());e.textContent=`⏱️ ${Math.floor(r/60000)}:${String(Math.floor(r/1000)%60).padStart(2,'0')}`;e.classList.toggle('hot',r<45000);if(!r){clearInterval(AUDT);audFail(d,'Le temps est écoulé.')}},250);
- popup(`<div class="au"><div class="au-top"><span class="au-pic">${susPic(x)}</span><div><small>Salle d’audition n°2 · jour ${d}</small><b>${esc(a.n)}</b><span class="au-pat">${'🟢'.repeat(st.pat)}${'⚫'.repeat(3-st.pat)}</span></div><span id="au-t" class="au-t">⏱️ 3:00</span></div>
-  <p class="au-h">${st.sel==null?'Une de ces déclarations est fausse. Laquelle ?':'Quelle pièce du dossier la contredit ?'}</p>
-  ${st.sel==null?a.dec.map((t,i)=>`<button class="alt au-d" onclick="audSel(${d},${i})">« ${esc(t)} »</button>`).join(''):`<q class="enq-q">${esc(a.dec[st.sel])}</q><div class="enq-ev">${PIECES.filter(p=>pcOn(p)&&!p.a).map(p=>`<button class="alt" onclick="audTry(${d},'${p.id}')"><span>${p.ic}</span><b>${esc(p.t)}</b><small>${esc(p.src)}</small></button>`).join('')}</div><button class="alt sm" onclick="audSel(${d},null)">↩️ Choisir une autre déclaration</button>`}
-  <button class="alt sm" onclick="enqOpen('pc')">📁 Relire le dossier</button></div>`)}
-function audSel(d,i){window.__audS.sel=i;try{SFX('tap')}catch(_){}audGo(d)}
-function audTry(d,pid){const a=AUD[d],st=window.__audS,ok=st.sel==a.lie&&a.ok.includes(pid);try{slog('🎙️',`Audition jour ${d} : objection sur « ${a.dec[st.sel].slice(0,40)} » avec ${pid}${ok?' ✅':' ❌'}`)}catch(_){}
- if(ok){clearInterval(AUDT);window.__audS=null;window.__audD=null;S.aud=S.aud||{};S.aud[d]=Date.now();save();try{SFX('ok')}catch(_){}try{confetti()}catch(_){}const g=PIECES.find(p=>p.id==a.gain);
-  return popup(`<div class="proof"><h2>⚡ OBJECTION !</h2><p class="proof-ok">La contradiction tient. ${esc(a.n)} craque.</p>${pieceBody(g)}<p class="muted" style="font-size:.85rem">📁 Ajouté au dossier, onglet Auditions.</p><button onclick="closePop()">Classer au dossier</button></div>`)}
- st.pat--;st.sel=null;try{SFX('bad')}catch(_){}try{navigator.vibrate&&navigator.vibrate(150)}catch(_){}
- if(st.pat<=0)return audFail(d,`${a.n} se braque et réclame son avocat.`);
- popup(`<div class="proof"><h2>❌ Ça ne colle pas…</h2><p class="muted">${esc(a.n)} hausse les sourcils. Cette pièce ne prouve pas que cette déclaration est fausse.</p><p>Patience restante : ${'🟢'.repeat(st.pat)}${'⚫'.repeat(3-st.pat)}</p><button onclick="audGo(${d})">Reprendre</button></div>`)}
-function audFail(d,why){window.__audS=null;try{SFX('bad')}catch(_){}popup(`<div class="proof"><h2>🚪 Fin de l’audition</h2><p>${esc(why)}</p><p class="muted">Pépin la reconvoque tout de suite. Relis le dossier avant de recommencer.</p><button onclick="audGo(${d})">🔁 Recommencer l’audition</button><button class="alt" onclick="window.__audD=null;enqOpen('pc')">📁 Relire le dossier</button></div>`)}
-/* ---------- l'accusation : un nom, une seule fois ---------- */
-function accuse(cb){window.__accCb=cb;if(S.accDone){const d=S.accDone;closePop();return accuseGo(d,1)}
- popup(`<h2>⚖️ Formulaire d’accusation</h2><p class="muted" style="margin:0 0 6px">Un seul nom. Une seule fois. Pas de retour en arrière.</p><div class="enq-su">${SUSP.map(x=>`<button class="enq-s ${(S.enqX||{})[x.id]?'out':''}" onclick="accuseAsk('${x.id}')">${susPic(x)}<b>${esc(x.n)}</b></button>`).join('')}</div><p style="margin-top:10px"><button class="alt" onclick="enqOpen()">📁 Relire le dossier</button><button class="alt" onclick="closePop()">Plus tard</button></p>`)}
-function accuseAsk(id){const x=SUSP.find(z=>z.id==id);popup(`<div class="sus-f"><div class="sus-ph">${susPic(x)}</div><h2>Accuser ${esc(x.n)} ?</h2><p>Tu signes le formulaire. Il part chez le procureur et ne peut plus être modifié.</p><button onclick="accuseGo('${id}')">✍️ Je signe : c’est ${esc(x.n)}</button><button class="alt" onclick="accuse(window.__accCb)">← Réfléchir encore</button></div>`)}
-function accuseGo(id,again){const x=SUSP.find(z=>z.id==id);if(!S.accDone){S.accDone=id;S.accTry=(S.accTry||0)+1;save();try{slog('⚖️','Accuse : '+x.n+(id=='valentin'?' ✅':' ❌'))}catch(_){}}
- closePop();const cb=window.__accCb;window.__accCb=null;S.story=S.story||{};const fin=()=>{S.story.rev=S.story.rev||Date.now();save();try{confetti()}catch(_){}window.__vbNoIntro=1;cb&&cb()};
- if(id=='valentin'){if(S.story.acc_valentin)delete S.story.acc_valentin;return story('acc_valentin',fin)}
- try{SFX('bad')}catch(_){}story('acc_'+id,()=>story('verite',fin,again?1:0),again?1:0)}
+/* ---------- l'audition : aveux après le boss ---------- */
+function audGrant(d){d=+d;if(!AUD[d])return;S.aud=S.aud||{};if(!S.aud[d]){S.aud[d]=Date.now();save()}}
+function audGo(d){d=+d;const a=AUD[d];if(!a)return;audGrant(d);window.__audD=null;return pieceOpen(a.gain)}
+/* ---------- l'accusation : on peut se tromper, retour au dossier ---------- */
+function accuse(cb){window.__accCb=cb;
+ popup(`<h2>⚖️ Formulaire d’accusation</h2><p class="muted" style="margin:0 0 6px">Qui a pris le bracelet ?</p><div class="enq-su">${SUSP.map(x=>`<button class="enq-s ${(S.enqX||{})[x.id]?'out':''}" onclick="accuseAsk('${x.id}')">${susPic(x)}<b>${esc(x.n)}</b></button>`).join('')}</div><p style="margin-top:10px"><button class="alt" onclick="enqOpen()">📁 Relire le dossier</button><button class="alt" onclick="closePop()">Plus tard</button></p>`)}
+function accuseAsk(id){const x=SUSP.find(z=>z.id==id);popup(`<div class="sus-f"><div class="sus-ph">${susPic(x)}</div><h2>Accuser ${esc(x.n)} ?</h2><button onclick="accuseGo('${id}')">⚖️ Oui, c’est ${esc(x.n)}</button><button class="alt" onclick="accuse(window.__accCb)">← Réfléchir encore</button></div>`)}
+function accuseGo(id,again){const x=SUSP.find(z=>z.id==id);S.accTry=(S.accTry||0)+1;if(id=='valentin')S.accDone=id;save();try{slog('⚖️','Accuse : '+x.n+(id=='valentin'?' ✅':' ❌'))}catch(_){}
+ closePop();const cb=window.__accCb;S.story=S.story||{};const fin=()=>{S.story.rev=S.story.rev||Date.now();save();try{confetti()}catch(_){}window.__vbNoIntro=1;cb&&cb()};
+ if(id=='valentin'){window.__accCb=null;if(S.story.acc_valentin)delete S.story.acc_valentin;return story('acc_valentin',fin)}
+ try{SFX('bad')}catch(_){}S.enqX=S.enqX||{};S.enqX[id]=1;save();story('acc_'+id,()=>{try{render()}catch(_){}enqOpen('sus')},1)}
 
 function storyHTML(){const sd=S.story||{},L=STORD.filter(k=>sd[k]);return`<h2>📖 L’histoire</h2><div class="panel">${L.length?`<p class="muted" style="margin:0 0 8px;font-size:.85rem">Le mystère du bracelet aux cœurs roses… Revois les scènes déjà débloquées.</p><div class="st-list">${L.map(k=>`<button class="sm alt" onclick="story('${k}')">${esc(STORY[k].t)}</button>`).join('')}</div>`:'<p class="muted" style="margin:0">L’histoire commence avec la première case…</p>'}</div>`}
 function showBon(i){const b=S.bons[i];popup(`<div style="font-size:3rem">${b.ic}</div><h2>BON POUR</h2><p style="font:700 1.3rem Georgia,serif">${esc(b.n)}</p><p class="muted">Montre ce bon pour en profiter 💝</p><button onclick="S.bons[${i}].used=true;slog('💝','Utilise le bon '+S.bons[${i}].n);save();closePop();meView();toast('Bon utilisé, profite bien !')">Marquer comme utilisé</button><button class="alt" onclick="closePop()">Pas encore</button>`)}
