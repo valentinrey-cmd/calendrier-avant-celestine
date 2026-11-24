@@ -67,7 +67,7 @@ public class MusicService extends Service {
       NotificationChannel ch = new NotificationChannel(CH, "Musique", NotificationManager.IMPORTANCE_LOW);
       ch.setShowBadge(false); nm.createNotificationChannel(ch);
     }
-    ms = new MediaSession(this, "OperationChocolat");
+    ms = new MediaSession(this, "Dossier24");
     ms.setCallback(new MediaSession.Callback() {
       @Override public void onPlay() { MainActivity.cmd("play"); }
       @Override public void onPause() { MainActivity.cmd("pause"); }
