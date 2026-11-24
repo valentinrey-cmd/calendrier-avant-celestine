@@ -187,7 +187,7 @@ const FICHIERS = {
     'media/persos/nora.webp',
     'media/persos/eya.webp',
     'media/persos/erika.webp',
-    'media/persos/parents.webp',
+    'media/persos/valerie.webp',
     'media/persos/sandrine.webp',
   ],
 };

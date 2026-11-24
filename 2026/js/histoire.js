@@ -30,8 +30,8 @@ Object.assign(STORY, {
       ['c', '…et Eya. 🧪', { fx: 'sus:eya' }],
       ['e', 'Je note. Et le week-end ?'],
       ['c', 'Chez mes parents, à Reyrieux. Edgar, mon grand frère, était là aussi.', { fx: 'sus:edgar' }],
-      ['e', 'Vos parents aussi, donc.', { fx: 'sus:parents' }],
-      ['c', 'Mes PARENTS ?! Vous êtes sérieux ? 😳', { fx: 'shake' }],
+      ['e', 'Votre mère aussi, donc.', { fx: 'sus:parents' }],
+      ['c', 'Ma MÈRE ?! Vous êtes sérieux ? 😳', { fx: 'shake' }],
       ['e', 'Je suis toujours sérieux avant mon cinquième café.'],
       ['c', 'Samedi, je travaillais à la pharmacie, avec Sandrine. 💊', { fx: 'sus:sandrine' }],
       ['e', 'Quelqu’un d’autre ? Quelqu’un qui a les clés de chez vous, par exemple ?'],
@@ -306,7 +306,7 @@ Object.assign(STORY, {
     t: 'Rapport · Reyrieux',
     sc: 'ecully',
     l: [
-      ['n', 'Reyrieux, la maison de Fabien et Valérie.', { fx: 'ein' }],
+      ['n', 'Reyrieux, la maison de Valérie.', { fx: 'ein' }],
       ['e', 'Votre mère m’a transféré un message. Elle a été très claire. Et très fâchée contre votre frère.'],
       ['c', 'Qu’est-ce qu’il a encore fait ?', { fx: 'cin' }],
       ['e', 'Lisez. Puis demandez-vous ce qu’il a vu dans ce sac. 🧐', { fx: 'clue' }]
@@ -544,21 +544,21 @@ Object.assign(STORY, {
     ]
   },
   acc_parents: {
-    t: 'Accusation · Fabien et Valérie',
+    t: 'Accusation · Valérie',
     sc: 'ecully',
     p: 'parents',
     l: [
-      ['n', 'Reyrieux, dans la cuisine. Valérie essuie un verre. Fabien lit le journal.', { fx: 'bin' }],
-      ['c', 'Papa, maman… Je suis obligée. Le dossier, c’est le dossier.', { fx: 'cin' }],
-      ['n', 'Fabien baisse lentement son journal.', { fx: 'pop:📰' }],
+      ['n', 'Reyrieux, dans la cuisine. Valérie essuie un verre en chantonnant.', { fx: 'bin' }],
+      ['c', 'Maman… Je suis obligée. Le dossier, c’est le dossier.', { fx: 'cin' }],
+      ['n', 'Valérie pose lentement son verre.', { fx: 'pop:📰' }],
       ['b', 'Tu… accuses… ta MÈRE ? 😱', { fx: 'shake' }],
       ['c', 'Samedi matin, tu as rangé mon sac. Tu l’as eu entre les mains. Seule.'],
       ['b', 'Ma chérie, je range ton sac depuis que tu as 12 ans. Je connais chaque miette qu’il y a dedans.'],
       ['b', 'Samedi : ta trousse rose, ton porte-monnaie (moins 20 €, merci Edgar), tes clés et un paquet de mouchoirs. AUCUN bijou. Sinon, je l’aurais mis de côté, comme d’habitude.'],
       ['e', 'J’ai lu sa lettre. Elle a même noté l’état des mouchoirs. C’est plus précis que nos rapports. 📝', { fx: 'ein' }],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:parents' }],
-      ['b', 'Et ton père n’a rien fait non plus. Il ne retrouve même pas ses lunettes quand elles sont sur sa tête.'],
-      ['c', '…Pardon maman. Pardon papa. 😳', { fx: 'cin' }],
+      ['b', 'La prochaine fois que tu accuses ta mère, préviens-moi : je ferai un gâteau pour la garde à vue.'],
+      ['c', '…Pardon maman. 😳', { fx: 'cin' }],
       ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },

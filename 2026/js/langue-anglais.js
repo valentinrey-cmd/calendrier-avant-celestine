@@ -3100,10 +3100,6 @@ window.TRADUCTIONS_EN = {
   'Tu me dois quand même 20 €. 😒': 'You still owe me €20. 😒',
   'Je te rembourse avec un toast à Noël. Le roi des toasts paie toujours ses dettes. 🥂':
     'I’ll pay you back with a toast at Christmas. The king of toasts always pays his debts. 🥂',
-  'Reyrieux, dans la cuisine. Valérie essuie un verre. Fabien lit le journal.':
-    'Reyrieux, in the kitchen. Valérie is drying a glass. Fabien is reading the paper.',
-  'Papa, maman… Je suis obligée. Le dossier, c’est le dossier.': 'Dad, Mum… I have to. The file is the file.',
-  'Fabien baisse lentement son journal.': 'Fabien slowly lowers his newspaper.',
   'Tu… accuses… ta MÈRE ? 😱': 'You’re… accusing… your MOTHER? 😱',
   'Samedi matin, tu as rangé mon sac. Tu l’as eu entre les mains. Seule.':
     'On Saturday morning, you tidied my bag. You had it in your hands. Alone.',
@@ -3113,9 +3109,6 @@ window.TRADUCTIONS_EN = {
     'Saturday: your pink pencil case, your purse (minus €20, thanks Edgar), your keys and a pack of tissues. NO jewellery. Otherwise I’d have put it aside, as usual.',
   'J’ai lu sa lettre. Elle a même noté l’état des mouchoirs. C’est plus précis que nos rapports. 📝':
     'I read her letter. She even noted the condition of the tissues. It’s more precise than our reports. 📝',
-  'Et ton père n’a rien fait non plus. Il ne retrouve même pas ses lunettes quand elles sont sur sa tête.':
-    'And your father didn’t do anything either. He can’t even find his glasses when they’re on his head.',
-  '…Pardon maman. Pardon papa. 😳': '…Sorry Mum. Sorry Dad. 😳',
   'Pharmacie de Reyrieux, samedi, en plein rush. Sandrine range un carton de crèmes.':
     'Reyrieux pharmacy, Saturday, in the middle of the rush. Sandrine is unpacking a box of creams.',
   'Sandrine. Samedi, tu as ouvert mon casier. Tu me l’as écrit toi-même.':
@@ -3132,5 +3125,25 @@ window.TRADUCTIONS_EN = {
   'Tiens, pour la peine : un tube de crème neuf. Le tien est presque vide… à cause de moi.':
     'Here, to make up for it: a new tube of cream. Yours is almost empty… because of me.',
   '…Garde la crème. 😳': '…Keep the cream. 😳',
-  'Le vrai coupable court toujours… Retour au dossier. 🗂️': 'The real culprit is still on the loose… Back to the file. 🗂️'
+  'Le vrai coupable court toujours… Retour au dossier. 🗂️': 'The real culprit is still on the loose… Back to the file. 🗂️',
+  'La mère de Célestine': 'Célestine’s mother',
+  '🧺 Range tout ce qui traîne': '🧺 Tidies up everything lying around',
+  'Elle a accueilli Célestine tout le week-end et a rangé son sac samedi matin.':
+    'She had Célestine over all weekend and tidied her bag on Saturday morning.',
+  '« J’ai juste rangé ton sac dans ta chambre, ma chérie. »': '“I just put your bag away in your room, sweetheart.”',
+  '🏠 Chez sa mère, Valérie, à Reyrieux': '🏠 At his mother Valérie’s in Reyrieux',
+  'Personnes vues dans la semaine : Noémie, Emma, Nora, Erika, Eya, Edgar, Valérie, Sandrine, Valentin.':
+    'People seen during the week: Noémie, Emma, Nora, Erika, Eya, Edgar, Valérie, Sandrine, Valentin.',
+  'Chez Valérie, et la pharmacie du samedi.': 'At Valérie’s, and the Saturday pharmacy.',
+  'Reyrieux, la maison de Valérie.': 'Reyrieux, Valérie’s house.',
+  'Votre mère aussi, donc.': 'Your mother too, then.',
+  'Ma MÈRE ?! Vous êtes sérieux ? 😳': 'My MOTHER?! Are you serious? 😳',
+  'Accusation · Valérie': 'Accusation · Valérie',
+  'Reyrieux, dans la cuisine. Valérie essuie un verre en chantonnant.': 'Reyrieux, in the kitchen. Valérie is drying a glass and humming.',
+  'Maman… Je suis obligée. Le dossier, c’est le dossier.': 'Mum… I have to. The file is the file.',
+  'Valérie pose lentement son verre.': 'Valérie slowly puts down her glass.',
+  'La prochaine fois que tu accuses ta mère, préviens-moi : je ferai un gâteau pour la garde à vue.':
+    'Next time you accuse your mother, warn me: I’ll bake a cake for the police custody.',
+  '…Pardon maman. 😳': '…Sorry Mum. 😳',
+  'Suspect n°7 · la mère': 'Suspect no. 7 · the mother'
 };

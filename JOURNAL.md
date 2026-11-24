@@ -4,6 +4,15 @@
 
 ---
 
+## 24 novembre 2026 (nuit) : le suspect n°7 devient seulement Valérie
+
+- Le suspect « Fabien et Valérie » devient **« Valérie », la mère de Célestine**. Fabien n'apparaît plus nulle part : fiche, prologue (« Votre mère aussi, donc. »), agenda, main courante, plan, générique, menu, scène d'accusation réécrite.
+- **Nouvelle photo :** seulement Valérie, découpée de l'ancienne photo des parents (`media/persos/valerie.webp`, `parents.webp` supprimé). L'identifiant interne reste `parents`, pour ne pas casser les sauvegardes.
+- Sa voix « charabia » est maintenant une voix de femme.
+- Fichiers : `js/enquete/suspects-pieces.js`, `js/enquete/plan-liege-notes.js`, `js/histoire.js`, `js/menu-demarrer.js`, `js/boss/boss-final.js`, `js/cinematiques.js`, `js/medias.js`, `js/fichiers.js`, `js/langue-anglais.js`.
+
+---
+
 ## 24 novembre 2026 (nuit) : vidéo du ski et vraies scènes de mauvaises accusations
 
 - **Album, vidéo n°2 :** « Notre bataille de boules de neige » est remplacée par **« Leçon de ski sur la piste rouge »** (13,5 s). Valentin explique la « pizza » à Célestine. Elle part trop vite, s'envole sur une bosse et finit tête la première dans la neige (« POUF ! »). Valentin est mort de rire (« C'était une calzone ça ! 😂 »), puis elle se venge avec une boule de neige.

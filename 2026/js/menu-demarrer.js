@@ -582,7 +582,7 @@ function smOpen(force, at) {
    <p><small>Suspect n°4 · la photographe de la promo</small><b>Erika</b></p>
    <p><small>Suspect n°5 · la fan de Bellecour</small><b>Eya</b></p>
    <p><small>Suspect n°6 · le grand frère</small><b>Edgar</b></p>
-   <p><small>Suspect n°7 · les parents</small><b>Fabien et Valérie</b></p>
+   <p><small>Suspect n°7 · la mère</small><b>Valérie</b></p>
    <p><small>Suspect n°8 · la collègue de la pharmacie</small><b>Sandrine</b></p>
    <p><small>Suspect n°9 · le copain (forcément)</small><b>Valentin</b></p>
    <p><small>Cascades</small><b>Le chat (il a refusé)</b></p>

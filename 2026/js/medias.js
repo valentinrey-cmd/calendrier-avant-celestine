@@ -49,6 +49,6 @@ const SIMG = {
   'nora': 'media/persos/nora.webp',
   'eya': 'media/persos/eya.webp',
   'erika': 'media/persos/erika.webp',
-  'parents': 'media/persos/parents.webp',
+  'parents': 'media/persos/valerie.webp',
   'sandrine': 'media/persos/sandrine.webp'
 };

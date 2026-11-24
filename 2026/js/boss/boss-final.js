@@ -2703,7 +2703,7 @@ function vCredits() {
     ['c', 'erika|Erika|Suspect n°4 · la photographe de la promo 🤳'],
     ['c', 'eya|Eya|Suspect n°5 · le témoin de Bellecour 🛍️'],
     ['c', 'edgar|Edgar|Suspect n°6 · le grand frère (et ses 20 €) 🌯'],
-    ['c', 'parents|Fabien et Valérie|Suspect n°7 · les parents 🏡'],
+    ['c', 'parents|Valérie|Suspect n°7 · la mère 🏡'],
     ['c', 'sandrine|Sandrine|Suspect n°8 · la collègue de la pharmacie 💊'],
     ['c', 'valentin|Valentin|Suspect n°9 · le vrai coupable 😈'],
     ['t', 'APPARITIONS SPÉCIALES'],

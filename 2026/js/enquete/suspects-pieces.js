@@ -66,19 +66,19 @@ const SUSP = [
     n: 'Edgar',
     img: 'edgar',
     r: 'Le grand frère de Célestine',
-    tr: ['🏠 Chez Fabien et Valérie à Reyrieux', '🌯 Fan de tacos', '🥂 Le roi des toasts', '🛫 Agence de location à Saint-Exupéry'],
+    tr: ['🏠 Chez sa mère, Valérie, à Reyrieux', '🌯 Fan de tacos', '🥂 Le roi des toasts', '🛫 Agence de location à Saint-Exupéry'],
     d: 'Deux ans de plus que Célestine. Le sac est resté tout le week-end dans l’entrée de sa maison.',
     dep: '« Ton sac ? Je n’y ai pas touché de tout le week-end. »',
     a: 'Il a vidé tout le sac vendredi soir : il n’y avait déjà plus de bracelet.'
   },
   {
     id: 'parents',
-    n: 'Fabien et Valérie',
+    n: 'Valérie',
     img: 'parents',
-    r: 'Les parents de Célestine',
-    tr: ['🏡 Reyrieux', '🧺 Valérie range tout ce qui traîne'],
-    d: 'Ils ont accueilli Célestine tout le week-end. Valérie a rangé son sac samedi matin.',
-    dep: '« On a juste rangé ton sac dans ta chambre, ma chérie. »',
+    r: 'La mère de Célestine',
+    tr: ['🏡 Reyrieux', '🧺 Range tout ce qui traîne'],
+    d: 'Elle a accueilli Célestine tout le week-end et a rangé son sac samedi matin.',
+    dep: '« J’ai juste rangé ton sac dans ta chambre, ma chérie. »',
     a: 'Valérie a rangé le sac samedi : trousse, porte-monnaie, clés, et rien d’autre.'
   },
   {
@@ -193,7 +193,7 @@ const PIECES = [
       '« J’ai perdu, ou on m’a volé, mon bracelet : une chaîne fine en or avec des petits cœurs roses. Valentin me l’a offert le 24 décembre dernier.',
       'Je l’enlève pour les TP et pour la douche. Vendredi matin, j’avais TP : je l’ai rangé dans ma trousse, comme d’habitude.',
       'Je suis partie le vendredi soir chez mes parents, à Reyrieux. J’ai travaillé samedi à la pharmacie. Dimanche à 21 h 30, en vidant mon sac : plus de bracelet. Ni dans la trousse, ni dans le sac, ni dans le vide-poche. »',
-      'Personnes vues dans la semaine : Noémie, Emma, Nora, Erika, Eya, Edgar, Fabien et Valérie, Sandrine, Valentin.'
+      'Personnes vues dans la semaine : Noémie, Emma, Nora, Erika, Eya, Edgar, Valérie, Sandrine, Valentin.'
     ]
   },
   {
@@ -220,7 +220,7 @@ const PIECES = [
       ['Mer. 25 · 13 h', 'Pause à la BU', 'Nora, Erika, Eya'],
       ['Jeu. 26 · 20 h', 'Resto', 'Emma, Noémie'],
       ['Ven. 27 · 8 h 30 → 12 h 30', 'TP', 'Nora, Erika, Eya'],
-      ['Ven. 27 · soir → dim. 29', 'Reyrieux', 'Fabien, Valérie, Edgar'],
+      ['Ven. 27 · soir → dim. 29', 'Reyrieux', 'Valérie, Edgar'],
       ['Sam. 28 · 9 h → 19 h', 'Pharmacie', 'Sandrine'],
       ['Tous les soirs de semaine', 'À l’appart', 'Valentin']
     ],

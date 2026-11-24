@@ -466,7 +466,7 @@ const CINE = (() => {
       if (w == 'v' && c && c.querySelector('.vb-cv.st-shadow')) f0 = VOICE.shadow[0];
       if (w == 'b' && c && BOSSV[c.__boss]) f0 = BOSSV[c.__boss];
       if (w == 'b' && c && c.__person)
-        f0 = { emma: 345, noemie: 385, edgar: 145, nora: 360, erika: 375, eya: 350, sandrine: 310, parents: 200 }[c.__person] || f0;
+        f0 = { emma: 345, noemie: 385, edgar: 145, nora: 360, erika: 375, eya: 350, sandrine: 310, parents: 330 }[c.__person] || f0;
       const code = ch.charCodeAt(0),
         f = f0 * (1 + (((code * 13) % 7) - 3) * 0.035),
         [F1, F2] = FOR[v],

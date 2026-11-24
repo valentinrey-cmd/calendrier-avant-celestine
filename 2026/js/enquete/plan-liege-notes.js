@@ -101,7 +101,7 @@ const PLACES = [
     y: 72,
     ic: '🏡',
     who: ['edgar', 'parents', 'sandrine'],
-    d: 'Chez Fabien et Valérie, et la pharmacie du samedi.'
+    d: 'Chez Valérie, et la pharmacie du samedi.'
   },
   { id: 'neuville', lx: 16, ly: 4, la: 'start', n: 'Neuville', x: 212, y: 193, ic: '🏠', who: ['emma'], d: 'Parents d’Emma.' }
 ];
