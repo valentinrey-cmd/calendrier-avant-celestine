@@ -2037,7 +2037,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795512660';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795512814';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2203,7 +2203,7 @@ const DAYS={
  5:{t:"La hutte de Panoramix",g:"balls",p:{colors:7,empty:1,slack:8,time:180},tier:1,ev:"🔄"},
  6:{t:"Air hockey contre Valentin",g:"hockey",p:{goal:7,ai:440,max:950},tier:2,ev:"✨",x2:true},
  7:{t:"Zip",g:"zip",p:{n:7,k:9,time:60},tier:2,ev:"🎡",unlock:"La roue de la chance est ouverte"},
- 8:{t:"Bulles d’indices",g:"bubble",p:{colors:4,rows:5,clues:5,drop:9,time:240},tier:2,ev:"🎨"},
+ 8:{t:"Bulles d’indices",g:"bubble",p:{colors:4,rows:6,clues:6,drop:8,time:210},tier:2,ev:"🎨"},
  9:{t:"Flèches en fuite",g:"arrows",p:{n:11,min:2,max:5,time:80,err:1,rot:.12,bombs:3,slack:2,spin:12},tier:2},
  10:{t:"Picross",g:"picross",p:{pics:["loupe","menottes","badge"]},tier:2},
  11:{t:"Simontagne",g:"simon",p:{goal:10,time:300},tier:2,ev:"🎟️"},
