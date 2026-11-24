@@ -1024,7 +1024,7 @@ body.fini h1{text-shadow:0 0 14px #ffd76a66}
 .vb-cbox{position:absolute;left:50%;top:40%;transform:translateX(-50%);display:flex;gap:10px;z-index:2}
 .vb-cbox i{width:62px;height:62px;border-radius:7px;background:linear-gradient(150deg,#f3d6a0,#d8a868 55%,#bb864c);box-shadow:inset 0 0 0 3px #b07a40,0 7px 0 -1px #9a6634,0 12px 14px #0008;position:relative;animation:vbpzin .5s cubic-bezier(.3,1.5,.6,1) both}
 .vb-cbox i:nth-child(2){animation-delay:.12s}.vb-cbox i:nth-child(3){animation-delay:.24s}
-.vb-cbox i::after{content:'PIZZA';position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#c62f3a;color:#fff;font:italic 900 .5rem/36px Georgia;text-align:center;border:2px solid #fff6e6}
+.vb-cbox i::after{content:'MARIO';position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#c62f3a;color:#fff;font:italic 900 .5rem/36px Georgia;text-align:center;border:2px solid #fff6e6}
 .vb-ccand{position:absolute;left:6%;right:6%;top:66%;display:flex;justify-content:space-between;z-index:2}
 .vb-ccand i{width:26px;height:34px;border-radius:5px 5px 9px 9px;border:2px solid #ffffff77;background:linear-gradient(180deg,#0000 20%,var(--c));position:relative;opacity:.55;animation:vbccl 2.4s ease-in-out infinite}
 .vb-ccand i::after{content:'';position:absolute;left:50%;top:-12px;width:8px;height:13px;margin-left:-4px;border-radius:50% 50% 50% 50%/62% 62% 38% 38%;background:radial-gradient(circle at 50% 72%,#fff,#ffe07a 35%,#ff9a3a 70%,#0000)}
@@ -2036,7 +2036,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795503240';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795504408';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2698,7 +2698,7 @@ function vBoss(test,sp,so){if(document.getElementById('vbo'))return;sp=Math.max(
     while(!stop&&alive){
      const n=round<2?3:round<4?4:5,bw=Math.min(W*(n==3?.25:n==4?.2:.165),100),gp=(W-bw*n)/(n+1),sx=q=>gp+q*(bw+gp);
      L.querySelectorAll('.vb-pzb,.vb-pzjunk').forEach(e=>e.remove());BR.classList.remove('on');
-     const B=[];for(let q=0;q<n;q++){const bx=el('div','vb-pzb in','<u></u><i class="lg">PIZZA<small>Trévoux</small></i>');bx.style.width=bx.style.height=bw+'px';bx.style.left=sx(q)+'px';bx.style.top=(y0-bw/2)+'px';bx.style.animationDelay=(q*.08)+'s';bx.style.setProperty('--dur','.4s');B.push(bx)}
+     const B=[];for(let q=0;q<n;q++){const bx=el('div','vb-pzb in','<u></u><i class="lg">PIZZA<small>MARIO</small></i>');bx.style.width=bx.style.height=bw+'px';bx.style.left=sx(q)+'px';bx.style.top=(y0-bw/2)+'px';bx.style.animationDelay=(q*.08)+'s';bx.style.setProperty('--dur','.4s');B.push(bx)}
      SH.style.top=(y0+bw*.38)+'px';
      const prize=Math.floor(Math.random()*n),slot=B.map((_,q)=>q);
      const putBr=bx=>{BR.style.width=(bw*.92)+'px';BR.style.left=(parseFloat(bx.style.left)+bw*.04)+'px';BR.style.top=(y0-bw*.22)+'px'};
