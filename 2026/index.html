@@ -2036,7 +2036,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795504667';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795505464';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -6580,10 +6580,10 @@ try{GAMES.bmetro=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Touc
     else if(o.gate&&o.open){}
     else if(!inv){lives--;inv=1.1;bad=performance.now();gap=Math.max(0,gap-.08);try{SFX('bad')}catch(_){}quip=o.gate?'Bip ! Portillon fermé ⛔':['Pardon madame !','Aïe, la valise…','Désolée monsieur !'][lives%3];qT=1.3;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Célestine s’est perdue dans la correspondance')},900)}}}}
   O=O.filter(o=>o.D>-3);vlT-=dt;if(vlT<=0){vlT=1.6+Math.random()*1.4;vl=Math.floor(Math.random()*3);if(Math.random()<.4){quip=EX[Math.floor(Math.random()*EX.length)];qT=1.8}}};
- const person=(X,Y,s,coat,hair,ph,skin)=>{x.save();x.translate(X,Y);x.scale(s,s);x.fillStyle='#0000002a';x.beginPath();x.ellipse(0,0,22,6,0,0,7);x.fill();
+ const person=(X,Y,s,coat,hair,ph,skin,lg)=>{x.save();x.translate(X,Y);x.scale(s,s);x.fillStyle='#0000002a';x.beginPath();x.ellipse(0,0,22,6,0,0,7);x.fill();
   const a=Math.sin(ph)*.5,b=Math.abs(Math.cos(ph))*3;x.translate(0,-b);x.fillStyle='#2b2b3a';x.save();x.translate(-7,-34);x.rotate(a);x.beginPath();x.roundRect(-4,0,8,34,3);x.fill();x.restore();x.save();x.translate(7,-34);x.rotate(-a);x.beginPath();x.roundRect(-4,0,8,34,3);x.fill();x.restore();
   x.fillStyle=coat;x.save();x.translate(-17,-76);x.rotate(-a*.7);x.beginPath();x.roundRect(-6,0,8,32,4);x.fill();x.restore();x.save();x.translate(17,-76);x.rotate(a*.7);x.beginPath();x.roundRect(-2,0,8,32,4);x.fill();x.restore();x.beginPath();x.roundRect(-17,-82,34,52,[12,12,6,6]);x.fill();
-  x.fillStyle=skin||'#f1c9a5';x.fillRect(-4,-88,8,8);x.fillStyle=hair;x.beginPath();x.arc(0,-98,13,0,7);x.fill();x.restore()};
+  x.fillStyle=skin||'#f1c9a5';x.fillRect(-4,-88,8,8);x.fillStyle=hair;x.beginPath();x.arc(0,-98,13,0,7);x.fill();if(lg){const sw=Math.sin(ph)*2.5;x.beginPath();x.moveTo(-13,-100);x.quadraticCurveTo(-17+sw,-80,-15+sw,-58);x.quadraticCurveTo(0+sw,-50,15+sw,-58);x.quadraticCurveTo(17+sw,-80,13,-100);x.closePath();x.fill();x.strokeStyle='#ffffff22';x.lineWidth=1.2;x.beginPath();x.moveTo(-5,-104);x.quadraticCurveTo(-7+sw,-80,-6+sw,-60);x.moveTo(5,-104);x.quadraticCurveTo(7+sw,-80,6+sw,-60);x.stroke()}x.restore()};
  const quad=(a,b,c,d)=>{x.beginPath();x.moveTo(...a);x.lineTo(...b);x.lineTo(...c);x.lineTo(...d);x.fill()};
  const draw=now=>{x.drawImage(off,0,0,360,540);
   // repères en mouvement, discrets : joints du sol, piliers, néons, affiches (apparition en fondu)
@@ -6603,7 +6603,7 @@ try{GAMES.bmetro=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Touc
    x.fillStyle='#0000002a';x.beginPath();x.ellipse(X,Y,26*kk,7*kk,0,0,7);x.fill();if(o.bon){x.drawImage(glow,X-36*kk,Y-70*kk,72*kk,72*kk)}bemo(x,o.e,X,Y-34*kk,Math.max(8,64*kk))}
   x.globalAlpha=1;
   // Célestine, de dos
-  const cX=VX+(ln-1)*110;x.save();if(inv>0)x.globalAlpha=.45+.35*Math.sin(now/70);person(cX,PY+34,1.05,'#a3324f','#5a3a24',run*1.25);x.restore();
+  const cX=VX+(ln-1)*110;x.save();if(inv>0)x.globalAlpha=.45+.35*Math.sin(now/70);person(cX,PY+34,1.05,'#a3324f','#4a2a18',run*1.25,null,1);x.restore();
   if(boost){const g=x.createRadialGradient(180,300,120,180,300,330);g.addColorStop(0,'#ffcf4a00');g.addColorStop(1,'#ffcf4a44');x.fillStyle=g;x.fillRect(0,0,360,540)}
   // bulle fixe en haut, avec une flèche vers Valentin
   if(qT>0&&vxy){x.save();x.globalAlpha=Math.min(1,qT*3);NBX.bub(x,76,48,276,quip,{});x.strokeStyle='#ffffffcc';x.lineWidth=2;x.beginPath();x.moveTo(214,84);x.lineTo(vxy[0],Math.max(92,vxy[1]-26));x.stroke();x.restore()}
