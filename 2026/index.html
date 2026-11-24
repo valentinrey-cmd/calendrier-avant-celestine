@@ -2037,7 +2037,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795512814';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795514439';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2201,7 +2201,7 @@ const DAYS={
  3:{t:"Mots mêlés pimentés 🌶️",g:"melee",p:{n:13,theme:"Sexe 🔥",words:["PENETRATION","CUNNILINGUS","LEVRETTE","FELLATION","ORGASME","PRELIMINAIRES","MISSIONNAIRE","KAMASUTRA","CAPOTE","LUBRIFIANT","EXTASE","CLITORIS"],time:360,egg:1},tier:1,ev:"🧪"},
  4:{t:"Flappy Célestine",g:"flappy",p:{goal:15,gap:142,gapMin:112,shrink:1.2,moveAt:6,ampMax:55,wob:1.7,pw:62,every:1.38,speed:165,acc:3.2,grav:1600,jump:460},tier:1,ev:"🔧"},
  5:{t:"La hutte de Panoramix",g:"balls",p:{colors:7,empty:1,slack:8,time:180},tier:1,ev:"🔄"},
- 6:{t:"Air hockey contre Valentin",g:"hockey",p:{goal:7,ai:440,max:950},tier:2,ev:"✨",x2:true},
+ 6:{t:"Air hockey contre Valentin",g:"hockey",p:{goal:7,ai:350,max:950},tier:2,ev:"✨",x2:true},
  7:{t:"Zip",g:"zip",p:{n:7,k:9,time:60},tier:2,ev:"🎡",unlock:"La roue de la chance est ouverte"},
  8:{t:"Bulles d’indices",g:"bubble",p:{colors:4,rows:6,clues:6,drop:8,time:210},tier:2,ev:"🎨"},
  9:{t:"Flèches en fuite",g:"arrows",p:{n:11,min:2,max:5,time:80,err:1,rot:.12,bombs:3,slack:2,spin:12},tier:2},
@@ -6365,9 +6365,10 @@ try{GAMES.hockey=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,`Glis
  let side=0,aimX=180,stall=0,cool=0,st='ready',sc=[0,0],pk={x:180,y:MID,vx:0,vy:0},me={x:180,y:BOT-70,vx:0,vy:0,tx:180,ty:BOT-70},va={x:180,y:TOP+70,vx:0,vy:0},serve=0,quip='Prête ? Je ne vais pas te faire de cadeau. 😏',qT=2.6,walls=new Set(),last='',flash=0,flashC='',T=0,trail=[],shake=0;
  const reset=who=>{pk={x:180,y:who=='me'?MID+60:MID-60,vx:0,vy:0};serve=.8;walls.clear();last='';trail=[]};
  const say=t=>{quip=t;qT=2};
+ let sndT=0;const CT={};const snd=(f,v)=>{const n=performance.now();if(n-sndT<160)return;sndT=n;try{bkT(f,.05,'triangle',Math.min(.045,.012+v/30000))}catch(_){}};
  W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';reset('me')}const q=P(e);me.tx=q[0];me.ty=q[1]};
  W.onpointermove=e=>{if(e.buttons||e.pointerType=='touch'){const q=P(e);me.tx=q[0];me.ty=q[1]}};
- const hitM=(m,who)=>{const dx=pk.x-m.x,dy=pk.y-m.y,d=Math.hypot(dx,dy);if(d<PR+MR&&d>0){const nx=dx/d,ny=dy/d;pk.x=m.x+nx*(PR+MR);pk.y=m.y+ny*(PR+MR);const rv=(pk.vx-m.vx)*nx+(pk.vy-m.vy)*ny;if(rv<0){pk.vx-=1.9*rv*nx;pk.vy-=1.9*rv*ny}const tf=who=='va'?.6:.35;pk.vx+=m.vx*tf;pk.vy+=m.vy*tf;if(who=='va')aimX=Math.random()<.35?(Math.random()<.5?-60:420):180+(Math.random()-.5)*90;const s=Math.hypot(pk.vx,pk.vy),mx=p.max;if(s>mx){pk.vx*=mx/s;pk.vy*=mx/s}if(last!=who){walls.clear()}last=who;if(Math.abs(rv)>120)sparks(pk.x-nx*PR,pk.y-ny*PR,who=='me'?'#ff7aa8':'#f3c623',Math.min(14,Math.abs(rv)/60|0));try{bkT(who=='me'?520:380,.05,'square',.04)}catch(_){}}};
+ const hitM=(m,who)=>{const dx=pk.x-m.x,dy=pk.y-m.y,d=Math.hypot(dx,dy);if(d<PR+MR&&d>0){const nx=dx/d,ny=dy/d;pk.x=m.x+nx*(PR+MR);pk.y=m.y+ny*(PR+MR);const rv=(pk.vx-m.vx)*nx+(pk.vy-m.vy)*ny;if(rv<0){pk.vx-=1.9*rv*nx;pk.vy-=1.9*rv*ny}const tf=who=='va'?.45:.35;pk.vx+=m.vx*tf;pk.vy+=m.vy*tf;if(who=='va')aimX=Math.random()<.35?(Math.random()<.5?-60:420):180+(Math.random()-.5)*90;const s=Math.hypot(pk.vx,pk.vy),mx=p.max;if(s>mx){pk.vx*=mx/s;pk.vy*=mx/s}if(last!=who){walls.clear()}last=who;if(Math.abs(rv)>120)sparks(pk.x-nx*PR,pk.y-ny*PR,who=='me'?'#ff7aa8':'#f3c623',Math.min(14,Math.abs(rv)/60|0));if(Math.abs(rv)>200&&!CT[who])snd(who=='me'?520:380,Math.abs(rv));CT[who]=6}};
  const goal=who=>{gT=1.1;gW='BUT !';sparks(pk.x,who=='me'?TOP:BOT,who=='me'?'#53e08a':'#ff4d6d',40);if(who=='me'){sc[0]++;flash=1;flashC='#53e08a';shake=.3;try{SFX('ok')}catch(_){}if(walls.has('l')&&walls.has('r')&&last=='me'){EGG(6)}say(['NOOON ! 😱','Comment t’as fait ça ?!','Coup de chance…','Je t’ai laissée marquer.','Arrête de rire !'][sc[0]%5])}else{sc[1]++;flash=1;flashC='#ff4d6d';shake=.3;try{SFX('bad')}catch(_){}say(QV[Math.floor(Math.random()*QV.length)])}
   if(sc[0]>=p.goal){st='won';if(sc[1]<=2)ACH('master3');setTimeout(()=>{if(id==RUN)win()},1100);return}if(sc[1]>=p.goal){st='dead';setTimeout(()=>{if(id==RUN)fail(`Valentin a gagné ${sc[1]} à ${sc[0]} 😈`)},1100);return}reset(who=='me'?'va':'me')};
  const upd=dt=>{T+=dt;gT=Math.max(0,gT-dt);for(const s of SP){s.x+=s.vx*dt;s.y+=s.vy*dt;s.vx*=.92;s.vy*=.92;s.t-=dt}SP=SP.filter(s=>s.t>0);qT=Math.max(0,qT-dt);flash=Math.max(0,flash-dt*2);shake=Math.max(0,shake-dt);
@@ -6380,7 +6381,7 @@ try{GAMES.hockey=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,`Glis
   if(serve>0){serve=Math.max(0,serve-dt);return}
   // palet
   const n=8;for(let k=0;k<n;k++){const h=dt/n;pk.x+=pk.vx*h;pk.y+=pk.vy*h;
-   if(pk.x<LFT+PR){pk.x=LFT+PR;pk.vx=Math.abs(pk.vx)*.92;walls.add('l');try{bkT(240,.03,'triangle',.03)}catch(_){}}if(pk.x>RGT-PR){pk.x=RGT-PR;pk.vx=-Math.abs(pk.vx)*.92;walls.add('r');try{bkT(240,.03,'triangle',.03)}catch(_){}}
+   if(pk.x<LFT+PR){pk.x=LFT+PR;if(pk.vx<-220&&!CT.l)snd(240,Math.abs(pk.vx));CT.l=3;pk.vx=Math.abs(pk.vx)*.92;walls.add('l')}if(pk.x>RGT-PR){pk.x=RGT-PR;if(pk.vx>220&&!CT.r)snd(240,Math.abs(pk.vx));CT.r=3;pk.vx=-Math.abs(pk.vx)*.92;walls.add('r')}for(const k in CT)if(CT[k]>0)CT[k]--;
    const inG=Math.abs(pk.x-180)<GW/2-PR*.4;
    if(pk.y<TOP+PR&&!inG){pk.y=TOP+PR;pk.vy=Math.abs(pk.vy)*.92}if(pk.y>BOT-PR&&!inG){pk.y=BOT-PR;pk.vy=-Math.abs(pk.vy)*.92}
    if(pk.y<TOP-PR){goal('me');return}if(pk.y>BOT+PR){goal('va');return}
