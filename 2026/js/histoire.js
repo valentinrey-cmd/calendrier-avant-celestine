@@ -433,10 +433,18 @@ Object.assign(STORY, {
     sc: 'audit',
     p: 'noemie',
     l: [
-      ['n', 'Noémie est convoquée. Elle lève les mains, ongles parfaits.', { fx: 'bin' }],
-      ['b', 'Je t’ai abîmé un cœur, d’accord ! Mais je te l’ai remis au poignet mardi soir. Tu l’avais mercredi, tu l’avais jeudi !'],
-      ['c', '…C’est vrai. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Salle d’audition. Noémie entre, un flacon de vernis dans chaque main.', { fx: 'bin' }],
+      ['b', 'Attends… tu m’accuses MOI ? Ta manucure attitrée ? Celle qui t’a fait un baby pink PARFAIT ? 😱', { fx: 'shake' }],
+      ['c', 'Mardi soir, mon bracelet était sur ta table. Je l’ai vu sur ta story.', { fx: ['cin', 'pop:📸'] }],
+      ['b', 'Évidemment ! Tu l’avais ENLEVÉ pour le gel. Je ne vernis pas les bijoux, moi.'],
+      ['b', '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅', { fx: 'pop:💅' }],
+      ['e', 'Colle à ongles sur un bijou en or. Je note : « dégradation, mais avec talent ». 📝', { fx: 'ein' }],
+      ['b', 'Et regarde ma photo de 19 h 40 : mes ongles finis… et le bracelet À TON POIGNET.', { fx: 'pop:📸' }],
+      ['e', 'Mercredi à la BU, il est encore à votre poignet. Jeudi au resto aussi. Ça fait beaucoup de poignet pour un vol, madame.', { fx: 'clue' }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:noemie' }],
+      ['b', 'Pour me faire pardonner… de MON innocence, je t’offre une pose gratuite. Attends. C’est toi qui devrais t’excuser !'],
+      ['c', '…Pardon Noémie. Je prends quand même la pose gratuite. 😳', { fx: 'cin' }],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_emma: {
@@ -444,13 +452,18 @@ Object.assign(STORY, {
     sc: 'audit',
     p: 'emma',
     l: [
-      ['n', 'Emma arrive avec un petit paquet cadeau.', { fx: 'bin' }],
-      [
-        'b',
-        'Tes nouvelles lunettes. Je voulais te les offrir pour Noël. Et ton bracelet, tu l’avais au poignet pendant que je fouillais ton sac.'
-      ],
-      ['c', '…Je suis la pire. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Emma entre en salle d’audition, lunettes sur le nez, regard d’ophtalmo qui a déjà tout vu.', { fx: 'bin' }],
+      ['b', 'Laisse-moi deviner. C’est Valentin qui t’a soufflé mon nom ? 🙄'],
+      ['c', 'Jeudi au resto, pendant que j’étais aux toilettes, tu avais mon sac sur les genoux. Noémie a une photo.', { fx: ['cin', 'pop:📸'] }],
+      ['b', 'Bien sûr que j’avais ton sac. J’y cherchais… ça.', { fx: 'pop:👓' }],
+      ['n', 'Elle pose sur la table un étui à lunettes… et un petit paquet cadeau.', { fx: 'pop:🎁' }],
+      ['b', 'J’ai testé tes verres avec mon appli. Ta correction a bougé, au fait. Je voulais t’offrir de nouvelles lunettes pour Noël. Surprise. Ratée. Merci.'],
+      ['e', 'Et le bracelet, pendant ce temps ? 🧐', { fx: 'ein' }],
+      ['b', 'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.', { fx: 'pop:🍕' }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:emma' }],
+      ['c', 'Emma… je suis la pire. 😳', { fx: 'cin' }],
+      ['b', 'Je sais. Avec tes nouvelles lunettes, tu liras mieux ton prochain suspect. 😌'],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_nora: {
@@ -458,10 +471,18 @@ Object.assign(STORY, {
     sc: 'fac',
     p: 'nora',
     l: [
-      ['n', 'Nora pâlit au milieu de la BU.', { fx: 'bin' }],
-      ['b', 'J’ai copié tes résultats, pas ton bracelet ! Ta trousse était vide à 8 h 45 !'],
-      ['c', '…Oups. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'À la BU, Nora révise derrière une forteresse de fiches. Célestine s’avance.', { fx: 'bin' }],
+      ['b', 'Chut ! Je suis au chapitre des anti-inflammatoires. Tu as dix secondes. 📚'],
+      ['c', 'Vendredi au TP, tu tenais ma trousse. Erika a une photo. Et c’est là que j’avais rangé mon bracelet.', { fx: ['cin', 'pop:🧪'] }],
+      ['b', '…Je peux tout expliquer.', { fx: 'shake' }],
+      ['b', 'J’ai pris ta trousse à 8 h 45 pour ton correcteur. Et… j’ai un peu copié tes résultats de dosage. Beaucoup. Tout, en fait.'],
+      ['c', 'NORA ! 😤', { fx: 'shake' }],
+      ['b', 'Mais il n’y avait PAS de bracelet ! Des stylos, ton surligneur rose et un vieux chewing-gum. Rien qui brille !', { fx: 'pop:🖊️' }],
+      ['e', 'Si la trousse était déjà vide à 8 h 45… peut-être que le bracelet n’y a jamais été. 🧐', { fx: ['ein', 'clue'] }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:nora' }],
+      ['b', 'Par contre… tu peux ne pas parler des résultats copiés au prof ?'],
+      ['c', 'Tes 18 fiches de révision contre mon silence. 😏', { fx: 'cin' }],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_erika: {
@@ -469,10 +490,19 @@ Object.assign(STORY, {
     sc: 'fac',
     p: 'erika',
     l: [
-      ['n', 'Erika sort son téléphone.', { fx: 'bin' }],
-      ['b', 'J’ai 2 000 photos de cette semaine. Tu veux que je te montre où j’étais à chaque minute ? 🤳'],
-      ['c', '…Non merci. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Erika arrive, téléphone déjà dégainé. Évidemment.', { fx: 'bin' }],
+      ['b', 'Tu m’accuses ? Parfait. J’ai des preuves. BEAUCOUP de preuves. 🤳'],
+      ['n', 'Elle fait défiler sa galerie. Ça dure. Longtemps. Très longtemps.', { fx: 'pop:📱' }],
+      ['b', 'Lundi, mon café. Mardi, mon café. Mercredi, toi à la BU, le bracelet au poignet. Jeudi, mon café.'],
+      ['c', 'Erika… tu prends tout en photo, mais toi, on ne te voit jamais dessus. C’est louche.', { fx: 'cin' }],
+      ['b', 'C’est MOI qui tiens le téléphone !! 😤', { fx: 'shake' }],
+      ['b', 'Vendredi au TP : 47 photos. Sur aucune je ne m’approche de ton sac. Et sur la 23e, Nora tient ta trousse. De rien.'],
+      ['e', 'Un téléphone ne vole pas de bracelet, madame. Il vole juste beaucoup de mémoire. 📸', { fx: 'ein' }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:erika' }],
+      ['b', 'Je peux faire un selfie avec toi pour fêter mon innocence ?'],
+      ['c', '…Une seule. 😳', { fx: 'cin' }],
+      ['n', 'CLIC. CLIC. CLIC. CLIC. Elle en a fait 34.', { fx: 'pop:🤳' }],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_eya: {
@@ -480,10 +510,18 @@ Object.assign(STORY, {
     sc: 'night',
     p: 'eya',
     l: [
-      ['n', 'Eya éclate de rire.', { fx: 'bin' }],
-      ['b', 'Moi ?! C’est moi qui t’ai dit pour Bellecour ! Tu as lu mon message jusqu’au bout ?'],
-      ['c', '…Ah. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Bellecour, la nuit. Eya sort d’une boutique, les bras chargés de sacs.', { fx: 'bin' }],
+      ['c', 'Eya. Vendredi, tu es partie du TP à 11 h 30. Avant tout le monde. Pile quand…', { fx: 'cin' }],
+      ['b', '…quand je suis allée faire du shopping à Bellecour, oui. 🛍️'],
+      ['b', 'Attends. ATTENDS. Tu m’accuses, moi ?! C’est MOI qui t’ai envoyé le message !', { fx: ['shake', 'pop:💬'] }],
+      ['c', 'Quel message ?'],
+      ['b', '« J’ai vu Valentin sortir d’une petite boutique vers 12 h 35. Il avait l’air de cacher un truc. » Tu l’as lu jusqu’au bout, au moins ?'],
+      ['c', '…Je l’ai lu en diagonale. 😳'],
+      ['e', 'Accuser son seul témoin. Audacieux. J’ai vu ça une fois, en 2009. Ça s’est mal fini pour tout le monde. ☕', { fx: 'ein' }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:eya' }],
+      ['b', 'Je retourne à mon shopping. Et toi, relis tes messages. LENTEMENT. 💅'],
+      ['n', 'Quelque part, quelqu’un soupire de soulagement…'],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_edgar: {
@@ -491,10 +529,18 @@ Object.assign(STORY, {
     sc: 'ecully',
     p: 'edgar',
     l: [
-      ['n', 'Edgar ouvre la porte de Reyrieux, un tacos à la main.', { fx: 'bin' }],
-      ['b', 'J’ai piqué 20 balles, pas ton bracelet ! Il n’était même pas dans ton sac, je l’ai retourné en entier !'],
-      ['c', '…Rends-moi mes 20 €, au moins. 😒', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Reyrieux. Edgar ouvre la porte, un tacos XL à la main.', { fx: 'bin' }],
+      ['b', 'Petite sœur ! Tu viens manger ? Il reste de la sauce fromagère. 🌯'],
+      ['c', 'Edgar. Vendredi soir, tu as pris de l’argent dans mon porte-monnaie. Maman me l’a dit.', { fx: ['cin', 'pop:💬'] }],
+      ['b', '20 balles. Un prêt. Un prêt d’urgence alimentaire.', { fx: 'shake' }],
+      ['c', 'Et pour trouver mon porte-monnaie, tu as fouillé TOUT mon sac. Là où devait être mon bracelet.'],
+      ['b', 'Justement ! J’ai tout retourné : la trousse, les poches, la doublure. J’ai même trouvé un ticket de 2023. Mais de bracelet : zéro.'],
+      ['e', 'Le ticket de caisse dit 23 h 04 : un tacos XL poulet, frites, sauce fromagère. Payé avec un billet de 20 €. Pas avec un bijou en or. 🧾', { fx: ['ein', 'clue'] }],
+      ['b', 'Tu vois ! Je suis un voleur… honnête.'],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:edgar' }],
+      ['c', 'Tu me dois quand même 20 €. 😒', { fx: 'cin' }],
+      ['b', 'Je te rembourse avec un toast à Noël. Le roi des toasts paie toujours ses dettes. 🥂'],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_parents: {
@@ -502,10 +548,18 @@ Object.assign(STORY, {
     sc: 'ecully',
     p: 'parents',
     l: [
-      ['n', 'Valérie pose les mains sur les hanches. Fabien se cache derrière le journal.', { fx: 'bin' }],
-      ['b', 'Ma chérie. Je range ton sac depuis que tu as 12 ans. Il n’y avait AUCUN bijou dedans.'],
-      ['c', '…Pardon maman. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Reyrieux, dans la cuisine. Valérie essuie un verre. Fabien lit le journal.', { fx: 'bin' }],
+      ['c', 'Papa, maman… Je suis obligée. Le dossier, c’est le dossier.', { fx: 'cin' }],
+      ['n', 'Fabien baisse lentement son journal.', { fx: 'pop:📰' }],
+      ['b', 'Tu… accuses… ta MÈRE ? 😱', { fx: 'shake' }],
+      ['c', 'Samedi matin, tu as rangé mon sac. Tu l’as eu entre les mains. Seule.'],
+      ['b', 'Ma chérie, je range ton sac depuis que tu as 12 ans. Je connais chaque miette qu’il y a dedans.'],
+      ['b', 'Samedi : ta trousse rose, ton porte-monnaie (moins 20 €, merci Edgar), tes clés et un paquet de mouchoirs. AUCUN bijou. Sinon, je l’aurais mis de côté, comme d’habitude.'],
+      ['e', 'J’ai lu sa lettre. Elle a même noté l’état des mouchoirs. C’est plus précis que nos rapports. 📝', { fx: 'ein' }],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:parents' }],
+      ['b', 'Et ton père n’a rien fait non plus. Il ne retrouve même pas ses lunettes quand elles sont sur sa tête.'],
+      ['c', '…Pardon maman. Pardon papa. 😳', { fx: 'cin' }],
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   acc_sandrine: {
@@ -513,10 +567,17 @@ Object.assign(STORY, {
     sc: 'pharma',
     p: 'sandrine',
     l: [
-      ['n', 'Sandrine lâche son carton de crèmes.', { fx: 'bin' }],
-      ['b', 'J’ai pris de ta crème pour les mains ! C’est tout ! Ton casier, il n’y avait rien qui brille dedans !'],
+      ['n', 'Pharmacie de Reyrieux, samedi, en plein rush. Sandrine range un carton de crèmes.', { fx: 'bin' }],
+      ['c', 'Sandrine. Samedi, tu as ouvert mon casier. Tu me l’as écrit toi-même.', { fx: ['cin', 'pop:💬'] }],
+      ['b', 'Pour ta crème pour les mains ! J’avais les mains plus sèches qu’un comprimé effervescent sans eau ! 🧴', { fx: 'shake' }],
+      ['c', 'Et mon bracelet était peut-être dans mon sac, dans ce casier…'],
+      ['b', 'Il y avait ton sac et ton manteau. J’ai pris UNE noisette de crème. Je n’ai pas ouvert ton sac. Je ne suis pas un monstre.'],
+      ['e', 'Et samedi matin, avant la pharmacie, sa mère avait déjà rangé ce sac. Aucun bijou dedans. Ce casier n’a rien pu cacher. 🧐', { fx: ['ein', 'clue'] }],
+      ['b', 'Tu vois ! Je suis préparatrice, pas cambrioleuse. Je prépare des gélules, pas des casses.'],
+      ['n', 'Le procureur tamponne le dossier.', { fx: 'out:sandrine' }],
+      ['b', 'Tiens, pour la peine : un tube de crème neuf. Le tien est presque vide… à cause de moi.'],
       ['c', '…Garde la crème. 😳', { fx: 'cin' }],
-      ['n', 'Le procureur rejette l’accusation. Le vrai coupable court toujours… Retour au dossier.', { fx: 'shake' }]
+      ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
   epi: {

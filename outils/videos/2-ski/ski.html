@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c" width="960" height="640"></canvas>
+<script>
+// Vidéo de l'album n°2 : « Leçon de ski sur la piste rouge » (rendu image par image)
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+const W = 960, H = 640, DUR = 13.5;
+const IMG = {};
+function load(k, src) { return new Promise(r => { const i = new Image(); i.onload = () => { IMG[k] = i; r(); }; i.src = src; }); }
+window.ready = Promise.all([load('v', '../../../2026/media/persos/valentin.webp'), load('c', '../../../2026/media/persos/celestine.webp')]);
+
+// ---------- hasard figé ----------
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const FLAKES = Array.from({ length: 90 }, () => [rnd() * W, rnd() * H, 1.5 + rnd() * 3, 20 + rnd() * 40, rnd() * 6]);
+const TREES = Array.from({ length: 40 }, (_, i) => [i * 130 + rnd() * 60, 0.7 + rnd() * 0.5, rnd() < 0.5 ? -1 : 1]);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = k => (1 - Math.cos(Math.PI * clamp(k, 0, 1))) / 2;
+
+// ---------- la piste : plat en haut, pente rouge, plat en bas ----------
+const SL = 0.42, X0 = 650, X1 = 2350, Y0 = 500;
+const g = X => X < X0 ? Y0 : X < X1 ? Y0 + (X - X0) * SL : Y0 + (X1 - X0) * SL;
+const ga = X => X > X0 && X < X1 ? Math.atan(SL) : 0;
+const BUMP = 2180; // la bosse fatale
+const gb = X => g(X) - 26 * Math.exp(-Math.pow((X - BUMP) / 34, 2));
+
+// ---------- trajectoires ----------
+const TC = 6.1; // départ du vol de Célestine
+function cX(t) { if (t < 3) return 560; const u = t - 3; return 560 + 60 * u + 140 * u * u; }
+const LX = cX(TC), LY = gb(LX) - 10, VX0 = 520, VY0 = -620, GR = 1700;
+const TL = (() => { // atterrissage
+  for (let t = TC; t < TC + 3; t += 0.002) { const dt = t - TC; if (LY + VY0 * dt + GR * dt * dt / 2 >= g(LX + VX0 * dt) + 10 && dt > 0.2) return t; }
+  return TC + 1;
+})();
+const LANDX = LX + VX0 * (TL - TC);
+function vX(t) { if (t < 3) return 380; return lerp(380, LANDX - 250, ease((t - 3) / 4.6)); }
+function cPos(t) {
+  if (t < TC) { const X = cX(t); return { X, Y: gb(X), fly: 0 }; }
+  if (t < TL) { const dt = t - TC; return { X: LX + VX0 * dt, Y: LY + VY0 * dt + GR * dt * dt / 2, fly: 1 }; }
+  return { X: LANDX, Y: g(LANDX), fly: 2 };
+}
+function cam(t) {
+  let cx;
+  if (t < 3) cx = 470;
+  else if (t < TL) cx = cPos(t).X - 80;
+  else cx = lerp(LANDX - 80, LANDX - 70, ease((t - TL) / 0.8));
+  return { cx, cy: g(cx) - 130 };
+}
+
+// ---------- dessin ----------
+const SKIN = '#f2c3a2', SKINL = '#d99b78';
+function rr(X, Y, w, h, r) { x.beginPath(); x.roundRect(X, Y, w, h, r); }
+function drawPerson(o) {
+  // o : X,Y (sol, écran), rot, s, face, jacket, hair, armL, armR (angles, 0 = bas), skis, ski, legs, buried
+  x.save(); x.translate(o.X, o.Y); x.rotate(o.rot || 0); const s = o.s || 0.78; x.scale(s, s);
+  if (o.skis) { // skis + chaussures de ski
+    x.fillStyle = o.ski; rr(-110, -6, 225, 12, 6); x.fill();
+    x.beginPath(); x.moveTo(108, -6); x.quadraticCurveTo(140, -8, 138, -32); x.lineTo(126, -30); x.quadraticCurveTo(126, -10, 104, 6); x.fill();
+    x.fillStyle = '#fff'; x.fillRect(-60, -3, 40, 3);
+  }
+  // jambes
+  const lg = o.legs || 0;
+  x.fillStyle = '#26365e';
+  x.save(); x.translate(-20, -150); x.rotate(lg); rr(-17, 0, 32, 142, 6); x.fill(); x.restore();
+  x.save(); x.translate(20, -150); x.rotate(-lg); rr(-15, 0, 32, 142, 6); x.fill(); x.restore();
+  x.fillStyle = '#33363d';
+  x.beginPath(); x.ellipse(-22 + Math.sin(lg) * -140, -12, 28, 14, 0, 0, 7); x.fill();
+  x.beginPath(); x.ellipse(24 + Math.sin(-lg) * -140, -12, 28, 14, 0, 0, 7); x.fill();
+  // cheveux (derrière)
+  if (o.hair) { x.fillStyle = o.hair; x.beginPath(); x.moveTo(-50, -325); x.quadraticCurveTo(-58, -410, 0, -418); x.quadraticCurveTo(58, -410, 52, -325); x.lineTo(40, -262); x.lineTo(-42, -262); x.closePath(); x.fill(); }
+  // corps
+  x.fillStyle = SKIN; x.fillRect(-12, -298, 24, 22);
+  x.fillStyle = o.jacket; rr(-66, -285, 132, 145, 14); x.fill();
+  x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(-4, -280, 8, 130); // fermeture éclair
+  // bras
+  const arm = (side, a) => {
+    x.save(); x.translate(side * 58, -272); x.rotate(-a * side);
+    x.fillStyle = o.jacket; rr(-15, -6, 30, 118, 13); x.fill();
+    x.fillStyle = SKIN; x.strokeStyle = SKINL; x.lineWidth = 2; x.beginPath(); x.arc(0, 118, 17, 0, 7); x.fill(); x.stroke();
+    if (o.poles) { x.strokeStyle = '#555'; x.lineWidth = 5; x.beginPath(); x.moveTo(0, 105); x.lineTo(-side * 6 + (o.poleDx || 0), 270); x.stroke(); x.fillStyle = '#555'; x.beginPath(); x.arc(-side * 6 + (o.poleDx || 0), 255, 9, 0, 7); x.stroke(); }
+    x.restore();
+  };
+  arm(-1, o.armL || 0); arm(1, o.armR || 0);
+  // tête (photo)
+  const im = IMG[o.face]; const hw = 92, hh = hw * im.height / im.width;
+  x.drawImage(im, -hw / 2, -292 - hh + 8, hw, hh);
+  if (o.snowHat) { x.fillStyle = '#fff'; [[-30, -392, 26], [0, -405, 32], [30, -390, 25], [-12, -380, 22], [18, -378, 20]].forEach(([a, b, r]) => { x.beginPath(); x.arc(a, b, r, 0, 7); x.fill(); }); }
+  if (o.splat) { x.fillStyle = 'rgba(255,255,255,.95)'; [[0, -330, 26], [-20, -342, 16], [22, -318, 15], [10, -352, 13]].forEach(([a, b, r]) => { x.beginPath(); x.arc(a, b, r, 0, 7); x.fill(); }); }
+  x.restore();
+}
+function bubble(txt, X, Y, k) {
+  if (k <= 0) return;
+  x.save(); x.globalAlpha = clamp(k * 4, 0, 1);
+  x.font = '800 25px system-ui, -apple-system, "Segoe UI", sans-serif';
+  const w = x.measureText(txt).width + 34, h = 46; let bx = clamp(X - w / 2, 10, W - w - 10); const by = Y - h - 18;
+  const sc = 0.6 + 0.4 * Math.min(1, k * 6); x.translate(X, Y); x.scale(sc, sc); x.translate(-X, -Y);
+  x.fillStyle = '#fff'; x.strokeStyle = '#2a3550'; x.lineWidth = 3;
+  rr(bx, by, w, h, 23); x.fill(); x.stroke();
+  x.beginPath(); x.moveTo(X - 10, by + h - 2); x.lineTo(X, Y - 2); x.lineTo(X + 12, by + h - 2); x.fill(); x.stroke();
+  x.fillStyle = '#fff'; x.fillRect(X - 9, by + h - 4, 20, 5);
+  x.fillStyle = '#1d2440'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, bx + w / 2, by + h / 2 + 1);
+  x.restore();
+}
+function bigWord(txt, X, Y, k, col) {
+  if (k <= 0 || k >= 1) return;
+  x.save(); x.translate(X, Y); const sc = k < 0.2 ? k / 0.2 * 1.2 : 1.2 - (k - 0.2) * 0.25; x.scale(sc, sc); x.rotate(-0.12);
+  x.globalAlpha = k > 0.75 ? (1 - k) / 0.25 : 1;
+  x.font = '900 64px "Lilita One", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.lineWidth = 10; x.strokeStyle = '#1d2440'; x.strokeText(txt, 0, 0); x.fillStyle = col || '#fff'; x.fillText(txt, 0, 0);
+  x.restore();
+}
+function tree(X, Y, s) {
+  x.fillStyle = '#5a3a22'; x.fillRect(X - 6 * s, Y - 22 * s, 12 * s, 24 * s);
+  x.fillStyle = '#2f6f4e';
+  for (let i = 0; i < 3; i++) { const w = (46 - i * 11) * s, y0 = Y - (18 + i * 30) * s; x.beginPath(); x.moveTo(X - w, y0); x.lineTo(X, y0 - 52 * s); x.lineTo(X + w, y0); x.fill(); }
+  x.fillStyle = '#fff'; x.beginPath(); x.moveTo(X - 10 * s, Y - 118 * s); x.lineTo(X, Y - 128 * s); x.lineTo(X + 10 * s, Y - 118 * s); x.fill();
+}
+function draw(t) {
+  const C = cam(t), sx = X => X - C.cx + 480, sy = Y => Y - C.cy + 360;
+  // ciel
+  const sk = x.createLinearGradient(0, 0, 0, H); sk.addColorStop(0, '#78aee8'); sk.addColorStop(1, '#d9e8f8'); x.fillStyle = sk; x.fillRect(0, 0, W, H);
+  // montagnes lointaines (parallaxe)
+  const px = -C.cx * 0.08, py = -(C.cy - 370) * 0.12;
+  for (let i = -1; i < 6; i++) {
+    const mx = ((i * 330 + px) % 1650 + 1650) % 1650 - 300, base = 470 + py, top = 210 + (i % 2) * 50 + py;
+    x.fillStyle = '#c9d9ef'; x.beginPath(); x.moveTo(mx - 260, base); x.lineTo(mx, top); x.lineTo(mx + 260, base); x.fill();
+    x.fillStyle = '#fff'; x.beginPath(); x.moveTo(mx - 52, top + 40); x.lineTo(mx, top); x.lineTo(mx + 52, top + 40); x.lineTo(mx + 22, top + 30); x.lineTo(mx, top + 44); x.lineTo(mx - 24, top + 30); x.fill();
+  }
+  // arbres de fond
+  for (const [tx, s] of TREES) { const X = sx(tx * 1.0) - 0; if (X < -80 || X > W + 80) continue; tree(X, sy(g(tx) - 46), s * 0.8); }
+  // la neige de la piste
+  x.fillStyle = '#f5f9ff'; x.beginPath(); x.moveTo(-10, H + 10);
+  for (let X = -10; X <= W + 10; X += 6) x.lineTo(X, sy(gb(X + C.cx - 480)));
+  x.lineTo(W + 10, H + 10); x.fill();
+  x.strokeStyle = '#dbe6f4'; x.lineWidth = 3; x.beginPath();
+  for (let X = -10; X <= W + 10; X += 6) x.lineTo(X, sy(gb(X + C.cx - 480)) + 26); x.stroke();
+  // panneau « piste rouge »
+  { const X = sx(250), Y = sy(g(250)); if (X > -100 && X < W + 100) {
+    x.fillStyle = '#6b4a2b'; x.fillRect(X - 5, Y - 150, 10, 150);
+    x.fillStyle = '#d7263d'; x.beginPath(); x.arc(X, Y - 165, 44, 0, 7); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 5; x.stroke();
+    x.fillStyle = '#fff'; x.font = '900 21px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('PISTE', X, Y - 175); x.fillText('ROUGE', X, Y - 154);
+  } }
+  // drapeaux rouges le long de la pente
+  for (let fx = 900; fx < 2300; fx += 260) { const X = sx(fx + 40), Y = sy(g(fx + 40)); if (X < -30 || X > W + 30) continue; x.strokeStyle = '#555'; x.lineWidth = 4; x.beginPath(); x.moveTo(X, Y); x.lineTo(X, Y - 90); x.stroke(); x.fillStyle = '#e0283f'; x.beginPath(); x.moveTo(X, Y - 90); x.lineTo(X + 34, Y - 78); x.lineTo(X, Y - 66); x.fill(); }
+
+  // ---- Valentin ----
+  const VXw = vX(t), vOnSlope = ga(VXw);
+  let vLaugh = t > 7.6 && t < 11.45, vHit = t > 11.55;
+  let vRot = vOnSlope ? 0.38 : 0, vArmL = 0.35, vArmR = 0.35, vY = 0, vLegs = 0, vPoleDx = 0;
+  if (t > 3 && t < 7.6) { vArmL = 0.55; vArmR = 0.55; vPoleDx = -40; }
+  if (vLaugh) { const q = Math.sin((t - 7.6) * 22); vRot = -0.12 + q * 0.05; vY = -Math.abs(Math.sin((t - 7.6) * 11)) * 10; vArmL = vArmR = -0.25 + q * 0.06; }
+  if (vHit) { const k = clamp((t - 11.55) / 0.35, 0, 1); vRot = -0.12 - 0.5 * ease(k); vArmL = vArmR = 2.2 * ease(k); }
+  drawPerson({ X: sx(VXw), Y: sy(g(VXw)) + vY, rot: vRot, face: 'v', jacket: '#c8312f', ski: '#1d2b55', armL: vArmL, armR: vArmR, skis: 1, poles: !vLaugh && !vHit, poleDx: vPoleDx, legs: vLegs, splat: vHit });
+  if (t > 7.3 && t < 8) { // dérapage : gerbe de neige
+    const k = (t - 7.3) / 0.7; x.fillStyle = 'rgba(255,255,255,' + (1 - k) + ')';
+    for (let i = 0; i < 14; i++) { const a = -0.3 - i * 0.12, r = 30 + k * 120 * (0.6 + (i % 3) * 0.2); x.beginPath(); x.arc(sx(VXw) + 90 + Math.cos(a) * r, sy(g(VXw)) - 10 + Math.sin(a) * r, 10 + (i % 4) * 3, 0, 7); x.fill(); }
+  }
+
+  // ---- Célestine ----
+  const P = cPos(t);
+  let cRot = 0, cArmL = 0.35, cArmR = 0.35, legs = 0;
+  if (t < 3) { cRot = Math.sin(t * 9) * 0.07; legs = 0.12 + Math.sin(t * 9) * 0.05; cArmL = 0.6 + Math.sin(t * 7) * 0.3; cArmR = 0.6 + Math.sin(t * 7 + 1) * 0.3; }
+  else if (P.fly == 0) { const w = (t - 3) * 14; cRot = ga(P.X) ? 0.28 + Math.sin(w) * 0.12 : Math.sin(w) * 0.1; cArmL = 1.8 + Math.sin(w) * 1.4; cArmR = 1.8 + Math.sin(w + 2) * 1.4; legs = 0.15; }
+  else if (P.fly == 1) { const dt = t - TC; cRot = dt * 11; cArmL = 2.6; cArmR = 2.6; legs = 0.35; }
+  if (P.fly < 2) {
+    drawPerson({ X: sx(P.X), Y: sy(P.Y), rot: cRot, face: 'c', jacket: '#e85d9b', hair: '#4a2a18', ski: '#16a5a5', armL: cArmL, armR: cArmR, skis: P.fly == 0, poles: P.fly == 0 && t < 3, legs });
+    if (P.fly == 1) { // les skis s'envolent
+      const dt = t - TC;
+      for (const [vx, vy, sp] of [[300, -900, 9], [700, -700, -7]]) {
+        const X = sx(LX + vx * dt), Y = sy(LY - 40 + vy * dt + GR * dt * dt / 2);
+        x.save(); x.translate(X, Y); x.rotate(dt * sp); x.fillStyle = '#16a5a5'; rr(-80, -5, 160, 10, 5); x.fill(); x.restore();
+      }
+    }
+  } else {
+    const k = t - TL, popped = t > 8.9;
+    if (!popped) { // tête la première dans la neige : les jambes dépassent et gigotent
+      const wig = Math.sin(k * 16) * 0.18 * Math.exp(-k * 0.6);
+      x.save(); x.beginPath(); x.rect(0, 0, W, sy(g(LANDX)) + 2); x.clip();
+      drawPerson({ X: sx(LANDX), Y: sy(g(LANDX)) - 178, rot: Math.PI + wig, face: 'c', jacket: '#e85d9b', hair: '#4a2a18', armL: 0.4, armR: 0.4, legs: Math.sin(k * 20) * 0.25 });
+      x.restore();
+    } else { // elle ressort, de la neige sur la tête
+      const up = ease((t - 8.9) / 0.25);
+      x.save(); x.beginPath(); x.rect(0, 0, W, sy(g(LANDX)) + 4); x.clip();
+      drawPerson({ X: sx(LANDX), Y: sy(g(LANDX)) + lerp(260, 120, up), rot: 0, face: 'c', jacket: '#e85d9b', hair: '#4a2a18', armL: t > 11 && t < 11.4 ? -2.8 : 0.3, armR: 0.25, snowHat: 1 });
+      x.restore();
+    }
+    // le trou / tas de neige
+    x.fillStyle = '#fff'; x.strokeStyle = '#d6e3f3'; x.lineWidth = 3;
+    x.beginPath(); x.ellipse(sx(LANDX), sy(g(LANDX)) + 4, 95, 26, 0, Math.PI, 0); x.fill(); x.stroke();
+    // les skis plantés dans la neige
+    for (const [dx, a] of [[-150, -0.4], [160, 0.5]]) { x.save(); x.translate(sx(LANDX + dx), sy(g(LANDX + dx)) + 6); x.rotate(a); x.fillStyle = '#16a5a5'; rr(-6, -120, 12, 120, 5); x.fill(); x.restore(); }
+    if (k < 1.2) { // explosion de neige
+      x.fillStyle = 'rgba(255,255,255,' + clamp(1.2 - k, 0, 1) + ')';
+      for (let i = 0; i < 22; i++) { const a = Math.PI + (i / 21) * Math.PI, r = 40 + k * 260 * (0.5 + (i % 5) * 0.12); x.beginPath(); x.arc(sx(LANDX) + Math.cos(a) * r, sy(g(LANDX)) + Math.sin(a) * r * 0.8 + k * k * 120, 12 + (i % 4) * 4, 0, 7); x.fill(); }
+    }
+    bigWord('POUF !', sx(LANDX), sy(g(LANDX)) - 210, (t - TL) / 1.3, '#ffffff');
+  }
+  // boule de neige vengeresse
+  if (t > 11.15 && t < 11.6) {
+    const k = (t - 11.15) / 0.45, X = lerp(sx(LANDX) - 40, sx(VXw) + 10, k), Y = lerp(sy(g(LANDX)) - 300, sy(g(VXw)) - 300, k) - Math.sin(k * Math.PI) * 90;
+    x.fillStyle = '#fff'; x.strokeStyle = '#c9d8ec'; x.lineWidth = 3; x.beginPath(); x.arc(X, Y, 16, 0, 7); x.fill(); x.stroke();
+  }
+  if (vHit) bigWord('PAF !', sx(VXw) - 10, sy(g(VXw)) - 360, (t - 11.55) / 1.1, '#bfe3ff');
+  // « HA HA HA » qui s'envolent
+  if (vLaugh) for (let i = 0; i < 5; i++) {
+    const k = ((t - 7.6) * 0.9 + i * 0.2) % 1; x.save(); x.globalAlpha = 1 - k;
+    x.font = '900 ' + (30 + i * 4) + 'px system-ui'; x.fillStyle = ['#ffd34d', '#ff8a2a', '#fff'][i % 3]; x.strokeStyle = '#1d2440'; x.lineWidth = 6; x.textAlign = 'center';
+    const X = sx(VXw) + (i % 2 ? 110 : -110) + Math.sin(k * 6 + i) * 10, Y = sy(g(VXw)) - 330 - k * 140;
+    x.strokeText('HA', X, Y); x.fillText('HA', X, Y); x.restore();
+  }
+  // flocons
+  x.fillStyle = 'rgba(255,255,255,.9)';
+  for (const [fx, fy, r, sp, ph] of FLAKES) { const X = ((fx + Math.sin(t * 1.3 + ph) * 18 - C.cx * 0.3) % W + W) % W, Y = ((fy + t * sp * 2 - (C.cy - 370) * 0.3) % H + H) % H; x.beginPath(); x.arc(X, Y, r, 0, 7); x.fill(); }
+
+  // ---- bulles ----
+  const hv = [sx(VXw), sy(g(VXw)) - 330], hc = P.fly == 2 ? [sx(LANDX), sy(g(LANDX)) - (t > 8.9 ? 210 : 120)] : [sx(P.X), sy(P.Y) - 330];
+  const B = (a, b, txt, at) => { if (t >= a && t < b) bubble(txt, at[0], at[1], Math.min(t - a, b - t)); };
+  B(0.3, 2.0, 'Facile : tu fais la pizza ! 🍕', hv);
+  B(1.7, 3.1, 'Une piste ROUGE ?! 😰', hc);
+  B(3.4, 4.9, 'Je freine comment ?!! 😱', hc);
+  B(4.6, 6.0, 'PIZZA ! PIZZAAAA ! 🍕', hv);
+  B(7.65, 8.85, 'C’était une calzone ça ! 😂', hv);
+  B(9.1, 10.4, 'Arrête de rire !! 😤', hc);
+  B(10.3, 11.3, 'Désolé… c’est nerveux 😂', hv);
+  B(11.9, 13.0, 'Touché ! 😏', hc);
+  // titre de fin
+  if (t > 11.9) {
+    const k = clamp((t - 11.9) / 0.5, 0, 1); x.save(); x.globalAlpha = k;
+    x.font = 'italic 700 34px Georgia, "Times New Roman", serif'; x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = '#1d2a4a'; x.shadowBlur = 0; x.shadowOffsetY = 3;
+    x.fillText('Leçon de ski : Piste rouge 1 – Célestine 0 🎿', W / 2, 62); x.restore();
+  }
+  // fondu
+  if (t < 0.4) { x.fillStyle = 'rgba(0,0,0,' + (1 - t / 0.4) + ')'; x.fillRect(0, 0, W, H); }
+  if (t > DUR - 0.5) { x.fillStyle = 'rgba(0,0,0,' + (t - (DUR - 0.5)) / 0.5 + ')'; x.fillRect(0, 0, W, H); }
+}
+window.draw = draw; window.DUR = DUR; window.TL = TL;
+</script></body></html>

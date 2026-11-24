@@ -30,6 +30,31 @@ Calendrier de l'Avent 2026 fait par Valentin pour sa copine Célestine : une enq
 - **Suivi en direct :** `syncLive()` et `slog()` envoient l'avancement de Célestine sur Firebase. Valentin le regarde avec l'appli « Suivi Célestine » (`suivi/`). Depuis le suivi, il peut aussi lancer des attaques du pickpocket et envoyer des cadeaux (`js/pickpocket.js`).
 - **Médias :** les photos, images et voix sont de vrais fichiers dans `2026/media/`. Leurs chemins sont regroupés dans `js/medias.js`, et dans `js/contenu.js` pour les photos du mémo et les voix. Les vidéos sont dans `2026/videos/`.
 
+## Où mettre le code pour chaque type de modification (recettes)
+
+Avant d'écrire du code, choisis l'endroit selon ce tableau. **Ne crée pas de nouveau fichier si un fichier existant correspond.**
+
+| Modification demandée | Où et comment |
+|---|---|
+| Changer un texte, une réplique, un dialogue | Le texte est dans le fichier de la fonctionnalité (voir la carte). Pour le trouver : `grep -rn "début du texte" 2026/js`. Ajoute aussi la traduction dans `js/langue-anglais.js`. |
+| Ajouter ou modifier une scène de l'histoire (Pépin, rapports, accusations…) | `js/histoire.js`, dans l'objet `STORY`. Une scène = `{ t: titre, sc: décor, p: suspect affiché, l: [répliques] }`. Une réplique = `[qui, texte, { fx: effet }]`, où `qui` vaut `n` (narration), `c` (Célestine), `v` (Valentin), `e` (Pépin) ou `b` (le suspect de `p`). Les décors (`sc`) sont `pole`, `audit`, `fac`, `night`, `ecully`, `pharma`, `salon`. Les effets (`fx`) sont `cin`, `vin`, `ein`, `bin` (faire entrer quelqu'un), `shake`, `clue`, `glow`, `pop:🎁` (un objet en gros plan), `sus:id` et `out:id` (fiche du suspect, « INNOCENT·E »), `shadow`, `peek` et `run:🚗`. Pour qu'une scène se déclenche toute seule, ajoute sa clé dans `STORD` et la condition dans `storyCheck()` (`js/menu-demarrer.js`). |
+| Les scènes quand on accuse la mauvaise personne | `js/histoire.js`, clés `acc_noemie`, `acc_emma`… (une par suspect). `acc_valentin` est la bonne accusation. Le lancement est dans `accuseGo()` (`js/enquete/dossier-accusation.js`). |
+| Régler un mini-jeu (temps, difficulté, objectif) | La ligne du jour dans `DAYS` (`js/jours.js`), champ `p`. Pour les règles affichées : `RULES` dans le même fichier. |
+| Changer le fonctionnement d'un mini-jeu | `js/jeux/jXX-….js` (XX = jour). Chaque fichier définit `GAMES.nom = function (p, el, win, fail) {…}`. |
+| Remplacer un mini-jeu par un nouveau | Crée `js/jeux/jXX-nouveau-nom.js` avec `GAMES.nouveaunom = function…`, change `g:` (et `t:`, `p:`) du jour dans `DAYS`, retire l'ancien fichier, puis mets à jour la liste dans `js/fichiers.js`. |
+| Régler un boss d'audition | Réglages (PV, vies, temps) : `bossCfg()` dans `js/boss/boss.js`. Règles affichées : `BRULES` dans le même fichier. Le jeu lui-même : `js/boss/jXX-….js`. Les aveux obtenus : `AUD` et `PIECES` (aveux `a4`, `a8`…) dans `js/enquete/suspects-pieces.js`. |
+| Le boss final | `js/boss/boss-final.js`. Les scènes entre les parties sont dans `LORE`, les 4 parties dans `PARTS`. |
+| Ajouter une pièce au dossier d'enquête | `PIECES` dans `js/enquete/suspects-pieces.js` (`d:` = jour où elle arrive). Les dessins des photos sont dans `PH`, dans le même fichier. |
+| Photos de l'album, légendes, chapitres | `CONTENU.album` dans `js/contenu.js`. Les fichiers photo vont dans `media/album/` et leur chemin dans `ALIMG` (`js/medias.js`). |
+| Vidéos de l'album | Les fichiers `.mp4` et `.jpg` (miniature) vont dans `2026/videos/`. Leur liste (titre, date, chapitre) est dans `CONTENU.videos` (`js/contenu.js`), dans l'ordre de déblocage par les boss. Les vidéos sont des dessins animés fabriqués par programme : leur source est dans `outils/videos/` (voir le `LISEZMOI.md` de chaque dossier). |
+| Ajouter une image, une photo ou un son | Mets le fichier dans `2026/media/…`, son chemin dans `js/medias.js` (ou `js/contenu.js`), **et** dans la liste `medias` de `js/fichiers.js`. |
+| Musique d'un écran, bruitage | Musique synthétisée : `js/musique.js`. Chansons du jour et lecteur : `js/musiques-jeux.js`. Petits bruits d'interface : `SFX` dans `js/sons.js`. Bruits des cinématiques : `CINE.sfx` dans `js/cinematiques.js`. |
+| Boutique, roue, casino, labo, succès | Le fichier du même nom (voir la carte). Les articles de la boutique sont dans `SHOP` (`js/jours.js`). |
+| Un nouveau gag | `js/gags.js`. |
+| Un nouvel écran ou onglet | La vue va dans un nouveau fichier `js/nom.js` (ajouté dans `fichiers.js` **avant** `js/demarrage.js`). Inscris-la dans `render()` (`js/interface.js`) et ajoute le bouton d'onglet dans `index.html` si besoin. |
+| Un style (couleur, taille, animation) | Cherche la classe avec `grep -rn "classe" 2026/css` et modifie la règle existante. Un nouveau style se met dans le fichier CSS du même thème. |
+| Une nouvelle donnée à sauvegarder | Ajoute un champ à `S` (par exemple `S.monChamp = …; save();`). Ne renomme ni n'efface les champs existants. |
+
 ## Carte : où trouver quoi (dossier `2026/`)
 
 | Je veux changer… | Fichier |

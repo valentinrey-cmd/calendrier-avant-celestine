@@ -4,6 +4,17 @@
 
 ---
 
+## 24 novembre 2026 (nuit) : vidéo du ski et vraies scènes de mauvaises accusations
+
+- **Album, vidéo n°2 :** « Notre bataille de boules de neige » est remplacée par **« Leçon de ski sur la piste rouge »** (13,5 s). Valentin explique la « pizza » à Célestine. Elle part trop vite, s'envole sur une bosse et finit tête la première dans la neige (« POUF ! »). Valentin est mort de rire (« C'était une calzone ça ! 😂 »), puis elle se venge avec une boule de neige.
+  - Fichiers : `2026/videos/2-ski.mp4` et `2-ski.jpg` (les fichiers `2-neige.*` sont supprimés), `2026/js/contenu.js` (titre et chemins).
+  - Source de l'animation : `outils/videos/2-ski/` (`ski.html`, `son.py`, `render.py`, `LISEZMOI.md`).
+- **Mauvaises accusations :** les 8 scènes (Noémie, Emma, Nora, Erika, Eya, Edgar, Fabien et Valérie, Sandrine) sont maintenant de vraies petites scènes drôles d'une douzaine de répliques. Le suspect se défend, avoue sa petite bêtise, Pépin vérifie avec une pièce du dossier, puis vient le tampon « INNOCENT·E » et une chute. Fichier : `2026/js/histoire.js` (clés `acc_…`).
+- Traductions anglaises ajoutées pour ces scènes et le titre de la vidéo : `2026/js/langue-anglais.js`.
+- `CLAUDE.md` : nouvelle section « Où mettre le code pour chaque type de modification (recettes) ».
+
+---
+
 ## 24 novembre 2026 (soir) : grand rangement du code (rien ne change à l'écran)
 
 Le site tenait dans un seul fichier de 5,3 Mo, copié en double pour la version de test. Il a été réorganisé pour que chaque modification future soit rapide.

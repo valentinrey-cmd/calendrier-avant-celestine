@@ -688,7 +688,7 @@ window.TRADUCTIONS_EN = {
   'Nos voyages': 'Our trips',
   'Notre 1re rencontre… sans un mot': 'Our 1st meeting… without a word',
   'Notre Histoire': 'Our Story',
-  'Notre bataille de boules de neige': 'Our snowball fight',
+  'Leçon de ski sur la piste rouge': 'Ski lesson on the red run',
   'Notre famille': 'Our family',
   'Notre histoire': 'Our story',
   'Notre lune de miel à La Réunion': 'Our honeymoon in Réunion',
@@ -3001,5 +3001,136 @@ window.TRADUCTIONS_EN = {
   'Les 24 chansons du calendrier': 'The 24 calendar songs',
   '(gratuit, autant de fois que tu veux)': '(free, as many times as you like)',
   'Tu peux le retenter tout de suite, c’est gratuit !': 'You can try again right away, it’s free!',
-  '🔁 Recommencer le boss': '🔁 Retry the boss'
+  '🔁 Recommencer le boss': '🔁 Retry the boss',
+  'Salle d’audition. Noémie entre, un flacon de vernis dans chaque main.':
+    'Interview room. Noémie walks in with a bottle of nail polish in each hand.',
+  'Attends… tu m’accuses MOI ? Ta manucure attitrée ? Celle qui t’a fait un baby pink PARFAIT ? 😱':
+    'Wait… you’re accusing ME? Your personal manicurist? The one who gave you a PERFECT baby pink? 😱',
+  'Mardi soir, mon bracelet était sur ta table. Je l’ai vu sur ta story.':
+    'Tuesday evening, my bracelet was on your table. I saw it in your story.',
+  'Évidemment ! Tu l’avais ENLEVÉ pour le gel. Je ne vernis pas les bijoux, moi.':
+    'Of course! You TOOK IT OFF for the gel. I don’t varnish jewellery.',
+  '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅':
+    '…Okay. It fell. A little heart got chipped. I glued it back with nail glue. Nobody can tell, it’s pro work. 💅',
+  'Colle à ongles sur un bijou en or. Je note : « dégradation, mais avec talent ». 📝':
+    'Nail glue on gold jewellery. Noted: “damage, but done with talent”. 📝',
+  'Et regarde ma photo de 19 h 40 : mes ongles finis… et le bracelet À TON POIGNET.':
+    'And look at my 7:40 pm photo: your finished nails… and the bracelet ON YOUR WRIST.',
+  'Mercredi à la BU, il est encore à votre poignet. Jeudi au resto aussi. Ça fait beaucoup de poignet pour un vol, madame.':
+    'Wednesday at the library, it’s still on your wrist. Thursday at the restaurant too. That’s a lot of wrist for a theft, madam.',
+  'Le procureur tamponne le dossier.': 'The prosecutor stamps the file.',
+  'Pour me faire pardonner… de MON innocence, je t’offre une pose gratuite. Attends. C’est toi qui devrais t’excuser !':
+    'To make up for… MY innocence, I’ll give you a free manicure. Wait. YOU should be apologising!',
+  '…Pardon Noémie. Je prends quand même la pose gratuite. 😳': '…Sorry Noémie. I’m still taking the free manicure. 😳',
+  'Emma entre en salle d’audition, lunettes sur le nez, regard d’ophtalmo qui a déjà tout vu.':
+    'Emma walks into the interview room, glasses on her nose, with the look of an eye doctor who has seen it all.',
+  'Laisse-moi deviner. C’est Valentin qui t’a soufflé mon nom ? 🙄': 'Let me guess. Valentin gave you my name? 🙄',
+  'Jeudi au resto, pendant que j’étais aux toilettes, tu avais mon sac sur les genoux. Noémie a une photo.':
+    'Thursday at the restaurant, while I was in the toilets, you had my bag on your lap. Noémie has a photo.',
+  'Bien sûr que j’avais ton sac. J’y cherchais… ça.': 'Of course I had your bag. I was looking for… this.',
+  'Elle pose sur la table un étui à lunettes… et un petit paquet cadeau.':
+    'She puts a glasses case on the table… and a small wrapped present.',
+  'J’ai testé tes verres avec mon appli. Ta correction a bougé, au fait. Je voulais t’offrir de nouvelles lunettes pour Noël. Surprise. Ratée. Merci.':
+    'I tested your lenses with my app. Your prescription has changed, by the way. I wanted to give you new glasses for Christmas. Surprise. Ruined. Thanks.',
+  'Et le bracelet, pendant ce temps ? 🧐': 'And the bracelet, meanwhile? 🧐',
+  'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.':
+    'On her wrist, right in front of me. 9:12 pm photo: gold chain, little pink hearts. Even Valentin would have seen it. Well… maybe.',
+  'Emma… je suis la pire. 😳': 'Emma… I’m the worst. 😳',
+  'Je sais. Avec tes nouvelles lunettes, tu liras mieux ton prochain suspect. 😌':
+    'I know. With your new glasses, you’ll read your next suspect better. 😌',
+  'À la BU, Nora révise derrière une forteresse de fiches. Célestine s’avance.':
+    'At the library, Nora is revising behind a fortress of flashcards. Célestine steps forward.',
+  'Chut ! Je suis au chapitre des anti-inflammatoires. Tu as dix secondes. 📚':
+    'Shh! I’m on the anti-inflammatories chapter. You have ten seconds. 📚',
+  'Vendredi au TP, tu tenais ma trousse. Erika a une photo. Et c’est là que j’avais rangé mon bracelet.':
+    'Friday in the lab class, you were holding my pencil case. Erika has a photo. And that’s where I had put my bracelet.',
+  '…Je peux tout expliquer.': '…I can explain everything.',
+  'J’ai pris ta trousse à 8 h 45 pour ton correcteur. Et… j’ai un peu copié tes résultats de dosage. Beaucoup. Tout, en fait.':
+    'I took your pencil case at 8:45 for your correction tape. And… I copied your assay results a little. A lot. All of them, actually.',
+  'NORA ! 😤': 'NORA! 😤',
+  'Mais il n’y avait PAS de bracelet ! Des stylos, ton surligneur rose et un vieux chewing-gum. Rien qui brille !':
+    'But there was NO bracelet! Pens, your pink highlighter and an old chewing gum. Nothing shiny!',
+  'Si la trousse était déjà vide à 8 h 45… peut-être que le bracelet n’y a jamais été. 🧐':
+    'If the pencil case was already empty at 8:45… maybe the bracelet was never in it. 🧐',
+  'Par contre… tu peux ne pas parler des résultats copiés au prof ?': 'But… could you not tell the teacher about the copied results?',
+  'Tes 18 fiches de révision contre mon silence. 😏': 'Your 18 flashcards in exchange for my silence. 😏',
+  'Erika arrive, téléphone déjà dégainé. Évidemment.': 'Erika arrives, phone already out. Of course.',
+  'Tu m’accuses ? Parfait. J’ai des preuves. BEAUCOUP de preuves. 🤳': 'You’re accusing me? Perfect. I have proof. A LOT of proof. 🤳',
+  'Elle fait défiler sa galerie. Ça dure. Longtemps. Très longtemps.': 'She scrolls through her gallery. It goes on. And on. And on.',
+  'Lundi, mon café. Mardi, mon café. Mercredi, toi à la BU, le bracelet au poignet. Jeudi, mon café.':
+    'Monday, my coffee. Tuesday, my coffee. Wednesday, you at the library, bracelet on your wrist. Thursday, my coffee.',
+  'Erika… tu prends tout en photo, mais toi, on ne te voit jamais dessus. C’est louche.':
+    'Erika… you photograph everything, but you’re never in the pictures. That’s suspicious.',
+  'C’est MOI qui tiens le téléphone !! 😤': 'I’M the one holding the phone!! 😤',
+  'Vendredi au TP : 47 photos. Sur aucune je ne m’approche de ton sac. Et sur la 23e, Nora tient ta trousse. De rien.':
+    'Friday lab class: 47 photos. In none of them am I near your bag. And in the 23rd, Nora is holding your pencil case. You’re welcome.',
+  'Un téléphone ne vole pas de bracelet, madame. Il vole juste beaucoup de mémoire. 📸':
+    'A phone doesn’t steal bracelets, madam. It just steals a lot of storage. 📸',
+  'Je peux faire un selfie avec toi pour fêter mon innocence ?': 'Can I take a selfie with you to celebrate my innocence?',
+  '…Une seule. 😳': '…Just one. 😳',
+  'CLIC. CLIC. CLIC. CLIC. Elle en a fait 34.': 'CLICK. CLICK. CLICK. CLICK. She took 34.',
+  'Bellecour, la nuit. Eya sort d’une boutique, les bras chargés de sacs.':
+    'Bellecour, at night. Eya comes out of a shop, arms full of bags.',
+  'Eya. Vendredi, tu es partie du TP à 11 h 30. Avant tout le monde. Pile quand…':
+    'Eya. On Friday, you left the lab class at 11:30. Before everyone else. Right when…',
+  '…quand je suis allée faire du shopping à Bellecour, oui. 🛍️': '…when I went shopping at Bellecour, yes. 🛍️',
+  'Attends. ATTENDS. Tu m’accuses, moi ?! C’est MOI qui t’ai envoyé le message !':
+    'Wait. WAIT. You’re accusing ME?! I’m the one who sent you the message!',
+  'Quel message ?': 'What message?',
+  '« J’ai vu Valentin sortir d’une petite boutique vers 12 h 35. Il avait l’air de cacher un truc. » Tu l’as lu jusqu’au bout, au moins ?':
+    '“I saw Valentin come out of a little shop around 12:35. He looked like he was hiding something.” Did you even read it to the end?',
+  '…Je l’ai lu en diagonale. 😳': '…I skimmed it. 😳',
+  'Accuser son seul témoin. Audacieux. J’ai vu ça une fois, en 2009. Ça s’est mal fini pour tout le monde. ☕':
+    'Accusing your only witness. Bold. I saw that once, in 2009. It ended badly for everyone. ☕',
+  'Je retourne à mon shopping. Et toi, relis tes messages. LENTEMENT. 💅':
+    'I’m going back to my shopping. And you, reread your messages. SLOWLY. 💅',
+  'Quelque part, quelqu’un soupire de soulagement…': 'Somewhere, someone sighs with relief…',
+  'Reyrieux. Edgar ouvre la porte, un tacos XL à la main.': 'Reyrieux. Edgar opens the door, an XL tacos in his hand.',
+  'Petite sœur ! Tu viens manger ? Il reste de la sauce fromagère. 🌯': 'Little sister! Coming to eat? There’s cheese sauce left. 🌯',
+  'Edgar. Vendredi soir, tu as pris de l’argent dans mon porte-monnaie. Maman me l’a dit.':
+    'Edgar. On Friday night, you took money from my purse. Mum told me.',
+  '20 balles. Un prêt. Un prêt d’urgence alimentaire.': '20 euros. A loan. An emergency food loan.',
+  'Et pour trouver mon porte-monnaie, tu as fouillé TOUT mon sac. Là où devait être mon bracelet.':
+    'And to find my purse, you searched my WHOLE bag. Where my bracelet was supposed to be.',
+  'Justement ! J’ai tout retourné : la trousse, les poches, la doublure. J’ai même trouvé un ticket de 2023. Mais de bracelet : zéro.':
+    'Exactly! I turned everything over: the pencil case, the pockets, the lining. I even found a receipt from 2023. But bracelets: zero.',
+  'Le ticket de caisse dit 23 h 04 : un tacos XL poulet, frites, sauce fromagère. Payé avec un billet de 20 €. Pas avec un bijou en or. 🧾':
+    'The receipt says 11:04 pm: one XL chicken tacos, fries, cheese sauce. Paid with a €20 note. Not with gold jewellery. 🧾',
+  'Tu vois ! Je suis un voleur… honnête.': 'See! I’m a thief… an honest one.',
+  'Tu me dois quand même 20 €. 😒': 'You still owe me €20. 😒',
+  'Je te rembourse avec un toast à Noël. Le roi des toasts paie toujours ses dettes. 🥂':
+    'I’ll pay you back with a toast at Christmas. The king of toasts always pays his debts. 🥂',
+  'Reyrieux, dans la cuisine. Valérie essuie un verre. Fabien lit le journal.':
+    'Reyrieux, in the kitchen. Valérie is drying a glass. Fabien is reading the paper.',
+  'Papa, maman… Je suis obligée. Le dossier, c’est le dossier.': 'Dad, Mum… I have to. The file is the file.',
+  'Fabien baisse lentement son journal.': 'Fabien slowly lowers his newspaper.',
+  'Tu… accuses… ta MÈRE ? 😱': 'You’re… accusing… your MOTHER? 😱',
+  'Samedi matin, tu as rangé mon sac. Tu l’as eu entre les mains. Seule.':
+    'On Saturday morning, you tidied my bag. You had it in your hands. Alone.',
+  'Ma chérie, je range ton sac depuis que tu as 12 ans. Je connais chaque miette qu’il y a dedans.':
+    'Sweetheart, I’ve been tidying your bag since you were 12. I know every crumb in it.',
+  'Samedi : ta trousse rose, ton porte-monnaie (moins 20 €, merci Edgar), tes clés et un paquet de mouchoirs. AUCUN bijou. Sinon, je l’aurais mis de côté, comme d’habitude.':
+    'Saturday: your pink pencil case, your purse (minus €20, thanks Edgar), your keys and a pack of tissues. NO jewellery. Otherwise I’d have put it aside, as usual.',
+  'J’ai lu sa lettre. Elle a même noté l’état des mouchoirs. C’est plus précis que nos rapports. 📝':
+    'I read her letter. She even noted the condition of the tissues. It’s more precise than our reports. 📝',
+  'Et ton père n’a rien fait non plus. Il ne retrouve même pas ses lunettes quand elles sont sur sa tête.':
+    'And your father didn’t do anything either. He can’t even find his glasses when they’re on his head.',
+  '…Pardon maman. Pardon papa. 😳': '…Sorry Mum. Sorry Dad. 😳',
+  'Pharmacie de Reyrieux, samedi, en plein rush. Sandrine range un carton de crèmes.':
+    'Reyrieux pharmacy, Saturday, in the middle of the rush. Sandrine is unpacking a box of creams.',
+  'Sandrine. Samedi, tu as ouvert mon casier. Tu me l’as écrit toi-même.':
+    'Sandrine. On Saturday, you opened my locker. You texted me yourself.',
+  'Pour ta crème pour les mains ! J’avais les mains plus sèches qu’un comprimé effervescent sans eau ! 🧴':
+    'For your hand cream! My hands were drier than an effervescent tablet without water! 🧴',
+  'Et mon bracelet était peut-être dans mon sac, dans ce casier…': 'And my bracelet might have been in my bag, in that locker…',
+  'Il y avait ton sac et ton manteau. J’ai pris UNE noisette de crème. Je n’ai pas ouvert ton sac. Je ne suis pas un monstre.':
+    'There was your bag and your coat. I took ONE dab of cream. I didn’t open your bag. I’m not a monster.',
+  'Et samedi matin, avant la pharmacie, sa mère avait déjà rangé ce sac. Aucun bijou dedans. Ce casier n’a rien pu cacher. 🧐':
+    'And on Saturday morning, before the pharmacy, her mother had already tidied that bag. No jewellery in it. That locker couldn’t hide anything. 🧐',
+  'Tu vois ! Je suis préparatrice, pas cambrioleuse. Je prépare des gélules, pas des casses.':
+    'See! I’m a pharmacy technician, not a burglar. I prepare capsules, not heists.',
+  'Tiens, pour la peine : un tube de crème neuf. Le tien est presque vide… à cause de moi.':
+    'Here, to make up for it: a new tube of cream. Yours is almost empty… because of me.',
+  '…Garde la crème. 😳': '…Keep the cream. 😳',
+  'Le vrai coupable court toujours… Retour au dossier. 🗂️': 'The real culprit is still on the loose… Back to the file. 🗂️'
 };

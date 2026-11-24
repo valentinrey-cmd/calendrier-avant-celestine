@@ -194,10 +194,10 @@ const CONTENU = {
       apres: ''
     },
     {
-      titre: 'Notre bataille de boules de neige',
+      titre: 'Leçon de ski sur la piste rouge',
       date: 'Hiver 2028',
-      src: 'videos/2-neige.mp4',
-      poster: 'videos/2-neige.jpg',
+      src: 'videos/2-ski.mp4',
+      poster: 'videos/2-ski.jpg',
       ch: 'Nos grandes étapes',
       apres: ''
     },
