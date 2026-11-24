@@ -2036,7 +2036,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795505464';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795505745';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2436,7 +2436,7 @@ const BOSSCOST=10;
 const BRULES={
  4:["🎙️ Noémie n’a pas le temps : ses ongles sèchent. Pour placer tes questions, esquive tout ce qu’elle t’envoie.","👆 Glisse le doigt pour déplacer Célestine en bas de l’écran. Tes questions ❓ partent toutes seules vers le haut : vise Noémie.","💅 Esquive ses reproches, ses gouttes de vernis, ses flacons et sa lime… Tu as <b>6 vies</b>.","😤 À la moitié, elle accélère… puis elle se vexe et sort le pot de gel géant. La ligne rouge ⚠️ annonce la lime.","⏱️ Tu as 2 min 40. 💡 L’indice donne une vie en plus. Ensuite : trouve sa contradiction."],
  8:["👁️ Emma te fait passer un test de vue. Sur chaque planche, une lettre est différente des autres : touche-la !","⏱️ Chaque planche a son chrono. Trop lent ou mauvaise lettre = 1 ❤️ en moins (<b>3 vies</b>).","😎 Plus ça avance, plus les lettres sont petites et floues. Et parfois Emma enlève ses lunettes : tout devient TRÈS flou.","👓 Quand ses lunettes apparaissent sur la planche, attrape-les : vision nette pendant 5 secondes.","🎯 Lis <b>18 planches</b> pour la faire craquer. 💡 L’indice donne une vie et une vision nette. Ensuite : trouve sa contradiction."],
- 11:["🌯 Edgar a faim. Il ne parlera qu’avec un kebab dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>3 vies</b>). Esquive-les !","🥛 La sauce blanche remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 kebabs</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
+ 11:["🌯 Edgar a faim. Il ne parlera qu’avec un tacos dans la main… fait EXACTEMENT comme il l’aime.","👆 Glisse le doigt pour déplacer la galette. La commande est en haut : attrape les ingrédients <b>dans l’ordre</b>.","🙅 Un ingrédient qu’il n’a pas demandé, ou dans le mauvais ordre = 1 ❤️ en moins (<b>3 vies</b>). Esquive-les !","🫕 La sauce fromagère remplace n’importe quel ingrédient.","🎯 Sers-lui <b>6 tacos</b> (de plus en plus garnis, et certains ingrédients zigzaguent !). 💡 L’indice donne une vie et nettoie le ciel. Ensuite : trouve sa contradiction."],
  15:["📚 Nora révise son partiel… et te met au défi : ses fiches, à toute vitesse.","👉 Glisse la fiche à <b>droite si c’est VRAI</b>, à <b>gauche si c’est FAUX</b> (ou touche les boutons en bas).","⏱️ Chaque fiche a son chrono, de plus en plus court. Mauvaise réponse ou trop lent = 1 ❤️ en moins (<b>3 vies</b>).","🔄 Attention au <b>MODE PIÈGE</b> : pendant quelques secondes, il faut répondre l’INVERSE. Et certaines fiches arrivent à l’envers 🙃.","🎯 <b>22 fiches</b> pour la faire craquer. 💡 L’indice donne une vie et annule le mode piège. Ensuite : trouve sa contradiction."],
  19:["💊 Samedi, la pharmacie déborde. Sandrine veut bien parler… si tu l’aides au comptoir.","👆 Lis ce que veut chaque client (fièvre, rhume, gorge…) et touche le bon produit sur l’étagère.","⏳ Sous chaque client, sa patience. S’il part sans rien, ou si tu donnes un produit que personne n’a demandé = 1 ❤️ en moins (<b>3 vies</b>).","🙋 Certains viennent juste discuter : ne leur donne rien, ils repartiront tout seuls. Et Sandrine range parfois la livraison… l’étagère change de place !","🎯 Sers <b>20 clients</b>. 💡 L’indice donne une vie et calme tout le monde. Ensuite : trouve sa contradiction."],
  22:["🚇 « J’ai mon métro ! » Valentin file en pleine audition. Suis-le dans les couloirs de Bellecour !","👆 Touche à gauche ou à droite de l’écran (ou glisse) pour changer de couloir.","🧳🎸🚧 Évite les valises, les musiciens et les travaux. Aux portillons ⛔, passe par celui qui est ouvert 🟢.","☕ = coup de boost, 🎫 = raccourci. Chaque choc = 1 ❤️ en moins et il reprend de l’avance (<b>4 vies</b>).","🎯 Remplis la barre pour le rattraper avant son métro. 💡 L’indice te rapproche et donne une vie. Ensuite : trouve sa contradiction."]};
@@ -2456,7 +2456,7 @@ function bossKO(B,cb){const box=document.getElementById('gwin');if(!box){cb();re
  o.innerHTML=`<div class="bko-fl"></div><div class="bko-b">${B.who?`<img src="${bpicSrc(B.who)}" alt="" style="width:1.6em;height:1.6em;border-radius:50%;object-fit:cover;border:4px solid #ffd34d">`:B.ic}</div>${Array.from({length:28},(_,i)=>{const a=i/28*Math.PI*2+Math.random()*.2,r=110+Math.random()*140;return`<span class="bko-p" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r).toFixed(0)}px;--d:${(Math.random()*.25).toFixed(2)}s">${PT[i%PT.length]}</span>`}).join('')}<div class="bko-t">ÇA CRAQUE !</div><div class="bko-v">🎙️ ${esc(B.n)} est prêt${/^(Noémie|Emma|Nora|Sandrine)/.test(B.n)?'e':''} à parler !<small>Touche pour continuer</small></div>`;
  box.appendChild(o);try{bkT(110,1,'sawtooth',.05,45);setTimeout(()=>{bkT(160,.6,'square',.07,40);bkT(900,.5,'sawtooth',.03,90)},850);[523,659,784,1046,1318].forEach((f,i)=>setTimeout(()=>bkT(f,i==4?.9:.22,'triangle',.07),1150+i*130))}catch(_){}
  setTimeout(()=>{try{confetti()}catch(_){}},1150);const t0=performance.now();let done=0;const go=()=>{if(done)return;done=1;o.remove();cb()};o.onclick=()=>{if(performance.now()-t0>1800)go()};setTimeout(go,4200)}
-const BTAUNT={4:'« Mes ongles sèchent, là. »',8:'« Tu devrais prendre rendez-vous, toi. »',11:'« Je vais me commander un tacos, laisse. »',15:'« Tu vas te planter au partiel, toi. »',19:'« Laisse, je vais servir moi-même. »',22:'« Bon, je l’ai raté, mon métro ! »'};
+const BTAUNT={4:'« Mes ongles sèchent, là. »',8:'« Tu devrais prendre rendez-vous, toi. »',11:'« Je vais me commander un KEBAB, tiens. »',15:'« Tu vas te planter au partiel, toi. »',19:'« Laisse, je vais servir moi-même. »',22:'« Bon, je l’ai raté, mon métro ! »'};
 function bossLose(B,d,cb){const box=document.getElementById('gwin');if(!box){cb();return}try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}
  const o=document.createElement('div');o.className='bko blo';o.innerHTML=`<div class="blo-b">${B.ic}</div><div class="blo-ha">HA</div><div class="blo-ha h2">HA</div><div class="blo-ha h3">HA !</div>${Array.from({length:14},(_,i)=>`<span class="blo-h" style="left:${(4+i*7)%96}%;--d:${(i*0.17%1.2).toFixed(2)}s;--r:${(i%2?1:-1)*(20+i*9)}deg">💔</span>`).join('')}<div class="blo-t">PERDU…</div><div class="bko-v">${esc(B.n)} t’a battue !<em>${BTAUNT[d]||''}</em><small>Touche pour continuer</small></div>`;
  box.appendChild(o);try{[392,370,349,330].forEach((f,i)=>setTimeout(()=>bkT(f,i==3?1.1:.42,'sawtooth',.045,i==3?f*.8:0),i*430));[0,180,360].forEach(t=>setTimeout(()=>bkT(260,.12,'square',.04,200),600+t))}catch(_){}
@@ -3099,7 +3099,7 @@ function alZoom(i){const A=alPhotos().slice(0,alRev());if(!A[i])return;let o=doc
 const ACHS=[
  {g:'Boss',id:'boss4',ic:'💅',n:'Vernis craquelé',d:'Fais craquer Noémie en audition (jour 4).',t:'M'},
  {g:'Boss',id:'boss8',ic:'👁️',n:'Dix dixièmes',d:'Réussis le test de vue d’Emma (jour 8).',t:'M'},
- {g:'Boss',id:'boss11',ic:'🌯',n:'Sauce blanche',d:'Sers 5 kebabs parfaits à Edgar (jour 11).',t:'M'},
+ {g:'Boss',id:'boss11',ic:'🌯',n:'Sauce fromagère',d:'Sers 6 tacos parfaits à Edgar (jour 11).',t:'M'},
  {g:'Boss',id:'boss15',ic:'📚',n:'Major de promo',d:'Bats Nora à ses fiches de révision (jour 15).',t:'M'},
  {g:'Boss',id:'boss19',ic:'💊',n:'Rush du samedi',d:'Tiens le comptoir de la pharmacie avec Sandrine (jour 19).',t:'M'},
  {g:'Boss',id:'boss22',ic:'🚇',n:'Correspondance',d:'Rattrape Valentin dans le métro Bellecour (jour 22).',t:'M'},
@@ -5144,15 +5144,15 @@ Object.assign(STORY,{
   ['e','Vendredi soir, Edgar a pris 20 € dans votre porte-monnaie. Et votre sac a passé la nuit dans l’entrée, à Reyrieux.'],
   ['c','Mon frère ?! …Bon, les 20 €, ça lui ressemble. 🙄',{fx:'cin'}],
   ['e','Je l’ai convoqué à 19 h. Il est arrivé à 20 h 15. Affamé.'],
-  ['n','Edgar arrive avec un kebab à moitié mangé.',{fx:'bin'}],
+  ['n','Edgar arrive avec un tacos à moitié mangé.',{fx:'bin'}],
   ['b','J’ai pas eu le temps de dîner, ça vous dérange pas ? 🌯'],
   ['e','Le sac de votre sœur est resté tout le week-end dans votre entrée.',{fx:'ein'}],
   ['b','Et moi j’étais dans ma chambre. Comme un ange.'],
-  ['n','En bas du commissariat, il y a le kebab du 8e. Le patron est parti en pause… la broche tourne toute seule.'],
+  ['n','En bas du commissariat, il y a un snack à tacos. Le patron est parti en pause… la plancha chauffe toute seule.'],
   ['b','Je parle le ventre plein, pas avant. Descends, et fais-m’en un. Sans erreur.'],
   ['e','Célestine… derrière la broche. Il ne lâchera rien sinon.',{fx:'shake'}]]},
  w11:{t:'Audition · Edgar',sc:'audit',p:'edgar',l:[
-  ['n','Edgar repose son kebab.',{fx:'bin'}],
+  ['n','Edgar repose son tacos.',{fx:'bin'}],
   ['b','Ok, ok. Mon week-end, minute par minute.'],
   ['e','Il y a un mensonge là-dedans. Et votre mère a la mémoire longue.',{fx:'ein'}]]},
  b15:{t:'Audition · Nora',sc:'audit',p:'nora',l:[
@@ -5324,7 +5324,7 @@ Object.assign(STORY,{
   ['c','…Ah. 😳',{fx:'cin'}],
   ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
  acc_edgar:{t:'Accusation · Edgar',sc:'ecully',p:'edgar',l:[
-  ['n','Edgar ouvre la porte de Reyrieux, un kebab à la main.',{fx:'bin'}],
+  ['n','Edgar ouvre la porte de Reyrieux, un tacos à la main.',{fx:'bin'}],
   ['b','J’ai piqué 20 balles, pas ton bracelet ! Il n’était même pas dans ton sac, je l’ai retourné en entier !'],
   ['c','…Rends-moi mes 20 €, au moins. 😒',{fx:'cin'}],
   ['n','Le procureur rejette l’accusation. L’affaire est classée.',{fx:'shake'}]]},
@@ -5868,7 +5868,7 @@ const SUSP=[
  {id:'nora',n:'Nora',av:['N','#7a5cff'],r:'Copine de fac (pharma)',tr:['🧪 Au TP vendredi matin','📚 Toujours à la BU'],d:'Copine de promo. Elle était juste à côté de Célestine au TP du vendredi.',dep:'« Ta trousse ? Je ne l’ai jamais ouverte. »',a:'À 8 h 45, la trousse était déjà vide.'},
  {id:'erika',n:'Erika',av:['E','#e0457b'],r:'Copine de fac (pharma)',tr:['🤳 Prend des photos de tout','🧪 Au TP vendredi matin'],d:'Copine de promo. Ses photos ont souvent un temps d’avance.',dep:'« J’ai rien vu, j’étais concentrée sur ma manip. »',a:'Ses photos montrent tout le monde… sauf elle près du sac.'},
  {id:'eya',n:'Eya',av:['E','#1f9e8a'],r:'Copine de fac (pharma)',tr:['🛍️ Adore Bellecour','🧪 A quitté le TP en avance vendredi'],d:'Copine de promo. Vendredi, elle est partie du TP avant tout le monde.',dep:'« Vendredi après-midi, j’étais à la BU. »',a:'Elle était à Bellecour… et c’est elle qui a vu quelque chose.'},
- {id:'edgar',n:'Edgar',img:'edgar',r:'Le grand frère de Célestine',tr:['🏠 Chez Fabien et Valérie à Reyrieux','🌯 Fan de kebab','🛫 Agence de location à Saint-Exupéry'],d:'Deux ans de plus que Célestine. Le sac est resté tout le week-end dans l’entrée de sa maison.',dep:'« Ton sac ? Je n’y ai pas touché de tout le week-end. »',a:'Il a vidé tout le sac vendredi soir : il n’y avait déjà plus de bracelet.'},
+ {id:'edgar',n:'Edgar',img:'edgar',r:'Le grand frère de Célestine',tr:['🏠 Chez Fabien et Valérie à Reyrieux','🌯 Fan de tacos','🛫 Agence de location à Saint-Exupéry'],d:'Deux ans de plus que Célestine. Le sac est resté tout le week-end dans l’entrée de sa maison.',dep:'« Ton sac ? Je n’y ai pas touché de tout le week-end. »',a:'Il a vidé tout le sac vendredi soir : il n’y avait déjà plus de bracelet.'},
  {id:'parents',n:'Fabien et Valérie',av:['F·V','#c08a2a'],r:'Les parents de Célestine',tr:['🏡 Reyrieux','🧺 Valérie range tout ce qui traîne'],d:'Ils ont accueilli Célestine tout le week-end. Valérie a rangé son sac samedi matin.',dep:'« On a juste rangé ton sac dans ta chambre, ma chérie. »',a:'Valérie a rangé le sac samedi : trousse, porte-monnaie, clés, et rien d’autre.'},
  {id:'sandrine',n:'Sandrine',av:['S','#2f8f5b'],r:'Collègue à la pharmacie',tr:['💊 Préparatrice à la pharmacie de Reyrieux','🧴 Toujours les mains sèches'],d:'Collègue du samedi. Elle a ouvert le casier de Célestine.',dep:'« Ton casier ? Je ne l’ai jamais ouvert. »',a:'Dans le casier, il n’y avait que le sac, sans bracelet.'},
  {id:'valentin',n:'Valentin',img:'v',r:'Le copain de Célestine',tr:['🏠 Vit avec elle la semaine','💼 Travaille le vendredi matin, puis rentre à Écully','🚇 Passe toujours par Bellecour'],d:'Il vit avec elle, donc forcément… Mais il n’a jamais approché le sac de la semaine.',dep:'« Vendredi, j’étais au travail, puis direct à Écully. Ton sac, je ne l’ai même pas vu. »',a:''}
@@ -5907,7 +5907,7 @@ const PIECES=[
  {id:'p_resto2',d:7,ic:'📸',src:'Photo de Noémie',t:'Pendant que Célestine est aux toilettes',k:'photo',ph:['resto2'],cap:['Jeudi 21 h 40. Emma, le sac de Célestine sur les genoux, un étui à lunettes ouvert devant elle.'],sum:'Jeudi 21 h 40, Emma a le sac de Célestine sur les genoux.',ev:[['262140','Jeu. 26 · 21 h 40','Emma tient le sac de Célestine']]},
  {id:'p_valerie',d:9,ic:'💬',src:'Téléphone de Célestine',t:'Message de Valérie',k:'sms',who:'Maman 💛',m:[['d','Sam. 28 nov.'],['them','08:12','Ma chérie, Edgar a pris 20 € dans ton porte-monnaie hier soir, il te les rend 🙄'],['them','08:13','J’ai rangé ton sac dans ta chambre, il traînait dans l’entrée'],['me','08:40','PARDON ?? 😤']],sum:'Edgar a pris 20 € dans le porte-monnaie vendredi soir. Valérie a rangé le sac samedi matin.'},
  {id:'p_regle',d:10,ic:'📋',src:'Fac de pharma Lyon 1',t:'Règlement des TP',k:'doc',rows:[['Bijoux','Interdits pendant les manipulations'],['Où les ranger','Dans son sac ou sa trousse, avant d’entrer'],['Vendredi 27','TP de 8 h 30 à 12 h 30, salle 214'],['Présents','Célestine, Nora, Erika, Eya (partie à 11 h 30)']],sum:'Pourquoi Célestine est sûre d’avoir rangé le bracelet dans sa trousse.'},
- {id:'p_kebab',d:11,ic:'🧾',src:'Ticket de caisse',t:'Le kebab de Reyrieux',k:'doc',rows:[['Date','Vendredi 27 novembre, 23 h 04'],['Commande','1 kebab galette, frites, sauce samouraï'],['Payé','20,00 € en espèces']],sum:'Vendredi 23 h 04, un kebab payé avec un billet de 20 €.'},
+ {id:'p_kebab',d:11,ic:'🧾',src:'Ticket de caisse',t:'Le tacos de Reyrieux',k:'doc',rows:[['Date','Vendredi 27 novembre, 23 h 04'],['Commande','1 tacos XL poulet, frites, sauce fromagère'],['Payé','20,00 € en espèces']],sum:'Vendredi 23 h 04, un tacos payé avec un billet de 20 €.'},
  {id:'p_smsv',d:12,ic:'💬',src:'Téléphone de Célestine',t:'SMS de vendredi matin',k:'sms',who:'Valentin ❤️',m:[['d','Ven. 27 nov.'],['me','07:55','Trop en retard, j’y vais 😭'],['them','07:56','Courage pour le TP ❤️'],['them','08:55','Je pars aussi, j’ai fermé à clé 🔑']],sum:'Célestine part à 7 h 55. Valentin part à 8 h 55 et ferme à clé.',ev:[['270755','Ven. 27 · 7 h 55','Célestine quitte l’appart'],['270855','Ven. 27 · 8 h 55','Valentin quitte l’appart et ferme à clé']]},
  {id:'p_tp',d:13,ic:'🧪',src:'Snapchat d’Erika',t:'Photo de TP',k:'photo',ph:['tp'],cap:['Vendredi 8 h 50. Nora tient la trousse rose de Célestine.'],sum:'Vendredi 8 h 50, Nora tient la trousse de Célestine.',ev:[['270850','Ven. 27 · 8 h 50','Nora tient la trousse de Célestine']]},
  {id:'p_sandrine',d:14,ic:'💬',src:'Téléphone de Célestine',t:'Message de Sandrine',k:'sms',who:'Sandrine (pharma)',m:[['d','Sam. 28 nov.'],['them','14:02','J’ai pris un peu de ta crème pour les mains 🙈 la mienne est vide'],['me','14:30','Pas de souci 😘']],sum:'Samedi 14 h, Sandrine a ouvert le casier de Célestine.'},
@@ -5919,7 +5919,7 @@ const PIECES=[
  /* aveux */
  {id:'a4',a:4,ic:'🗣️',src:'Audition de Noémie',t:'Aveux · Noémie',k:'aveu',who:'noemie',body:'« Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré. »',sum:'Elle a ébréché un cœur et l’a recollé. Le bracelet est rendu mardi à 19 h 40.'},
  {id:'a8',a:8,ic:'🗣️',src:'Audition d’Emma',t:'Aveux · Emma',k:'aveu',who:'emma',body:'« Ok, j’ai pris ton sac. J’ai sorti tes lunettes pour tester tes verres avec mon appli : je voulais t’en offrir des nouvelles pour Noël. Ta correction a bougé, d’ailleurs. Et ton bracelet, tu l’avais au poignet, en face de moi. »',sum:'Elle testait ses lunettes. Le bracelet était au poignet de Célestine pendant ce temps.'},
- {id:'a11',a:11,ic:'🗣️',src:'Audition d’Edgar',t:'Aveux · Edgar',k:'aveu',who:'edgar',body:'« J’avoue : 20 balles pour un kebab. Mais j’ai retourné TOUT ton sac pour trouver le porte-monnaie. La trousse, les poches, tout. Il n’y avait aucun bracelet, j’en suis sûr. »',sum:'Vendredi soir, il a vidé tout le sac : aucun bracelet.',ev:[['272250','Ven. 27 · 22 h 50','Edgar vide le sac : aucun bracelet']]},
+ {id:'a11',a:11,ic:'🗣️',src:'Audition d’Edgar',t:'Aveux · Edgar',k:'aveu',who:'edgar',body:'« J’avoue : 20 balles pour un tacos. Mais j’ai retourné TOUT ton sac pour trouver le porte-monnaie. La trousse, les poches, tout. Il n’y avait aucun bracelet, j’en suis sûr. »',sum:'Vendredi soir, il a vidé tout le sac : aucun bracelet.',ev:[['272250','Ven. 27 · 22 h 50','Edgar vide le sac : aucun bracelet']]},
  {id:'a15',a:15,ic:'🗣️',src:'Audition de Nora',t:'Aveux · Nora',k:'aveu',who:'nora',body:'« Oui, j’ai pris ta trousse à 8 h 45 pour ton correcteur… et j’ai copié tes résultats, pardon. Mais je te jure, il n’y avait pas de bracelet dedans. Juste des stylos et ton surligneur rose. »',sum:'Vendredi 8 h 45, la trousse était déjà sans bracelet.',ev:[['270845','Ven. 27 · 8 h 45','Nora ouvre la trousse : pas de bracelet']]},
  {id:'a19',a:19,ic:'🗣️',src:'Audition de Sandrine',t:'Aveux · Sandrine',k:'aveu',who:'sandrine',body:'« D’accord, j’ai ouvert ton casier pour ta crème. Mais il n’y avait que ton sac et ton manteau. Pas de bijou, rien qui brille. »',sum:'Samedi, aucun bracelet dans le casier.'},
  {id:'a22',a:22,ic:'🗣️',src:'Audition de Valentin (témoin)',t:'Déclaration · Valentin',k:'aveu',who:'valentin',body:'« Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir. »',sum:'Valentin reconnaît s’être arrêté dans une boutique à Bellecour.'}
@@ -6402,21 +6402,21 @@ try{GAMES.bvue=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Trouve
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>({R,gl,show,st,hp,lives}),hint:()=>{if(st!='play')return false;lives++;glass=6;return true}}}}catch(e){console.error(e)}
 
-/* 🌯 Edgar : kebab express (boutique de nuit, broche qui tourne, néon) */
+/* 🌯 Edgar : tacos express (boutique de nuit, broche qui tourne, néon) */
 try{GAMES.bkebab=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Glisse le doigt pour déplacer la galette. Attrape SEULEMENT le prochain ingrédient de la commande, évite les autres !");
- const ING=[['🥩','viande'],['🥗','salade'],['🍅','tomates'],['🧅','oignons'],['🧀','fromage'],['🌶️','harissa'],['🍟','frites']];
- const QU=['Sauce blanche, toujours.','Plus vite, j’ai faim !','Les frites DEDANS, hein.','J’ai sauté le goûter, là.','Tu le fais exprès ?','Ça sent bon…','Maman m’attend pour dîner. Chut.'];
- let st='ready',hp=p.hp,lives=p.lives,px=180,tx=180,F=[],sp=.9,ord=[],got=0,stack=[],bHit=0,bad=0,quip='Un kebab. Vite. 🌯',qT=2.5,serve=0,T=0,len=3,inv=0,pf=[];
+ const ING=[['🥩','viande'],['🥗','salade'],['🍗','poulet'],['🧅','oignons'],['🧀','cheddar'],['🌶️','harissa'],['🍟','frites']];
+ const QU=['Sauce fromagère, toujours.','Plus vite, j’ai faim !','Les frites DEDANS, hein.','J’ai sauté le goûter, là.','Tu le fais exprès ?','Ça sent bon…','Maman m’attend pour dîner. Chut.'];
+ let st='ready',hp=p.hp,lives=p.lives,px=180,tx=180,F=[],sp=.9,ord=[],got=0,stack=[],bHit=0,bad=0,quip='Un tacos XL. Vite. 🌯',qT=2.5,serve=0,T=0,len=3,inv=0,pf=[];
  const order=()=>{const a=[...ING.keys()].sort(()=>Math.random()-.5);ord=a.slice(0,len);got=0;stack=[];len=Math.min(5,len+1)};
  const spawn=()=>{const need=ord[got],r=Math.random();let i;if(r<.35)i=need;else if(r<.4)i=-1;else{do{i=Math.floor(Math.random()*ING.length)}while(i==need)}F.push({i,x:40+Math.random()*290,y:170,v:(185+165*(1-hp/p.hp))*(.85+Math.random()*.35),r:(Math.random()-.5)*3,a:0,w:Math.random()<.2*(1-hp/p.hp)+.05?(Math.random()<.5?-1:1)*60:0})};
- W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';order();timer(p.time,()=>{if(st=='play'){st='dead';fail(`Edgar attend encore ${hp} kebab${hp>1?'s':''}`)}},id)}tx=P(e)[0]};
+ W.onpointerdown=e=>{e.preventDefault();if(st=='ready'){st='play';order();timer(p.time,()=>{if(st=='play'){st='dead';fail(`Edgar attend encore ${hp} tacos`)}},id)}tx=P(e)[0]};
  W.onpointermove=e=>{if(e.buttons||e.pointerType=='touch')tx=P(e)[0]};
  const upd=dt=>{T+=dt;qT=Math.max(0,qT-dt);inv=Math.max(0,inv-dt);px+=(Math.max(40,Math.min(330,tx))-px)*Math.min(1,dt*14);for(const o of pf){o.t-=dt;o.y-=50*dt}pf=pf.filter(o=>o.t>0);
   if(serve>0){serve-=dt;if(serve<=0){if(hp<=0){st='won';setTimeout(()=>{if(id==RUN)win()},500);return}order()}return}
   sp-=dt;if(sp<=0){spawn();sp=Math.max(.42,.8-.38*(1-hp/p.hp))*(.8+Math.random()*.4)}
   for(const f of F){f.y+=f.v*dt;f.a+=f.r*dt;if(f.w){f.x+=f.w*dt;if(f.x<30||f.x>330)f.w=-f.w}
    const top=470-stack.length*13;if(!f.done&&Math.abs(f.y-top)<18&&Math.abs(f.x-px)<46){f.done=1;
-    if(f.i==ord[got]||f.i==-1){stack.push(f.i==-1?'🥛':ING[f.i][0]);got++;pf.push({x:px,y:top-20,t:.6,e:'+1'});try{SFX('ok')}catch(_){}if(f.i==-1){quip='La sauce blanche, ça compte !';qT=1.4}
+    if(f.i==ord[got]||f.i==-1){stack.push(f.i==-1?'🫕':ING[f.i][0]);got++;pf.push({x:px,y:top-20,t:.6,e:'+1'});try{SFX('ok')}catch(_){}if(f.i==-1){quip='La sauce fromagère, ça compte toujours !';qT=1.4}
      if(got>=ord.length){hp--;bHit=performance.now();serve=1.1;F=[];quip=['Mmmh… PARFAIT. 🤤','Ok… celui-là, il est bon.','Encore un ! J’ai encore faim.'][hp%3];qT=1.6;try{bkT(660,.15,'triangle',.06);setTimeout(()=>bkT(990,.25,'triangle',.06),120)}catch(_){}}}
     else if(!inv){lives--;inv=.8;bad=performance.now();try{SFX('bad')}catch(_){}quip=`Des ${ING[f.i][1]} ?! J’ai rien demandé !`;qT=1.6;if(lives<=0){st='dead';setTimeout(()=>{if(id==RUN)fail('Edgar a fait « beurk » et il est parti manger ailleurs')},800)}}}}
   F=F.filter(f=>!f.done&&f.y<560);if(Math.random()<dt*.15){quip=QU[Math.floor(Math.random()*QU.length)];qT=1.8}};
@@ -6427,14 +6427,14 @@ try{GAMES.bkebab=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Glis
   // broche qui tourne
   x.save();x.translate(26,300);x.fillStyle='#777';x.fillRect(-2,-150,4,300);const bg=x.createLinearGradient(-24,0,24,0);bg.addColorStop(0,'#5a2a12');bg.addColorStop(.5,'#b8642a');bg.addColorStop(1,'#5a2a12');x.fillStyle=bg;x.beginPath();x.moveTo(-26,-110);x.lineTo(26,-110);x.lineTo(16,110);x.lineTo(-16,110);x.fill();x.strokeStyle='#4a1e0a88';x.lineWidth=2;for(let i=0;i<10;i++){const yy=-110+((i*24+T*40)%220);x.beginPath();x.moveTo(-24+yy*.045,yy);x.lineTo(24-yy*.045,yy+6);x.stroke()}x.fillStyle='#ff8a3d33';x.fillRect(22,-120,14,240);x.restore();
   // néon
-  x.fillStyle='#2a1a12';x.beginPath();x.roundRect(78,96,144,52,10);x.fill();x.strokeStyle='#5a3a22';x.lineWidth=3;x.stroke();x.save();x.font='900 22px system-ui';x.textAlign='center';x.shadowColor='#ff4fa3';x.shadowBlur=Math.floor(T*3)%9==0?2:16;x.fillStyle='#ffd1ea';x.fillText('KEBAB',150,120);x.shadowColor='#3de0ff';x.fillStyle='#d6fbff';x.font='800 12px system-ui';x.fillText('DU 8e · OUVERT TARD',150,138);x.restore();
+  x.fillStyle='#2a1a12';x.beginPath();x.roundRect(78,96,144,52,10);x.fill();x.strokeStyle='#5a3a22';x.lineWidth=3;x.stroke();x.save();x.font='900 22px system-ui';x.textAlign='center';x.shadowColor='#ff4fa3';x.shadowBlur=Math.floor(T*3)%9==0?2:16;x.fillStyle='#ffd1ea';x.fillText('TACOS',150,120);x.shadowColor='#3de0ff';x.fillStyle='#d6fbff';x.font='800 12px system-ui';x.fillText('DU 8e · OUVERT TARD',150,138);x.restore();
   // ticket de commande
   x.save();x.shadowColor='#0004';x.shadowBlur=6;x.fillStyle='#fffdf6';x.beginPath();x.moveTo(12,10);x.lineTo(214,10);x.lineTo(214,80);for(let i=0;i<=20;i++)x.lineTo(214-i*10.1,80+(i%2?6:0));x.closePath();x.fill();x.restore();
   x.font='800 10.5px ui-monospace,Menlo,monospace';x.fillStyle='#555';x.textAlign='left';x.fillText('TICKET · EDGAR · À EMPORTER',20,25);
   ord.forEach((i,j)=>{const X=30+j*31;bemo(x,ING[i][0],X,54,24);if(j<got){x.strokeStyle='#2f8f5b';x.lineWidth=3;x.beginPath();x.moveTo(X-11,54);x.lineTo(X+11,54);x.stroke()}if(j==got&&!serve){x.strokeStyle='#e0457b';x.lineWidth=2.5;x.beginPath();x.roundRect(X-15,38,30,32,6);x.stroke()}});
   bpic(x,'edgar',300,52,64,now-bHit<200?'#53c07a':now-bad<250?'#ff3d6e':'#ffcf4a',st=='won');
   if(qT>0)NBX.bub(x,122,150,226,quip,{tail:300,up:1});
-  for(const f of F){x.fillStyle='#0002';x.beginPath();x.ellipse(f.x,488,14,4,0,0,7);x.fill();x.save();x.translate(f.x,f.y);x.rotate(f.a);bemo(x,f.i==-1?'🥛':ING[f.i][0],0,0,36);x.restore()}
+  for(const f of F){x.fillStyle='#0002';x.beginPath();x.ellipse(f.x,488,14,4,0,0,7);x.fill();x.save();x.translate(f.x,f.y);x.rotate(f.a);bemo(x,f.i==-1?'🫕':ING[f.i][0],0,0,36);x.restore()}
   // comptoir inox
   const cg=x.createLinearGradient(0,494,0,540);cg.addColorStop(0,'#d9dee3');cg.addColorStop(1,'#8a939c');x.fillStyle=cg;x.fillRect(0,494,360,46);x.fillStyle='#ffffff88';x.fillRect(0,494,360,2);
   const by=482;x.save();if(inv>0&&Math.floor(now/80)%2)x.globalAlpha=.4;x.fillStyle='#0003';x.beginPath();x.ellipse(px,by+12,54,8,0,0,7);x.fill();x.fillStyle='#e8c27a';x.beginPath();x.ellipse(px,by,54,14,0,0,7);x.fill();x.fillStyle='#c98f45';for(let i=-3;i<=3;i++){x.beginPath();x.arc(px+i*12,by-2+(i%2)*3,1.6,0,7);x.fill()}
@@ -6442,7 +6442,7 @@ try{GAMES.bkebab=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,"Glis
   for(const o of pf){x.globalAlpha=o.t/.6;x.font='900 16px system-ui';x.fillStyle='#2f8f5b';x.textAlign='center';x.fillText(o.e,o.x,o.y);x.globalAlpha=1}
   if(serve>0){x.fillStyle='#0006';x.fillRect(0,0,360,540);bemo(x,'🌯',180,280,90*(1+(1.1-serve)*.3));x.save();x.font='900 30px system-ui';x.textAlign='center';x.shadowColor='#ff4fa3';x.shadowBlur=14;x.fillStyle='#fff';x.fillText('SERVI !',180,370);x.restore()}
   NBX.flash(x,now,bad);
-  bbar(x,hp,p.hp,`🌯 Edgar · encore ${hp} kebab${hp>1?'s':''}`,now-bHit<200,500);NBX.hearts(x,lives,p.lives,352,104,'right');
+  bbar(x,hp,p.hp,`🌯 Edgar · encore ${hp} tacos`,now-bHit<200,500);NBX.hearts(x,lives,p.lives,352,104,'right');
   NBX.end(x,st)};
  const loop=now=>{if(id!=RUN)return;const dt=Math.min(.05,(now-(loop.t||now))/1000);loop.t=now;if(st=='play')upd(dt);draw(now);requestAnimationFrame(loop)};requestAnimationFrame(loop);
  G={dbg:()=>({F,ord,got,px,st,hp,lives,stack,serve}),key:k=>{if(k=='ArrowLeft')tx=px-60;if(k=='ArrowRight')tx=px+60},hint:()=>{if(st!='play')return false;lives++;F=F.filter(f=>f.i==ord[got]);return true}}}}catch(e){console.error(e)}
