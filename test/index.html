@@ -2039,7 +2039,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795518239';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795518627';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2203,7 +2203,7 @@ const DAYS={
  3:{t:"Mots mêlés pimentés 🌶️",g:"melee",p:{n:13,theme:"Sexe 🔥",words:["PENETRATION","CUNNILINGUS","LEVRETTE","FELLATION","ORGASME","PRELIMINAIRES","MISSIONNAIRE","KAMASUTRA","CAPOTE","LUBRIFIANT","EXTASE","CLITORIS"],time:360,egg:1},tier:1,ev:"🧪"},
  4:{t:"Flappy Célestine",g:"flappy",p:{goal:15,gap:142,gapMin:112,shrink:1.2,moveAt:6,ampMax:55,wob:1.7,pw:62,every:1.38,speed:165,acc:3.2,grav:1600,jump:460},tier:1,ev:"🔧"},
  5:{t:"La hutte de Panoramix",g:"balls",p:{colors:7,empty:1,slack:8,time:180},tier:1,ev:"🔄"},
- 6:{t:"Air hockey contre Valentin",g:"hockey",p:{goal:7,ai:370,max:820},tier:2,ev:"✨",x2:true},
+ 6:{t:"Air hockey contre Valentin",g:"hockey",p:{goal:5,ai:370,max:820},tier:2,ev:"✨",x2:true},
  7:{t:"Zip",g:"zip",p:{n:7,k:9,time:60},tier:2,ev:"🎡",unlock:"La roue de la chance est ouverte"},
  8:{t:"Bulles d’indices",g:"bubble",p:{colors:4,rows:6,clues:6,drop:8,time:210},tier:2,ev:"🎨"},
  9:{t:"Flèches en fuite",g:"arrows",p:{n:11,min:2,max:5,time:80,err:1,rot:.12,bombs:3,slack:2,spin:12},tier:2},
@@ -6376,7 +6376,7 @@ try{GAMES.hockey=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,`Glis
   let mvx=m.vx,mvy=m.vy;const ms=Math.hypot(mvx,mvy);if(ms>1300){mvx*=1300/ms;mvy*=1300/ms}
   const vn=(pk.vx-mvx)*nx+(pk.vy-mvy)*ny;
   if(vn<0){pk.vx-=1.85*vn*nx;pk.vy-=1.85*vn*ny;
-   if(who=='va'){if(pk.vy<0){pk.vy=Math.abs(pk.vy)*.35+40;pk.vx*=.8}aimX=Math.random()<.35?(Math.random()<.5?-60:420):180+(Math.random()-.5)*90;cool=Math.max(cool,.35)}
+   if(who=='va'){const sh=Math.max(Math.hypot(pk.vx,pk.vy),540+Math.random()*240),ax=aimX-pk.x,ay=BOT+30-pk.y,al=Math.hypot(ax,ay)||1;pk.vx=ax/al*sh;pk.vy=Math.max(120,ay/al*sh);if(Math.random()<.3)try{say(['Prends ça ! 💥','Attention, ça arrive !','Tir de champion 😎','Celle-là, tu l’arrêtes pas !'][Math.random()*4|0])}catch(_){}aimX=Math.random()<.35?(Math.random()<.5?-60:420):180+(Math.random()-.5)*90;cool=Math.max(cool,.35)}
    const sp=Math.hypot(pk.vx,pk.vy);if(sp>p.max){pk.vx*=p.max/sp;pk.vy*=p.max/sp}
    if(last!=who)walls.clear();last=who;
    if(-vn>120&&!CT[who]){sparks(pk.x-nx*PR,pk.y-ny*PR,who=='me'?'#ff7aa8':'#f3c623',Math.min(14,-vn/60|0));hsnd('hit',-vn)}}
@@ -6392,7 +6392,7 @@ try{GAMES.hockey=function(p,el,win,fail){const id=RUN;const {W,x,P}=bcv(el,`Glis
   cool=Math.max(0,cool-dt);{const sd=pk.y<MID;if(sd&&!side)derr=(Math.random()-.5)*180;if(sd&&!side)aimX=Math.random()<.4?(Math.random()<.5?-70:430):180+(Math.random()-.5)*80;side=sd}const spk=Math.hypot(pk.vx,pk.vy);let lv=lvl;if(pk.y<MID-4&&serve<=0&&cool<=0){const above=pk.y<va.y-4;
    if(above){const sx=pk.x<180?1:-1,beside=Math.abs(va.x-pk.x)>PR+MR+10;gx=pk.x+sx*(PR+MR+22);gy=beside?Math.max(TOP+MR,pk.y-(PR+MR+12)):Math.max(va.y,pk.y+PR+MR+10);if(pk.vy<-120){gx=180+Math.max(-GW/2,Math.min(GW/2,pk.x-180))*.8;gy=TOP+MR;if(Math.abs(va.x-pk.x)<PR+MR+4&&va.y>pk.y)gx=pk.x+sx*(PR+MR+18)}}
    else if(pk.vy<-160){const tt=Math.max(.05,(pk.y-(TOP+56))/(-pk.vy));gx=pk.x+pk.vx*tt*.6+derr;gy=TOP+56;lv=lvl*.26}
-   else if(spk<340||pk.y<MID-60){const ddx=aimX-pk.x,ddy=BOT+30-pk.y,dl=Math.hypot(ddx,ddy)||1,ux=ddx/dl,uy=ddy/dl,bx=pk.x-ux*(PR+MR+6),by=pk.y-uy*(PR+MR+6),beh=((va.x-pk.x)*ux+(va.y-pk.y)*uy)<-(PR+MR)*.6;if(beh||Math.hypot(va.x-bx,va.y-by)<10){gx=pk.x+ux*70;gy=pk.y+uy*70}else{gx=bx;gy=by}}
+   else if(spk<340||pk.y<MID-60){const ddx=aimX-pk.x,ddy=BOT+30-pk.y,dl=Math.hypot(ddx,ddy)||1,ux=ddx/dl,uy=ddy/dl,bx=pk.x-ux*(PR+MR+6),by=pk.y-uy*(PR+MR+6),beh=((va.x-pk.x)*ux+(va.y-pk.y)*uy)<-(PR+MR)*.6;if(beh||Math.hypot(va.x-bx,va.y-by)<12){gx=pk.x+ux*110;gy=pk.y+uy*110;lv=lvl*1.7}else{gx=bx;gy=by;lv=lvl*1.25}}
    else{gx=pk.x+pk.vx*.05;gy=pk.y-20}}else{gx=180+(pk.x-180)*.35+Math.sin(T*1.7)*45;gy=TOP+92+Math.sin(T*1.1)*12}
   gy=Math.max(TOP+MR,Math.min(MID-MR-14,gy));gx=Math.max(LFT+MR,Math.min(RGT-MR,gx));const dx=gx-va.x,dy=gy-va.y,dd=Math.hypot(dx,dy),mv=Math.min(dd,lv*dt);if(dd>0){va.x+=dx/dd*mv;va.y+=dy/dd*mv}va.vx=(va.x-ox2)/dt;va.vy=(va.y-oy2)/dt;
   if(serve>0){serve=Math.max(0,serve-dt);return}
