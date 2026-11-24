@@ -2036,7 +2036,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795504408';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795504618';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2566,7 +2566,7 @@ function vBoss(test,sp,so){if(document.getElementById('vbo'))return;sp=Math.max(
  const turnV=async()=>{if(!alive)return;if(st.stun){st.stun=0;await say(STUN[stunI++%STUN.length]);return}
   if(!st.heal&&st.e<=st.eM-120){st.heal=1;await say('VALENTIN se cache sous un plaid et regarde une série…');heal('e',15);await say('Il récupère 15 PV.');return}
   if(!VMQ.length)VMQ=shuf(VMP);const v=VMQ.pop();for(const x of v.l)await say(x);if(v.charm)st.charm=1;let d=rnd(v.d[0],v.d[1]);if(st.pout&&d){d=Math.round(d*.5);await say('Il s’excuse à moitié… dégâts réduits.')}st.pout=0;if(d)hurt('c',d)};
- const PARTS=[null,{t:'⚔️ Le combat',s:'Choisis tes attaques et touche au bon moment 💗',m:['b24','b11']},{t:'🕺 Duel de rock',s:'Refais ses pas en glissant le doigt · 🙃 = ne bouge pas · INVERSE = glisse dans l’autre sens',m:['b27','b24','b11']},{t:'🍕 Les boîtes à pizza',s:'Suis la boîte qui cache le bracelet pendant le mélange, puis touche-la',m:['b28','b24','b11']},{t:'🔒 Le cadenas du 3 juillet',s:'Touche quand le bon chiffre de votre date passe sous ▼',m:['b29','b24','b11']}];
+ const PARTS=[null,{t:'⚔️ Le combat',s:'Choisis tes attaques et touche au bon moment 💗',m:['b24','b11']},{t:'🕺 Duel de rock',s:'Refais ses pas en glissant le doigt · 🙃 = ne bouge pas · INVERSE = glisse dans l’autre sens',m:['b27','b24','b11']},{t:'🍕 Les boîtes à pizza',s:'Suis la boîte qui cache le bracelet pendant le mélange, puis touche-la',m:['b28','b24','b11']},{t:'🔒 Le cadenas',s:'Touche quand le bon chiffre passe sous ▼',m:['b29','b24','b11']}];
  const partStart=async k=>{try{$$('.vb-cover').classList.remove('on')}catch(_){}o.dataset.part=k;try{syncLive({d:24,t:'😈 Boss final · Partie '+k+' '+PARTS[k].t,at:Date.now(),boss:1});slog('😈',`Boss final : partie ${k}/4 (${PARTS[k].t})${test?' (test)':''}`)}catch(_){}if(st.djm&&k==2){const dj=st.djm;st.djm=null;if(st.djk<2){try{dj.stop()}catch(_){}mu=vMusic(PARTS[k].m)}else{mu=dj;if(st.djk<3)try{dj.setVol(.75,700)}catch(_){}}st.mk=k}
   if(st.mk!==k){try{(st.mk==='d'&&mu.pause)?mu.pause():mu.stop()}catch(_){}mu=vMusic(PARTS[k].m);st.mk=k}st.e=st.eM-200*(k-1);st.floor=st.eM-200*k;hp();
   if(k>1){const fl=document.createElement('div');fl.className='vb-flash';o.appendChild(fl);setTimeout(()=>fl.remove(),900);try{bkT(90,.8,'sawtooth',.07,300)}catch(_){}}
