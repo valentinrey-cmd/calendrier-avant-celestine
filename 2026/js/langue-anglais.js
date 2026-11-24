@@ -595,7 +595,7 @@ window.TRADUCTIONS_EN = {
   "Le jour de l'officialisation": 'The day we made it official',
   'Le laboratoire': 'The laboratory',
   'Le laboratoire ouvre avec la case du 3 décembre.': 'The lab opens with the December 3rd box.',
-  'Le lancer du bouquet': 'The bouquet toss',
+  'Notre voyage à Tenerife': 'Our trip to Tenerife',
   'Le mois de notre début': 'The month we started',
   'Le mot était :': 'The word was:',
   'Le passé': 'The past',

@@ -4,6 +4,22 @@
 
 ---
 
+## 24 novembre 2026 (nuit) : vidéo « Notre voyage à Tenerife » à la place du bouquet
+
+- **Album, vidéo n°4** (débloquée par le boss de Nora) : « Le lancer du bouquet » est remplacée par **« Notre voyage à Tenerife »** (août 2026, 47 s). Elle se range maintenant dans le chapitre « Nos voyages », juste après la photo « Tenerife ».
+- C'est un timelapse du voyage, avec une carte de l'île entre chaque étape :
+  1. la plage ;
+  2. le snorkeling avec les tortues ;
+  3. Siam Park et la Tower of Power ;
+  4. le canyoning en rappel ;
+  5. le parapente depuis le Teide (2 200 m, mer de nuages) ;
+  6. la forêt d'Anaga ;
+  7. le coucher de soleil sur le Teide (ombre en triangle), puis la Voie lactée et les constellations.
+- Fichiers : `2026/videos/4-tenerife.mp4` et `.jpg` (les fichiers `4-bouquet.*` sont supprimés), `2026/js/contenu.js`, `2026/js/langue-anglais.js`.
+- Source de l'animation : `outils/videos/4-tenerife/` (avec `LISEZMOI.md`). Ajout de `outils/videos/.gitignore` (images de travail).
+
+---
+
 ## 24 novembre 2026 (nuit) : le suspect n°7 devient seulement Valérie
 
 - Le suspect « Fabien et Valérie » devient **« Valérie », la mère de Célestine**. Fabien n'apparaît plus nulle part : fiche, prologue (« Votre mère aussi, donc. »), agenda, main courante, plan, générique, menu, scène d'accusation réécrite.

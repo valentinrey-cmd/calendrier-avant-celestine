@@ -210,12 +210,12 @@ const CONTENU = {
       apres: 'La demande en mariage'
     },
     {
-      titre: 'Le lancer du bouquet',
-      date: 'Juillet 2034',
-      src: 'videos/4-bouquet.mp4',
-      poster: 'videos/4-bouquet.jpg',
-      ch: 'Le grand oui',
-      apres: 'Notre mariage'
+      titre: 'Notre voyage à Tenerife',
+      date: 'Août 2026',
+      src: 'videos/4-tenerife.mp4',
+      poster: 'videos/4-tenerife.jpg',
+      ch: 'Nos voyages',
+      apres: 'Tenerife'
     },
     {
       titre: 'Notre tour du monde',
