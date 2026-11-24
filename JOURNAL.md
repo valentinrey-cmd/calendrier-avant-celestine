@@ -4,6 +4,15 @@
 
 ---
 
+## 25 novembre 2026 : Tenerife, nouvelle musique et 2ᵉ version « comme les autres vidéos »
+
+- **Nouvelle musique** (dans les deux versions) : une composition nostalgique originale au piano, aux cordes et au violoncelle, jouée avec de vrais sons d'instruments enregistrés (banque MusyngKite). Le script `outils/videos/musique-nostalgique.py` est réutilisable pour d'autres vidéos.
+- La vidéo de l'album (`2026/videos/4-tenerife.mp4`, version illustrée) a maintenant cette musique.
+- **2ᵉ version** dans le style des autres vidéos de l'album : vos visages en photo sur des corps entiers, des bulles de dialogue et un titre en italique en haut. Elle utilise les mêmes décors et le même ordre. Elle est gardée dans `outils/videos/4-tenerife/versions/4-tenerife-style-bd.mp4` et **n'est pas encore dans l'album** : Valentin doit choisir.
+- Les décors communs aux deux versions sont dans `outils/videos/4-tenerife/decors.js`.
+
+---
+
 ## 24 novembre 2026 (nuit) : vidéo de Tenerife entièrement refaite
 
 - **Nouvel ordre**, celui du vrai voyage :
