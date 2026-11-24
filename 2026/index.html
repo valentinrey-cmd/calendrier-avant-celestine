@@ -2039,7 +2039,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795517600';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795518239';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -2823,7 +2823,7 @@ function launchBoss(d,test){const B=bossCfg(d);if(!B)return;if(!(S.story||{})['b
  const g=$('#game');g.classList.remove('solv');g.onpointerdown=g.onpointermove=g.onpointerup=g.onpointercancel=null;try{$('#lives').textContent=''}catch(_){}
  openGame(d,true,w=>end(false,w,1),`${B.ic} AUDITION · ${B.n}${test?' (test)':''}`);if(B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}}else{try{if(!YTM.start(d))MUS.day(d)}catch(_){}}
  g.innerHTML=`<div class="bossin"><span>🎙️ AUDITION 🎙️</span><b class="bi">${B.ic}</b><b>${B.n}</b></div>`;try{SFX('lose')}catch(_){}
- setTimeout(()=>{if(id!=RUN)return;const RL=BRULES[d]||[];g.innerHTML=`<div class="bossr"><p class="bri">${B.ic}</p><h3>Comment faire craquer ${esc(B.n)} ?</h3><ul>${RL.map(t=>`<li>${t}</li>`).join('')}</ul><button id="bgo">🎙️ J’ai compris, c’est parti !</button></div>`;$('#bgo').onclick=()=>{if(id!=RUN)return;if(!B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}let okm=false;try{okm=YTM.boss('b'+d)}catch(_){}if(!okm){try{MUS.play(({4:'tetris',8:'elise',15:'canon',19:'joy',22:'rest'})[d]||'tetris',.06)}catch(_){}}try{slog('🎵','Musique de boss (jour '+d+')'+(okm?'':' · mélodie de secours'))}catch(_){}}GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))}},1800)}
+ setTimeout(()=>{if(id!=RUN)return;const RL=BRULES[d]||[];g.innerHTML=`<div class="bossr"><p class="bri">${B.ic}</p><h3>Comment faire craquer ${esc(B.n)} ?</h3><ul>${RL.map(t=>`<li>${t}</li>`).join('')}</ul><button id="bgo">🎙️ J’ai compris, c’est parti !</button></div>`;$('#bgo').onclick=()=>{if(id!=RUN)return;if(!B.quiet){try{YTM.stopGame()}catch(_){}try{MUS.stop()}catch(_){}let okm=false;try{okm=YTM.boss('b'+d)}catch(_){}if(!okm){try{MUS.play(({4:'filature',8:'pluie',11:'enquete',15:'noir',19:'lyon',22:'filature'})[d]||'enquete',.06)}catch(_){}}try{slog('🎵','Musique de boss (jour '+d+')'+(okm?'':' · mélodie de secours'))}catch(_){}}GAMES[B.g](B.p,g,()=>end(true),w=>end(false,w))}},1800)}
 function bossResult(d,ok,why,test){try{SFX(ok?'win':'lose')}catch(_){}
  if(test&&!ok){startBox(d,`Boss raté (test) : ${esc(why)}.`);return bossRetry(d,why,1)}
  if(ok){S.boss=S.boss||{};S.boss[d]=Date.now();if(!(S.story||{})['w'+d])S.storyQ='w'+d;save();try{ACH('boss'+d)}catch(_){}try{slog('🏆',`Boss du jour ${d} vaincu ! Vidéo ${vidN()} débloquée 🎬`)}catch(_){}ding();confetti();splash(true);startBox(d,'Audition réussie ! 🎙️');setTimeout(vidNew,1500)}
@@ -2938,7 +2938,7 @@ async function vrecExport(){const o={};Object.entries(S.st||{}).forEach(([g,x])=
  popup(`<h2>⚔️ Code de tes records</h2><p>Envoie-lui ce code : elle le colle dans <b>🎮 menu de démarrage → ⚙️ Options → 📥 Coller un code</b>, et tes records apparaissent à battre dans chaque jeu.</p><textarea class="synct" readonly onclick="this.select()">${code}</textarea><p class="muted">${Object.keys(o).length} jeu(x) avec un record.</p><button onclick="closePop()">OK</button>`)}
 /* musique d'ambiance */
 function bgmOn(){return S.bgm!==false&&S.sound!==false&&S.music!==false}
-function bgm(){if(window.__vidOn)return;if(typeof ALBM!='undefined'&&ALBM.on)return;try{if(YTM.on())return}catch(_){}try{if(!bgmOn()||document.getElementById('gwin'))return;if(MUS.cur&&MUS.cur.startsWith('bg'))return;MUS.play('deck',.025);MUS._bg=1}catch(_){}}
+function bgm(){if(window.__vidOn)return;if(typeof ALBM!='undefined'&&ALBM.on)return;try{if(YTM.on())return}catch(_){}try{if(!bgmOn()||document.getElementById('gwin'))return;if(MUS.cur&&MUS.cur.startsWith('bg'))return;MUS.play('noir',.025);MUS._bg=1}catch(_){}}
 
 /* ---------- Appli installable ---------- */
 const APP={native:()=>/AventApp/.test(navigator.userAgent),standalone:()=>/AventApp/.test(navigator.userAgent)||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true,
@@ -5752,7 +5752,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
  const log=t=>{try{slog('🎮','Menu démarrer : '+t)}catch(_){}};
  /* pluie de décembre sur Lyon + reflets dorés */
  {const F=Q('.sm-fall');for(let i=0;i<34;i++){const e=document.createElement('i');if(i%6==0){e.className='bk';e.textContent=''}else{e.className='rn';e.textContent=''};e.style.left=(Math.random()*100)+'%';e.style.fontSize=(10+Math.random()*16)+'px';e.style.animationDuration=(6+Math.random()*8)+'s';e.style.animationDelay=(-Math.random()*12)+'s';e.style.opacity=.4+Math.random()*.6;F.appendChild(e)}}
- try{MUS.play('jingle',.035)}catch(_){}
+ try{MUS.play('enquete',.035)}catch(_){}
  let cgu=!!S.cguOk,cguNext=null;try{cgu=cgu||!!localStorage.getItem('avent_cgusig')}catch(_){}try{cgu=cgu||!!localStorage.getItem('avent_cgu')}catch(_){}let diff=null;
  /* écran titre */
  Q('.sm-title').addEventListener('click',()=>{snd('swish');bip(880);scr('menu');log('écran titre passé')});
@@ -5787,7 +5787,7 @@ function smOpen(force,at){if(document.getElementById('smo'))return;try{smBk(0)}c
    <p class="sm-small center">🎄 Calendrier 2026 Célestine · fait avec ❤️ par Valentin<br>${vd?'Version du '+vd:''}</p>`,[['← Retour',()=>scr('menu')]]);
    const P=Q('.sm-pc');
    P.querySelectorAll('[data-t]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.t,def=b.dataset.def=='1',cur=def?S[k]!==false:!!S[k],v=!cur;S[k]=v;save();b.classList.toggle('on',v);b.textContent=v?'ON':'OFF';bip(700);
-    try{if(k=='sound'&&v)SFX('ok');if(k=='vib'&&v)navigator.vibrate(60);if(['warm','fxbg','wake'].includes(k)){applyDisp();if(k=='fxbg')snowCount()}if(k=='music'){v?MUS.play('jingle',.035):MUS.stop()}}catch(_){}});
+    try{if(k=='sound'&&v)SFX('ok');if(k=='vib'&&v)navigator.vibrate(60);if(['warm','fxbg','wake'].includes(k)){applyDisp();if(k=='fxbg')snowCount()}if(k=='music'){v?MUS.play('noir',.035):MUS.stop()}}catch(_){}});
    P.querySelectorAll('[data-l]').forEach(b=>b.onclick=e=>{e.stopPropagation();if((S.lang||'fr')==b.dataset.l)return;try{setLang(b.dataset.l)}catch(_){}});
    P.querySelectorAll('[data-fs]').forEach(b=>b.onclick=e=>{e.stopPropagation();try{setOpt('fsz',b.dataset.fs)}catch(_){}P.querySelectorAll('[data-fs]').forEach(x=>x.classList.toggle('on',x==b));bip(600)});
    P.querySelectorAll('[data-dc]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.dc,v=S[k]===false;S[k]=v;save();try{snowCount();if(k=='voix'&&v)ding()}catch(_){}b.classList.toggle('on',v);b.textContent=v?'ON':'OFF';bip(700)});
@@ -7237,9 +7237,15 @@ function orientFix(){const R=document.documentElement,gw=document.getElementById
  const land=innerWidth>innerHeight&&Math.min(innerWidth,innerHeight)<600&&(matchMedia('(pointer:coarse)').matches||'ontouchstart' in window),on=!!gw&&land&&(a==90||a==270);
  R.style.setProperty('--vw',innerWidth+'px');R.style.setProperty('--vh',innerHeight+'px');R.classList.toggle('rotL',on&&a==90);R.classList.toggle('rotR',on&&a==270)}
 ['resize','orientationchange'].forEach(e=>addEventListener(e,()=>{orientFix();setTimeout(orientFix,250)}));if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',()=>setTimeout(orientFix,50));setInterval(orientFix,700);
-/* ---------- Musique de fond (airs traditionnels du domaine public, synthétisés) ---------- */
+/* ---------- Musique de fond (thèmes originaux d’enquête, synthétisés) ---------- */
 const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
  const SONGS={
+  noir:{bpm:96,w:'triangle',n:"A3:.75 C4:.25 E4:.5 D#4:.5 D4:1 R:.5 A3:.5 C4:.75 E4:.25 G4:.5 F4:.5 E4:2 R:.5 E4:.5 F4:.75 E4:.25 D4:.5 C4:.5 B3:1 G#3:1 A3:.75 C4:.25 E4:.5 A4:.5 G#4:1.5 R:.5 F4:.5 E4:.5 D4:.5 B3:.5 C4:.5 B3:.5 A3:2 R:1"},
+  enquete:{bpm:118,w:'square',n:"D4:.5 F4:.5 A4:.5 F4:.5 D4:.5 F4:.5 Bb4:.5 A4:.5 D4:.5 F4:.5 A4:.5 C5:.5 Bb4:1 A4:1 G4:.5 Bb4:.5 D5:.5 Bb4:.5 G4:.5 A4:.5 F4:.5 E4:.5 D4:.5 E4:.5 F4:.5 G4:.5 A4:1.5 R:.5 D5:.75 C5:.25 A4:.5 F4:.5 G4:.75 F4:.25 E4:.5 C#4:.5 D4:2 R:1"},
+  lyon:{bpm:84,w:'sine',n:"C4:1 F4:1 A4:1 G4:1.5 F4:.5 E4:1 F4:1 A4:1 C5:1 Bb4:2 A4:1 G4:1 Bb4:1 D5:1 C5:1.5 A4:.5 F4:1 G4:1 A4:1 G4:1 F4:3 R:1"},
+  pluie:{bpm:100,w:'triangle',n:"E5:.5 B4:.5 G4:.5 B4:.5 E5:.5 D5:.5 B4:1 C5:.5 G4:.5 E4:.5 G4:.5 C5:.5 B4:.5 A4:1 A4:.5 E4:.5 C4:.5 E4:.5 A4:.5 B4:.5 C5:.5 D5:.5 B4:2 R:.5 G4:.5 F#4:.5 E4:.5 D#4:.5 E4:2 R:1"},
+  filature:{bpm:108,w:'square',n:"G3:.5 R:.5 G3:.5 Bb3:.5 R:.5 D4:.5 C#4:.5 R:.5 C4:.5 R:.5 C4:.5 Eb4:.5 R:.5 G4:.5 F#4:1 R:.5 D4:.5 Eb4:.5 D4:.5 C4:.5 Bb3:.5 A3:.5 Bb3:.5 C4:.5 D4:1.5 R:.5 G3:.5 Bb3:.5 D4:.5 G4:.5 F#4:.5 D4:.5 G4:2 R:1"},
+  coeur:{bpm:92,w:'sine',n:"E4:1 G4:.5 C5:1.5 B4:.5 A4:.5 G4:1 E4:1 F4:.5 A4:1.5 G4:.5 F4:.5 E4:2 D4:1 E4:.5 F4:1.5 A4:.5 G4:.5 E4:1 C4:1 D4:.5 E4:.5 F4:.5 D4:.5 C4:3 R:1"},
   tannen:{bpm:110,w:'sine',n:"D4:1 G4:.75 G4:.25 G4:1.5 A4:.5 B4:.75 B4:.25 B4:1.5 B4:.5 A4:.5 B4:.5 C5:1 F#4:1 A4:1 G4:2 R:1 D5:.5 D5:.5 B4:.5 E5:1.5 D5:.5 D5:.5 C5:.5 C5:1.5 C5:.5 C5:.5 A4:.5 D5:1.5 C5:.5 C5:.5 B4:.5 B4:1.5 D4:1 G4:.75 G4:.25 G4:1.5 A4:.5 B4:.75 B4:.25 B4:1.5 B4:.5 A4:.5 B4:.5 C5:1 F#4:1 A4:1 G4:3 R:1"},
   noel:{bpm:120,w:'triangle',n:"E4:.5 D4:.5 C4:1.5 D4:.5 E4:.5 F4:.5 G4:2 A4:.5 B4:.5 C5:1 B4:1 A4:1 G4:2 A4:.5 B4:.5 C5:1 B4:1 A4:1 G4:1 A4:1 B4:1 C5:1 G4:1 F4:1 E4:2 E4:.5 D4:.5 C4:1.5 D4:.5 E4:.5 F4:.5 G4:2 C5:.5 B4:.5 A4:2 A4:1 G4:3 C5:1 B4:1 A4:1 G4:1 A4:1 B4:1 C5:1 G4:1 F4:1 E4:3 R:1"},
   anges:{bpm:126,w:'triangle',n:"A4:1 A4:1 A4:1 C5:1 C5:1.5 Bb4:.5 A4:2 A4:1 G4:1 A4:1 C5:1 A4:1.5 G4:.5 F4:2 A4:1 A4:1 A4:1 C5:1 C5:1.5 Bb4:.5 A4:2 A4:1 G4:1 A4:1 C5:1 A4:1.5 G4:.5 F4:2 C5:1.5 D5:.5 C5:.5 Bb4:.5 A4:.5 Bb4:.5 C5:1.5 Bb4:.5 A4:.5 G4:.5 A4:.5 Bb4:.5 A4:1.5 G4:.5 F4:.5 E4:.5 F4:.5 G4:.5 F4:1 C4:1 F4:1 G4:1 A4:3 R:1"},
@@ -7260,7 +7266,7 @@ const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
   silent:{bpm:96,w:'sine',n:"G4:1.5 A4:.5 G4:1 E4:3 G4:1.5 A4:.5 G4:1 E4:3 D5:2 D5:1 B4:3 C5:2 C5:1 G4:3 A4:2 A4:1 C5:1.5 B4:.5 A4:1 G4:1.5 A4:.5 G4:1 E4:3 A4:2 A4:1 C5:1.5 B4:.5 A4:1 G4:1.5 A4:.5 G4:1 E4:3 D5:2 D5:1 F5:1.5 D5:.5 B4:1 C5:3 E5:3 C5:1 G4:1 E4:1 G4:1.5 F4:.5 D4:1 C4:4 R:2"},
   joy:{bpm:120,w:'triangle',n:"C5:2 B4:1.5 A4:.5 G4:3 F4:1 E4:2 D4:2 C4:3 G4:1 A4:3 A4:1 B4:3 B4:1 C5:6 R:1 C5:1 C5:1 B4:1 A4:1 G4:1 G4:1.5 F4:.5 E4:1 C5:1 C5:1 B4:1 A4:1 G4:1 G4:1.5 F4:.5 E4:1 E4:1 E4:1 E4:1 E4:.5 F4:.5 G4:3 F4:.5 E4:.5 D4:1 D4:1 D4:1 D4:.5 E4:.5 F4:3 E4:.5 D4:.5 C4:1 C5:2 A4:1 G4:1.5 F4:.5 E4:1 F4:1 E4:2 D4:2 C4:4"},
   rest:{bpm:132,w:'triangle',n:"E4:1 E4:1 B4:1 B4:1 A4:1 G4:1 F#4:1 E4:1 D4:1 E4:1 F#4:1 G4:1 A4:1 B4:3 E4:1 E4:1 B4:1 B4:1 A4:1 G4:1 F#4:1 E4:1 D4:1 E4:1 F#4:1 G4:1 A4:1 B4:3 B4:1 C5:1 A4:1 B4:1 C5:1 D5:1 E5:1 B4:1 A4:1 G4:1 E4:1 F#4:1 G4:2 A4:1 G4:1 F#4:1 E4:1 D4:1 E4:2 R:1"}};
- const BY={1:'wish',2:'house',3:'jingle',4:'jolly',5:'anges',6:'carol',7:'canon',8:'wences',9:'elise',10:'tannen',11:'adeste',12:'manger',13:'joy',14:'deck',15:'ruisseau',16:'silent',17:'house',18:'tetris',19:'ilestne',20:'noel',21:'carol',22:'rest',23:'jolly',24:'silent'};
+ const BY={1:'enquete',2:'filature',3:'pluie',4:'noir',5:'lyon',6:'coeur',7:'enquete',8:'filature',9:'pluie',10:'noir',11:'lyon',12:'coeur',13:'enquete',14:'filature',15:'pluie',16:'noir',17:'lyon',18:'coeur',19:'enquete',20:'filature',21:'pluie',22:'noir',23:'lyon',24:'coeur'};
  const fq=s=>{const m=/^([A-G])(#|b)?(\d)$/.exec(s);const k={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]=='#'?1:m[2]=='b'?-1:0);return 440*2**((k+12*(+m[3]+1)-69)/12)};
  const stop=()=>{if(iv){clearInterval(iv);iv=null}if(M&&A){try{const g=M;g.gain.setTargetAtTime(0,A.currentTime,.08);setTimeout(()=>{try{g.disconnect()}catch(_){}},400)}catch(_){}}M=null;cur=null};
  const play=(name,vol,bg)=>{stop();isBg=!!bg;if(typeof S!='undefined'&&(S.sound===false||S.music===false))return;const sg=SONGS[name];if(!sg)return;
@@ -7272,7 +7278,7 @@ const MUS=(()=>{let A=null,M=null,iv=null,cur=null,isBg=false;
      if(Math.abs(beat-Math.round(beat))<.01&&Math.round(beat)%2==0){const b=A.createOscillator(),h=A.createGain();b.type='sine';b.frequency.value=f/4;h.gain.setValueAtTime(.0001,tt);h.gain.exponentialRampToValueAtTime(.35,tt+.02);h.gain.exponentialRampToValueAtTime(.0001,tt+Math.min(1.6,bt*2));b.connect(h).connect(out);b.start(tt);b.stop(tt+bt*2+.05)}}
     tt+=d*bt;beat+=d;i++;if(i>=notes.length){i=0;beat=0;tt+=bt}}};
   tick();iv=setInterval(tick,90)};
- return{play,stop,day:d=>play(BY[d]||'jingle'),get cur(){return cur},get bg(){return isBg&&!!cur}}})();
+ return{play,stop,day:d=>play(BY[d]||'enquete'),get cur(){return cur},get bg(){return isBg&&!!cur}}})();
 document.addEventListener('pointerdown',()=>{try{bgm()}catch(_){}},{once:true});
 
 /* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
