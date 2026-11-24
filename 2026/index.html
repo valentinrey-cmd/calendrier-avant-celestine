@@ -899,7 +899,8 @@ body.playing #ytm.big{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
 .mstrk{position:absolute;top:4px;left:4px;right:4px;z-index:3;font:700 .6rem/1.2 system-ui;background:#b3122e;color:#fff;border-radius:6px;padding:2px 4px;transform:rotate(-3deg)}
 .al-pred{position:absolute;right:5%;bottom:7%;z-index:2;font:700 calc(var(--alw)*.026) system-ui;background:#2a1a3acc;color:#ffe7a8;padding:2px 6px;border-radius:999px;pointer-events:none}
 .alz-stamp{margin:10px auto 0;display:inline-block;transform:rotate(-6deg);border:3px solid #3ddc84;color:#3ddc84;font:900 1.05rem system-ui;padding:6px 12px;border-radius:10px;animation:bloha .5s ease-out both}.alz-stamp small{display:block;font-weight:600;font-size:.75rem}
-#boot{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1c4a3a,#0b1f18);color:#f3e6c4;transition:opacity .4s}#boot.out{opacity:0}.bt-in{text-align:center;padding:20px}.bt-ic{font-size:3.4rem;animation:bsbp 1s ease-in-out infinite}.bt-in p{font:italic 600 1.05rem Georgia,serif;margin:12px 0}.bt-bar{width:200px;height:8px;border-radius:8px;background:#ffffff22;margin:0 auto;overflow:hidden}.bt-bar i{display:block;height:100%;width:0;background:#e8c768;animation:btb 1.4s ease-out forwards}@keyframes btb{to{width:99%}}
+#boot{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;background:linear-gradient(#070d1c,#13203b 60%,#24172c);color:#f3e6c4;transition:opacity .4s}#boot.out{opacity:0}.bt-in{text-align:center;padding:20px}.bt-ic{font-size:3.4rem;animation:bsbp 1s ease-in-out infinite}.bt-in p{font:italic 600 1.05rem Georgia,serif;margin:12px 0}.bt-bar{width:200px;height:8px;border-radius:8px;background:#ffffff22;margin:0 auto;overflow:hidden}.bt-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff7aa8,#ffcf4a);animation:btb 1.4s ease-out forwards}
+.bt-ic .sm-brac{width:min(220px,58vw);margin:0 auto}.bt-tag{display:inline-block;font:700 .85rem 'Courier New',monospace;letter-spacing:4px;color:#ff5a6e;border:3px solid #ff5a6e;border-radius:6px;padding:3px 9px 2px 13px;transform:rotate(-4deg);margin-bottom:6px}@keyframes btb{to{width:99%}}
 
 /* ===== Jeu terminé ===== */
 body.fini #top{background:linear-gradient(90deg,#3a2a00cc,#5a1030cc,#3a2a00cc);box-shadow:0 2px 0 #ffd76a88,0 6px 18px #ffcc4433}
@@ -2038,7 +2039,7 @@ html.tab.tabp{font-size:118%}
 <div id="pop"></div><div id="toast"></div>
 <script>
 /* 🔄 Mise à jour forcée : si une version plus récente est en ligne, on recharge (appli Android, PWA, cache) */
-const APPV='1795517048';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
+const APPV='1795517600';(function(){try{if(APPV=='dev')return;const loc=location.protocol=='file:',base=loc?'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/':'';
  fetch(base+'version.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.v||+j.v<=+APPV)return;let k='';try{k=sessionStorage.getItem('vchk')}catch(_){}if(k==j.v)return;try{sessionStorage.setItem('vchk',j.v)}catch(_){}
   if(loc){location.replace(base+'?app=android&v='+j.v);return}const u=new URL(location.href);u.searchParams.set('v',j.v);location.replace(u.href)}).catch(()=>{})}catch(_){}})();
 /* =====================================================================
@@ -7041,8 +7042,8 @@ let funCardW=0;setInterval(()=>{try{if(!funIdle()){funCardW=0;return}if((S.story
 setInterval(()=>{try{if(funIdle()&&!document.hidden&&Math.random()<.07)funCat()}catch(_){}},20000);
 
 if(!instPend()){try{smOpen()}catch(e){console.error(e)}}
-try{const pr=document.getElementById('pre');if(pr&&!document.getElementById('smo'))pr.remove()}catch(_){}
-if(document.getElementById('smo')){}else{const b=document.createElement('div');b.id='boot';b.innerHTML=`<div class="bt-in"><div class="bt-ic">🎄</div><p>${pick(JK.boot)}</p><div class="bt-bar"><i></i></div></div>`;document.body.appendChild(b);const rm=()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)};b.onclick=rm;setTimeout(rm,1500);
+try{const pr=document.getElementById('pre');if(pr){const bb=pr.querySelector('.sm-brac');if(bb)window.__brac=bb.outerHTML}if(pr&&!document.getElementById('smo'))pr.remove()}catch(_){}
+if(document.getElementById('smo')){}else{const b=document.createElement('div');b.id='boot';b.innerHTML=`<div class="bt-in"><span class="bt-tag">DOSSIER N°24</span><div class="bt-ic">${window.__brac||(document.querySelector('.sm-brac')||{}).outerHTML||'💖'}</div><p>${pick(JK.boot)}</p><div class="bt-bar"><i></i></div></div>`;document.body.appendChild(b);const rm=()=>{b.classList.add('out');setTimeout(()=>b.remove(),400)};b.onclick=rm;setTimeout(rm,1500);
  setTimeout(()=>{const r=Math.random();if(r<1/30)toast('💌 Rappel : Valentin t’aime. Fin du message.');else if(r<2/30)toast('🔔 Valentin a faim. Ce n’est pas une nouvelle, c’est juste un rappel.')},2600)}
 let taps=[];$('#logo').onclick=()=>{const n=Date.now();taps=taps.filter(x=>n-x<3000);taps.push(n);if(taps.length>=7){taps=[];popup(`<h2>🔐 Accès secret</h2><input type="text" id="pin" inputmode="numeric" placeholder="Code"><p><button onclick="if($('#pin').value==CONTENU.codeSecret)admin();else toast('Code faux')">Entrer</button><button class="alt" onclick="closePop()">Annuler</button></p>`)}};
 function askWipe(){popup('<h2>Tout effacer ?</h2><p>Toute la progression de cet appareil sera supprimée.</p><button onclick="wipe()">Oui, tout effacer</button><button class="alt" onclick="admin()">Annuler</button>')}
