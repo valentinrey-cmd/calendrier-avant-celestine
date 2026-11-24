@@ -43,7 +43,8 @@ public class MainActivity extends Activity {
     s.setDatabaseEnabled(true);
     s.setMediaPlaybackRequiresUserGesture(false);
     s.setAllowFileAccess(true);
-    s.setCacheMode(WebSettings.LOAD_DEFAULT);
+    s.setCacheMode(WebSettings.LOAD_NO_CACHE);
+    w.clearCache(true);
     s.setTextZoom(100);
     s.setUseWideViewPort(true);
     s.setLoadWithOverviewMode(true);
@@ -70,7 +71,7 @@ public class MainActivity extends Activity {
       }
     });
     w.addJavascriptInterface(new Bridge(), "AventAndroid");
-    if (b != null) w.restoreState(b); else w.loadUrl(URL);
+    if (b != null) w.restoreState(b); else w.loadUrl(URL + "&t=" + System.currentTimeMillis());
   }
   @Override protected void onActivityResult(int req, int res, Intent data) {
     if (req == 42 && fileCb != null) { fileCb.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(res, data)); fileCb = null; }
