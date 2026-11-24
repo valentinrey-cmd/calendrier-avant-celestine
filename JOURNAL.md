@@ -4,6 +4,29 @@
 
 ---
 
+## 24 novembre 2026 (nuit) : vidéo de Tenerife entièrement refaite
+
+- **Nouvel ordre**, celui du vrai voyage :
+  1. la plage (avec le snorkeling et la tortue) ;
+  2. le coucher de soleil sur le Teide ;
+  3. les étoiles ;
+  4. Siam Park ;
+  5. la descente en rappel ;
+  6. Anaga ;
+  7. le parapente ;
+  8. **Santiago del Teide** (nouveau) ;
+  9. **Masca** (nouveau).
+- **Nouveau style graphique**, façon carnet de voyage illustré :
+  - de vrais paysages en couches, avec lumière, brume et reflets ;
+  - le couple en petites silhouettes dessinées, au lieu des têtes en photo ;
+  - des fondus enchaînés et une carte de lieu élégante pour chaque étape ;
+  - une carte de l'itinéraire au début ;
+  - la vraie photo « stargazing » en polaroïd à la fin.
+- **Nouvelle musique** : piano et cordes, lente et émouvante.
+- Durée : 52 s. Fichiers : `2026/videos/4-tenerife.mp4` et `.jpg`, source dans `outils/videos/4-tenerife/` (`tenerife.html`, `son.py`, `LISEZMOI.md`).
+
+---
+
 ## 24 novembre 2026 (nuit) : vidéo « Notre voyage à Tenerife » à la place du bouquet
 
 - **Album, vidéo n°4** (débloquée par le boss de Nora) : « Le lancer du bouquet » est remplacée par **« Notre voyage à Tenerife »** (août 2026, 47 s). Elle se range maintenant dans le chapitre « Nos voyages », juste après la photo « Tenerife ».

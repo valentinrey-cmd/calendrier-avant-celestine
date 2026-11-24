@@ -9,7 +9,7 @@ async def main():
     pg=await b.new_page(viewport={'width':960,'height':640})
     errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     await pg.goto('file://'+os.path.abspath('tenerife.html'));await pg.evaluate('ready')
-    dur=await pg.evaluate('DUR');print('DUR',dur)
+    dur=await pg.evaluate('DUR');print('DUR',dur,await pg.evaluate('PLAN'))
     T=times or [i/30 for i in range(int(dur*30))]
     for i,t in enumerate(T):
       d=await pg.evaluate(f"(draw({t}),document.getElementById('c').toDataURL('image/png'))")

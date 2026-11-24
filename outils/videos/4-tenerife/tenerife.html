@@ -2,336 +2,487 @@
 <html><head><meta charset="utf-8"><style>body{margin:0;background:#000}canvas{display:block}</style></head>
 <body><canvas id="c" width="960" height="640"></canvas>
 <script>
-// Vidéo n°4 de l'album : « Notre voyage à Tenerife » (août 2026), un timelapse du voyage.
-// draw(t) dessine l'image au temps t (secondes). Les scènes et leurs durées sont dans PLAN, en bas.
-const cv = document.getElementById('c'), x = cv.getContext('2d');
+// Vidéo n°4 de l'album : « Notre voyage à Tenerife » (août 2026).
+// Style « carnet de voyage illustré » : paysages en couches, lumière, brume, petites silhouettes du couple.
+// draw(t) dessine l'image au temps t. L'ordre des étapes et leurs durées sont dans SC (en bas).
 const W = 960, H = 640;
+const main = document.getElementById('c'), M = main.getContext('2d');
+const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+const bufA = mk(), bufB = mk();
+let x = M; // contexte de dessin courant (les scènes dessinent dans x)
 const IMG = {};
 function load(k, src) { return new Promise(r => { const i = new Image(); i.onload = () => { IMG[k] = i; r(); }; i.onerror = r; i.src = src; }); }
-window.ready = Promise.all([load('v', '../../../2026/media/persos/valentin.webp'), load('c', '../../../2026/media/persos/celestine.webp')]);
+window.ready = Promise.all([load('photo', '../../../2026/media/album/tenerife.jpg'), document.fonts.load('italic 600 40px "Crimson Text"'), document.fonts.load('300 20px Inter'), document.fonts.load('600 20px Inter')]);
 
 // ---------- outils ----------
-let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const R = n => Array.from({ length: n }, () => [rnd(), rnd(), rnd(), rnd()]);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const lerp = (a, b, k) => a + (b - a) * k;
 const ease = k => (1 - Math.cos(Math.PI * clamp(k, 0, 1))) / 2;
-const mix = (c1, c2, k) => { const a = c1.match(/\w\w/g).map(h => parseInt(h, 16)), b = c2.match(/\w\w/g).map(h => parseInt(h, 16)); return 'rgb(' + a.map((v, i) => Math.round(lerp(v, b[i], clamp(k, 0, 1)))).join(',') + ')'; };
-function rr(X, Y, w, h, r) { x.beginPath(); x.roundRect(X, Y, w, h, r); }
-function circ(X, Y, r, c) { x.fillStyle = c; x.beginPath(); x.arc(X, Y, r, 0, 7); x.fill(); }
-function grad(c1, c2, y0 = 0, y1 = H) { const g = x.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, c1); g.addColorStop(1, c2); return g; }
-const SKIN = '#f2c3a2', SKINL = '#d99b78';
-
-// ---------- personnage (même style que les autres vidéos) ----------
-// o : X,Y (pieds), rot, s, face ('v'|'c'), top, topSkin, bot (pantalon) ou shorts, legL/legR (angles), armL/armR, hair, helmet, mask, hood
-function person(o) {
-  x.save(); x.translate(o.X, o.Y); x.rotate(o.rot || 0); const s = o.s || 0.6; x.scale(s, s);
-  const leg = (side, a) => {
-    x.save(); x.translate(side * 20, -150); x.rotate(a);
-    if (o.shorts) { x.fillStyle = SKIN; rr(-16, 0, 32, 140, 8); x.fill(); x.fillStyle = o.shorts; rr(-18, -4, 36, 50, 6); x.fill(); }
-    else { x.fillStyle = o.bot || '#26365e'; rr(-16, 0, 32, 142, 6); x.fill(); }
-    x.fillStyle = o.feet || (o.shorts ? SKIN : '#2f3238'); x.beginPath(); x.ellipse(side * 6, 144, 24, 12, 0, 0, 7); x.fill();
-    x.restore();
-  };
-  leg(-1, o.legL || 0); leg(1, o.legR || 0);
-  if (o.hair) { x.fillStyle = o.hair; x.beginPath(); x.moveTo(-50, -325); x.quadraticCurveTo(-58, -410, 0, -418); x.quadraticCurveTo(58, -410, 52, -325); x.lineTo(40, -262); x.lineTo(-42, -262); x.closePath(); x.fill(); }
-  x.fillStyle = SKIN; x.fillRect(-12, -298, 24, 22);
-  if (o.topSkin) { x.fillStyle = SKIN; rr(-62, -285, 124, 140, 14); x.fill(); if (o.bikini) { x.fillStyle = o.bikini; rr(-50, -262, 44, 30, 10); x.fill(); rr(6, -262, 44, 30, 10); x.fill(); } }
-  else { x.fillStyle = o.top; rr(-66, -285, 132, 145, 14); x.fill(); }
-  if (o.harness) { x.strokeStyle = '#ffb020'; x.lineWidth = 9; x.beginPath(); x.moveTo(-60, -160); x.lineTo(60, -160); x.moveTo(-20, -160); x.lineTo(-20, -130); x.moveTo(20, -160); x.lineTo(20, -130); x.stroke(); }
-  if (o.hood) { x.fillStyle = 'rgba(0,0,0,.18)'; rr(-30, -250, 60, 36, 10); x.fill(); x.strokeStyle = 'rgba(255,255,255,.5)'; x.lineWidth = 3; x.beginPath(); x.moveTo(-10, -285); x.lineTo(-12, -240); x.moveTo(10, -285); x.lineTo(12, -240); x.stroke(); }
-  if (o.logo) { x.fillStyle = '#d7a6c8'; x.beginPath(); x.moveTo(-14, -250); x.lineTo(0, -236); x.lineTo(14, -250); x.lineTo(0, -244); x.fill(); }
-  const arm = (side, a) => {
-    x.save(); x.translate(side * 58, -272); x.rotate(-a * side);
-    x.fillStyle = o.topSkin ? SKIN : o.top; rr(-14, -6, 28, 116, 13); x.fill();
-    x.fillStyle = SKIN; x.strokeStyle = SKINL; x.lineWidth = 2; x.beginPath(); x.arc(0, 116, 16, 0, 7); x.fill(); x.stroke();
-    x.restore();
-  };
-  arm(-1, o.armL ?? 0.25); arm(1, o.armR ?? 0.25);
-  const im = o.face && IMG[o.face]; const hw = 92, hh = im ? hw * im.height / im.width : 110;
-  if (im) x.drawImage(im, -hw / 2, -292 - hh + 8, hw, hh);
-  else { circ(0, -340, 46, SKIN); x.fillStyle = '#1d2230'; rr(-40, -356, 80, 22, 10); x.fill(); x.fillStyle = '#7a4a2a'; x.beginPath(); x.arc(0, -316, 10, 0, Math.PI); x.fill(); }
-  if (o.helmet) { x.fillStyle = o.helmet; x.beginPath(); x.ellipse(0, -372, 56, 40, 0, Math.PI, 0); x.fill(); x.fillRect(-58, -374, 116, 10); }
-  if (o.mask) {
-    x.fillStyle = 'rgba(140,220,255,.35)'; x.strokeStyle = '#ff5a3c'; x.lineWidth = 8; rr(-40, -362, 80, 38, 14); x.fill(); x.stroke();
-    x.strokeStyle = '#ff5a3c'; x.lineWidth = 5; x.beginPath(); x.moveTo(-46, -344); x.lineTo(46, -344); x.stroke();
-    x.strokeStyle = '#ffd23c'; x.lineWidth = 10; x.lineCap = 'round'; x.beginPath(); x.moveTo(44, -330); x.lineTo(54, -330); x.lineTo(54, -410); x.stroke(); x.lineCap = 'butt';
+const smooth = (a, b, v) => { const k = clamp((v - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
+const hex = h => h.match(/\w\w/g).map(v => parseInt(v, 16));
+const rgba = (h, a) => { const c = hex(h); return `rgba(${c[0]},${c[1]},${c[2]},${a})`; };
+function rand(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function vgrad(stops, y0 = 0, y1 = H) { const g = x.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, c]) => g.addColorStop(o, c)); return g; }
+function glow(X, Y, r, col, a = 1) { const g = x.createRadialGradient(X, Y, 0, X, Y, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.fillRect(X - r, Y - r, 2 * r, 2 * r); }
+function circ(X, Y, r) { x.beginPath(); x.arc(X, Y, r, 0, 7); x.fill(); }
+// crête de montagne douce (somme de sinus), remplie jusqu'en bas
+function ridge(y, amp, seed, freq, fill, x0 = 0) {
+  x.fillStyle = fill; x.beginPath(); x.moveTo(-20, H + 20);
+  for (let X = -20; X <= W + 20; X += 8) { const p = (X + x0) * freq; const v = Math.sin(p + seed) * 0.5 + Math.sin(p * 2.3 + seed * 1.7) * 0.28 + Math.sin(p * 5.1 + seed * 0.3) * 0.12; x.lineTo(X, y - v * amp); }
+  x.lineTo(W + 20, H + 20); x.fill();
+}
+function teide(X, Y, w, h, fill, cap) { // le Teide : cône principal + épaule du Pico Viejo à gauche
+  x.fillStyle = fill; x.beginPath(); x.moveTo(X - w * 1.3, Y);
+  x.bezierCurveTo(X - w * 0.9, Y - h * 0.32, X - w * 0.62, Y - h * 0.46, X - w * 0.4, Y - h * 0.5);
+  x.bezierCurveTo(X - w * 0.28, Y - h * 0.55, X - w * 0.16, Y - h * 0.8, X - w * 0.06, Y - h);
+  x.lineTo(X + w * 0.06, Y - h); x.bezierCurveTo(X + w * 0.2, Y - h * 0.72, X + w * 0.5, Y - h * 0.35, X + w * 1.2, Y); x.fill();
+  if (cap) { x.fillStyle = cap; x.beginPath(); x.moveTo(X - w * 0.06, Y - h); x.lineTo(X + w * 0.06, Y - h); x.lineTo(X + w * 0.13, Y - h * 0.86); x.lineTo(X + w * 0.04, Y - h * 0.9); x.lineTo(X - w * 0.03, Y - h * 0.84); x.lineTo(X - w * 0.11, Y - h * 0.88); x.fill(); }
+}
+function cloudBank(y, t, sp, top, bottom, seed, scale = 1, n = 16) { // mer de nuages
+  const R = rand(seed);
+  const g = x.createLinearGradient(0, y - 60 * scale, 0, y + 80 * scale); g.addColorStop(0, top); g.addColorStop(1, bottom); x.fillStyle = g;
+  x.beginPath(); x.moveTo(-50, H + 10);
+  for (let i = 0; i <= n; i++) { const X = i * (W + 200) / n - 100 + ((t * sp) % ((W + 200) / n)); const r = (40 + R() * 50) * scale; x.lineTo(X - r, y); x.arc(X, y - r * 0.15, r, Math.PI, 0); }
+  x.lineTo(W + 50, H + 10); x.fill();
+}
+function palm(X, Y, s, sway, col) {
+  x.strokeStyle = col; x.fillStyle = col; x.lineWidth = 7 * s; x.lineCap = 'round';
+  const tx = X + 30 * s + sway, ty = Y - 190 * s;
+  x.beginPath(); x.moveTo(X, Y); x.quadraticCurveTo(X + 30 * s, Y - 100 * s, tx, ty); x.stroke();
+  for (let i = 0; i < 9; i++) {
+    const a = -Math.PI * 0.95 + i * Math.PI / 8 + Math.sin(sway * 0.08 + i) * 0.06;
+    const ex = tx + Math.cos(a) * 85 * s, ey = ty + Math.sin(a) * 40 * s + 28 * s * Math.abs(Math.cos(a));
+    x.lineWidth = 3 * s; x.beginPath(); x.moveTo(tx, ty); x.quadraticCurveTo(tx + Math.cos(a) * 50 * s, ty + Math.sin(a) * 50 * s - 14 * s, ex, ey); x.stroke();
+    for (let j = 1; j < 8; j++) { const k = j / 8, px = lerp(tx, ex, k), py = lerp(ty, ey, k) - Math.sin(k * Math.PI) * 14 * s; x.beginPath(); x.ellipse(px, py + 6 * s, 3 * s, 12 * s * (1 - k * 0.5), a + 1.2, 0, 7); x.fill(); x.beginPath(); x.ellipse(px, py - 6 * s, 3 * s, 12 * s * (1 - k * 0.5), a - 1.2, 0, 7); x.fill(); }
   }
-  x.restore();
+  x.lineCap = 'butt';
 }
-function bubble(txt, X, Y, k) {
-  if (k <= 0) return;
-  x.save(); x.globalAlpha = clamp(k * 4, 0, 1);
-  x.font = '800 24px system-ui, -apple-system, "Segoe UI", sans-serif';
-  const w = x.measureText(txt).width + 32, h = 44; const bx = clamp(X - w / 2, 10, W - w - 10), by = Y - h - 16;
-  const sc = 0.6 + 0.4 * Math.min(1, k * 6); x.translate(X, Y); x.scale(sc, sc); x.translate(-X, -Y);
-  x.fillStyle = '#fff'; x.strokeStyle = '#2a3550'; x.lineWidth = 3; rr(bx, by, w, h, 22); x.fill(); x.stroke();
-  x.beginPath(); x.moveTo(X - 10, by + h - 2); x.lineTo(X, Y - 2); x.lineTo(X + 12, by + h - 2); x.fill(); x.stroke();
-  x.fillStyle = '#fff'; x.fillRect(X - 9, by + h - 4, 20, 5);
-  x.fillStyle = '#1d2440'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(txt, bx + w / 2, by + h / 2 + 1);
-  x.restore();
-}
-function caption(txt, u) { // bandeau de lieu, en bas à gauche (u = secondes depuis son apparition)
-  if (u <= 0) return; const a = clamp(u * 4, 0, 1), k = u / 1.2;
-  x.save(); x.globalAlpha = a; x.textAlign = 'left'; x.font = '800 26px system-ui, sans-serif'; const w = x.measureText(txt).width + 36;
-  const X = lerp(-w, 24, ease(u * 2.5)); x.fillStyle = 'rgba(16,24,48,.72)'; rr(X, H - 78, w, 50, 25); x.fill();
-  x.fillStyle = '#fff'; x.textBaseline = 'middle'; x.fillText(txt, X + 18, H - 52); x.restore();
-}
-function bigWord(txt, X, Y, k, col) {
-  if (k <= 0 || k >= 1) return;
-  x.save(); x.translate(X, Y); const sc = k < 0.2 ? k / 0.2 * 1.2 : 1.2 - (k - 0.2) * 0.25; x.scale(sc, sc); x.rotate(-0.1);
-  x.globalAlpha = k > 0.75 ? (1 - k) / 0.25 : 1; x.font = '900 60px "Lilita One", system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
-  x.lineWidth = 10; x.strokeStyle = '#1d2440'; x.strokeText(txt, 0, 0); x.fillStyle = col || '#fff'; x.fillText(txt, 0, 0); x.restore();
-}
-function teide(X, Y, w, h, c, top, snow) { // silhouette du Teide (cône + Pico Viejo)
-  x.fillStyle = c; x.beginPath(); x.moveTo(X - w, Y); x.lineTo(X - w * 0.45, Y - h * 0.48); x.lineTo(X - w * 0.3, Y - h * 0.5); x.lineTo(X - w * 0.1, Y - h * 0.94);
-  x.lineTo(X - w * 0.03, Y - h); x.lineTo(X + w * 0.04, Y - h); x.lineTo(X + w * 0.12, Y - h * 0.93); x.lineTo(X + w * 0.55, Y - h * 0.3); x.lineTo(X + w, Y); x.fill();
-  if (top) { x.fillStyle = top; x.beginPath(); x.moveTo(X - w * 0.1, Y - h * 0.94); x.lineTo(X - w * 0.03, Y - h); x.lineTo(X + w * 0.04, Y - h); x.lineTo(X + w * 0.12, Y - h * 0.93); x.lineTo(X + w * 0.07, Y - h * 0.86); x.lineTo(X, Y - h * 0.9); x.lineTo(X - w * 0.06, Y - h * 0.86); x.fill(); }
-}
-function palm(X, Y, s, sway) {
-  x.strokeStyle = '#8a6a44'; x.lineWidth = 12 * s; x.lineCap = 'round'; x.beginPath(); x.moveTo(X, Y); x.quadraticCurveTo(X + 20 * s, Y - 90 * s, X + 10 * s + sway, Y - 170 * s); x.stroke(); x.lineCap = 'butt';
-  const tx = X + 10 * s + sway, ty = Y - 170 * s; x.fillStyle = '#2f8f4e';
-  for (let i = 0; i < 7; i++) { const a = -Math.PI + i * Math.PI / 6 + Math.sin(sway * 0.05 + i) * 0.05; x.save(); x.translate(tx, ty); x.rotate(a); x.beginPath(); x.ellipse(45 * s, 8 * s, 50 * s, 12 * s, 0.25, 0, 7); x.fill(); x.restore(); }
-}
-function clouds(y, t, sp, col, n, sz) { x.fillStyle = col; for (let i = 0; i < n; i++) { const cx = ((i * 197 + t * sp) % (W + 400)) - 200; for (let j = 0; j < 4; j++) { x.beginPath(); x.arc(cx + j * 38 * sz, y + Math.sin(i + j) * 10, (34 + (j % 2) * 16) * sz, 0, 7); x.fill(); } } }
-function seaOfClouds(y, t, light) { // la « mer de nuages »
-  x.fillStyle = light || '#f4f1ee'; x.fillRect(0, y + 20, W, H - y);
-  for (let i = -1; i < 14; i++) { const cx = i * 80 + ((t * 10) % 80); x.beginPath(); x.arc(cx, y + 22, 52 + (i % 3) * 10, Math.PI, 0); x.fill(); }
+function pine(X, Y, s, col) { // pin des Canaries (silhouette)
+  x.fillStyle = col; x.fillRect(X - 3 * s, Y - 30 * s, 6 * s, 30 * s);
+  for (let i = 0; i < 7; i++) { const yy = Y - 25 * s - i * 22 * s, w = (34 - i * 4) * s; x.beginPath(); x.moveTo(X - w, yy); x.quadraticCurveTo(X, yy - 26 * s, X + w, yy); x.quadraticCurveTo(X, yy - 10 * s, X - w, yy); x.fill(); x.beginPath(); x.ellipse(X, yy - 8 * s, w * 0.8, 10 * s, 0, 0, 7); x.fill(); }
+  x.beginPath(); x.moveTo(X - 6 * s, Y - 175 * s); x.lineTo(X, Y - 200 * s); x.lineTo(X + 6 * s, Y - 175 * s); x.fill();
 }
 
-// ---------- la carte de Tenerife (entre les scènes) ----------
-// Contour simplifié de l'île (Teno au nord-ouest, Anaga au nord-est, la pointe sud vers El Médano)
-const ISLE = [[120, 270], [150, 225], [205, 210], [260, 232], [330, 236], [400, 222], [470, 214], [540, 196], [610, 160], [680, 128], [740, 100], [800, 76], [860, 70], [872, 92], [830, 118], [770, 150], [715, 196], [672, 250], [640, 312], [612, 380], [585, 445], [550, 500], [512, 548], [470, 585], [432, 600], [400, 585], [360, 548], [310, 505], [255, 470], [205, 438], [160, 400], [128, 340]];
-const SPOTS = { // emplacements sur la carte
-  plage: [235, 460, '🏖️'], snorkel: [200, 410, '🤿'], siam: [262, 482, '🌊'], canyon: [520, 255, '🧗'], parapente: [520, 300, '🪂'], anaga: [770, 120, '🌿'], teide: [400, 330, '🌋'],
-};
-function drawMap(t, from, to, k, label) {
-  x.fillStyle = grad('#7ec8f2', '#3d8fd0'); x.fillRect(0, 0, W, H);
-  x.strokeStyle = 'rgba(255,255,255,.25)'; x.lineWidth = 2; for (let i = 0; i < 6; i++) { x.beginPath(); for (let X = 0; X <= W; X += 20) x.lineTo(X, 80 + i * 100 + Math.sin(X / 60 + t * 2 + i) * 6); x.stroke(); }
-  x.save(); x.translate(10, 20);
-  x.fillStyle = '#e9d9a8'; x.strokeStyle = '#fff'; x.lineWidth = 6; x.beginPath(); ISLE.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.fill(); x.stroke();
-  x.fillStyle = '#8fbf6a'; x.beginPath(); x.ellipse(720, 150, 90, 30, -0.5, 0, 7); x.fill(); x.beginPath(); x.ellipse(170, 250, 50, 28, 0.3, 0, 7); x.fill();
-  x.fillStyle = '#b7895a'; x.beginPath(); x.ellipse(410, 330, 120, 70, -0.1, 0, 7); x.fill();
-  teide(405, 340, 60, 70, '#7a4f33', '#fff');
-  const done = PLAN.filter(p => p.spot && p.t1 <= t).map(p => p.spot);
-  for (const k2 of Object.keys(SPOTS)) { const [a, b, e] = SPOTS[k2]; const on = done.includes(k2) || k2 == to; circ(a, b, on ? 22 : 0, '#fff'); if (on) { x.font = '24px system-ui'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(e, a, b + 1); } }
-  if (from && to) { const [a, b] = SPOTS[from], [c, d] = SPOTS[to]; x.setLineDash([8, 10]); x.strokeStyle = '#e0283f'; x.lineWidth = 4; x.beginPath(); x.moveTo(a, b); x.quadraticCurveTo((a + c) / 2, Math.min(b, d) - 80, lerp(a, c, ease(k)), lerp(b, d, ease(k)) - Math.sin(Math.PI * ease(k)) * 40); x.stroke(); x.setLineDash([]); }
-  if (to) { const [c, d] = SPOTS[to]; const kk = from ? ease(k) : 1; const [a, b] = from ? SPOTS[from] : [c, d]; const px = lerp(a, c, kk), py = lerp(b, d, kk) - Math.sin(Math.PI * kk) * 40 - 30; x.fillStyle = '#e0283f'; x.beginPath(); x.arc(px, py, 16, Math.PI, 0); x.lineTo(px, py + 26); x.closePath(); x.fill(); circ(px, py, 6, '#fff'); }
-  x.restore();
-  x.font = 'italic 700 40px Georgia, serif'; x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.35)'; x.shadowOffsetY = 3; x.fillText('Tenerife · août 2026', W / 2, 60); x.shadowColor = 'transparent';
-  if (label) caption(label, 1);
-}
-
-// ---------- les scènes ----------
-function sPlage(u, D) { // la plage, le Teide au loin, le soleil traverse le ciel
-  const k = u / D, sunX = lerp(120, 840, k), sunY = 170 - Math.sin(k * Math.PI) * 90;
-  x.fillStyle = grad('#5fb6f0', '#cfeefe', 0, 380); x.fillRect(0, 0, W, H);
-  circ(sunX, sunY, 46, '#fff4b0'); circ(sunX, sunY, 34, '#ffe066');
-  clouds(80, u * 3, 40, 'rgba(255,255,255,.9)', 5, 0.7);
-  teide(700, 330, 230, 190, '#9a7d6a', '#e9e3dc');
-  x.fillStyle = '#1e8cc9'; x.fillRect(0, 320, W, 80); x.fillStyle = '#3aa7de'; for (let i = 0; i < 12; i++) { x.fillRect(((i * 120 + u * 60) % (W + 100)) - 50, 340 + (i % 3) * 18, 60, 4); }
-  x.fillStyle = '#f2d59b'; x.beginPath(); x.moveTo(0, 390); for (let X = 0; X <= W; X += 40) x.lineTo(X, 392 + Math.sin(X / 90 + u * 2) * 5); x.lineTo(W, H); x.lineTo(0, H); x.fill();
-  palm(90, 520, 1.1, Math.sin(u * 1.5) * 6); palm(880, 500, 0.9, Math.sin(u * 1.3 + 1) * 6);
-  // parasol + serviette
-  x.strokeStyle = '#eee'; x.lineWidth = 6; x.beginPath(); x.moveTo(640, 560); x.lineTo(660, 400); x.stroke();
-  for (let i = 0; i < 6; i++) { x.fillStyle = i % 2 ? '#fff' : '#e0283f'; x.beginPath(); x.moveTo(660, 395); x.arc(660, 420, 120, Math.PI + i * Math.PI / 6, Math.PI + (i + 1) * Math.PI / 6); x.fill(); }
-  x.fillStyle = '#3fb6b0'; x.save(); x.translate(560, 560); x.rotate(-0.05); rr(-120, -18, 240, 36, 6); x.fill(); x.restore();
-  // Valentin enterré dans le sable, Célestine qui rit à côté
-  x.fillStyle = '#e7c58a'; x.beginPath(); x.ellipse(330, 548, 140, 40, 0, Math.PI, 0); x.fill();
-  const im = IMG.v; if (im) x.drawImage(im, 186, 440 + Math.sin(u * 3) * 2, 64, 64 * im.height / im.width);
-  x.fillStyle = '#d6b072'; [[300, 530], [360, 522], [420, 532]].forEach(([a, b]) => { x.beginPath(); x.arc(a, b, 16, Math.PI, 0); x.fill(); });
-  x.fillStyle = '#c99c5a'; x.fillRect(440, 488, 34, 40); x.fillRect(436, 482, 10, 8); x.fillRect(452, 482, 10, 8); x.fillRect(468, 482, 10, 8); // château
-  person({ X: 520, Y: 600, s: 0.5, face: 'c', topSkin: 1, bikini: '#ff6fa8', shorts: '#ff6fa8', hair: '#4a2a18', armL: 1.2 + Math.sin(u * 6) * 0.2, armR: 0.5, legL: 0.1, legR: -0.1 });
-  if (u > 0.8 && u < 3) bubble('Bouge pas, c’est artistique ! 😂', 520, 380, Math.min(u - 0.8, 3 - u));
-  if (u > 2.9) bubble('Sortez-moi de là ! 😩', 220, 430, Math.min(u - 2.9, D - u));
-}
-function sSnorkel(u, D) { // sous l'eau, avec une tortue
-  x.fillStyle = grad('#2bb6d8', '#0a4f86'); x.fillRect(0, 0, W, H);
-  for (let i = 0; i < 6; i++) { x.fillStyle = 'rgba(255,255,255,.07)'; x.beginPath(); const a = 120 + i * 150 + Math.sin(u + i) * 20; x.moveTo(a, 0); x.lineTo(a + 60, 0); x.lineTo(a - 60, H); x.lineTo(a - 140, H); x.fill(); }
-  x.fillStyle = '#d9c38f'; x.beginPath(); x.moveTo(0, 560); for (let X = 0; X <= W; X += 40) x.lineTo(X, 560 + Math.sin(X / 70) * 12); x.lineTo(W, H); x.lineTo(0, H); x.fill();
-  x.fillStyle = '#2e2a2e'; [[120, 560, 90, 50], [700, 570, 120, 60], [880, 560, 70, 40]].forEach(([a, b, w, h]) => { x.beginPath(); x.ellipse(a, b, w, h, 0, Math.PI, 0); x.fill(); });
-  x.strokeStyle = '#2f8f5b'; x.lineWidth = 5; for (let i = 0; i < 14; i++) { const a = 40 + i * 70; x.beginPath(); x.moveTo(a, 575); x.quadraticCurveTo(a + Math.sin(u * 2 + i) * 14, 535, a + Math.sin(u * 2 + i) * 18, 505); x.stroke(); }
-  // bancs de poissons
-  for (let i = 0; i < 18; i++) { const fx = (i * 83 + u * (60 + (i % 3) * 20)) % (W + 80) - 40, fy = 120 + (i % 6) * 55 + Math.sin(u * 3 + i) * 8; x.fillStyle = ['#ffd23c', '#ff8a3c', '#7fe0ff'][i % 3]; x.beginPath(); x.ellipse(fx, fy, 14, 7, 0, 0, 7); x.fill(); x.beginPath(); x.moveTo(fx - 12, fy); x.lineTo(fx - 22, fy - 7); x.lineTo(fx - 22, fy + 7); x.fill(); }
-  // la tortue
-  const tx = lerp(1060, -160, u / D), ty = 450 + Math.sin(u * 1.5) * 16, fl = Math.sin(u * 4) * 0.5;
-  x.save(); x.translate(tx, ty); x.scale(-1, 1);
-  x.fillStyle = '#7fa65a'; [[-50, -30, fl], [-50, 30, -fl], [50, -26, -fl * 0.6], [50, 26, fl * 0.6]].forEach(([a, b, r]) => { x.save(); x.translate(a, b); x.rotate(r + (b < 0 ? -0.6 : 0.6)); x.beginPath(); x.ellipse(0, b < 0 ? -22 : 22, 18, 40, 0, 0, 7); x.fill(); x.restore(); });
-  x.beginPath(); x.ellipse(-92, 0, 26, 20, 0, 0, 7); x.fill(); circ(-102, -6, 4, '#222');
-  x.fillStyle = '#6b4a2a'; x.beginPath(); x.ellipse(0, 0, 80, 56, 0, 0, 7); x.fill(); x.strokeStyle = '#a8814f'; x.lineWidth = 4;
-  [[0, 0, 26, 20], [-44, -10, 18, 16], [44, -10, 18, 16], [-30, 30, 18, 14], [30, 30, 18, 14]].forEach(([a, b, w, h]) => { x.beginPath(); x.ellipse(a, b, w, h, 0, 0, 7); x.stroke(); });
-  x.restore();
-  // Célestine et Valentin qui nagent (masque + tuba)
-  const sw = Math.sin(u * 5) * 0.25;
-  person({ X: 300 + u * 12, Y: 170, rot: -Math.PI / 2 + 0.1, s: 0.42, face: 'c', topSkin: 1, bikini: '#ff6fa8', shorts: '#ff6fa8', hair: '#4a2a18', mask: 1, armL: 2.6, armR: 0.3, legL: sw, legR: -sw, feet: '#2b6fe0' });
-  person({ X: 380 + u * 12, Y: 300, rot: -Math.PI / 2 + 0.05, s: 0.42, face: 'v', topSkin: 1, shorts: '#e0283f', mask: 1, armL: 2.8, armR: 0.2, legL: -sw, legR: sw, feet: '#2b6fe0' });
-  for (let i = 0; i < 10; i++) { const k = (u * 0.8 + i * 0.1) % 1; circ(470 + u * 12 + Math.sin(i * 3) * 10, 300 - 130 - k * 140 - 40, 4 + (i % 3) * 2, 'rgba(255,255,255,.6)'); }
-  if (u > 0.8 && u < 3.2) bubble('Une tortue !! 🐢', 360, 90, Math.min(u - 0.8, 3.2 - u));
-}
-function sSiam(u, D) { // Siam Park : le temple thaï et la Tower of Power
-  x.fillStyle = grad('#4fb2ee', '#d4f0ff', 0, 420); x.fillRect(0, 0, W, H);
-  clouds(70, u * 2, 30, 'rgba(255,255,255,.9)', 5, 0.6);
-  palm(60, 470, 1.2, Math.sin(u) * 5); palm(910, 460, 1.0, Math.sin(u + 2) * 5);
-  // le temple
-  const TX = 300, TY = 470;
-  x.fillStyle = '#f3e3c3'; x.fillRect(TX - 110, TY - 150, 220, 150);
-  for (let i = 0; i < 4; i++) { const w = 150 - i * 30, y0 = TY - 150 - i * 44; x.fillStyle = i % 2 ? '#c0392b' : '#a5281f'; x.beginPath(); x.moveTo(TX - w, y0); x.lineTo(TX - w + 40, y0 - 44); x.lineTo(TX + w - 40, y0 - 44); x.lineTo(TX + w, y0); x.fill(); x.fillStyle = '#e6b422'; x.fillRect(TX - w, y0 - 4, 2 * w, 6); x.beginPath(); x.moveTo(TX - w, y0); x.lineTo(TX - w - 22, y0 - 26); x.lineTo(TX - w + 6, y0 - 6); x.fill(); x.beginPath(); x.moveTo(TX + w, y0); x.lineTo(TX + w + 22, y0 - 26); x.lineTo(TX + w - 6, y0 - 6); x.fill(); }
-  x.fillStyle = '#e6b422'; x.beginPath(); x.moveTo(TX - 14, TY - 326); x.lineTo(TX, TY - 400); x.lineTo(TX + 14, TY - 326); x.fill();
-  x.fillStyle = '#7a2a10'; rr(TX - 26, TY - 70, 52, 70, 20); x.fill();
-  // le toboggan presque vertical
-  const top = [TX + 90, TY - 280];
-  x.strokeStyle = '#1f7fd1'; x.lineWidth = 34; x.lineCap = 'round'; x.beginPath(); x.moveTo(...top); x.quadraticCurveTo(TX + 120, TY - 40, TX + 300, TY + 20); x.stroke();
-  x.strokeStyle = '#59b6ff'; x.lineWidth = 14; x.stroke(); x.lineCap = 'butt';
-  // piscine à vagues
-  x.fillStyle = '#20b2c9'; x.fillRect(0, 490, W, 150); x.fillStyle = '#fff8e3'; x.fillRect(0, 470, W, 26);
-  x.fillStyle = 'rgba(255,255,255,.5)'; for (let i = 0; i < 9; i++) { const wx = ((i * 130 + u * 80) % (W + 120)) - 60; x.beginPath(); x.ellipse(wx, 520 + (i % 3) * 30, 50, 6, 0, 0, 7); x.fill(); }
-  // Célestine sur sa bouée qui regarde
-  circ(760, 540, 46, '#ff5a8c'); circ(760, 540, 20, '#20b2c9');
-  x.save(); x.beginPath(); x.rect(0, 0, W, 545); x.clip();
-  person({ X: 760, Y: 660 + Math.sin(u * 3) * 4, s: 0.5, face: 'c', topSkin: 1, bikini: '#ff6fa8', shorts: '#ff6fa8', hair: '#4a2a18', armL: 1.4, armR: 1.4 });
-  x.restore();
-  // Valentin : en haut, puis la chute
-  const go = 1.6, kk = clamp((u - go) / 0.9, 0, 1);
-  if (u < go) { person({ X: top[0] + 10, Y: top[1] + 4, s: 0.34, face: 'v', topSkin: 1, shorts: '#e0283f', armL: 0.2 + Math.sin(u * 12) * 0.1, armR: 0.2, legL: Math.sin(u * 14) * 0.08 }); bubble('28 mètres… presque à la verticale ?! 😰', top[0] + 10, top[1] - 160, Math.min(u, go - u)); }
-  else if (kk < 1) { const t2 = kk * kk; const px = lerp(top[0], TX + 300, t2), py = lerp(top[1], TY + 10, Math.pow(kk, 1.4)); person({ X: px, Y: py, rot: -1.2, s: 0.34, face: 'v', topSkin: 1, shorts: '#e0283f', armL: 2.8, armR: 2.8 }); }
-  if (u > go + 0.9) { const k3 = (u - go - 0.9); x.fillStyle = 'rgba(255,255,255,' + clamp(1 - k3, 0, 1) + ')'; for (let i = 0; i < 14; i++) { const a = Math.PI + i / 13 * Math.PI; x.beginPath(); x.arc(TX + 310 + Math.cos(a) * (30 + k3 * 120), TY + 30 + Math.sin(a) * (20 + k3 * 90), 10, 0, 7); x.fill(); } bigWord('SPLASH !', TX + 320, TY - 80, k3 / 1.2, '#bfe9ff'); }
-  if (u > go + 1.6) { const im = IMG.v; if (im) x.drawImage(im, TX + 280, 486 + Math.sin(u * 4) * 3, 60, 60 * im.height / im.width); bubble('Encore !! 🤩', TX + 310, 470, Math.min(u - go - 1.6, D - u)); }
-}
-function sCanyon(u, D) { // canyon de cendres volcaniques, descente en rappel
-  x.fillStyle = grad('#7cc4f0', '#e8f4fb', 0, 200); x.fillRect(0, 0, W, H);
-  const layer = (pts, c) => { x.fillStyle = c; x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.fill(); };
-  layer([[0, 0], [380, 0], [360, 120], [400, 260], [370, 420], [420, 640], [0, 640]], '#c9783e');
-  layer([[960, 0], [600, 0], [620, 140], [580, 300], [640, 460], [600, 640], [960, 640]], '#b8672f');
-  for (let i = 0; i < 9; i++) { x.strokeStyle = i % 2 ? '#e09a5a' : '#a85a2a'; x.lineWidth = 6; x.beginPath(); x.moveTo(0, 60 + i * 64); x.quadraticCurveTo(200, 40 + i * 64, 380, 70 + i * 64); x.stroke(); x.beginPath(); x.moveTo(600, 70 + i * 64); x.quadraticCurveTo(780, 50 + i * 64, 960, 80 + i * 64); x.stroke(); }
-  x.fillStyle = '#6f9e3c'; [[120, 200], [300, 360], [700, 240], [860, 420], [60, 520]].forEach(([a, b]) => { x.beginPath(); x.ellipse(a, b, 50, 18, 0.2, 0, 7); x.fill(); });
-  // l'arche de roche
-  x.fillStyle = '#9a5428'; x.beginPath(); x.moveTo(370, 120); x.quadraticCurveTo(490, 60, 610, 130); x.lineTo(610, 160); x.quadraticCurveTo(490, 100, 375, 150); x.fill();
-  x.fillStyle = '#8a7a66'; x.fillRect(380, 610, 240, 30);
-  // la corde + Célestine qui descend la paroi
-  const k = ease(u / (D - 0.4)), cy = lerp(170, 520, k);
-  x.strokeStyle = '#ff3c6e'; x.lineWidth = 5; x.beginPath(); x.moveTo(395, 150); x.lineTo(470, cy - 40); x.lineTo(470, 640); x.stroke();
-  person({ X: 392, Y: cy, rot: 1.15, s: 0.42, face: 'c', top: '#ff6fa8', bot: '#3a3f5a', hair: '#4a2a18', helmet: '#ffcc1f', harness: 1, armL: 2.9, armR: 0.6, legL: 0.25 + Math.sin(u * 4) * 0.15, legR: -0.1 });
-  // Valentin en bas qui assure
-  person({ X: 520, Y: 615, s: 0.42, face: 'v', top: '#e0283f', bot: '#26365e', helmet: '#3cc1ff', harness: 1, armL: -2.4, armR: 0.6 });
-  if (u > 0.4 && u < 2.3) bubble('Je regarde pas en bas 😬', 560, cy - 120, Math.min(u - 0.4, 2.3 - u));
-  if (u > 2.4) bubble('Je te tiens, mon cœur ❤️', 520, 420, Math.min(u - 2.4, D - u));
-}
-function sParapente(u, D) { // décollage au-dessus de la mer de nuages, descente vers la côte
-  const k = u / D;
-  x.fillStyle = grad('#2f7fd6', '#b9ddfb'); x.fillRect(0, 0, W, H);
-  // le Teide au loin, au-dessus des nuages
-  teide(220 - k * 120, 420 + k * 140, 260, 260, '#8a6550', '#f1e8e0');
-  seaOfClouds(400 + k * 160, u, '#fbf8f4');
-  // la côte qui apparaît sous les nuages à la fin
-  if (k > 0.6) { const a = (k - 0.6) / 0.4; x.globalAlpha = a; x.fillStyle = '#1c7fc4'; x.fillRect(0, 590, W, 50); x.fillStyle = '#c9b07a'; x.beginPath(); x.moveTo(0, 600); x.quadraticCurveTo(400, 570, 960, 610); x.lineTo(960, 640); x.lineTo(0, 640); x.fill(); x.globalAlpha = 1; }
-  clouds(120, u * 6, 40, 'rgba(255,255,255,.85)', 4, 0.6);
-  const wing = (X, Y, c1, c2, face, top, hair) => {
-    x.fillStyle = c1; x.beginPath(); x.ellipse(X, Y - 170, 140, 34, 0, Math.PI, 0); x.fill();
-    for (let i = 0; i < 7; i++) { x.fillStyle = i % 2 ? c1 : c2; x.beginPath(); x.moveTo(X, Y - 170); x.ellipse(X, Y - 170, 140, 34, 0, Math.PI + i * Math.PI / 7, Math.PI + (i + 1) * Math.PI / 7); x.fill(); }
-    x.strokeStyle = 'rgba(40,40,40,.55)'; x.lineWidth = 1.5; for (let i = -3; i <= 3; i++) { x.beginPath(); x.moveTo(X + i * 44, Y - 172); x.lineTo(X, Y - 60); x.stroke(); }
-    person({ X: X + 12, Y: Y + 30, s: 0.26, face: null, top: '#2a2f3a', bot: '#2a2f3a', helmet: '#e0283f', legL: -1.1, legR: -1.0, armL: 2.7, armR: 2.7 }); // le pilote (moniteur)
-    person({ X: X - 8, Y: Y + 22, s: 0.3, face, top, bot: '#26365e', hair, helmet: '#ffffff', legL: -1.2, legR: -1.0, armL: 1.8 + Math.sin(u * 3) * 0.3, armR: 1.6 });
+// ---------- les silhouettes du couple ----------
+// o : X,Y (pieds), s (taille), who ('v'|'c'), top/bot (vêtements), sil (couleur unie, pour les contre-jours), rim (liseré lumineux), pose
+function figure(o) {
+  const s = o.s || 1, P = o.pose || {};
+  const draw = (fill, dx) => {
+    x.save(); x.translate(o.X + dx, o.Y); x.rotate(P.rot || 0);
+    const skin = fill || '#e9b796', top = fill || o.top, bot = fill || o.bot, hair = fill || (o.who == 'c' ? '#4a2a18' : '#231a14');
+    x.lineCap = 'round';
+    const leg = (a, b) => { x.strokeStyle = bot; x.lineWidth = 9 * s; x.beginPath(); x.moveTo(a * 5 * s, -46 * s); const kx = a * 5 * s + Math.sin(b) * 22 * s, ky = -46 * s + Math.cos(b) * 22 * s; x.lineTo(kx, ky); x.lineTo(kx + Math.sin(b) * 2 * s, ky + 22 * s); x.stroke(); };
+    if (P.sit) { x.strokeStyle = bot; x.lineWidth = 9 * s; x.beginPath(); x.moveTo(-4 * s, -18 * s); x.lineTo(14 * s, -20 * s); x.lineTo(16 * s, 0); x.moveTo(4 * s, -18 * s); x.lineTo(20 * s, -18 * s); x.lineTo(24 * s, 0); x.stroke(); }
+    else { leg(-1, P.l1 || 0); leg(1, P.l2 || 0); }
+    const by = P.sit ? 28 * s : 0;
+    x.fillStyle = top; x.beginPath(); x.roundRect(-11 * s, -84 * s + by, 22 * s, 40 * s, 8 * s); x.fill();
+    const arm = (side, a) => { x.strokeStyle = top; x.lineWidth = 7 * s; x.beginPath(); x.moveTo(side * 9 * s, -78 * s + by); const ex = side * 9 * s + Math.sin(a) * side * 30 * s, ey = -78 * s + by + Math.cos(a) * 30 * s; x.lineTo(ex, ey); x.stroke(); x.fillStyle = skin; circ(ex, ey, 3.6 * s); };
+    arm(-1, P.a1 ?? 0.15); arm(1, P.a2 ?? 0.15);
+    x.fillStyle = skin; circ(0, -95 * s + by, 10 * s);
+    x.fillStyle = hair;
+    if (o.who == 'c') { x.beginPath(); x.ellipse(0, -97 * s + by, 11.5 * s, 11 * s, 0, Math.PI * 1.02, Math.PI * 1.98); x.fill(); x.beginPath(); x.moveTo(-11 * s, -98 * s + by); x.quadraticCurveTo(-14 * s, -70 * s + by, -9 * s + (P.wind || 0), -62 * s + by); x.lineTo(9 * s + (P.wind || 0), -62 * s + by); x.quadraticCurveTo(14 * s, -70 * s + by, 11 * s, -98 * s + by); x.fill(); }
+    else { x.beginPath(); x.ellipse(0, -99 * s + by, 10.5 * s, 8 * s, 0, Math.PI, 0); x.fill(); circ(0, -96 * s + by, 9.5 * s); }
+    if (o.helmet) { x.fillStyle = fill || o.helmet; x.beginPath(); x.ellipse(0, -100 * s + by, 12 * s, 9 * s, 0, Math.PI, 0); x.fill(); }
+    x.restore();
   };
-  // le moniteur a un casque intégral : on cache son visage
-  const px = lerp(180, 680, k), py = lerp(210, 330, k) + Math.sin(u * 1.4) * 12;
-  wing(px, py, '#ff5a3c', '#ffd23c', 'v', '#e0283f');
-  wing(px + 190, py + 60 + Math.sin(u * 1.2 + 1) * 10, '#3cb8ff', '#ffffff', 'c', '#ff6fa8', '#4a2a18');
-  caption('🪂 Parapente depuis le Teide · 2 200 m', u);
-  if (u > 0.7 && u < 2.6) bubble('On vole au-dessus des nuages !! 😍', px + 40, py - 70, Math.min(u - 0.7, 2.6 - u));
-  if (u > 2.6) bubble('Waouh… la mer ! 🌊', px + 180, py - 160, Math.min(u - 2.6, D - u));
+  if (o.rim) draw(o.rim, -1.4 * s);
+  draw(o.sil || null, 0);
 }
-function sAnaga(u, D) { // la forêt de lauriers d'Anaga, brume et mousse
-  const off = u * 70;
-  x.fillStyle = grad('#cfe2d3', '#7fa58a'); x.fillRect(0, 0, W, H);
-  for (let L = 0; L < 3; L++) {
-    const sp = [0.3, 0.6, 1][L], col = ['#7f9f86', '#4f7a5a', '#2f5a3a'][L];
-    for (let i = 0; i < 9; i++) {
-      const X = ((i * 140 + 60 - off * sp) % (W + 200) + W + 200) % (W + 200) - 100, h = 420 + (i % 3) * 60;
-      x.strokeStyle = col; x.lineWidth = 18 - L * 3 + (i % 2) * 6; x.lineCap = 'round'; x.beginPath(); x.moveTo(X, H); x.bezierCurveTo(X + 30, H - h * 0.4, X - 40, H - h * 0.7, X + 20, H - h); x.stroke();
-      x.beginPath(); x.moveTo(X + 5, H - h * 0.55); x.quadraticCurveTo(X + 60, H - h * 0.7, X + 90, H - h * 0.85); x.stroke(); x.lineCap = 'butt';
-      x.fillStyle = ['#8fb08a', '#5f8f5f', '#3f7a46'][L]; for (let j = 0; j < 5; j++) { x.beginPath(); x.arc(X + 20 + Math.cos(j * 1.3) * 70, H - h - 10 + Math.sin(j * 1.7) * 40, 60 - L * 8, 0, 7); x.fill(); }
+
+// ---------- texte : carte de lieu élégante ----------
+function placeCard(step, total, name, sub, u, D) {
+  const a = smooth(0.3, 1.0, u) * (1 - smooth(D - 1.0, D - 0.35, u));
+  if (a <= 0) return;
+  x.save(); x.globalAlpha = a;
+  const X = 44, Y = H - 92;
+  x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 14;
+  x.fillStyle = 'rgba(255,255,255,.92)'; x.font = '600 13px Inter'; x.letterSpacing = '3px';
+  x.fillText(`TENERIFE  ·  ${String(step).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, X, Y);
+  x.letterSpacing = '0px'; x.font = 'italic 600 42px "Crimson Text"'; x.fillStyle = '#fff'; x.fillText(name, X, Y + 42);
+  if (sub) { x.font = '300 16px Inter'; x.fillStyle = 'rgba(255,255,255,.9)'; x.fillText(sub, X, Y + 66); }
+  x.shadowBlur = 0; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillRect(X, Y + 10, lerp(0, 60, smooth(0.4, 1.4, u)), 1.5);
+  x.restore();
+}
+
+// ---------- précalculs (étoiles, grain) ----------
+const STARS = (() => { const R = rand(7); return Array.from({ length: 900 }, () => { const a = R(), b = R(); const band = R() < 0.55; const X = a * W, Y = band ? (b - 0.5) * 120 + 470 - X * 0.5 + (R() - 0.5) * 60 : b * 520; return [X, Y, R() * 1.3 + 0.2, R(), band]; }); })();
+const GRAIN = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 256; const g = c.getContext('2d'), d = g.createImageData(256, 256), R = rand(3); for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (R() - 0.5) * 70; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } g.putImageData(d, 0, 0); return c; })();
+
+// =====================================================================
+//  LES SCÈNES (u = temps dans la scène, D = durée)
+// =====================================================================
+function sIntro(u, D) {
+  x.fillStyle = vgrad([[0, '#0f3b4d'], [1, '#08202c']]); x.fillRect(0, 0, W, H);
+  glow(480, 300, 420, '#2f7d8f', 0.35);
+  // l'île (contour simplifié, vue du dessus) avec un léger relief
+  const ISLE = [[160, 330], [190, 285], [245, 270], [300, 290], [370, 292], [440, 280], [505, 272], [570, 252], [635, 218], [700, 186], [760, 158], [820, 134], [870, 128], [880, 148], [840, 174], [782, 208], [730, 252], [690, 306], [660, 364], [632, 428], [600, 482], [562, 526], [520, 560], [482, 572], [448, 560], [408, 524], [360, 486], [306, 452], [252, 424], [204, 394]];
+  x.save(); x.globalAlpha = smooth(0, 0.9, u);
+  x.shadowColor = 'rgba(0,0,0,.4)'; x.shadowBlur = 30; x.fillStyle = '#e9dcc0'; x.beginPath(); ISLE.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.fill(); x.shadowBlur = 0;
+  x.save(); x.clip();
+  const rg = x.createRadialGradient(455, 380, 10, 455, 380, 230); rg.addColorStop(0, '#9b7a5e'); rg.addColorStop(0.45, '#c8b08a'); rg.addColorStop(1, 'rgba(233,220,192,0)'); x.fillStyle = rg; x.fillRect(0, 0, W, H);
+  x.fillStyle = 'rgba(110,150,90,.35)'; x.beginPath(); x.ellipse(800, 160, 110, 34, -0.5, 0, 7); x.fill(); x.beginPath(); x.ellipse(220, 320, 70, 34, 0.3, 0, 7); x.fill();
+  x.restore();
+  x.strokeStyle = 'rgba(255,255,255,.7)'; x.lineWidth = 2; x.beginPath(); ISLE.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.stroke();
+  // le Teide
+  x.fillStyle = '#6b4c38'; x.beginPath(); x.moveTo(430, 392); x.lineTo(455, 360); x.lineTo(480, 392); x.fill(); x.fillStyle = '#fff'; x.beginPath(); x.moveTo(449, 368); x.lineTo(455, 360); x.lineTo(461, 368); x.fill();
+  // l'itinéraire, dans l'ordre du voyage : plage, Teide (soleil puis étoiles), Siam Park, canyon, Anaga, parapente, Santiago del Teide, Masca
+  const R = [[290, 470], [455, 372], [262, 440], [540, 300], [800, 160], [570, 330], [255, 365], [205, 330]];
+  const k = smooth(0.8, D - 0.4, u) * (R.length - 1);
+  x.setLineDash([6, 8]); x.strokeStyle = '#e0283f'; x.lineWidth = 3;
+  const seg = (a, b, f) => { const cx = (a[0] + b[0]) / 2 + (b[1] - a[1]) * 0.25, cy = (a[1] + b[1]) / 2 - (b[0] - a[0]) * 0.25; x.beginPath(); x.moveTo(...a); for (let q = 0.05; q <= f + 1e-6; q += 0.05) { const m = 1 - q; x.lineTo(m * m * a[0] + 2 * m * q * cx + q * q * b[0], m * m * a[1] + 2 * m * q * cy + q * q * b[1]); } x.stroke(); };
+  for (let i = 0; i < R.length - 1 && i < k; i++) seg(R[i], R[i + 1], Math.min(1, k - i)); x.setLineDash([]);
+  R.forEach(([a, b], i) => { if (i <= k + 0.01) { x.fillStyle = '#fff'; circ(a, b, 6); x.fillStyle = '#e0283f'; circ(a, b, 3.5); } });
+  x.restore();
+  // titre
+  const ta = smooth(0.2, 1.2, u);
+  x.save(); x.globalAlpha = ta; x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 18;
+  x.font = 'italic 600 72px "Crimson Text"'; x.fillText('Tenerife', W / 2, 108);
+  x.font = '300 18px Inter'; x.letterSpacing = '6px'; x.fillText('AOÛT 2026', W / 2, 142); x.restore();
+}
+
+function sPlage(u, D) {
+  const dive = smooth(2.9, 3.7, u); // 0 = plage, 1 = sous l'eau
+  if (dive < 1) {
+    x.save(); x.translate(0, -dive * H);
+    x.fillStyle = vgrad([[0, '#3f8fd6'], [0.55, '#9fd0f2'], [0.7, '#e6f3fa']], 0, 330); x.fillRect(0, 0, W, 340);
+    glow(230, 90, 260, '#fff6d8', 0.75); x.fillStyle = '#fffbe9'; circ(230, 90, 26);
+    // le Teide au loin dans la brume
+    teide(720, 300, 170, 150, 'rgba(140,165,190,.55)', 'rgba(255,255,255,.6)');
+    // la mer
+    x.fillStyle = vgrad([[0, '#1f6fa8'], [0.6, '#2b9ec4'], [1, '#5fd0d6']], 290, 430); x.fillRect(0, 290, W, 150);
+    for (let i = 0; i < 70; i++) { const X = (i * 137.5 + u * 18 * (1 + (i % 3))) % W, Y = 296 + (i * 53) % 120; x.fillStyle = 'rgba(255,255,255,' + (0.25 + 0.5 * Math.abs(Math.sin(u * 3 + i))) + ')'; x.fillRect(X, Y, 8 + (i % 5) * 4, 1.5); }
+    // vagues qui montent sur le sable
+    const wv = (u * 0.45) % 1;
+    x.fillStyle = '#e9cf98'; x.beginPath(); x.moveTo(0, 430); for (let X = 0; X <= W; X += 20) x.lineTo(X, 422 + Math.sin(X / 110) * 8); x.lineTo(W, H); x.lineTo(0, H); x.fill();
+    x.fillStyle = 'rgba(160,130,90,.35)'; x.beginPath(); x.moveTo(0, 430); for (let X = 0; X <= W; X += 20) x.lineTo(X, 430 + Math.sin(X / 110) * 8 + 18 * Math.sin(wv * Math.PI)); x.lineTo(W, 470); x.lineTo(0, 470); x.fill();
+    x.fillStyle = 'rgba(255,255,255,.75)'; x.beginPath(); for (let X = 0; X <= W; X += 20) x.lineTo(X, 424 + Math.sin(X / 110) * 8 + 26 * Math.sin(wv * Math.PI) + Math.sin(X / 23 + u) * 2); for (let X = W; X >= 0; X -= 20) x.lineTo(X, 418 + Math.sin(X / 110) * 8 + 22 * Math.sin(wv * Math.PI)); x.fill();
+    const R = rand(5); for (let i = 0; i < 260; i++) { x.fillStyle = 'rgba(150,110,60,' + R() * 0.25 + ')'; x.fillRect(R() * W, 470 + R() * 170, 2, 2); }
+    // palmiers en contre-jour à droite
+    palm(860, 640, 1.3, Math.sin(u * 0.9) * 6, 'rgba(40,70,50,.95)'); palm(940, 600, 1.0, Math.sin(u * 0.8 + 1) * 5, 'rgba(40,70,50,.85)');
+    // la serviette et le couple, de dos, qui regarde la mer
+    x.fillStyle = '#e8577a'; x.beginPath(); x.moveTo(380, 560); x.lineTo(560, 556); x.lineTo(578, 598); x.lineTo(372, 604); x.fill(); x.fillStyle = 'rgba(255,255,255,.6)'; for (let i = 0; i < 5; i++) x.fillRect(388 + i * 38, 557, 12, 44);
+    figure({ X: 435, Y: 585, s: 1.15, who: 'v', top: '#e9b796', bot: '#2a5a8a', pose: { sit: 1, a1: 0.5, a2: -0.3 } });
+    figure({ X: 478, Y: 586, s: 1.08, who: 'c', top: '#e8577a', bot: '#e9b796', pose: { sit: 1, a1: 0.4, a2: 0.2, rot: -0.12, wind: Math.sin(u * 2) * 1.5 } });
+    // mouettes
+    for (let i = 0; i < 3; i++) { const X = (300 + i * 90 + u * 30) % W, Y = 150 + i * 22 + Math.sin(u * 2 + i) * 6; x.strokeStyle = 'rgba(40,50,70,.7)'; x.lineWidth = 2; x.beginPath(); x.moveTo(X - 9, Y); x.quadraticCurveTo(X - 4, Y - 6 - Math.sin(u * 8 + i) * 3, X, Y); x.quadraticCurveTo(X + 4, Y - 6 - Math.sin(u * 8 + i) * 3, X + 9, Y); x.stroke(); }
+    x.restore();
+  }
+  if (dive > 0) { // sous l'eau : snorkeling avec une tortue
+    const v = u - 2.9;
+    x.save(); x.translate(0, (1 - dive) * H);
+    x.fillStyle = vgrad([[0, '#3fc0dd'], [0.45, '#1784b5'], [1, '#08355f']]); x.fillRect(0, 0, W, H);
+    x.save(); x.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 7; i++) { const a = 80 + i * 140 + Math.sin(v * 0.7 + i) * 30; const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(200,250,255,.22)'); g.addColorStop(1, 'rgba(200,250,255,0)'); x.fillStyle = g; x.beginPath(); x.moveTo(a, 0); x.lineTo(a + 50, 0); x.lineTo(a - 60, H); x.lineTo(a - 150, H); x.fill(); }
+    x.restore();
+    // surface ondulée vue de dessous
+    x.fillStyle = 'rgba(220,255,255,.35)'; x.beginPath(); x.moveTo(0, 0); for (let X = 0; X <= W; X += 12) x.lineTo(X, 18 + Math.sin(X / 40 + v * 3) * 5); x.lineTo(W, 0); x.fill();
+    // fond rocheux et caustiques
+    x.fillStyle = '#c7b48a'; x.beginPath(); x.moveTo(0, 580); for (let X = 0; X <= W; X += 30) x.lineTo(X, 575 + Math.sin(X / 80) * 14); x.lineTo(W, H); x.lineTo(0, H); x.fill();
+    x.fillStyle = '#26303a'; [[90, 600, 120, 70], [620, 610, 160, 80], [880, 590, 90, 60]].forEach(([a, b, w, h]) => { x.beginPath(); x.ellipse(a, b, w, h, 0, Math.PI, 0); x.fill(); });
+    x.save(); x.globalCompositeOperation = 'lighter'; x.strokeStyle = 'rgba(255,255,220,.18)'; x.lineWidth = 2; for (let i = 0; i < 14; i++) { x.beginPath(); for (let X = 0; X <= W; X += 20) x.lineTo(X, 590 + i * 4 + Math.sin(X / 25 + v * 4 + i * 2) * 3); x.stroke(); } x.restore();
+    // poissons
+    for (let i = 0; i < 26; i++) { const X = (i * 61 + v * (40 + (i % 4) * 15)) % (W + 60) - 30, Y = 220 + (i % 7) * 38 + Math.sin(v * 2 + i) * 6; x.fillStyle = ['#ffd75a', '#9fe6ff', '#ffb070'][i % 3]; x.beginPath(); x.ellipse(X, Y, 9, 4, 0, 0, 7); x.fill(); x.beginPath(); x.moveTo(X - 8, Y); x.lineTo(X - 15, Y - 4); x.lineTo(X - 15, Y + 4); x.fill(); }
+    // la tortue verte qui plane
+    const tx = lerp(1000, 300, smooth(0, 3.4, v)), ty = 400 + Math.sin(v * 1.2) * 12, fl = Math.sin(v * 2.2) * 0.45;
+    x.save(); x.translate(tx, ty); x.rotate(-0.08);
+    x.fillStyle = '#6f8f55'; [[-30, -26, -fl], [-30, 26, fl], [40, -22, fl * 0.5], [40, 22, -fl * 0.5]].forEach(([a, b, r]) => { x.save(); x.translate(a, b); x.rotate(r + (b < 0 ? -0.9 : 0.9) * (a < 0 ? 1 : 0.5)); x.beginPath(); x.ellipse(0, b < 0 ? -26 : 26, 14, a < 0 ? 40 : 22, 0, 0, 7); x.fill(); x.restore(); });
+    x.beginPath(); x.ellipse(-78, 0, 22, 16, 0, 0, 7); x.fill(); x.fillStyle = '#1b1b1b'; circ(-88, -5, 3);
+    const sh = x.createRadialGradient(-10, -14, 6, 0, 0, 70); sh.addColorStop(0, '#9c7a48'); sh.addColorStop(1, '#4e3a22'); x.fillStyle = sh; x.beginPath(); x.ellipse(0, 0, 64, 46, 0, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(230,200,140,.5)'; x.lineWidth = 2; [[0, 0, 20, 15], [-34, -8, 14, 12], [34, -8, 14, 12], [-24, 22, 14, 10], [24, 22, 14, 10]].forEach(([a, b, w, h]) => { x.beginPath(); x.ellipse(a, b, w, h, 0, 0, 7); x.stroke(); });
+    x.restore();
+    // les deux nageurs à la surface (vus de dessous) + bulles
+    for (const [X0, c] of [[360, '#e8577a'], [470, '#2a5a8a']]) {
+      const X = X0 + v * 20; x.fillStyle = 'rgba(15,40,60,.85)';
+      x.beginPath(); x.ellipse(X, 46, 34, 10, 0, 0, 7); x.fill(); circ(X - 42, 44, 9);
+      x.strokeStyle = 'rgba(15,40,60,.85)'; x.lineWidth = 7; x.lineCap = 'round'; x.beginPath(); x.moveTo(X + 30, 46); x.lineTo(X + 62, 46 + Math.sin(v * 6 + X0) * 8); x.moveTo(X + 30, 50); x.lineTo(X + 62, 54 - Math.sin(v * 6 + X0) * 8); x.stroke(); x.lineCap = 'butt';
+      x.fillStyle = c; x.fillRect(X - 10, 42, 16, 8);
     }
-    x.fillStyle = 'rgba(230,240,232,' + (0.35 - L * 0.08) + ')'; x.fillRect(0, 0, W, H); // brume
-  }
-  // le sentier et les fougères
-  x.fillStyle = '#7a5a3a'; x.beginPath(); x.moveTo(0, 600); x.quadraticCurveTo(480, 560, 960, 590); x.lineTo(960, 640); x.lineTo(0, 640); x.fill();
-  for (let i = 0; i < 12; i++) { const X = ((i * 90 - off) % (W + 100) + W + 100) % (W + 100) - 50; x.strokeStyle = '#4f9a4a'; x.lineWidth = 4; for (let j = -3; j <= 3; j++) { x.beginPath(); x.moveTo(X, 610); x.quadraticCurveTo(X + j * 12, 570, X + j * 24, 560 + Math.abs(j) * 8); x.stroke(); } }
-  const st = Math.sin(u * 7) * 0.35;
-  person({ X: 420, Y: 600, s: 0.48, face: 'v', top: '#e0283f', bot: '#5a6a3a', legL: st, legR: -st, armL: -st * 0.8 + 0.2, armR: st * 0.8 + 0.2 });
-  person({ X: 560, Y: 604, s: 0.48, face: 'c', top: '#5fb8a8', bot: '#3a3f5a', hair: '#4a2a18', legL: -st, legR: st, armL: st * 0.8 + 0.2, armR: -st * 0.8 + 0.2 });
-  if (u > 0.6 && u < 2.8) bubble('On dirait une forêt enchantée 🌿', 560, 330, Math.min(u - 0.6, 2.8 - u));
-  if (u > 2.8) bubble('Attention, une racine ! 😅', 420, 330, Math.min(u - 2.8, D - u));
-}
-const STARS = R(260), MW = R(500);
-function sTeide(u, D) { // coucher de soleil au Teide (l'ombre en triangle), puis la nuit et les étoiles
-  const dusk = clamp(u / 3.4, 0, 1), night = clamp((u - 3.2) / 1.6, 0, 1);
-  x.fillStyle = grad(mix('#ff9a4d', '#0b1030', night), mix('#ffd9a0', '#1c2350', night)); x.fillRect(0, 0, W, H);
-  // étoiles + Voie lactée
-  if (night > 0) {
-    x.save(); x.globalAlpha = night;
-    for (const [a, b, c, d] of MW) { const X = a * W, Y = (b - 0.5) * 140 + 420 - X * 0.45; circ(X, Y + (c - 0.5) * 120, 1 + d * 1.5, 'rgba(255,255,255,' + (0.12 + d * 0.2) + ')'); }
-    for (const [a, b, c] of STARS) circ(a * W, b * 470, 0.6 + c * 1.6, 'rgba(255,255,255,' + (0.5 + 0.5 * Math.sin(u * 3 + a * 40)) + ')');
-    // le Triangle d'été (Véga, Deneb, Altaïr) et le Scorpion avec Antarès
-    const ST = [[300, 90], [420, 60], [380, 230]];
-    x.strokeStyle = 'rgba(160,210,255,' + clamp((u - 4.4) * 2, 0, 0.8) + ')'; x.lineWidth = 2; x.beginPath(); ST.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.closePath(); x.stroke();
-    ST.forEach(([a, b]) => circ(a, b, 3.5, '#fff'));
-    const SC = [[700, 230], [720, 250], [735, 275], [740, 310], [748, 345], [770, 370], [800, 372], [815, 350]];
-    x.beginPath(); SC.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.stroke(); SC.forEach(([a, b], i) => circ(a, b, i == 2 ? 5 : 3, i == 2 ? '#ff8a5a' : '#fff'));
-    x.font = '700 16px system-ui'; x.fillStyle = 'rgba(200,225,255,' + clamp((u - 4.6) * 2, 0, 0.9) + ')'; x.fillText('Triangle d’été', 310, 160); x.fillText('Scorpion', 760, 410);
-    if (u > 6.2 && u < 7.0) { const k = (u - 6.2) / 0.8; x.strokeStyle = 'rgba(255,255,255,' + (1 - k) + ')'; x.lineWidth = 3; x.beginPath(); x.moveTo(120 + k * 300, 60 + k * 120); x.lineTo(120 + k * 300 - 60, 60 + k * 120 - 24); x.stroke(); }
+    for (let i = 0; i < 12; i++) { const k = (v * 0.7 + i * 0.083) % 1; x.strokeStyle = 'rgba(255,255,255,.6)'; x.lineWidth = 1.5; x.beginPath(); x.arc(330 + (i % 3) * 30 + Math.sin(i + v) * 6, 300 - k * 240, 2 + (i % 3), 0, 7); x.stroke(); }
     x.restore();
   }
-  // le soleil qui se couche sur la mer de nuages, à gauche
-  if (night < 1) { const sy = lerp(300, 410, dusk); x.globalAlpha = 1 - night; circ(170, sy, 50, '#ffe28a'); circ(170, sy, 38, '#fff1b8'); x.globalAlpha = 1; }
-  seaOfClouds(410, u * 0.5, mix(mix('#ffd0a0', '#f6c4c8', dusk), '#2a3158', night));
-  // l'ombre du Teide, un triangle projeté vers l'est (à droite) sur les nuages et le ciel
-  if (night < 1) { x.save(); x.globalAlpha = (0.12 + dusk * 0.3) * (1 - night); const gS = x.createLinearGradient(0, 460, 0, 120); gS.addColorStop(0, '#3a2f6a'); gS.addColorStop(1, 'rgba(58,47,106,0)'); x.fillStyle = gS; x.beginPath(); x.moveTo(500, 460); x.lineTo(960, 460); x.lineTo(790 + dusk * 20, 150 - dusk * 40); x.closePath(); x.fill(); x.restore(); }
-  // les roches volcaniques au premier plan
-  x.fillStyle = mix('#7a3a22', '#1a1420', night); x.beginPath(); x.moveTo(0, 640); x.lineTo(0, 520); for (let X = 0; X <= W; X += 60) x.lineTo(X, 520 + Math.sin(X / 50) * 18 + (X % 120 ? 10 : -14)); x.lineTo(W, 640); x.fill();
-  // eux deux, en sweat (gris pour Valentin, noir pour Célestine), comme sur la photo
-  const dark = night * 0.35;
-  x.save(); x.filter = 'brightness(' + (1 - dark) + ')';
-  person({ X: 480, Y: 600, s: 0.5, face: 'c', top: '#1d1d22', bot: '#1d1d22', hair: '#4a2a18', hood: 1, logo: 1, armL: 0.15, armR: -0.35 });
-  person({ X: 575, Y: 600, s: 0.52, face: 'v', top: '#a9abb0', bot: '#26365e', hood: 1, armL: -0.45, armR: 0.2 });
-  x.restore();
-  if (u > 0.8 && u < 3.0) bubble('L’ombre du Teide… 😍', 480, 330, Math.min(u - 0.8, 3.0 - u));
-  if (u > 5.0 && u < 6.8) bubble('Regarde, la Voie lactée ✨', 575, 330, Math.min(u - 5.0, 6.8 - u));
-  if (u > 6.9) { for (let i = 0; i < 6; i++) { const k = ((u - 6.9) * 0.6 + i * 0.16) % 1; x.globalAlpha = 1 - k; x.font = '28px system-ui'; x.fillText('❤️', 520 + Math.sin(i * 2 + u) * 40, 360 - k * 160); } x.globalAlpha = 1; }
-}
-function outro(u, D) {
-  sTeide(7.5 + u * 0.2, 9);
-  x.fillStyle = 'rgba(8,10,30,' + clamp(u / 0.8, 0, 0.55) + ')'; x.fillRect(0, 0, W, H);
-  const k = clamp((u - 0.2) / 0.8, 0, 1); x.save(); x.globalAlpha = k; x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowOffsetY = 3;
-  x.font = 'italic 700 48px Georgia, serif'; x.fillText('Tenerife · août 2026', W / 2, 220);
-  x.font = '700 30px system-ui'; x.fillText('Notre plus beau voyage ❤️', W / 2, 275); x.restore();
 }
 
-// ---------- le plan de la vidéo ----------
-const SC = [
-  ['plage', '🏖️ La plage', sPlage, 4.2],
-  ['snorkel', '🤿 Snorkeling avec les tortues', sSnorkel, 4.2],
-  ['siam', '🌊 Siam Park · la Tower of Power', sSiam, 4.8],
-  ['canyon', '🧗 Canyoning : descente en rappel', sCanyon, 4.4],
-  ['parapente', '🪂 Parapente depuis le Teide · 2 200 m', sParapente, 4.6],
-  ['anaga', '🌿 Balade dans la forêt d’Anaga', sAnaga, 4.4],
-  ['teide', '🌋 Coucher de soleil sur le Teide', sTeide, 7.8],
-];
-const PLAN = []; let T0 = 0;
-PLAN.push({ t0: 0, t1: 2.4, map: 1, from: null, to: null }); T0 = 2.4;
-let prev = null;
-for (const [k, lab, f, d] of SC) { PLAN.push({ t0: T0, t1: T0 + 1.0, map: 1, from: prev, to: k, label: lab }); T0 += 1.0; PLAN.push({ t0: T0, t1: T0 + d, f, spot: k, label: lab }); T0 += d; prev = k; }
-PLAN.push({ t0: T0, t1: T0 + 3.2, f: outro }); T0 += 3.2;
-const DUR = T0;
-function draw(t) {
-  const p = PLAN.find(q => t >= q.t0 && t < q.t1) || PLAN[PLAN.length - 1], u = t - p.t0, D = p.t1 - p.t0;
-  x.save(); x.textAlign = 'left'; x.textBaseline = 'alphabetic';
-  if (p.map) { drawMap(t, p.from, p.to, u / D, p.to ? p.label : null); if (!p.to) { const k = clamp(u / 1.4, 0, 1); x.font = '42px system-ui'; x.fillText('✈️', lerp(-60, 420, ease(k)), lerp(140, 330, ease(k))); } }
-  else { p.f(u, D); if (p.label && p.f !== sParapente) { if (p.f === sTeide && u > 4.2) caption('✨ Puis les étoiles', u - 4.2); else caption(p.label, 1.5); } }
-  // petit fondu entre les plans
-  const fin = Math.min(u, D - u); if (fin < 0.18 && t > 0.2) { x.fillStyle = 'rgba(255,255,255,' + (1 - fin / 0.18) * 0.3 + ')'; x.fillRect(0, 0, W, H); }
-  if (t < 0.4) { x.fillStyle = 'rgba(0,0,0,' + (1 - t / 0.4) + ')'; x.fillRect(0, 0, W, H); }
-  if (t > DUR - 0.6) { x.fillStyle = 'rgba(0,0,0,' + (t - (DUR - 0.6)) / 0.6 + ')'; x.fillRect(0, 0, W, H); }
-  x.restore();
+function sCoucher(u, D) {
+  const k = u / D;
+  x.fillStyle = vgrad([[0, '#2b2a6b'], [0.35, '#a1427e'], [0.6, '#f07a4a'], [0.78, '#ffc56b'], [1, '#ffe3a6']], 0, 470); x.fillRect(0, 0, W, H);
+  // l'ombre du Teide projetée dans le ciel, à l'est (à droite), au-dessus de la mer de nuages
+  x.save(); x.globalAlpha = 0.28 + k * 0.12; const gs = x.createLinearGradient(0, 430, 0, 150); gs.addColorStop(0, '#3b2c66'); gs.addColorStop(1, 'rgba(59,44,102,0)'); x.fillStyle = gs; x.beginPath(); x.moveTo(600, 440); x.lineTo(960, 440); x.lineTo(800, 150); x.fill(); x.restore();
+  // le soleil qui descend dans les nuages
+  const sy = lerp(330, 420, k);
+  glow(250, sy, 360, '#ffb347', 0.55); glow(250, sy, 120, '#fff0c0', 0.9); x.fillStyle = '#fff5d6'; circ(250, sy, 38);
+  // la mer de nuages, éclairée par le dessus
+  cloudBank(420, u, 6, '#ffd6a0', '#c06a7a', 21, 1.1);
+  cloudBank(455, u, 10, '#f4a37a', '#7c3f6e', 22, 1.3);
+  x.save(); x.globalCompositeOperation = 'lighter'; glow(250, 430, 300, '#ff9a4a', 0.35); x.restore();
+  // rochers volcaniques au premier plan, liseré orange
+  x.fillStyle = '#2a1618'; x.beginPath(); x.moveTo(0, H); x.lineTo(0, 545); x.bezierCurveTo(140, 520, 260, 560, 380, 540); x.bezierCurveTo(500, 520, 640, 548, 760, 530); x.bezierCurveTo(840, 520, 900, 535, W, 525); x.lineTo(W, H); x.fill();
+  x.strokeStyle = 'rgba(255,150,80,.7)'; x.lineWidth = 2; x.beginPath(); x.moveTo(0, 545); x.bezierCurveTo(140, 520, 260, 560, 380, 540); x.bezierCurveTo(500, 520, 640, 548, 760, 530); x.stroke();
+  x.fillStyle = '#1d1012'; [[120, 560, 70, 40], [820, 545, 90, 50]].forEach(([a, b, w, h]) => { x.beginPath(); x.ellipse(a, b, w, h, 0, Math.PI, 0); x.fill(); });
+  // le couple en contre-jour, main dans la main
+  const sil = '#1a0f14', rim = '#ffae6b';
+  figure({ X: 540, Y: 538, s: 1.6, who: 'c', sil, rim, pose: { a1: 0.12, a2: -0.42, wind: Math.sin(u * 1.5) * 2 } });
+  figure({ X: 580, Y: 536, s: 1.72, who: 'v', sil, rim, pose: { a1: -0.42, a2: 0.12 } });
 }
-window.draw = draw; window.DUR = DUR; window.PLAN = PLAN.map(p => [p.t0, p.t1, p.to || p.spot || (p.map ? 'carte' : 'fin')]);
+
+function sEtoiles(u, D) {
+  x.fillStyle = vgrad([[0, '#03040d'], [0.6, '#0b1230'], [1, '#1b2550']]); x.fillRect(0, 0, W, H);
+  // la Voie lactée : nébulosités + étoiles, qui tournent très lentement
+  x.save(); x.translate(480, 300); x.rotate(u * 0.004); x.translate(-480, -300);
+  x.save(); x.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 26; i++) { const X = i * 40 - 40, Y = 470 - X * 0.5 + Math.sin(i * 1.7) * 30; glow(X, Y, 90 + (i % 4) * 25, i % 5 == 0 ? '#c08a6a' : '#7a7ab8', 0.12); }
+  x.restore();
+  for (let i = 0; i < 12; i++) { const X = i * 85 + 20, Y = 470 - X * 0.5 + Math.sin(i * 2.3) * 14; x.fillStyle = 'rgba(5,5,15,.16)'; x.beginPath(); x.ellipse(X, Y, 60, 10, -0.46, 0, 7); x.fill(); }
+  x.save(); x.globalCompositeOperation = 'lighter';
+  for (const [X, Y, r, ph, band] of STARS) { const tw = 0.55 + 0.45 * Math.sin(u * 2.5 + ph * 30); x.fillStyle = 'rgba(255,255,255,' + (band ? 0.5 : 0.85) * tw + ')'; x.fillRect(X, Y, r, r); if (r > 1.35) glow(X, Y, 5, '#cfe0ff', 0.5 * tw); }
+  x.restore();
+  // Triangle d'été (Véga, Deneb, Altaïr)
+  const ca = smooth(1.5, 3, u) * 0.6; x.strokeStyle = 'rgba(170,210,255,' + ca + ')'; x.lineWidth = 1; x.beginPath(); x.moveTo(640, 80); x.lineTo(760, 60); x.lineTo(720, 220); x.closePath(); x.stroke();
+  [[640, 80], [760, 60], [720, 220]].forEach(([a, b]) => { glow(a, b, 10, '#e6f0ff', 0.9); });
+  x.font = '300 12px Inter'; x.fillStyle = 'rgba(200,225,255,' + ca + ')'; x.fillText('Triangle d’été', 690, 140);
+  x.restore();
+  // étoile filante
+  if (u > 3.3 && u < 4.1) { const k = (u - 3.3) / 0.8; const X = lerp(120, 420, k), Y = lerp(70, 180, k); const g = x.createLinearGradient(X - 120, Y - 44, X, Y); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,' + (1 - k) + ')'); x.strokeStyle = g; x.lineWidth = 2; x.beginPath(); x.moveTo(X - 120, Y - 44); x.lineTo(X, Y); x.stroke(); }
+  // le laser vert du guide qui montre une étoile
+  if (u > 1.0 && u < 3.0) { const a = smooth(1.0, 1.3, u) * (1 - smooth(2.7, 3.0, u)); x.save(); x.globalCompositeOperation = 'lighter'; x.strokeStyle = 'rgba(80,255,120,' + 0.55 * a + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(250, 520); x.lineTo(720, 220); x.stroke(); x.restore(); }
+  // pins des Canaries, télescope et le couple en silhouette
+  const sil = '#05070f';
+  const R = rand(9); for (let i = 0; i < 16; i++) { const X = i * 64 + R() * 30 - 20; pine(X, 600 + R() * 20, 0.9 + R() * 0.9, sil); }
+  x.fillStyle = sil; x.fillRect(0, 590, W, 50);
+  x.strokeStyle = sil; x.lineWidth = 4; x.beginPath(); x.moveTo(222, 592); x.lineTo(238, 530); x.lineTo(254, 592); x.moveTo(238, 530); x.lineTo(238, 592); x.stroke();
+  x.save(); x.translate(238, 528); x.rotate(-0.6); x.fillStyle = sil; x.fillRect(-7, -46, 14, 56); x.restore();
+  figure({ X: 470, Y: 592, s: 1.5, who: 'c', sil, rim: '#3a4a7a', pose: { a1: 0.1, a2: -0.2, rot: 0.04 } });
+  figure({ X: 506, Y: 592, s: 1.62, who: 'v', sil, rim: '#3a4a7a', pose: { a1: -1.2, a2: 0.1 } });
+}
+
+function sSiam(u, D) {
+  x.fillStyle = vgrad([[0, '#3a9be0'], [0.6, '#a9dcf6'], [1, '#e8f6fd']], 0, 420); x.fillRect(0, 0, W, H);
+  glow(800, 70, 260, '#fffbe0', 0.7);
+  ridge(380, 50, 3, 0.006, 'rgba(120,150,130,.5)');
+  // végétation tropicale
+  for (let i = 0; i < 12; i++) { x.fillStyle = i % 2 ? '#2f7a4e' : '#3d8f5a'; circ(i * 90, 400 + (i % 3) * 8, 70); }
+  // le temple thaï
+  const TX = 390, TY = 470;
+  x.fillStyle = vgrad([[0, '#fff7e8'], [1, '#e8d7b8']], TY - 160, TY); x.fillRect(TX - 120, TY - 160, 240, 160);
+  for (let i = 0; i < 5; i++) { x.fillStyle = '#d6b04a'; x.fillRect(TX - 108 + i * 52, TY - 160, 6, 160); }
+  for (let i = 0; i < 4; i++) {
+    const w = 160 - i * 32, y0 = TY - 160 - i * 46;
+    x.fillStyle = vgrad([[0, '#b8322a'], [1, '#7e1c17']], y0 - 46, y0); x.beginPath(); x.moveTo(TX - w, y0); x.lineTo(TX - w + 46, y0 - 46); x.lineTo(TX + w - 46, y0 - 46); x.lineTo(TX + w, y0); x.fill();
+    x.fillStyle = '#2f6b4a'; x.beginPath(); x.moveTo(TX - w + 46, y0 - 46); x.lineTo(TX - w + 54, y0 - 40); x.lineTo(TX + w - 54, y0 - 40); x.lineTo(TX + w - 46, y0 - 46); x.fill();
+    x.fillStyle = '#e9b92e'; x.fillRect(TX - w, y0 - 3, 2 * w, 5);
+    x.strokeStyle = '#e9b92e'; x.lineWidth = 4; x.beginPath(); x.moveTo(TX - w, y0); x.quadraticCurveTo(TX - w - 14, y0 - 8, TX - w - 10, y0 - 30); x.moveTo(TX + w, y0); x.quadraticCurveTo(TX + w + 14, y0 - 8, TX + w + 10, y0 - 30); x.stroke();
+  }
+  x.fillStyle = vgrad([[0, '#fff2a8'], [1, '#d49a1a']], TY - 440, TY - 344); x.beginPath(); x.moveTo(TX - 18, TY - 344); x.quadraticCurveTo(TX - 6, TY - 380, TX, TY - 440); x.quadraticCurveTo(TX + 6, TY - 380, TX + 18, TY - 344); x.fill();
+  x.fillStyle = '#5a1a10'; x.beginPath(); x.roundRect(TX - 26, TY - 74, 52, 74, [26, 26, 0, 0]); x.fill();
+  // la Tower of Power : chute presque verticale depuis le haut du temple
+  const top = [TX + 70, TY - 300];
+  x.lineCap = 'round'; x.strokeStyle = 'rgba(30,110,200,.9)'; x.lineWidth = 26; x.beginPath(); x.moveTo(...top); x.bezierCurveTo(TX + 92, TY - 150, TX + 120, TY - 10, TX + 290, TY + 30); x.stroke();
+  x.strokeStyle = 'rgba(150,215,255,.8)'; x.lineWidth = 8; x.stroke(); x.lineCap = 'butt';
+  x.fillStyle = '#d9c39a'; x.fillRect(top[0] - 24, top[1] - 6, 48, 10);
+  // la piscine à vagues (Wave Palace)
+  x.fillStyle = vgrad([[0, '#2fb7cf'], [1, '#1a8fb0']], 500, H); x.fillRect(0, 505, W, H);
+  x.fillStyle = '#fff4df'; x.fillRect(0, 488, W, 20);
+  const wv = (u * 0.35) % 1; x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.moveTo(0, 540 + wv * 80); for (let X = 0; X <= W; X += 20) x.lineTo(X, 530 + wv * 80 + Math.sin(X / 60 + u * 2) * 6); x.lineTo(W, 548 + wv * 80); x.lineTo(0, 548 + wv * 80); x.fill();
+  for (let i = 0; i < 14; i++) { x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect((i * 97 + u * 30) % W, 560 + (i % 4) * 18, 30, 2); }
+  palm(70, 520, 1.4, Math.sin(u) * 5, '#24563a'); palm(900, 510, 1.2, Math.sin(u + 1.4) * 5, '#24563a');
+  // Valentin s'élance… et plouf
+  const go = 1.4, kk = smooth(go, go + 0.8, u);
+  if (u < go) figure({ X: top[0], Y: top[1] - 4, s: 0.55, who: 'v', top: '#e9b796', bot: '#e0283f', pose: { a1: 0.3, a2: 0.3 } });
+  else if (kk < 1) { const X = lerp(top[0], TX + 280, Math.pow(kk, 2.2)), Y = lerp(top[1], TY + 26, Math.pow(kk, 1.3)); figure({ X, Y, s: 0.55, who: 'v', top: '#e9b796', bot: '#e0283f', pose: { rot: -1.1, a1: 2.8, a2: 2.8 } }); }
+  if (u > go + 0.8) { const k = u - go - 0.8; x.fillStyle = 'rgba(255,255,255,' + clamp(1 - k * 0.8, 0, 1) + ')'; for (let i = 0; i < 18; i++) { const a = Math.PI + (i / 17) * Math.PI, r = 20 + k * 90 * (0.6 + (i % 3) * 0.2); circ(TX + 300 + Math.cos(a) * r, TY + 34 + Math.sin(a) * r * 0.9 + k * k * 50, 4 + (i % 3) * 2); } }
+  // Célestine qui regarde depuis le bord
+  figure({ X: 640, Y: 500, s: 0.95, who: 'c', top: '#e8577a', bot: '#e9b796', pose: { a1: 0.1, a2: -2.6 + Math.sin(u * 6) * 0.2 } });
+}
+
+function sRappel(u, D) {
+  x.fillStyle = vgrad([[0, '#a9d8f4'], [0.14, '#f2dcc0'], [0.3, '#b8682f'], [1, '#3e1c0c']]); x.fillRect(0, 0, W, H);
+  // parois de cendres volcaniques, en strates orangées
+  const wall = (side, c1, c2) => {
+    x.fillStyle = vgrad([[0, c1], [1, c2]]); x.beginPath();
+    if (side < 0) { x.moveTo(0, 0); x.lineTo(410, 0); x.bezierCurveTo(380, 140, 440, 260, 400, 380); x.bezierCurveTo(370, 480, 430, 560, 420, H); x.lineTo(0, H); }
+    else { x.moveTo(W, 0); x.lineTo(590, 0); x.bezierCurveTo(620, 160, 560, 280, 610, 400); x.bezierCurveTo(640, 500, 590, 580, 610, H); x.lineTo(W, H); }
+    x.fill();
+  };
+  wall(-1, '#d9925a', '#9a5428'); wall(1, '#c47a44', '#7e3f1c');
+  { const sh = (side) => { const g = side < 0 ? x.createLinearGradient(160, 0, 430, 0) : x.createLinearGradient(800, 0, 580, 0); g.addColorStop(0, 'rgba(60,25,8,0)'); g.addColorStop(1, 'rgba(60,25,8,.55)'); return g; };
+    const keep = x.fillStyle; const w2 = (side) => { x.beginPath(); if (side < 0) { x.moveTo(0, 0); x.lineTo(410, 0); x.bezierCurveTo(380, 140, 440, 260, 400, 380); x.bezierCurveTo(370, 480, 430, 560, 420, H); x.lineTo(0, H); } else { x.moveTo(W, 0); x.lineTo(590, 0); x.bezierCurveTo(620, 160, 560, 280, 610, 400); x.bezierCurveTo(640, 500, 590, 580, 610, H); x.lineTo(W, H); } };
+    x.fillStyle = sh(-1); w2(-1); x.fill(); x.fillStyle = sh(1); w2(1); x.fill(); x.fillStyle = keep; }
+  for (let i = 0; i < 26; i++) { const y = i * 25 + 8; x.strokeStyle = i % 3 ? 'rgba(255,220,170,.18)' : 'rgba(90,40,15,.25)'; x.lineWidth = 2 + (i % 3); x.beginPath(); x.moveTo(0, y); x.bezierCurveTo(150, y - 8, 300, y + 10, 420, y - 4); x.stroke(); x.beginPath(); x.moveTo(590, y + 6); x.bezierCurveTo(720, y - 6, 840, y + 8, W, y); x.stroke(); }
+  x.fillStyle = 'rgba(110,150,60,.55)'; [[80, 160], [250, 330], [700, 250], [880, 420], [330, 520], [660, 560]].forEach(([a, b]) => { x.beginPath(); x.ellipse(a, b, 46, 14, 0.2, 0, 7); x.fill(); });
+  // l'arche naturelle en haut
+  x.fillStyle = '#8f4a22'; x.beginPath(); x.moveTo(395, 90); x.bezierCurveTo(450, 40, 560, 40, 600, 100); x.lineTo(600, 130); x.bezierCurveTo(560, 80, 450, 80, 400, 120); x.fill();
+  // rayons de lumière et poussière
+  x.save(); x.globalCompositeOperation = 'lighter'; const lg = x.createLinearGradient(0, 0, 0, H); lg.addColorStop(0, 'rgba(255,230,180,.22)'); lg.addColorStop(1, 'rgba(255,240,200,0)'); x.fillStyle = lg; x.beginPath(); x.moveTo(440, 0); x.lineTo(560, 0); x.lineTo(620, H); x.lineTo(470, H); x.fill();
+  const R = rand(4); for (let i = 0; i < 40; i++) { x.fillStyle = 'rgba(255,240,210,' + (0.3 + R() * 0.4) + ')'; circ(460 + R() * 130 + Math.sin(u + i) * 8, (R() * H + u * 12) % H, 1 + R() * 1.4); } x.restore();
+  x.fillStyle = '#6f5c4a'; x.fillRect(400, 610, 220, 30);
+  // la corde et Célestine qui descend, pieds contre la paroi
+  const cy = lerp(150, 500, ease(u / D));
+  x.strokeStyle = '#ff4f7b'; x.lineWidth = 2.5; x.beginPath(); x.moveTo(420, 112); x.lineTo(486, cy - 98); x.lineTo(470, 640); x.stroke();
+  figure({ X: 452, Y: cy, s: 1.05, who: 'c', top: '#e8577a', bot: '#3a3f5a', helmet: '#ffcc1f', pose: { rot: 0.35, a1: -0.3, a2: 2.7, l1: -1.35 + Math.sin(u * 3) * 0.12, l2: -1.15 } });
+  figure({ X: 520, Y: 612, s: 1.0, who: 'v', top: '#2a5a8a', bot: '#26365e', helmet: '#4cc3ff', pose: { a1: -2.4, a2: 0.4 } });
+}
+
+function sAnaga(u, D) {
+  x.fillStyle = vgrad([[0, '#dfe9df'], [1, '#9ab89c']]); x.fillRect(0, 0, W, H);
+  const cam = u * 14;
+  const trunks = (n, seed, col, wd, depth) => { const R = rand(seed); for (let i = 0; i < n; i++) { const X0 = R() * (W + 200) - 100 - cam * depth, h = 380 + R() * 260, w = wd * (0.7 + R() * 0.6); x.strokeStyle = col; x.lineWidth = w; x.lineCap = 'round'; x.beginPath(); x.moveTo(X0, H + 10); x.bezierCurveTo(X0 + 40 * (R() - 0.5), H - h * 0.4, X0 + 70 * (R() - 0.5), H - h * 0.7, X0 + 30 * (R() - 0.5), H - h); x.stroke(); x.lineWidth = w * 0.5; x.beginPath(); x.moveTo(X0, H - h * 0.55); x.quadraticCurveTo(X0 + 60, H - h * 0.7, X0 + 100 * (R() - 0.3), H - h * 0.95); x.stroke(); x.lineCap = 'butt'; } };
+  const canopy = (seed, col, y, r) => { const R = rand(seed); x.fillStyle = col; for (let i = 0; i < 26; i++) circ(R() * W, y + R() * 90, r * (0.6 + R() * 0.6)); };
+  canopy(31, '#a7c2a4', 40, 90); trunks(10, 32, '#9aae96', 10, 0.2); x.fillStyle = 'rgba(225,236,225,.45)'; x.fillRect(0, 0, W, H);
+  canopy(33, '#6f9a6e', 20, 80); trunks(9, 34, '#5f7d5c', 16, 0.5); x.fillStyle = 'rgba(215,230,215,.35)'; x.fillRect(0, 0, W, H);
+  // rayons qui percent la brume
+  x.save(); x.globalCompositeOperation = 'lighter'; for (let i = 0; i < 4; i++) { const a = 280 + i * 150; const g = x.createLinearGradient(a, 0, a - 200, H); g.addColorStop(0, 'rgba(255,250,220,.28)'); g.addColorStop(1, 'rgba(255,250,220,0)'); x.fillStyle = g; x.beginPath(); x.moveTo(a, 0); x.lineTo(a + 40, 0); x.lineTo(a - 160, H); x.lineTo(a - 230, H); x.fill(); } x.restore();
+  canopy(35, '#3f6e45', -30, 70); trunks(7, 36, '#3a4f34', 24, 1.0);
+  // mousse sur les troncs proches
+  const R = rand(37); x.fillStyle = 'rgba(120,170,80,.55)'; for (let i = 0; i < 40; i++) { x.beginPath(); x.ellipse(R() * W - cam, 200 + R() * 400, 10, 5, R(), 0, 7); x.fill(); }
+  // le sentier et les fougères
+  x.fillStyle = '#6b5236'; x.beginPath(); x.moveTo(330, H); x.lineTo(450, 470); x.lineTo(510, 470); x.lineTo(700, H); x.fill();
+  x.fillStyle = 'rgba(60,40,20,.35)'; for (let i = 0; i < 6; i++) { const y = 480 + i * 28; x.fillRect(lerp(450, 330, (y - 470) / 170) + 10, y, lerp(60, 370, (y - 470) / 170) - 20, 4); }
+  const fern = (X, Y, s) => { x.strokeStyle = '#2f7a3a'; x.lineWidth = 2.5 * s; for (let j = -4; j <= 4; j++) { const a = j * 0.32 - Math.PI / 2; x.beginPath(); x.moveTo(X, Y); x.quadraticCurveTo(X + Math.cos(a) * 30 * s, Y + Math.sin(a) * 40 * s, X + Math.cos(a) * 60 * s, Y + Math.sin(a) * 50 * s + 20 * s); x.stroke(); } };
+  for (let i = 0; i < 9; i++) fern(((i * 120 - cam * 1.4) % (W + 120) + W + 120) % (W + 120) + (i % 2 ? 0 : 60) - 60, 640, 1.3 + (i % 3) * 0.3);
+  // le couple qui s'éloigne main dans la main dans la brume
+  const k = u / D, s = lerp(1.25, 0.85, k), Y = lerp(610, 520, k), st = Math.sin(u * 5) * 0.32;
+  figure({ X: 468, Y, s, who: 'c', top: '#5fb8a8', bot: '#3a3f5a', pose: { l1: st, l2: -st, a1: 0.2 + st * 0.5, a2: -0.55 } });
+  figure({ X: 468 + 30 * s, Y: Y + 1, s: s * 1.08, who: 'v', top: '#c0392b', bot: '#4a5a3a', pose: { l1: -st, l2: st, a1: -0.55, a2: 0.2 - st * 0.5 } });
+  x.fillStyle = 'rgba(230,240,230,' + (0.08 + k * 0.12) + ')'; x.fillRect(0, 0, W, H);
+}
+
+function sParapente(u, D) {
+  const k = u / D;
+  x.fillStyle = vgrad([[0, '#1d5fb4'], [0.55, '#78b6ec'], [1, '#d6ecfb']]); x.fillRect(0, 0, W, H);
+  glow(150, 80, 300, '#fffbe6', 0.6);
+  // le Teide qui dépasse de la mer de nuages, au loin
+  teide(250 - k * 60, 420 + k * 40, 210, 230, '#7d5e4c', '#f4eee8');
+  x.fillStyle = 'rgba(160,190,220,.35)'; x.fillRect(0, 300, W, 200);
+  // la côte qui apparaît en dessous à la fin de la descente
+  const sea = smooth(0.45, 1, k);
+  cloudBank(470 + sea * 120, u, 8, '#ffffff', '#c8d8ea', 41, 1.1);
+  if (sea > 0) { x.save(); x.globalAlpha = sea; x.fillStyle = vgrad([[0, '#2a8fc9'], [1, '#155f94']], 560, H); x.fillRect(0, 580, W, 60); x.fillStyle = '#c9b07a'; x.beginPath(); x.moveTo(0, 598); x.bezierCurveTo(300, 575, 600, 605, W, 585); x.lineTo(W, 600); x.bezierCurveTo(600, 615, 300, 595, 0, 610); x.fill(); x.restore(); }
+  cloudBank(530 + sea * 120, u, 14, '#ffffff', '#b9cce2', 42, 1.4);
+  // les deux parapentes en tandem
+  const wing = (X, Y, c1, c2, who, col, sc) => {
+    const span = 150 * sc;
+    const g = x.createLinearGradient(X - span, 0, X + span, 0); g.addColorStop(0, c1); g.addColorStop(0.5, c2); g.addColorStop(1, c1);
+    x.fillStyle = g; x.beginPath(); x.moveTo(X - span, Y - 150 * sc); x.bezierCurveTo(X - span * 0.6, Y - 205 * sc, X + span * 0.6, Y - 205 * sc, X + span, Y - 150 * sc); x.bezierCurveTo(X + span * 0.6, Y - 178 * sc, X - span * 0.6, Y - 178 * sc, X - span, Y - 150 * sc); x.fill();
+    x.strokeStyle = 'rgba(255,255,255,.35)'; x.lineWidth = 1; for (let i = -4; i <= 4; i++) { x.beginPath(); x.moveTo(X + i * span / 5, Y - 186 * sc + Math.abs(i) * 6 * sc); x.lineTo(X + i * span / 5, Y - 166 * sc + Math.abs(i) * 4 * sc); x.stroke(); }
+    x.strokeStyle = 'rgba(40,40,60,.35)'; for (let i = -4; i <= 4; i++) { x.beginPath(); x.moveTo(X + i * span / 4.5, Y - 162 * sc + Math.abs(i) * 3 * sc); x.lineTo(X, Y - 42 * sc); x.stroke(); }
+    figure({ X: X + 6 * sc, Y: Y, s: 0.75 * sc, who: 'v', top: '#2a2f3a', bot: '#2a2f3a', helmet: '#333', pose: { sit: 1, a1: 2.7, a2: 2.7 } });
+    figure({ X: X - 10 * sc, Y: Y - 6 * sc, s: 0.75 * sc, who, top: col, bot: '#26365e', helmet: '#ffffff', pose: { sit: 1, a1: 1.6 + Math.sin(u * 3) * 0.2, a2: 1.4 } });
+  };
+  const px = lerp(260, 640, k), py = lerp(230, 330, k) + Math.sin(u * 1.3) * 8;
+  wing(px, py, '#ff4f6e', '#ffd166', 'c', '#e8577a', 1);
+  wing(px + 210, py + 70 + Math.sin(u * 1.1 + 1) * 8, '#2a8fd9', '#9ff0ff', 'v', '#c0392b', 0.8);
+  for (let i = 0; i < 3; i++) { const X = 700 - u * 40 + i * 30, Y = 120 + i * 14; x.strokeStyle = 'rgba(30,40,60,.6)'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(X - 7, Y); x.quadraticCurveTo(X - 3, Y - 5, X, Y); x.quadraticCurveTo(X + 3, Y - 5, X + 7, Y); x.stroke(); }
+}
+
+function sSantiago(u, D) {
+  x.fillStyle = vgrad([[0, '#5aa2df'], [1, '#f6e7c8']], 0, 420); x.fillRect(0, 0, W, H);
+  glow(760, 110, 260, '#fff3d0', 0.6);
+  teide(640, 330, 150, 170, 'rgba(120,100,95,.55)', 'rgba(255,255,255,.55)');
+  // collines volcaniques sombres (coulée du Chinyero) et collines cultivées
+  ridge(360, 50, 2.1, 0.008, '#5a4a44'); ridge(400, 40, 4.4, 0.01, '#6e6650');
+  const R = rand(51); for (let i = 0; i < 18; i++) { const X = R() * W, Y = 395 + R() * 40; x.fillStyle = '#5c4a3a'; x.fillRect(X - 2, Y - 14, 4, 16); x.fillStyle = i % 3 ? '#f4d5de' : '#ffffff'; circ(X, Y - 18, 10); } // amandiers
+  // l'église San Fernando Rey : blanchie à la chaux, coupoles « demi-orange »
+  const CX = 470, CY = 520;
+  x.fillStyle = vgrad([[0, '#ffffff'], [1, '#e5e1d8']], CY - 150, CY); x.fillRect(CX - 170, CY - 120, 340, 120);
+  const dome = (X, Y, r) => { const g = x.createRadialGradient(X - r * 0.35, Y - r * 0.6, r * 0.1, X, Y, r * 1.1); g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#cfcac0'); x.fillStyle = g; x.beginPath(); x.arc(X, Y, r, Math.PI, 0); x.fill(); x.fillStyle = '#e9e5dc'; x.fillRect(X - r - 4, Y - 2, 2 * r + 8, 8); x.fillStyle = '#d8d2c6'; x.fillRect(X - 2, Y - r - 12, 4, 12); x.fillRect(X - 6, Y - r - 8, 12, 3); };
+  x.fillStyle = '#f7f5f0'; x.fillRect(CX - 60, CY - 175, 120, 60); dome(CX, CY - 175, 52);
+  dome(CX - 120, CY - 120, 34); dome(CX + 120, CY - 120, 34);
+  // clocher-mur et portail
+  x.fillStyle = '#ffffff'; x.fillRect(CX - 210, CY - 170, 60, 170); x.fillStyle = '#3a3a3a'; x.beginPath(); x.arc(CX - 180, CY - 135, 12, Math.PI, 0); x.fill(); x.fillRect(CX - 192, CY - 135, 24, 16);
+  x.fillStyle = '#6b4a2a'; x.beginPath(); x.roundRect(CX - 22, CY - 70, 44, 70, [22, 22, 0, 0]); x.fill();
+  x.fillStyle = '#5a3a20'; x.fillRect(CX + 40, CY - 92, 90, 8); for (let i = 0; i < 9; i++) x.fillRect(CX + 44 + i * 10, CY - 84, 3, 22); // balcon canarien en bois
+  // la place, un palmier, le couple qui se promène
+  x.fillStyle = '#d9cbb0'; x.fillRect(0, CY, W, H - CY); x.fillStyle = 'rgba(0,0,0,.06)'; for (let i = 0; i < 10; i++) x.fillRect(0, CY + 8 + i * 12, W, 1);
+  palm(150, 560, 1.2, Math.sin(u) * 4, '#2f5a3a'); palm(810, 560, 1.05, Math.sin(u + 2) * 4, '#2f5a3a');
+  const wx = lerp(560, 690, u / D), st = Math.sin(u * 5) * 0.3;
+  figure({ X: wx, Y: 600, s: 1.1, who: 'c', top: '#f2a65a', bot: '#3a3f5a', pose: { l1: st, l2: -st, a1: 0.2, a2: -0.5 } });
+  figure({ X: wx + 32, Y: 600, s: 1.18, who: 'v', top: '#ffffff', bot: '#26365e', pose: { l1: -st, l2: st, a1: -0.5, a2: 0.2 } });
+}
+
+function sMasca(u, D) {
+  const k = u / D;
+  x.fillStyle = vgrad([[0, '#f0a35c'], [0.5, '#f8cf8a'], [1, '#fbe6bf']], 0, 380); x.fillRect(0, 0, W, H);
+  glow(140, 230, 320, '#fff0c0', 0.55);
+  // l'océan au bout du ravin et La Gomera à l'horizon
+  x.fillStyle = vgrad([[0, '#6a8fb0'], [1, '#3a6a92']], 300, 380); x.fillRect(0, 300, W, 120);
+  x.fillStyle = 'rgba(110,120,150,.6)'; x.beginPath(); x.ellipse(170, 302, 120, 16, 0, Math.PI, 0); x.fill();
+  // les crêtes acérées du Teno, couche par couche
+  const crest = (pts, col) => { x.fillStyle = col; x.beginPath(); x.moveTo(-10, H + 10); pts.forEach(([a, b]) => x.lineTo(a, b)); x.lineTo(W + 10, H + 10); x.fill(); };
+  crest([[-10, 330], [80, 300], [160, 340], [260, 250], [330, 320], [420, 270], [520, 330], [620, 230], [700, 300], [800, 210], [880, 290], [970, 250]], '#a3876e');
+  crest([[-10, 400], [90, 330], [170, 390], [250, 300], [330, 380], [380, 330], [460, 420], [560, 360], [640, 410], [740, 330], [830, 390], [970, 340]], '#7e6a4e');
+  // le Roque (pointu) à côté du village
+  x.fillStyle = '#5d4a35'; x.beginPath(); x.moveTo(560, 470); x.lineTo(610, 250); x.lineTo(625, 240); x.lineTo(660, 470); x.fill();
+  x.fillStyle = 'rgba(255,200,130,.35)'; x.beginPath(); x.moveTo(610, 250); x.lineTo(625, 240); x.lineTo(605, 470); x.lineTo(585, 470); x.fill();
+  crest([[-10, 520], [120, 440], [260, 480], [380, 430], [470, 460], [560, 420], [680, 470], [800, 430], [970, 500]], '#4f5a38');
+  // le village sur son éperon : maisons en pierre, toits de tuiles, palmiers
+  const R = rand(61);
+  for (let i = 0; i < 11; i++) { const X = 380 + i * 22 + R() * 8, Y = 455 - Math.sin(i / 10 * Math.PI) * 26 + R() * 6; x.fillStyle = '#b9a58a'; x.fillRect(X, Y - 14, 18, 14); x.fillStyle = '#b5502e'; x.beginPath(); x.moveTo(X - 2, Y - 14); x.lineTo(X + 9, Y - 22); x.lineTo(X + 20, Y - 14); x.fill(); x.fillStyle = '#3a2a20'; x.fillRect(X + 7, Y - 8, 4, 8); }
+  for (let i = 0; i < 6; i++) palm(360 + i * 48 + R() * 10, 470 - R() * 10, 0.32, Math.sin(u + i) * 2, '#2f4f2e');
+  // la route en lacets
+  x.strokeStyle = 'rgba(230,220,200,.8)'; x.lineWidth = 3; x.beginPath(); x.moveTo(820, 300); x.bezierCurveTo(760, 330, 860, 360, 780, 380); x.bezierCurveTo(700, 400, 820, 430, 720, 440); x.bezierCurveTo(640, 450, 700, 470, 600, 470); x.stroke();
+  // le mirador au premier plan : muret en pierre et le couple accoudé, de dos
+  x.fillStyle = '#2e2618'; x.fillRect(0, 560, W, 80);
+  x.fillStyle = '#6e5c44'; x.fillRect(0, 548, W, 20); for (let i = 0; i < 24; i++) { x.strokeStyle = 'rgba(0,0,0,.2)'; x.lineWidth = 1; x.strokeRect(i * 42, 548, 42, 20); }
+  figure({ X: 430, Y: 600, s: 1.35, who: 'c', top: '#e8577a', bot: '#3a3f5a', pose: { a1: 0.9, a2: -0.5, wind: Math.sin(u * 1.4) * 2 } });
+  figure({ X: 470, Y: 600, s: 1.45, who: 'v', top: '#3a6aa0', bot: '#26365e', pose: { a1: -0.5, a2: 0.9 } });
+  // lumière dorée du soir
+  x.save(); x.globalCompositeOperation = 'soft-light'; x.fillStyle = 'rgba(255,170,80,' + (0.25 + k * 0.15) + ')'; x.fillRect(0, 0, W, H); x.restore();
+}
+
+function sOutro(u, D) {
+  x.fillStyle = vgrad([[0, '#141a30'], [1, '#2a1a2c']]); x.fillRect(0, 0, W, H);
+  const R = rand(71); x.save(); x.globalCompositeOperation = 'lighter'; for (let i = 0; i < 22; i++) glow(R() * W, R() * H + Math.sin(u * 0.6 + i) * 10, 30 + R() * 50, ['#ff9a6a', '#ffd36b', '#9ab8ff'][i % 3], 0.12); x.restore();
+  // la vraie photo, en polaroïd
+  const a = smooth(0.2, 1.2, u), z = lerp(0.96, 1.02, u / D);
+  x.save(); x.globalAlpha = a; x.translate(W / 2, 270); x.rotate(-0.035); x.scale(z, z);
+  const pw = 430, ph = 288;
+  x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 30; x.shadowOffsetY = 12; x.fillStyle = '#fbf8f2'; x.fillRect(-pw / 2 - 16, -ph / 2 - 16, pw + 32, ph + 86); x.shadowBlur = 0; x.shadowOffsetY = 0;
+  const im = IMG.photo; if (im) { const s = Math.max(pw / im.width, ph / im.height); x.save(); x.beginPath(); x.rect(-pw / 2, -ph / 2, pw, ph); x.clip(); x.drawImage(im, -im.width * s / 2, -im.height * s / 2 + 10, im.width * s, im.height * s); x.restore(); }
+  x.fillStyle = '#3a3040'; x.font = 'italic 600 26px "Crimson Text"'; x.textAlign = 'center'; x.fillText('Tenerife · août 2026', 0, ph / 2 + 46);
+  x.restore();
+  const b = smooth(1.6, 2.6, u); x.save(); x.globalAlpha = b; x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 12;
+  x.font = 'italic 600 34px "Crimson Text"'; x.fillText('Notre plus beau voyage ❤', W / 2, 600); x.restore();
+}
+
+// ---------- le montage ----------
+const SC = [ // [fonction, durée, nom affiché, sous-titre]
+  [sIntro, 4.6, null],
+  [sPlage, 6.4, 'La plage', 'Le sable chaud, puis les tortues sous l’eau'],
+  [sCoucher, 5.6, 'Coucher de soleil sur le Teide', 'Au-dessus de la mer de nuages'],
+  [sEtoiles, 6.2, 'Sous les étoiles', 'La Voie lactée, au pied du Teide'],
+  [sSiam, 5.2, 'Siam Park', 'La Tower of Power et la Wave Palace'],
+  [sRappel, 5.2, 'Descente en rappel', 'Entre les parois de cendres volcaniques'],
+  [sAnaga, 5.4, 'La forêt d’Anaga', 'La laurisylve et sa brume'],
+  [sParapente, 5.6, 'Parapente', 'Depuis les pentes du Teide, au-dessus des nuages'],
+  [sSantiago, 5.0, 'Santiago del Teide', 'L’église San Fernando Rey et ses coupoles blanches'],
+  [sMasca, 5.8, 'Masca', 'Le village perché dans les montagnes du Teno'],
+  [sOutro, 6.0, null],
+];
+const XF = 0.9; // fondu enchaîné entre deux étapes
+const PLAN = []; { let t = 0; SC.forEach(([f, d, n, sub], i) => { PLAN.push({ f, t0: t, t1: t + d, n, sub, step: i }); t += d - XF; }); }
+const DUR = PLAN[PLAN.length - 1].t1;
+const NSTEP = SC.filter(s => s[2]).length;
+function renderScene(p, t, ctx) {
+  x = ctx; const u = t - p.t0, D = p.t1 - p.t0;
+  x.save(); x.clearRect(0, 0, W, H);
+  // léger travelling (zoom lent) pour donner vie à chaque plan
+  const z = 1 + 0.05 * (u / D); x.translate(W / 2, H / 2); x.scale(z, z); x.translate(-W / 2, -H / 2);
+  x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.lineCap = 'butt'; x.setLineDash([]); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+  p.f(u, D);
+  x.restore();
+  if (p.n) placeCard(p.step, NSTEP, p.n, p.sub, u, D);
+}
+function draw(t) {
+  const act = PLAN.filter(p => t >= p.t0 && t < p.t1);
+  M.globalAlpha = 1; M.fillStyle = '#000'; M.fillRect(0, 0, W, H);
+  act.forEach((p, i) => {
+    const buf = i ? bufB : bufA; renderScene(p, t, buf.getContext('2d'));
+    const a = i ? smooth(p.t0, p.t0 + XF, t) : 1; M.globalAlpha = a; M.drawImage(buf, 0, 0); M.globalAlpha = 1;
+  });
+  // finitions : vignette, grain, fondus d'ouverture et de fermeture
+  const vg = M.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, W * 0.7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.42)'); M.fillStyle = vg; M.fillRect(0, 0, W, H);
+  M.save(); M.globalAlpha = 0.05; M.globalCompositeOperation = 'overlay'; const ox = Math.floor(t * 97) % 256, oy = Math.floor(t * 61) % 256; for (let X = -ox; X < W; X += 256) for (let Y = -oy; Y < H; Y += 256) M.drawImage(GRAIN, X, Y); M.restore();
+  if (t < 0.8) { M.fillStyle = 'rgba(0,0,0,' + (1 - t / 0.8) + ')'; M.fillRect(0, 0, W, H); }
+  if (t > DUR - 1.2) { M.fillStyle = 'rgba(0,0,0,' + clamp((t - (DUR - 1.2)) / 1.2, 0, 1) + ')'; M.fillRect(0, 0, W, H); }
+}
+window.draw = draw; window.DUR = DUR; window.PLAN = PLAN.map(p => [p.n, +p.t0.toFixed(2), +p.t1.toFixed(2)]);
 </script></body></html>
