@@ -186,6 +186,14 @@ const CONTENU = {
   videos: [
     // 🎬 VIDÉOS DE L'ALBUM (débloquées en battant les boss, dans l'ordre) · ch = chapitre, apres = titre de la photo d'avant (vide = début du chapitre)
     {
+      titre: 'Notre voyage à Tenerife',
+      date: '29 août 2026',
+      src: 'videos/4-tenerife.mp4',
+      poster: 'videos/4-tenerife.jpg',
+      ch: 'Nos voyages',
+      apres: 'Tenerife'
+    },
+    {
       titre: 'Chef Valentin et la crêpe volante',
       date: 'Février 2027 · la Chandeleur',
       src: 'videos/1-crepe.mp4',
@@ -208,14 +216,6 @@ const CONTENU = {
       poster: 'videos/3-slow.jpg',
       ch: 'Nos grandes étapes',
       apres: 'La demande en mariage'
-    },
-    {
-      titre: 'Notre voyage à Tenerife',
-      date: '29 août 2026',
-      src: 'videos/4-tenerife.mp4',
-      poster: 'videos/4-tenerife.jpg',
-      ch: 'Nos voyages',
-      apres: 'Tenerife'
     },
     {
       titre: 'Notre tour du monde',

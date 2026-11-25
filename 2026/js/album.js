@@ -357,8 +357,11 @@ function alPages() {
   if (P.length % 2) P.push({ blank: 1 });
   return P;
 }
+// Les vidéos se débloquent dans l'ordre de CONTENU.videos (ordre chronologique) : chaque boss vaincu,
+// quel qu'il soit, boss final compris, débloque la vidéo suivante.
 function vidN() {
-  return Math.min((CONTENU.videos || []).length, Object.keys(S.boss || {}).length);
+  const n = Object.keys(S.boss || {}).filter(k => S.boss[k]).length + (S.vbDone ? 1 : 0);
+  return Math.min((CONTENU.videos || []).length, n);
 }
 const vidOk = k => k < vidN();
 function vidFig(k) {

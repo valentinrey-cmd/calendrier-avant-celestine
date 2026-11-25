@@ -4,6 +4,12 @@
 
 ---
 
+## 25 novembre 2026 (après-midi) : tout se débloque dans l'ordre chronologique
+
+- **Vidéos :** elles ne sont plus liées à un boss précis. Le 1er boss vaincu, quel qu'il soit (boss final compris), débloque la 1re vidéo, le 2e boss la 2e, et ainsi de suite. Liste remise dans l'ordre chronologique : Tenerife, crêpe, ski, slow, tour du monde, papy. Le boss final compte comme un boss et affiche la nouvelle vidéo s'il en débloque une.
+- **Photos :** rien à changer, elles se révélaient déjà dans l'ordre de l'album (chaque jour réussi révèle la photo suivante).
+- Fichiers : `js/contenu.js`, `js/album.js`, `js/boss/boss-final.js`, `CLAUDE.md`.
+
 ## 25 novembre 2026 (matin) : Tenerife dans l'album, en version BD, au 29 août
 
 - Valentin a choisi la **version « comme les autres vidéos »** (vos visages en photo, des bulles). Elle remplace la version illustrée dans `2026/videos/4-tenerife.mp4`, avec une nouvelle miniature `.jpg` (le coucher de soleil). La version illustrée est gardée dans `outils/videos/4-tenerife/versions/4-tenerife-style-illustre.mp4`.

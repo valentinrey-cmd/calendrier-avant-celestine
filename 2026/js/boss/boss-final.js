@@ -2497,6 +2497,7 @@ function vBoss(test, sp, so) {
       confetti();
     } catch (_) {}
     if (!st.so) {
+      if (!S.vbDone) window.__vbVid = vidN(); // pour savoir si le boss final débloque une nouvelle vidéo
       S.vbDone = Date.now();
       save();
       try {
@@ -2757,6 +2758,8 @@ function vCredits() {
         } catch (_) {}
         setTimeout(() => toast('👑 Jeu terminé : le calendrier a mis sa tenue de fête !'), 900);
       }
+      if (window.__vbVid != null && vidN() > window.__vbVid) setTimeout(vidNew, 2600);
+      window.__vbVid = null;
     }, 600);
   };
   o.querySelector('.vc-x').onclick = close;
