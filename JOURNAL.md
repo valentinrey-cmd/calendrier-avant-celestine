@@ -4,6 +4,13 @@
 
 ---
 
+## 25 novembre 2026 (14 h 30) : nouveaux dessins pour toutes les photos-indices (version 1795612358)
+
+- Les 11 dessins des pièces du dossier sont refaits, plus détaillés et plus jolis : lumière, ombres, vrais visages dessinés (yeux, cheveux, vêtements), décors complets (bibliothèque de la BU, resto en briques avec guirlande, labo de TP, salle de bain carrelée), interface façon Instagram ou Snapchat, horodatages.
+- Concernés : le bracelet dans son écrin, le sac vidé, le vide-poche, la story de Noémie, les ongles finis, le selfie de la BU, le resto, Emma avec le sac, la photo de TP, le selfie de 7 h 51 et l'agrandissement du Dr Rodolphe (qui montre maintenant aussi la trace de colle du cœur recollé par Noémie).
+- Les anciens dessins (`HEARTS`, `CHAIN` et l'ancien `PH`) sont supprimés. Les nouvelles petites fonctions de dessin s'appellent `phPerso`, `phBracelet`, `phCoeur`…
+- Fichiers : `2026/js/enquete/suspects-pieces.js`.
+
 ## 25 novembre 2026 (11 h 20) : les 3 règles d'or dans CLAUDE.md (version 1795601827)
 
 - `CLAUDE.md` : ajout en tête des règles des « 3 règles d'or » à appliquer à chaque demande : supprimer l'ancienne version, noter la modification en haut de ce journal avec le numéro de version, ranger le code au bon endroit.

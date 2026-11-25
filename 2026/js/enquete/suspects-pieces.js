@@ -133,49 +133,406 @@ const susPic = x => {
   return u ? `<img src="${u}" alt="">` : `<i>${x.e || '❓'}</i>`;
 };
 /* ---------- les dessins des pièces ---------- */
-const HEARTS = (x, y, n, s) =>
-  Array.from(
-    { length: n },
-    (_, i) =>
-      `<path d="M${x + i * s} ${y} c-3 -4 -8 -1 -5 3 l5 5 l5 -5 c3 -4 -2 -7 -5 -3z" fill="#ff8fb8" stroke="#d94f86" stroke-width=".8"/>`
-  ).join('');
-const CHAIN = (x1, y1, x2, y2, sag) =>
-  `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${(y1 + y2) / 2 + sag} ${x2} ${y2}" fill="none" stroke="#e6b94a" stroke-width="2" stroke-dasharray="3 1.5"/>`;
+// Chaque dessin est un SVG 320×220. Les identifiants des dégradés sont préfixés par le nom du dessin
+// (plusieurs dessins peuvent s'afficher dans la même fenêtre).
+const phSh = (h, k) => {
+  // assombrit (k<0) ou éclaircit (k>0) une couleur #rrggbb
+  const n = parseInt(h.slice(1), 16),
+    f = c => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
+  return '#' + [n >> 16, (n >> 8) & 255, n & 255].map(c => f(c).toString(16).padStart(2, '0')).join('');
+};
+const phDefs = p => `<defs>
+<linearGradient id="${p}or" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".35" stop-color="#e9bf52"/><stop offset=".7" stop-color="#b8862a"/><stop offset="1" stop-color="#f3d27a"/></linearGradient>
+<radialGradient id="${p}co" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffd6e6"/><stop offset=".5" stop-color="#ff8fb8"/><stop offset="1" stop-color="#d94f86"/></radialGradient>
+<radialGradient id="${p}vi" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient>
+<radialGradient id="${p}gl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<filter id="${p}fl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>
+<filter id="${p}om" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>
+</defs>`;
+// petit cœur rose brillant, centré en (x, y), taille s
+const phCoeur = (p, x, y, s, rot = 0, recolle = false) =>
+  `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s / 10})"><path d="M0 4 C-7 -1 -6 -8 -2.6 -8 C-1.2 -8 -0.3 -7 0 -6 C.3 -7 1.2 -8 2.6 -8 C6 -8 7 -1 0 4Z" fill="url(#${p}co)" stroke="#b83a6c" stroke-width=".7"/><ellipse cx="-2.6" cy="-5" rx="1.6" ry=".9" fill="#fff" opacity=".8" transform="rotate(-30 -2.6 -5)"/>${
+    recolle ? '<path d="M-1 -6.5 L.6 -3.2 L-.4 -.6 L1 2" fill="none" stroke="#fff6" stroke-width=".55"/>' : ''
+  }</g>`;
+// le bracelet : chaîne en maillons dorés le long d'une courbe, avec des cœurs et un fermoir
+const phBracelet = (p, x1, y1, x2, y2, sag, o = {}) => {
+  const n = o.n || 34,
+    hearts = o.h || 5,
+    hs = o.hs || 9,
+    pt = t => {
+      const cx = (x1 + x2) / 2,
+        cy = (y1 + y2) / 2 + sag;
+      return [(1 - t) * (1 - t) * x1 + 2 * (1 - t) * t * cx + t * t * x2, (1 - t) * (1 - t) * y1 + 2 * (1 - t) * t * cy + t * t * y2];
+    };
+  let s = '';
+  for (let i = 0; i < n; i++) {
+    const [ax, ay] = pt(i / n),
+      [bx, by] = pt((i + 1) / n),
+      a = (Math.atan2(by - ay, bx - ax) * 180) / Math.PI,
+      L = Math.hypot(bx - ax, by - ay);
+    s += `<ellipse cx="${(ax + bx) / 2}" cy="${(ay + by) / 2}" rx="${L * 0.62}" ry="${(o.w || 1.6) * (i % 2 ? 0.6 : 1)}" transform="rotate(${a} ${(ax + bx) / 2} ${(ay + by) / 2})" fill="none" stroke="url(#${p}or)" stroke-width="${o.sw || 1}"/>`;
+  }
+  const [fx, fy] = pt(1);
+  s += `<g transform="translate(${fx} ${fy})"><ellipse rx="${hs * 0.45}" ry="${hs * 0.3}" fill="none" stroke="url(#${p}or)" stroke-width="${hs * 0.17}"/></g>`;
+  for (let i = 0; i < hearts; i++) {
+    const t = (i + 1) / (hearts + 1),
+      [hx, hy] = pt(t);
+    s +=
+      `<line x1="${hx}" y1="${hy - 1}" x2="${hx}" y2="${hy + hs * 0.35}" stroke="url(#${p}or)" stroke-width="${hs * 0.09}"/>` +
+      phCoeur(p, hx, hy + hs * 0.75, hs, (t - 0.5) * 14, o.recolle == i);
+  }
+  if (o.eclat)
+    o.eclat.forEach(([ex, ey, er]) => {
+      s += `<circle cx="${ex}" cy="${ey}" r="${er}" fill="url(#${p}gl)"/><path d="M${ex - er * 1.4} ${ey} L${ex + er * 1.4} ${ey} M${ex} ${ey - er * 1.4} L${ex} ${ey + er * 1.4}" stroke="#fff" stroke-width="${er * 0.12}" opacity=".9"/>`;
+    });
+  return s;
+};
+// un personnage dessiné : tête centrée en (x, y), taille 1 = tête de ~44 px
+const phPerso = (p, x, y, s, o) => {
+  const sk = o.peau || '#f1c9a9',
+    sk2 = phSh(sk, -0.14),
+    hr = o.cheveux || '#3a2416',
+    hr2 = phSh(hr, 0.18),
+    hr3 = phSh(hr, -0.3),
+    top = o.haut || '#2f4a6b',
+    top2 = phSh(top, -0.25),
+    yeux = o.yeux || '#4a2f1c';
+  const dos = {
+    long: `<path d="M-23 -6 C-26 -32 26 -32 23 -6 L27 40 Q0 50 -27 40Z" fill="${hr3}"/>`,
+    carre: `<path d="M-23 -6 C-26 -32 26 -32 23 -6 L25 18 Q0 24 -25 18Z" fill="${hr3}"/>`,
+    queue: `<path d="M-21 -8 C-24 -32 24 -32 21 -8Z" fill="${hr3}"/><path d="M14 -18 Q34 -8 26 26 Q22 34 18 20 Q24 0 12 -12Z" fill="${hr}"/>`,
+    chignon: `<circle cx="0" cy="-30" r="11" fill="${hr}"/><circle cx="-3" cy="-33" r="4" fill="${hr2}" opacity=".5"/>`,
+    boucles: `${[-22, -14, 14, 22, -24, 24].map((a, i) => `<circle cx="${a}" cy="${i > 3 ? 14 : -4 + (i % 2) * 12}" r="11" fill="${hr3}"/>`).join('')}`,
+    court: ''
+  }[o.coiffure || 'long'];
+  const devant = {
+    long: `<path d="M-21 -4 C-24 -30 4 -36 20 -20 C24 -14 23 -8 22 -2 C16 -14 6 -20 -6 -17 C-12 -15 -17 -10 -21 -4Z" fill="${hr}"/><path d="M-12 -20 C-4 -27 8 -26 14 -20" fill="none" stroke="${hr2}" stroke-width="1.5" opacity=".7"/>`,
+    carre: `<path d="M-22 4 C-26 -30 24 -32 22 -2 C18 -12 10 -16 2 -15 C-6 -18 -16 -12 -18 2Z" fill="${hr}"/><path d="M-14 -20 C-4 -26 8 -26 14 -20" fill="none" stroke="${hr2}" stroke-width="1.4" opacity=".7"/>`,
+    queue: `<path d="M-21 -4 C-22 -28 20 -32 21 -6 C14 -18 -4 -22 -21 -4Z" fill="${hr}"/><path d="M-10 -21 C-2 -26 10 -25 15 -18" fill="none" stroke="${hr2}" stroke-width="1.4" opacity=".7"/>`,
+    chignon: `<path d="M-21 -2 C-22 -28 20 -30 21 -4 C12 -20 -10 -20 -21 -2Z" fill="${hr}"/><path d="M-12 -19 C-4 -24 8 -24 14 -18" fill="none" stroke="${hr2}" stroke-width="1.3" opacity=".7"/>`,
+    boucles: `${[-16, -8, 0, 8, 16].map((a, i) => `<circle cx="${a}" cy="${-20 + Math.abs(i - 2) * 3}" r="8" fill="${hr}"/>`).join('')}<circle cx="-4" cy="-24" r="3" fill="${hr2}" opacity=".5"/>`,
+    court: `<path d="M-21 -6 C-22 -30 22 -32 21 -6 C16 -16 4 -18 -6 -16 C-14 -14 -18 -10 -21 -6Z" fill="${hr}"/>`
+  }[o.coiffure || 'long'];
+  const lun = o.lunettes
+    ? `<g fill="${o.lunettes == 'labo' ? '#dff4ff55' : 'none'}" stroke="${o.lunettes == 'labo' ? '#9cc8e0' : '#2a2a2a'}" stroke-width="1.4"><rect x="-14" y="-6" width="11" height="9" rx="3"/><rect x="3" y="-6" width="11" height="9" rx="3"/><path d="M-3 -2 h6"/></g>`
+    : '';
+  const bouche =
+    o.bouche == 'o'
+      ? `<ellipse cx="0" cy="12" rx="2.6" ry="3" fill="#8a2f3c"/>`
+      : o.bouche == 'rire'
+        ? `<path d="M-6 9 Q0 17 6 9Z" fill="#8a2f3c"/><path d="M-4.6 9.6 h9.2" stroke="#fff" stroke-width="1.6"/>`
+        : `<path d="M-5 10 Q0 14 5 10" fill="none" stroke="#a8404f" stroke-width="1.6" stroke-linecap="round"/>`;
+  const oeil = dx =>
+    o.yeuxFermes
+      ? `<path d="M${dx - 3.4} -1 Q${dx} 1.6 ${dx + 3.4} -1" fill="none" stroke="#3a2a22" stroke-width="1.3" stroke-linecap="round"/>`
+      : `<ellipse cx="${dx}" cy="-1" rx="3.4" ry="2.7" fill="#fff"/><circle cx="${dx + (o.regard || 0)}" cy="-0.8" r="2" fill="${yeux}"/><circle cx="${dx + (o.regard || 0)}" cy="-0.8" r="1" fill="#120a06"/><circle cx="${dx + 0.7 + (o.regard || 0)}" cy="-1.6" r=".6" fill="#fff"/><path d="M${dx - 3.8} -2.2 Q${dx} -5 ${dx + 3.8} -2.4" fill="none" stroke="#2a1a12" stroke-width="1.1"/>`;
+  const corps =
+    o.corps === false
+      ? ''
+      : `<path d="M-6 18 L-6 28 L6 28 L6 18Z" fill="${sk2}"/>
+<path d="M-8 26 Q-34 30 -40 62 L40 62 Q34 30 8 26 Q0 32 -8 26Z" fill="${top}"/>
+<path d="M-8 26 Q0 32 8 26" fill="none" stroke="${top2}" stroke-width="1.4"/>${o.blouse ? `<path d="M-8 26 L-3 44 L0 34 L3 44 L8 26" fill="#fff" stroke="#d6dde3" stroke-width=".8"/><path d="M-40 62 Q-34 30 -8 26 L-3 44 L-6 62Z M40 62 Q34 30 8 26 L3 44 L6 62Z" fill="#fdfdfd" stroke="#d6dde3" stroke-width=".8"/>` : ''}
+<path d="M-26 40 Q-22 52 -24 62 M24 40 Q22 52 25 62" fill="none" stroke="${top2}" stroke-width="1.2" opacity=".6"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})">${corps}${dos}
+<ellipse cx="-20.5" cy="2" rx="3" ry="4.4" fill="${sk2}"/><ellipse cx="20.5" cy="2" rx="3" ry="4.4" fill="${sk2}"/>
+<ellipse cx="0" cy="0" rx="20" ry="23" fill="${sk}"/><path d="M-20 0 Q-18 20 0 23 Q-12 16 -14 0Z" fill="${sk2}" opacity=".35"/>
+<ellipse cx="-11" cy="7" rx="4" ry="2.4" fill="#ff8a8a" opacity=".3"/><ellipse cx="11" cy="7" rx="4" ry="2.4" fill="#ff8a8a" opacity=".3"/>
+${oeil(-8)}${oeil(8)}
+<path d="M-12 -7.5 Q-8 -10 -4 -8.4 M4 -8.4 Q8 -10 12 -7.5" fill="none" stroke="${hr3}" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M0 0 Q-1.6 5 -2.4 6.2 Q0 7.4 2.2 6.4" fill="none" stroke="${sk2}" stroke-width="1.2" stroke-linecap="round"/>
+${bouche}${lun}${devant}${o.extra || ''}</g>`;
+};
+// un bras (épaule → main), avec manche et main ; renvoie aussi la position du poignet via o.poignet
+const phBras = (x1, y1, x2, y2, peau, manche, w = 9) => {
+  const mx = x1 + (x2 - x1) * 0.62,
+    my = y1 + (y2 - y1) * 0.62;
+  return `<path d="M${x1} ${y1} L${mx} ${my}" stroke="${manche}" stroke-width="${w + 3}" stroke-linecap="round"/><path d="M${mx} ${my} L${x2} ${y2}" stroke="${peau}" stroke-width="${w * 0.8}" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="${w * 0.62}" fill="${peau}"/><path d="M${x2 - w * 0.3} ${y2 - w * 0.3} q${w * 0.2} ${-w * 0.25} ${w * 0.45} 0" fill="none" stroke="${phSh(peau, -0.2)}" stroke-width=".8"/>`;
+};
+// en-tête façon appli (story, snap…) et horodatage
+const phStory = (p, nom, quand, coul) =>
+  `<g><rect width="320" height="44" fill="#0004"/><rect x="10" y="8" width="300" height="3" rx="1.5" fill="#fff5"/><rect x="10" y="8" width="${coul || 120}" height="3" rx="1.5" fill="#fff"/><circle cx="24" cy="26" r="9" fill="url(#${p}co)" stroke="#fff" stroke-width="1.6"/><text x="38" y="30" font-family="Inter,system-ui,sans-serif" font-size="11" font-weight="700" fill="#fff" style="paint-order:stroke" stroke="#0005" stroke-width="2">${nom}</text><text x="${44 + nom.length * 6.2}" y="30" font-family="Inter,system-ui,sans-serif" font-size="10.5" fill="#fffc" style="paint-order:stroke" stroke="#0004" stroke-width="2">${quand}</text></g>`;
+const phTampon = (x, y, txt, ancre = 'start') =>
+  `<text x="${x}" y="${y}" text-anchor="${ancre}" font-family="'Courier New',monospace" font-size="11" font-weight="700" fill="#ffb347" style="paint-order:stroke" stroke="#000a" stroke-width="2.4" letter-spacing=".5">${txt}</text>`;
+const phVig = p => `<rect width="320" height="220" fill="url(#${p}vi)" pointer-events="none"/>`;
+const phSvg = (p, corps) => `<svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">${phDefs(p)}${corps}${phVig(p)}</svg>`;
+
 const PH = {
-  bracelet: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#f6efe6"/><rect x="18" y="16" width="124" height="80" rx="6" fill="#7a1f33"/><rect x="24" y="22" width="112" height="68" rx="4" fill="#a83a52"/>${CHAIN(36, 52, 124, 52, 22)}${HEARTS(52, 66, 4, 18)}<rect x="74" y="72" width="10" height="5" rx="2" fill="#e6b94a"/><text x="80" y="104" text-anchor="middle" font-size="7" fill="#7a5a3a">24 déc. 2025 · le cadeau de Valentin</text></svg>`,
-  sac: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#d9cfc0"/><path d="M20 40 h70 l-6 56 h-58z" fill="#3a2a2a"/><path d="M36 40 q19 -30 38 0" fill="none" stroke="#3a2a2a" stroke-width="4"/><rect x="96" y="30" width="52" height="20" rx="8" fill="#ff8fb8"/><text x="122" y="44" text-anchor="middle" font-size="7" fill="#fff">trousse</text><rect x="100" y="58" width="36" height="22" rx="4" fill="#5a3a24"/><text x="118" y="72" text-anchor="middle" font-size="6.5" fill="#fff">porte-monnaie</text><g transform="translate(102 86)"><circle r="5" fill="none" stroke="#999" stroke-width="2"/><rect x="4" y="-2" width="16" height="4" fill="#bbb"/></g><text x="56" y="104" text-anchor="middle" font-size="7" fill="#3a2a2a">dim. 29 · 21 h 30 : rien</text></svg>`,
-  videpoche: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#e9f0f2"/><rect x="0" y="62" width="160" height="10" fill="#cfd9dd"/><ellipse cx="80" cy="62" rx="34" ry="9" fill="#f7d7e0" stroke="#d9a3b3" stroke-width="2"/><ellipse cx="80" cy="60" rx="26" ry="5" fill="#fbe9ee"/><rect x="20" y="30" width="16" height="32" rx="3" fill="#b9d7e8"/><rect x="124" y="36" width="12" height="26" rx="3" fill="#f3c6a0"/><text x="80" y="96" text-anchor="middle" font-size="7.5" fill="#5a6a72">le vide-poche de la salle de bain, vide</text></svg>`,
-  storyn: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#2a1a24"/><rect x="10" y="56" width="140" height="54" fill="#e9dcc8"/>${['#ff4f7b', '#c0233a', '#ffd1dc', '#7a5cff', '#f3c623'].map((c, i) => `<rect x="${20 + i * 14}" y="36" width="9" height="22" rx="2" fill="${c}"/><rect x="${21 + i * 14}" y="30" width="7" height="7" fill="#222"/>`).join('')}${CHAIN(96, 74, 140, 74, 8)}${HEARTS(104, 82, 3, 12)}<rect x="96" y="40" width="44" height="12" rx="3" fill="#a070ff"/><text x="118" y="49" text-anchor="middle" font-size="6.5" fill="#fff">lampe UV</text><text x="8" y="14" font-size="7.5" fill="#fff">noemie.nails · mar. 18 h 05 · « Prête pour le gel ✨ »</text></svg>`,
-  ongles: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#f3e6ef"/><path d="M40 110 L58 54 Q80 40 104 54 L118 110Z" fill="#f0c7a4"/>${[52, 66, 80, 94, 108].map((x, i) => `<rect x="${x - 5}" y="${30 + Math.abs(2 - i) * 6}" width="10" height="28" rx="5" fill="#f0c7a4"/><rect x="${x - 4}" y="${30 + Math.abs(2 - i) * 6}" width="8" height="9" rx="4" fill="#ff8fb8"/>`).join('')}${CHAIN(50, 92, 114, 92, 6)}${HEARTS(64, 98, 3, 14)}<text x="6" y="12" font-size="7.5" fill="#7a3a5a">mar. 19 h 40 · « Baby pink 💗 »</text></svg>`,
-  bu: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#d8e2ea"/>${Array.from({ length: 6 }, (_, i) => `<rect x="${i * 28}" y="0" width="24" height="44" fill="#9fb3c4"/>`).join('')}${[
-    [34, '#e8b4a0', '#3a2a1a'],
-    [64, '#f0c8a8', '#d9b36a'],
-    [94, '#c98e64', '#1a1a1a'],
-    [124, '#e2b18e', '#5a3a24']
+  // 1. le bracelet dans son écrin, le jour du cadeau
+  bracelet: phSvg(
+    'br',
+    `<rect width="320" height="220" fill="#3b1d24"/><rect width="320" height="220" fill="url(#brgl)" opacity=".12"/>
+<path d="M0 150 L320 150 L320 220 L0 220Z" fill="#6e4a33"/><path d="M0 150 L320 150" stroke="#8a6046" stroke-width="2"/>
+${Array.from({ length: 7 }, (_, i) => `<path d="M0 ${162 + i * 9} Q160 ${158 + i * 9} 320 ${164 + i * 9}" stroke="#5e3e2a" stroke-width=".8" fill="none" opacity=".6"/>`).join('')}
+<g transform="translate(160 118)"><ellipse cx="0" cy="44" rx="120" ry="10" fill="#000" opacity=".35" filter="url(#brom)"/>
+<path d="M-104 -58 L104 -58 L96 -96 L-96 -96Z" fill="#7a1f33"/><path d="M-96 -92 L96 -92 L100 -62 L-100 -62Z" fill="#f6e8ec"/><path d="M-96 -92 L96 -92 L100 -62 L-100 -62Z" fill="url(#brgl)" opacity=".5"/>
+<text x="0" y="-74" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="11" fill="#a35a70">Joyeux Noël, mon amour</text>
+<rect x="-110" y="-58" width="220" height="100" rx="8" fill="#8c2639"/><rect x="-102" y="-50" width="204" height="84" rx="5" fill="#a83a52"/>
+<path d="M-102 -50 h204 v20 q-102 10 -204 0Z" fill="#c25a72" opacity=".45"/>
+<ellipse cx="0" cy="-6" rx="78" ry="24" fill="#7a1f33" opacity=".55"/>
+${phBracelet('br', -74, -14, 74, -14, 30, {
+  n: 46,
+  h: 5,
+  hs: 15,
+  w: 2.3,
+  sw: 1.5,
+  eclat: [
+    [-30, 2, 5],
+    [42, -2, 4]
   ]
-    .map(
-      ([x, sk, h]) =>
-        `<circle cx="${x}" cy="58" r="12" fill="${sk}"/><path d="M${x - 12} 56 q12 -16 24 0" fill="${h}"/><rect x="${x - 14}" y="70" width="28" height="40" rx="6" fill="#fff"/>`
-    )
-    .join(
-      ''
-    )}<path d="M58 84 l-10 10" stroke="#f0c8a8" stroke-width="7" stroke-linecap="round"/>${CHAIN(44, 96, 54, 90, 2)}<circle cx="50" cy="94" r="2.5" fill="#ff8fb8"/><text x="6" y="106" font-size="7" fill="#fff">mer. 13 h · BU Rockefeller</text></svg>`,
-  resto: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#4a2418"/><rect x="0" y="70" width="160" height="40" fill="#7a4a2a"/><ellipse cx="80" cy="76" rx="40" ry="8" fill="#f3e2b0"/><circle cx="80" cy="74" r="14" fill="#e0a040"/>${[
-    [40, '#f0c8a8', '#d9b36a'],
-    [80, '#e8b4a0', '#3a2a1a'],
-    [120, '#f0c8a8', '#2a1a10']
-  ]
-    .map(
-      ([x, sk, h]) =>
-        `<circle cx="${x}" cy="36" r="11" fill="${sk}"/><path d="M${x - 11} 34 q11 -14 22 0" fill="${h}"/><rect x="${x - 12}" y="47" width="24" height="18" rx="5" fill="#2a3a5a"/>`
-    )
-    .join(
-      ''
-    )}<path d="M92 60 l8 10" stroke="#e8b4a0" stroke-width="6" stroke-linecap="round"/>${CHAIN(94, 66, 104, 72, 1)}<circle cx="99" cy="70" r="2.4" fill="#ff8fb8"/><text x="6" y="104" font-size="7" fill="#fff">jeu. 21 h 12 · « les meufs 🍕 »</text></svg>`,
-  resto2: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#4a2418"/><rect x="0" y="70" width="160" height="40" fill="#7a4a2a"/><circle cx="58" cy="38" r="12" fill="#f0c8a8"/><path d="M46 36 q12 -16 24 0" fill="#2a1a10"/><rect x="44" y="50" width="28" height="22" rx="5" fill="#5a3a7a"/><path d="M40 70 h40 l-4 26 h-32z" fill="#3a2a2a"/><rect x="80" y="62" width="30" height="12" rx="5" fill="#2a2a2a"/><circle cx="88" cy="68" r="4" fill="none" stroke="#9fd0ff" stroke-width="2"/><circle cx="100" cy="68" r="4" fill="none" stroke="#9fd0ff" stroke-width="2"/><rect x="118" y="30" width="22" height="40" rx="3" fill="#111"/><rect x="120" y="34" width="18" height="30" fill="#4fd1ff"/><text x="6" y="104" font-size="7" fill="#fff">jeu. 21 h 40 · chaise de Célestine vide</text></svg>`,
-  tp: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#eef3f6"/><rect x="0" y="66" width="160" height="44" fill="#2a3440"/>${[30, 52, 74].map(x => `<rect x="${x}" y="44" width="10" height="22" rx="3" fill="#cfe6ff" stroke="#7aa0c0"/>`).join('')}<circle cx="118" cy="36" r="12" fill="#c98e64"/><path d="M106 34 q12 -16 24 0" fill="#1a1a1a"/><rect x="104" y="48" width="28" height="22" rx="5" fill="#fff" stroke="#ccc"/><rect x="92" y="56" width="26" height="11" rx="5" fill="#ff8fb8"/><text x="105" y="64" text-anchor="middle" font-size="5.5" fill="#fff">C.</text><text x="6" y="104" font-size="7" fill="#fff">ven. 8 h 50 · TP de chimie analytique</text></svg>`,
-  snap: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#e9f0f2"/><rect x="88" y="22" width="60" height="10" fill="#cfd9dd"/><ellipse cx="118" cy="22" rx="18" ry="5" fill="#f7d7e0" stroke="#d9a3b3" stroke-width="1.5"/><path d="M108 21 q10 4 20 0" fill="none" stroke="#e6b94a" stroke-width="1.6" stroke-dasharray="2 1"/><circle cx="114" cy="21" r="1.6" fill="#ff8fb8"/><circle cx="121" cy="22" r="1.6" fill="#ff8fb8"/><circle cx="58" cy="50" r="18" fill="#f0c8a8"/><path d="M40 46 q18 -26 36 0 l2 16 q-20 -8 -40 0Z" fill="#6a3a24"/><circle cx="51" cy="50" r="5" fill="none" stroke="#333" stroke-width="1.6"/><circle cx="65" cy="50" r="5" fill="none" stroke="#333" stroke-width="1.6"/><path d="M30 110 q28 -44 56 0Z" fill="#f2f2f2"/><rect x="70" y="58" width="14" height="24" rx="2" fill="#111"/><rect x="0" y="0" width="160" height="14" fill="#fffc00"/><text x="6" y="10" font-size="7.5" fill="#111">ven. 7 h 51 · « en retard 😭 »</text></svg>`,
-  zoom: `<svg viewBox="0 0 160 110"><rect width="160" height="110" fill="#f7d7e0"/><ellipse cx="80" cy="60" rx="70" ry="30" fill="#fbe9ee" stroke="#d9a3b3" stroke-width="3"/>${CHAIN(24, 58, 136, 58, 10)}${HEARTS(42, 66, 5, 20)}<rect x="74" y="64" width="12" height="6" rx="2" fill="#e6b94a"/><circle cx="130" cy="20" r="14" fill="none" stroke="#333" stroke-width="3"/><path d="M140 30 l12 12" stroke="#333" stroke-width="4"/><text x="6" y="104" font-size="7" fill="#7a3a5a">agrandissement ×8 · Dr Rodolphe</text></svg>`
+})}
+</g>
+<g transform="translate(250 176) rotate(-8)"><rect x="-34" y="-18" width="68" height="40" rx="3" fill="#fffaf0"/><path d="M-34 -18 L34 -18" stroke="#e2c7a2"/><text x="0" y="0" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="10" fill="#7a3a4a">24 · 12 · 2025</text><text x="0" y="13" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="8.5" fill="#a0707a">— V. ♡</text></g>
+<g transform="translate(46 182) rotate(12)"><path d="M-26 -4 Q0 -14 26 -4 Q0 6 -26 -4Z" fill="#c8a24a"/><path d="M-6 -6 Q-22 -26 -4 -16 Q4 -26 6 -6Z" fill="#e8c35a"/></g>`
+  ),
+  // 2. le sac vidé sur le lit, dimanche soir
+  sac: phSvg(
+    'sc',
+    `<rect width="320" height="220" fill="#e9e1d6"/>
+${Array.from({ length: 12 }, (_, i) => `<path d="M${i * 30 - 20} 0 L${i * 30 + 40} 220" stroke="#ddd3c4" stroke-width="10" opacity=".5"/>`).join('')}
+<path d="M0 0 L320 0 L320 26 Q160 40 0 26Z" fill="#d6ccbd"/>
+<g transform="translate(92 118)"><ellipse cx="0" cy="62" rx="74" ry="9" fill="#000" opacity=".2" filter="url(#scom)"/>
+<path d="M-62 -20 L62 -20 L54 60 L-54 60Z" fill="#2f2523"/><path d="M-62 -20 L62 -20 L60 -4 L-60 -4Z" fill="#3e302c"/><path d="M-50 60 L-56 -10 M50 60 L56 -10" stroke="#1f1816" stroke-width="1.5"/>
+<path d="M-34 -20 C-30 -70 30 -70 34 -20" fill="none" stroke="#2f2523" stroke-width="7"/><path d="M-34 -20 C-30 -66 30 -66 34 -20" fill="none" stroke="#4a3a35" stroke-width="2"/>
+<rect x="-14" y="10" width="28" height="18" rx="3" fill="#3e302c" stroke="#c9a45a" stroke-width="1.2"/><circle cx="0" cy="19" r="2.5" fill="#c9a45a"/>
+<path d="M-60 -4 Q0 8 60 -4" fill="none" stroke="#1a1312" stroke-width="2" opacity=".6"/></g>
+<g transform="translate(224 60) rotate(-6)"><rect x="-48" y="-16" width="96" height="34" rx="14" fill="#f48fb5"/><rect x="-48" y="-16" width="96" height="14" rx="10" fill="#f9b4cd"/><path d="M-40 -2 h80" stroke="#b9577e" stroke-width="2" stroke-dasharray="2.5 1.5"/><rect x="38" y="-6" width="10" height="7" rx="2" fill="#d9d9d9"/><path d="M-40 -2 Q0 6 40 -2" fill="none" stroke="#c46a90" stroke-width="1" opacity=".6"/><text x="0" y="13" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="8" fill="#fff" font-weight="700">ouverte · vide</text></g>
+<g transform="translate(232 128) rotate(8)"><rect x="-34" y="-20" width="68" height="40" rx="5" fill="#6b4126"/><rect x="-34" y="-20" width="68" height="16" rx="5" fill="#7d4e30"/><path d="M-30 -4 h60" stroke="#4e2e1a" stroke-width="1"/><circle cx="24" cy="-6" r="3.4" fill="#d4b15e"/><rect x="-28" y="4" width="34" height="3" rx="1" fill="#4e2e1a" opacity=".6"/></g>
+<g transform="translate(272 182)"><circle r="9" fill="none" stroke="#a8a8a8" stroke-width="3"/><path d="M6 6 L30 22 L28 26 L24 24 L22 28 L18 25" fill="#c7c7c7" stroke="#8a8a8a" stroke-width="1"/><circle cx="-14" cy="12" r="7" fill="#ffd34d" stroke="#c89b20"/><text x="-14" y="15" text-anchor="middle" font-size="8">🏠</text></g>
+<g transform="translate(184 182) rotate(-14)"><rect x="-22" y="-12" width="44" height="24" rx="3" fill="#ffffff" stroke="#cfd8e2"/><rect x="-22" y="-12" width="44" height="8" fill="#4aa3df"/><path d="M-6 0 q6 6 12 0" fill="none" stroke="#9cb4c8" stroke-width="1.5"/></g>
+<g transform="translate(36 40) rotate(20)"><rect x="-5" y="-16" width="10" height="32" rx="4" fill="#e85d8a"/><rect x="-5" y="-16" width="10" height="10" rx="4" fill="#f7f7f7"/></g>`
+  ),
+  // 3. le vide-poche de la salle de bain, vide
+  videpoche: phSvg(
+    'vp',
+    `<rect width="320" height="220" fill="#eef3f4"/>
+${Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 0 V128" stroke="#d7e1e4" stroke-width="2"/>`).join('')}${Array.from({ length: 4 }, (_, i) => `<path d="M0 ${i * 32} H320" stroke="#d7e1e4" stroke-width="2"/>`).join('')}
+<rect x="0" y="128" width="320" height="14" fill="#f7f7f5"/><rect x="0" y="142" width="320" height="6" fill="#c9d3d6"/><path d="M0 148 H320 V220 H0Z" fill="#dfe7ea"/>
+<rect x="206" y="0" width="114" height="106" rx="4" fill="#cfe2ea" stroke="#b5c7cf" stroke-width="3"/><path d="M220 12 L250 0 M226 40 L300 4 M240 80 L318 30" stroke="#fff" stroke-width="5" opacity=".5"/>
+<g transform="translate(150 128)"><ellipse cx="0" cy="2" rx="52" ry="9" fill="#000" opacity=".18" filter="url(#vpom)"/><path d="M-48 -6 Q-46 8 0 8 Q46 8 48 -6Z" fill="#f2c6d3"/><ellipse cx="0" cy="-6" rx="48" ry="10" fill="#f7d7e0" stroke="#d9a3b3" stroke-width="1.6"/><ellipse cx="0" cy="-5" rx="38" ry="6.5" fill="#fbe9ee"/><ellipse cx="-12" cy="-7" rx="10" ry="2" fill="#fff" opacity=".7"/></g>
+<g transform="translate(46 128)"><rect x="-12" y="-46" width="24" height="46" rx="5" fill="#bcdaf0" opacity=".9"/><rect x="-12" y="-46" width="6" height="46" rx="3" fill="#fff" opacity=".5"/><rect x="-4" y="-66" width="3" height="26" rx="1.5" fill="#4fb0e8"/><rect x="2" y="-62" width="3" height="22" rx="1.5" fill="#ff8fb8"/></g>
+<g transform="translate(88 128)"><rect x="-10" y="-34" width="20" height="34" rx="4" fill="#f3c6a0"/><rect x="-3" y="-44" width="6" height="12" fill="#ddd"/><path d="M-3 -44 h12 v3 h-12z" fill="#ddd"/><rect x="-7" y="-24" width="14" height="10" rx="2" fill="#fff" opacity=".7"/></g>
+<g transform="translate(254 128)"><path d="M-16 0 L-12 -22 L12 -22 L16 0Z" fill="#e7dccd"/><path d="M0 -22 C-14 -40 -20 -46 -24 -58 M0 -22 C4 -44 2 -54 6 -64 M0 -22 C10 -36 22 -42 26 -52" stroke="#5f8f5a" stroke-width="2.4" fill="none"/>${[
+      [-24, -58],
+      [6, -64],
+      [26, -52],
+      [-14, -40],
+      [12, -40]
+    ]
+      .map(([a, b]) => `<ellipse cx="${a}" cy="${b}" rx="7" ry="3.4" fill="#79b06f" transform="rotate(-30 ${a} ${b})"/>`)
+      .join('')}</g>
+<path d="M286 142 v70 q0 6 -6 6 h-30 q-6 0 -6 -6 v-70Z" fill="#f2a9c0"/><path d="M244 150 h42 M244 158 h42" stroke="#e48aa8" stroke-width="2"/>`
+  ),
+  // 4. la story de Noémie : « Prête pour le gel »
+  storyn: phSvg(
+    'sn',
+    `<rect width="320" height="220" fill="#2b1a26"/><circle cx="250" cy="80" r="70" fill="#8a5cff" opacity=".18" filter="url(#snfl)"/>
+<path d="M0 110 L320 110 L320 220 L0 220Z" fill="#e9dcc8"/><path d="M0 110 L320 110" stroke="#cdbfa8" stroke-width="2"/>
+<path d="M30 128 L208 122 L216 204 L22 212Z" fill="#f6f0f6"/><path d="M30 128 L208 122 L210 140 L28 146Z" fill="#ffffff" opacity=".6"/>
+${['#ff4f7b', '#c0233a', '#ffd1dc', '#7a5cff', '#f3c623']
+  .map(
+    (c, i) =>
+      `<g transform="translate(${44 + i * 30} 104)"><ellipse cx="0" cy="26" rx="13" ry="3" fill="#000" opacity=".25"/><rect x="-10" y="-4" width="20" height="30" rx="5" fill="${c}"/><rect x="-10" y="-4" width="6" height="30" rx="3" fill="#fff" opacity=".35"/><rect x="-6" y="8" width="12" height="10" rx="1.5" fill="#fff" opacity=".8"/><rect x="-5" y="-22" width="10" height="19" rx="2" fill="#1c1c1c"/><rect x="-5" y="-22" width="3" height="19" fill="#555"/></g>`
+  )
+  .join('')}
+<g transform="translate(262 136)"><ellipse cx="0" cy="30" rx="48" ry="8" fill="#000" opacity=".3"/><path d="M-44 28 L-40 -4 Q0 -30 40 -4 L44 28Z" fill="#f2f2f6"/><path d="M-32 28 L-30 4 Q0 -14 30 4 L32 28Z" fill="#b48cff"/><path d="M-30 28 L-28 6 Q0 -10 28 6 L30 28Z" fill="#d9c4ff" opacity=".6"/><rect x="-10" y="-20" width="20" height="5" rx="2" fill="#7a5cff"/><circle cx="26" cy="-6" r="2.5" fill="#56f07a"/></g>
+<g transform="translate(70 178) rotate(-10)"><rect x="-26" y="-3" width="52" height="6" rx="3" fill="#d8b4a0"/><rect x="-26" y="-3" width="52" height="2" rx="1" fill="#fff" opacity=".4"/></g>
+${[
+  [44, 196],
+  [58, 200],
+  [36, 186]
+]
+  .map(([a, b]) => `<circle cx="${a}" cy="${b}" r="7" fill="#fff" stroke="#eee"/>`)
+  .join('')}
+${phBracelet('sn', 112, 168, 192, 164, 14, { n: 30, h: 5, hs: 9, w: 1.4, eclat: [[150, 182, 3.4]] })}
+${phStory('sn', 'noemie.nails', '18 h 05', 96)}
+<g transform="translate(160 66) rotate(-4)"><rect x="-86" y="-15" width="172" height="28" rx="8" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#c0234a">Prête pour le gel 💅</text></g>`
+  ),
+  // 5. les ongles finis, le bracelet de nouveau au poignet
+  ongles: phSvg(
+    'og',
+    `<rect width="320" height="220" fill="#f4e3ec"/><circle cx="60" cy="40" r="80" fill="#fff" opacity=".45" filter="url(#ogfl)"/>
+<path d="M0 170 Q160 150 320 176 V220 H0Z" fill="#e8cfdb"/>
+<g transform="translate(172 120) rotate(-8) scale(.9)">
+<path d="M-50 130 L-46 34 Q-44 8 -24 4 L34 2 Q54 6 56 32 L60 130Z" fill="#efc4a3"/>
+<path d="M-44 34 Q-42 60 -48 120 L-56 120Z" fill="#dba886" opacity=".7"/>
+${[
+  [-34, -44, 17, -5],
+  [-13, -62, 17.5, -1.5],
+  [8, -66, 17.5, 1.5],
+  [29, -56, 16.5, 4],
+  [42, -22, 15.5, 38]
+]
+  .map(
+    ([fx, fy, w, r]) =>
+      `<g transform="rotate(${r} ${fx} 10)"><rect x="${fx - w / 2}" y="${fy}" width="${w}" height="${(10 - fy) * 1.02}" rx="${w / 2}" fill="#efc4a3"/><path d="M${fx - w / 2 + 1} ${fy + 26} h${w - 2} M${fx - w / 2 + 1.5} ${fy + 42} h${w - 3}" stroke="#d29c7b" stroke-width=".9"/><rect x="${fx - w / 2 + 1.6}" y="${fy + 1.4}" width="${w - 3.2}" height="16" rx="${(w - 3.2) / 2}" fill="#ffb2cb"/><rect x="${fx - w / 2 + 3}" y="${fy + 3}" width="2.2" height="10" rx="1.1" fill="#fff" opacity=".85"/><path d="M${fx - w / 2 + 1.6} ${fy + 12} q${(w - 3.2) / 2} 5 ${w - 3.2} 0" fill="none" stroke="#f08db0" stroke-width=".8"/></g>`
+  )
+  .join('')}
+${phBracelet('og', -52, 82, 62, 82, 12, { n: 40, h: 5, hs: 11, w: 1.8, sw: 1.2, eclat: [[-10, 98, 4]] })}
+</g>
+${phStory('og', 'noemie.nails', '19 h 40', 230)}
+<g transform="translate(86 74) rotate(-6)"><rect x="-58" y="-15" width="116" height="28" rx="14" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#e0567f">Baby pink 💗</text></g>`
+  ),
+  // 6. selfie d'Erika à la BU, mercredi 13 h
+  bu: phSvg(
+    'bu',
+    `<rect width="320" height="220" fill="#d9cbb5"/>
+${Array.from(
+  { length: 3 },
+  (_, r) =>
+    `<rect x="0" y="${r * 44}" width="320" height="6" fill="#8a6a48"/>` +
+    Array.from({ length: 34 }, (_, i) => {
+      const h = 26 + ((i * 7 + r * 5) % 11),
+        c = ['#7a2f3a', '#2f4a6b', '#3f6b4a', '#c9a04a', '#5a3a6b', '#b85a3a', '#2a2a2a', '#8aa0b8'][(i * 3 + r) % 8];
+      return `<rect x="${i * 9.6 + (r % 2) * 3}" y="${r * 44 + 6 + (38 - h)}" width="8.4" height="${h}" fill="${c}"/><rect x="${i * 9.6 + (r % 2) * 3 + 1}" y="${r * 44 + 10 + (38 - h)}" width="6.4" height="2" fill="#fff" opacity=".35"/>`;
+    }).join('')
+).join('')}
+<rect x="0" y="132" width="320" height="88" fill="#cbb9a0"/>
+${phPerso('bu', 50, 120, 1.12, { peau: '#c98e64', cheveux: '#151010', coiffure: 'boucles', haut: '#d9b36a', regard: 0.6 })}
+${phPerso('bu', 270, 118, 1.12, { peau: '#e9b896', cheveux: '#5a3a24', coiffure: 'chignon', haut: '#4a6b8a', regard: -0.6 })}
+${phPerso('bu', 120, 112, 1.22, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#f0e6dc', bouche: 'rire' })}
+${phPerso('bu', 196, 116, 1.18, { peau: '#f0c8a8', cheveux: '#d9b36a', coiffure: 'queue', haut: '#7a2f3a', regard: -0.4 })}
+${phBras(146, 150, 154, 98, '#f3cfb3', '#f0e6dc', 11)}
+<g transform="translate(154 96)"><rect x="-5" y="-20" width="5" height="14" rx="2.5" fill="#f3cfb3"/><rect x="1" y="-22" width="5" height="16" rx="2.5" fill="#f3cfb3"/></g>
+${phBras(220, 160, 236, 214, '#f0c8a8', '#7a2f3a', 12)}
+${phBracelet('bu', 143, 110, 163, 106, 4, { n: 14, h: 3, hs: 5, w: 1, sw: 0.8, eclat: [[156, 114, 2.6]] })}
+<rect x="0" y="150" width="320" height="22" fill="#0007"/><text x="160" y="166" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="12" font-weight="700" fill="#fff">pause BU, on survit 📚😵</text>
+${phTampon(312, 210, 'MER. 13:02 · BU ROCKEFELLER', 'end')}`
+  ),
+  // 7. le resto de jeudi, 21 h 12
+  resto: phSvg(
+    're',
+    `<rect width="320" height="220" fill="#3a1c14"/>
+${Array.from({ length: 6 }, (_, r) => Array.from({ length: 9 }, (_, i) => `<rect x="${i * 38 + (r % 2) * 19 - 10}" y="${r * 20}" width="34" height="16" rx="2" fill="#6a2e1e" opacity="${0.5 + ((i + r) % 3) * 0.12}"/>`).join('')).join('')}
+<path d="M0 18 Q80 34 160 20 Q240 6 320 24" fill="none" stroke="#2a1a12" stroke-width="1.2"/>
+${Array.from({ length: 11 }, (_, i) => {
+  const x = i * 31 + 6,
+    y = 22 + Math.sin(i * 0.9) * 7;
+  return `<circle cx="${x}" cy="${y}" r="10" fill="#ffcf70" opacity=".25" filter="url(#refl)"/><circle cx="${x}" cy="${y}" r="3" fill="#ffe7a8"/>`;
+}).join('')}
+${phPerso('re', 64, 96, 1.1, { peau: '#f0c8a8', cheveux: '#c99a4a', coiffure: 'carre', haut: '#2a2a3a', bouche: 'rire', regard: 0.5 })}
+${phPerso('re', 256, 94, 1.1, { peau: '#f3d2b8', cheveux: '#2a1a10', coiffure: 'long', haut: '#5a3a7a', regard: -0.6, lunettes: 1 })}
+${phPerso('re', 160, 90, 1.16, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#a8323e', bouche: 'rire' })}
+<path d="M0 156 L320 156 L320 220 L0 220Z" fill="#7a4a2a"/><path d="M0 156 L320 156" stroke="#9a6a44" stroke-width="3"/>
+<g transform="translate(160 184)"><ellipse cx="0" cy="6" rx="78" ry="16" fill="#000" opacity=".3"/><ellipse cx="0" cy="0" rx="74" ry="15" fill="#d8d8d8"/><ellipse cx="0" cy="-2" rx="62" ry="12" fill="#e0a040"/><ellipse cx="0" cy="-3" rx="54" ry="9.5" fill="#d9472e"/>${[
+      [-30, -4],
+      [-8, -6],
+      [16, -2],
+      [36, -5],
+      [-18, 1],
+      [4, 2],
+      [26, 2]
+    ]
+      .map(([a, b]) => `<ellipse cx="${a}" cy="${b}" rx="7" ry="3.6" fill="#fff4d6"/>`)
+      .join('')}${[
+      [-36, 0],
+      [10, -6],
+      [30, 0]
+    ]
+      .map(([a, b]) => `<ellipse cx="${a}" cy="${b}" rx="4" ry="1.8" fill="#4a9a3a"/>`)
+      .join('')}<path d="M0 -12 L-26 9 M0 -12 L28 8 M0 -12 L2 12" stroke="#b77a2a" stroke-width="1"/></g>
+${[
+  [54, 160],
+  [270, 158]
+]
+  .map(
+    ([a, b]) =>
+      `<g transform="translate(${a} ${b})"><path d="M-9 -30 Q-9 -12 0 -10 Q9 -12 9 -30Z" fill="#fff" opacity=".35" stroke="#fff8" stroke-width="1"/><path d="M-8.4 -22 Q-8 -12 0 -11 Q8 -12 8.4 -22Z" fill="#8a1a2a"/><path d="M0 -10 V0 M-7 0 h14" stroke="#fff8" stroke-width="1.5"/></g>`
+  )
+  .join('')}
+${phBras(136, 142, 196, 128, '#f3cfb3', '#a8323e', 10)}
+<g transform="translate(200 126)"><path d="M-7 -26 Q-7 -10 0 -8 Q7 -10 7 -26Z" fill="#fff" opacity=".35" stroke="#fff8"/><path d="M-6.4 -20 Q-6 -10 0 -9 Q6 -10 6.4 -20Z" fill="#8a1a2a"/><path d="M0 -8 V2" stroke="#fff8" stroke-width="1.4"/></g>
+${phBracelet('re', 176, 126, 186, 140, 0, { n: 12, h: 3, hs: 4.6, w: 1, sw: 0.8, eclat: [[184, 136, 2.6]] })}
+${phTampon(10, 210, 'JEU. 21:12 · « les meufs 🍕 »')}`
+  ),
+  // 8. pendant que Célestine est aux toilettes : Emma, le sac sur les genoux
+  resto2: phSvg(
+    'r2',
+    `<rect width="320" height="220" fill="#3a1c14"/>
+${Array.from({ length: 6 }, (_, r) => Array.from({ length: 9 }, (_, i) => `<rect x="${i * 38 + (r % 2) * 19 - 10}" y="${r * 20}" width="34" height="16" rx="2" fill="#6a2e1e" opacity="${0.5 + ((i + r) % 3) * 0.12}"/>`).join('')).join('')}
+${Array.from({ length: 6 }, (_, i) => `<circle cx="${i * 60 + 20}" cy="${18 + (i % 2) * 6}" r="11" fill="#ffcf70" opacity=".25" filter="url(#r2fl)"/><circle cx="${i * 60 + 20}" cy="${18 + (i % 2) * 6}" r="3" fill="#ffe7a8"/>`).join('')}
+<g transform="translate(236 104)"><rect x="-26" y="-10" width="52" height="80" rx="6" fill="#5a3320"/><rect x="-30" y="66" width="60" height="10" rx="3" fill="#4a2a18"/><path d="M-22 -6 Q-30 30 -18 70 L18 70 Q26 30 22 -6 Q0 4 -22 -6Z" fill="#c0233a"/><path d="M-6 -2 L-2 70 M8 -2 L4 70" stroke="#8a1a2a" stroke-width="1.6"/><text x="0" y="-16" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#ffe0b0">la chaise de Célestine</text></g>
+${phPerso('r2', 96, 76, 1.08, { peau: '#f3d2b8', cheveux: '#2a1a10', coiffure: 'long', haut: '#5a3a7a', regard: 1.6, lunettes: 1 })}
+<path d="M44 140 L148 140 L150 150 L42 150Z" fill="#4a2f52"/>
+<g transform="translate(98 150)"><path d="M-44 -6 L44 -6 L38 46 L-38 46Z" fill="#2f2523"/><path d="M-44 -6 L44 -6 L42 6 L-42 6Z" fill="#43342f"/><path d="M-24 -6 C-22 -36 22 -36 24 -6" fill="none" stroke="#2f2523" stroke-width="5"/><rect x="-10" y="16" width="20" height="13" rx="2" fill="#3e302c" stroke="#c9a45a"/><path d="M-30 -6 Q-20 -18 -6 -10" fill="none" stroke="#f48fb5" stroke-width="7" stroke-linecap="round"/><text x="0" y="40" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="8" font-weight="700" fill="#ffe0b0">sac de Célestine</text></g>
+${phBras(66, 120, 62, 146, '#f3d2b8', '#5a3a7a', 9)}${phBras(126, 120, 150, 134, '#f3d2b8', '#5a3a7a', 9)}
+<path d="M150 150 L320 150 L320 220 L150 220Z" fill="#7a4a2a"/><path d="M150 150 L320 150" stroke="#9a6a44" stroke-width="3"/><path d="M150 150 L150 220" stroke="#5a3420" stroke-width="3"/>
+<g transform="translate(192 162)"><rect x="-22" y="-8" width="44" height="18" rx="8" fill="#1c1c1c"/><path d="M-22 -8 Q0 -24 22 -8" fill="#333" stroke="#111"/><g fill="#cfeaff88" stroke="#222" stroke-width="2"><circle cx="-8" cy="1" r="6"/><circle cx="8" cy="1" r="6"/></g><path d="M-2 1 h4" stroke="#222" stroke-width="2"/></g>
+<g transform="translate(160 136) rotate(-12)"><rect x="-10" y="-18" width="20" height="36" rx="4" fill="#111"/><rect x="-8" y="-15" width="16" height="28" rx="2" fill="#e8f6ff"/><text x="0" y="-5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="7.5" font-weight="800" fill="#1a5a8a">E</text><text x="0" y="3" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="5" font-weight="700" fill="#1a5a8a">F P</text><text x="0" y="9" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="3" font-weight="700" fill="#1a5a8a">T O Z</text></g>
+<g transform="translate(270 186)"><ellipse cx="0" cy="6" rx="40" ry="9" fill="#000" opacity=".3"/><ellipse cx="0" cy="0" rx="36" ry="8" fill="#d8d8d8"/><path d="M-30 -1 L0 -6 L28 0 L0 6Z" fill="#e0a040"/><path d="M-24 -1 L0 -4 L22 0 L0 4Z" fill="#d9472e"/></g>
+${phTampon(10, 210, 'JEU. 21:40 · chaise vide 👀')}`
+  ),
+  // 9. la photo du TP : Nora tient la trousse rose
+  tp: phSvg(
+    'tp',
+    `<rect width="320" height="220" fill="#e8eef2"/>
+${Array.from({ length: 4 }, (_, i) => `<rect x="${12 + i * 78}" y="10" width="68" height="70" rx="2" fill="#bcd8ea"/><path d="M${12 + i * 78} 45 h68 M${46 + i * 78} 10 v70" stroke="#fff" stroke-width="3"/><path d="M${18 + i * 78} 70 L${60 + i * 78} 16" stroke="#fff" stroke-width="6" opacity=".35"/>`).join('')}
+<rect x="0" y="84" width="320" height="8" fill="#cfd8de"/>
+${phPerso('tp', 80, 98, 1.0, { peau: '#f0c8a8', cheveux: '#d9b36a', coiffure: 'queue', haut: '#ffffff', blouse: 1, lunettes: 'labo', regard: 1.2 })}
+${phPerso('tp', 196, 92, 1.14, { peau: '#c98e64', cheveux: '#151010', coiffure: 'chignon', haut: '#ffffff', blouse: 1, lunettes: 'labo', regard: -1.4 })}
+<path d="M0 150 L320 150 L320 220 L0 220Z" fill="#2a3440"/><path d="M0 150 L320 150" stroke="#46566a" stroke-width="3"/>
+${phBras(170, 132, 150, 150, '#c98e64', '#ffffff', 10)}${phBras(222, 132, 196, 156, '#c98e64', '#ffffff', 10)}
+<g transform="translate(172 152) rotate(-8)"><rect x="-30" y="-11" width="60" height="22" rx="10" fill="#f48fb5"/><rect x="-30" y="-11" width="60" height="9" rx="7" fill="#f9b4cd"/><path d="M-24 0 h48" stroke="#b9577e" stroke-width="1.6" stroke-dasharray="2 1.2"/><text x="0" y="8.5" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="7" fill="#fff">Célestine</text></g>
+${[
+  [40, 172, '#9be0b0'],
+  [70, 176, '#ffd76b'],
+  [256, 170, '#a8c8ff'],
+  [286, 176, '#ffb0c8']
+]
+  .map(
+    ([a, b, c]) =>
+      `<g transform="translate(${a} ${b})"><path d="M-6 -24 v12 L-14 10 Q-14 16 -8 16 h16 Q14 16 14 10 L6 -12 v-12Z" fill="#e8f6ff" opacity=".85" stroke="#9cc8e0"/><path d="M-11 4 L11 4 L14 10 Q14 16 8 16 h-16 Q-14 16 -14 10Z" fill="${c}"/><rect x="-7" y="-27" width="14" height="4" rx="1" fill="#9cc8e0"/></g>`
+  )
+  .join('')}
+<g transform="translate(120 186)"><rect x="-26" y="-4" width="52" height="10" rx="2" fill="#c9d3da"/>${[-18, -6, 6, 18].map(a => `<rect x="${a - 2.5}" y="-28" width="5" height="26" rx="2" fill="#e8f6ff" stroke="#9cc8e0" stroke-width=".8"/><rect x="${a - 2.5}" y="-12" width="5" height="10" rx="2" fill="#ff8fb8" opacity=".8"/>`).join('')}</g>
+${phTampon(312, 210, 'VEN. 8:50 · TP SALLE 214', 'end')}`
+  ),
+  // 10. le selfie du vendredi matin, 7 h 51 (le bracelet brille dans le vide-poche)
+  snap: phSvg(
+    'sp',
+    `<rect width="320" height="220" fill="#eef3f4"/>
+${Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 0 V220" stroke="#d7e1e4" stroke-width="2"/>`).join('')}${Array.from({ length: 7 }, (_, i) => `<path d="M0 ${i * 32} H320" stroke="#d7e1e4" stroke-width="2"/>`).join('')}
+<rect x="196" y="74" width="124" height="10" fill="#f7f7f5"/><rect x="196" y="84" width="124" height="4" fill="#c9d3d6"/>
+<g transform="translate(262 74)"><path d="M-24 -4 Q-23 4 0 4 Q23 4 24 -4Z" fill="#f2c6d3"/><ellipse cx="0" cy="-4" rx="24" ry="5" fill="#f7d7e0" stroke="#d9a3b3" stroke-width="1"/>${phBracelet(
+      'sp',
+      -14,
+      -6,
+      14,
+      -6,
+      3,
+      {
+        n: 14,
+        h: 3,
+        hs: 4,
+        w: 0.9,
+        sw: 0.7,
+        eclat: [
+          [2, -4, 4.2],
+          [-8, -5, 2.4]
+        ]
+      }
+    )}</g>
+<g transform="translate(222 74)"><rect x="-6" y="-24" width="12" height="24" rx="3" fill="#bcdaf0"/><rect x="-2" y="-36" width="2" height="16" fill="#4fb0e8"/></g><g transform="translate(304 74)"><rect x="-5" y="-20" width="10" height="20" rx="3" fill="#f3c6a0"/></g>
+${phPerso('sp', 112, 104, 1.5, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#c9a27a', bouche: 'o' })}
+<path d="M64 196 L64 220 M160 196 V220" stroke="#a8825e" stroke-width="2"/><path d="M98 150 L112 200 L126 150" fill="none" stroke="#a8825e" stroke-width="2"/>
+${phBras(150, 170, 166, 112, '#f3cfb3', '#c9a27a', 13)}
+<g transform="translate(168 98) rotate(8)"><rect x="-15" y="-27" width="30" height="54" rx="6" fill="#1a1a1a"/><rect x="-12" y="-24" width="24" height="48" rx="4" fill="#2a2a2a"/><circle cx="-6" cy="-18" r="3.4" fill="#111" stroke="#555"/><circle cx="-6" cy="-18" r="1.4" fill="#3a6aa8"/></g>
+<rect x="0" y="0" width="320" height="220" fill="#fff" opacity=".06"/>
+<rect x="0" y="150" width="320" height="22" fill="#0007"/><text x="160" y="166" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="12" font-weight="700" fill="#fff">en retard 😭</text>
+${phTampon(312, 16, 'VEN. 7:51', 'end')}`
+  ),
+  // 11. l'agrandissement ×8 du Dr Rodolphe
+  zoom: phSvg(
+    'zm',
+    `<rect width="320" height="220" fill="#1d2a33"/>
+${Array.from({ length: 17 }, (_, i) => `<path d="M${i * 20} 0 V220" stroke="#2c3e4a" stroke-width="1"/>`).join('')}${Array.from({ length: 12 }, (_, i) => `<path d="M0 ${i * 20} H320" stroke="#2c3e4a" stroke-width="1"/>`).join('')}
+<circle cx="150" cy="112" r="96" fill="#f7d7e0"/><circle cx="150" cy="112" r="96" fill="url(#zmgl)" opacity=".25"/>
+<clipPath id="zmcl"><circle cx="150" cy="112" r="96"/></clipPath><ellipse cx="150" cy="150" rx="140" ry="40" fill="#fbe9ee" stroke="#d9a3b3" stroke-width="5" clip-path="url(#zmcl)"/>
+<g>${phBracelet('zm', 74, 92, 226, 92, 28, { n: 40, h: 5, hs: 19, w: 3, sw: 1.8, recolle: 2 })}</g>
+<circle cx="150" cy="112" r="96" fill="none" stroke="#c9d6de" stroke-width="7"/><circle cx="150" cy="112" r="102" fill="none" stroke="#7d8e99" stroke-width="3"/>
+<g font-family="'Courier New',monospace" font-size="10" fill="#9fe8ff" font-weight="700"><path d="M226 92 L262 58" stroke="#9fe8ff" stroke-width="1.2"/><text x="264" y="56">FERMOIR</text><path d="M190 120 L262 134" stroke="#9fe8ff" stroke-width="1.2"/><text x="264" y="132">5 CŒURS</text><text x="264" y="144">ROSES</text><path d="M154 128 L250 178" stroke="#ffb347" stroke-width="1.2"/><text x="252" y="184" fill="#ffb347">trace de</text><text x="252" y="196" fill="#ffb347">colle ?</text></g>
+${phTampon(8, 16, 'LABO · ×8 · VIDE-POCHE · 7:51')}
+<g transform="translate(26 196)"><path d="M0 0 h50 M0 -4 v8 M50 -4 v8" stroke="#9fe8ff" stroke-width="1.5"/><text x="25" y="-6" text-anchor="middle" font-family="'Courier New',monospace" font-size="8" fill="#9fe8ff">1 cm</text></g>`
+  )
 };
 /* ---------- les pièces du dossier ---------- */
 const PIECES = [
