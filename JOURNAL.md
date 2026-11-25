@@ -4,6 +4,11 @@
 
 ---
 
+## 25 novembre 2026 (15 h 15) : main des « ongles finis » redessinée (version 1795613762)
+
+- La main de Célestine sur la photo « Les ongles finis » est refaite avec des proportions naturelles : doigts longs et fins qui s'affinent vers le bout, légèrement écartés, phalanges, pouce bien attaché, paume plus étroite. Le poignet et le bracelet ne changent pas.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`.
+
 ## 25 novembre 2026 (15 h) : vraies têtes sur les photos-indices, nouvelle main au bracelet (version 1795613672)
 
 - Les personnes des photos-indices (BU, resto, Emma au resto, TP, selfie de 7 h 51) ont maintenant leur **vraie tête**, au lieu d'un visage dessiné. Les têtes sont détourées (fond retiré), redressées (Emma, Nora, Erika et Eya penchaient), les yeux sont alignés au même endroit, et le cou dessiné prend la couleur de leur vraie peau. Le fondu ne reste que sous le menton.

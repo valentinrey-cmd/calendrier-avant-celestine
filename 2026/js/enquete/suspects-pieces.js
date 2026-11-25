@@ -337,27 +337,30 @@ ${phStory('sn', 'noemie.nails', '18 h 05', 96)}
     'og',
     `<rect width="320" height="220" fill="#f4e3ec"/><circle cx="70" cy="60" r="90" fill="#fff" opacity=".5" filter="url(#ogfl)"/>
 <path d="M0 176 Q160 160 320 184 V220 H0Z" fill="#ead2dd"/>
-<g transform="translate(178 152) rotate(-7) scale(1.12)">
-<ellipse cx="6" cy="40" rx="34" ry="8" fill="#b98aa0" opacity=".25" filter="url(#ogom)"/>
-<path d="M-21 150 L-20 40 Q-21 24 -25 12 Q-31 -6 -31 -22 Q-31 -38 -24 -44 L22 -44 Q30 -38 30 -22 Q30 -4 24 12 Q20 24 20 40 L22 150Z" fill="#f0c6a6"/>
-<path d="M20 40 Q20 24 24 12 Q30 -4 30 -22 Q30 -38 22 -44 L18 -40 Q24 -30 22 -12 Q18 8 14 28 L14 150 L22 150Z" fill="#d9a483" opacity=".55"/>
-<path d="M-31 -22 Q-31 -6 -25 12 L-21 30 Q-26 8 -27 -20Z" fill="#fff" opacity=".18"/>
-<g transform="translate(-28 -18) rotate(-38)"><rect x="-7.5" y="-40" width="15" height="44" rx="7.5" fill="#f0c6a6"/><path d="M-7.5 -18 Q0 -14 7.5 -18" fill="none" stroke="#d29c7b" stroke-width=".9"/><rect x="-5.6" y="-38.4" width="11.2" height="13" rx="5.6" fill="#ffb3cc"/><rect x="-3.6" y="-36.6" width="2.4" height="8" rx="1.2" fill="#fff" opacity=".85"/></g>
+<g transform="translate(176 150) rotate(-6)">
+<ellipse cx="6" cy="44" rx="30" ry="7" fill="#b98aa0" opacity=".22" filter="url(#ogom)"/>
+${(() => {
+  const pe = '#f2c9aa',
+    om = '#dba586',
+    // un doigt : base (bx, by), longueur L, largeur w, angle a (degrés)
+    doigt = (bx, by, L, w, a) =>
+      `<g transform="translate(${bx} ${by}) rotate(${a})"><path d="M${-w / 2} 4 L${-w * 0.4} ${-L + w * 0.42} A${w * 0.4} ${w * 0.42} 0 0 1 ${w * 0.4} ${-L + w * 0.42} L${w / 2} 4Z" fill="${pe}"/><path d="M${w * 0.18} ${-L * 0.9} L${w * 0.3} 0" stroke="${om}" stroke-width="${w * 0.22}" opacity=".35" stroke-linecap="round"/><path d="M${-w * 0.3} ${-L * 0.36} q${w * 0.3} 1.6 ${w * 0.6} 0 M${-w * 0.28} ${-L * 0.64} q${w * 0.28} 1.3 ${w * 0.56} 0" fill="none" stroke="${om}" stroke-width=".7" opacity=".8"/><rect x="${-w * 0.3}" y="${-L + w * 0.12}" width="${w * 0.6}" height="${L * 0.25}" rx="${w * 0.3}" fill="#ffb3cc"/><path d="M${-w * 0.3} ${-L + w * 0.12 + L * 0.2} q${w * 0.3} ${w * 0.25} ${w * 0.6} 0" fill="none" stroke="#ef8fb1" stroke-width=".6"/><rect x="${-w * 0.16}" y="${-L + w * 0.3}" width="${w * 0.16}" height="${L * 0.13}" rx="${w * 0.08}" fill="#fff" opacity=".85"/></g>`;
+  return `<path d="M-17 150 L-17 36 Q-18 22 -22 8 Q-26 -10 -25 -26 Q-24 -38 -18 -42 L17 -42 Q24 -38 24 -26 Q24 -10 20 8 Q17 22 17 36 L18 150Z" fill="${pe}"/>
+<path d="M17 36 Q17 22 20 8 Q24 -10 24 -26 Q24 -38 17 -42 L14 -38 Q19 -26 17 -8 Q14 12 12 30 L12 150 L18 150Z" fill="${om}" opacity=".45"/>
+<path d="M-24 -20 Q-23 0 -19 16" fill="none" stroke="#fff" stroke-width="3" opacity=".22" stroke-linecap="round"/>
+<g transform="translate(-21 -2) rotate(-34)"><path d="M-5.5 6 L-5 -26 A5 5.4 0 0 1 5 -26 L5.5 6Z" fill="${pe}"/><path d="M-4 -12 q4 1.6 8 0" fill="none" stroke="${om}" stroke-width=".7"/><rect x="-3.4" y="-30" width="6.8" height="9.5" rx="3.4" fill="#ffb3cc"/><rect x="-1.6" y="-28.4" width="1.4" height="5.4" rx=".7" fill="#fff" opacity=".85"/></g>
+${doigt(-14, -38, 46, 10.4, -7)}${doigt(-2, -41, 52, 10.8, -1.5)}${doigt(9.5, -39, 48, 10.2, 4)}${doigt(19.5, -32, 36, 8.6, 11)}
 ${[
-  [-18, -84, 13.2],
-  [-4, -92, 13.8],
-  [10, -88, 13.2],
-  [23, -72, 11.4]
+  [-14, -38],
+  [-2, -41],
+  [9.5, -39]
 ]
-  .map(
-    ([fx, fy, w]) =>
-      `<rect x="${fx - w / 2}" y="${fy}" width="${w}" height="${-38 - fy}" rx="${w / 2}" fill="#f0c6a6"/><path d="M${fx - w / 2 + 1.4} ${fy + (-38 - fy) * 0.38} q${w / 2 - 1.4} 2.4 ${w - 2.8} 0 M${fx - w / 2 + 1.6} ${fy + (-38 - fy) * 0.7} q${w / 2 - 1.6} 2 ${w - 3.2} 0" fill="none" stroke="#d29c7b" stroke-width=".8"/><rect x="${fx - w / 2 + 1.8}" y="${fy + 1.6}" width="${w - 3.6}" height="13" rx="${(w - 3.6) / 2}" fill="#ffb3cc"/><path d="M${fx - w / 2 + 1.8} ${fy + 12} q${(w - 3.6) / 2} 4 ${w - 3.6} 0" fill="none" stroke="#f08db0" stroke-width=".8"/><rect x="${fx - w / 2 + 3.2}" y="${fy + 3.4}" width="2.2" height="8" rx="1.1" fill="#fff" opacity=".85"/>`
-  )
+  .map(([x, y]) => `<ellipse cx="${x}" cy="${y + 3}" rx="3.2" ry="1.4" fill="${om}" opacity=".45"/>`)
   .join('')}
-${[-18, -4, 10, 23].map(fx => `<ellipse cx="${fx}" cy="-38" rx="4.6" ry="2.2" fill="#e3ad8c" opacity=".6"/>`).join('')}
-<path d="M-14 -30 Q-12 -6 -8 14 M-3 -32 L-1 12 M9 -30 Q8 -6 6 12" fill="none" stroke="#dfa988" stroke-width="1.1" opacity=".45"/>
-<path d="M-20 40 Q0 46 20 40" fill="none" stroke="#d9a483" stroke-width="1" opacity=".7"/>
-${phBracelet('og', -21, 34, 21, 34, 12, { n: 26, h: 5, hs: 8.5, w: 1.5, sw: 1.1, eclat: [[-4, 54, 3.4]] })}
+<path d="M-11 -30 Q-10 -8 -7 12 M-1 -32 L0 12 M9 -30 Q8 -8 5 12" fill="none" stroke="${om}" stroke-width=".9" opacity=".4"/>
+<path d="M-17 40 Q0 45 17 40" fill="none" stroke="${om}" stroke-width=".9" opacity=".6"/>`;
+})()}
+${phBracelet('og', -18, 34, 18, 34, 10, { n: 24, h: 5, hs: 7.5, w: 1.4, sw: 1, eclat: [[-3, 52, 3]] })}
 </g>
 ${phStory('og', 'noemie.nails', '19 h 40', 230)}
 <g transform="translate(78 82) rotate(-6)"><rect x="-58" y="-15" width="116" height="28" rx="14" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#e0567f">Baby pink 💗</text></g>`
