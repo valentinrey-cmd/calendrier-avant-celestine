@@ -4,6 +4,14 @@
 
 ---
 
+## 25 novembre 2026 (matin) : Tenerife dans l'album, en version BD, au 29 août
+
+- Valentin a choisi la **version « comme les autres vidéos »** (vos visages en photo, des bulles). Elle remplace la version illustrée dans `2026/videos/4-tenerife.mp4`, avec une nouvelle miniature `.jpg` (le coucher de soleil). La version illustrée est gardée dans `outils/videos/4-tenerife/versions/4-tenerife-style-illustre.mp4`.
+- Date de la vidéo : **29 août 2026** (`2026/js/contenu.js`), avec sa traduction anglaise.
+- Pour rappel, déjà en place : la vidéo du ski remplace la bataille de boules de neige, et le lancer du bouquet n'est plus dans l'album.
+
+---
+
 ## 25 novembre 2026 : Tenerife, nouvelle musique et 2ᵉ version « comme les autres vidéos »
 
 - **Nouvelle musique** (dans les deux versions) : une composition nostalgique originale au piano, aux cordes et au violoncelle, jouée avec de vrais sons d'instruments enregistrés (banque MusyngKite). Le script `outils/videos/musique-nostalgique.py` est réutilisable pour d'autres vidéos.

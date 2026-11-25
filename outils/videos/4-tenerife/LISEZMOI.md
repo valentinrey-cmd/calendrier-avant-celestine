@@ -31,4 +31,4 @@ ffmpeg -y -ss 12.6 -i ../../../2026/videos/4-tenerife.mp4 -frames:v 1 -vf scale=
 - Les polices utilisées sont Crimson Text (titres) et Inter (petits textes). Elles doivent être installées sur la machine qui fait le rendu.
 - Si la durée totale change, passe la nouvelle durée à `musique-nostalgique.py`.
 - Les décors communs sont dans `decors.js`.
-- **Deuxième version, « comme les autres vidéos »** (vos visages en photo sur des corps entiers, avec des bulles) : `tenerife-bd.html`, rendue avec `PAGE=tenerife-bd.html python3 render.py frames`. Le résultat est gardé dans `versions/4-tenerife-style-bd.mp4`, en attendant que Valentin choisisse la version à mettre dans l'album.
+- **Deuxième version, « comme les autres vidéos »** (vos visages en photo sur des corps entiers, avec des bulles) : `tenerife-bd.html`, rendue avec `PAGE=tenerife-bd.html python3 render.py frames`. **C'est cette version qui est dans l'album** (choix de Valentin). La version illustrée est gardée dans `versions/4-tenerife-style-illustre.mp4`.

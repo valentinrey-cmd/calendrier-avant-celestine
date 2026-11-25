@@ -103,6 +103,7 @@ window.TRADUCTIONS_EN = {
   'Allumer la machine': 'Turn on the machine',
   'Améliorations': 'Upgrades',
   'Août 2026': 'August 2026',
+  '29 août 2026': 'August 29, 2026',
   'Août 2034': 'August 2034',
   'Apocalypse sucrée': 'Sweet apocalypse',
   'Apprentie chimiste': 'Apprentice chemist',

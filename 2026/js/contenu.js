@@ -211,7 +211,7 @@ const CONTENU = {
     },
     {
       titre: 'Notre voyage à Tenerife',
-      date: 'Août 2026',
+      date: '29 août 2026',
       src: 'videos/4-tenerife.mp4',
       poster: 'videos/4-tenerife.jpg',
       ch: 'Nos voyages',
