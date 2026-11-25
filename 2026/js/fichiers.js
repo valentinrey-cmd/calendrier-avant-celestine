@@ -189,6 +189,12 @@ const FICHIERS = {
     'media/persos/erika.webp',
     'media/persos/valerie.webp',
     'media/persos/sandrine.webp',
+    'media/persos/detoures/celestine.webp',
+    'media/persos/detoures/noemie.webp',
+    'media/persos/detoures/emma.webp',
+    'media/persos/detoures/nora.webp',
+    'media/persos/detoures/erika.webp',
+    'media/persos/detoures/eya.webp',
   ],
 };
 

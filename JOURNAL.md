@@ -4,6 +4,14 @@
 
 ---
 
+## 25 novembre 2026 (15 h) : vraies têtes sur les photos-indices, nouvelle main au bracelet (version 1795613672)
+
+- Les personnes des photos-indices (BU, resto, Emma au resto, TP, selfie de 7 h 51) ont maintenant leur **vraie tête**, au lieu d'un visage dessiné. Les têtes sont détourées (fond retiré), redressées (Emma, Nora, Erika et Eya penchaient), les yeux sont alignés au même endroit, et le cou dessiné prend la couleur de leur vraie peau. Le fondu ne reste que sous le menton.
+- Les 6 têtes détourées sont de nouveaux fichiers : `media/persos/detoures/<prénom>.webp` (chemins dans `PHTETE`, `js/medias.js`). Elles ont été faites à partir des photos de `media/persos/` avec l'outil de détourage `rembg`, puis nettoyées à la main (zone autour de la tête, redressement selon les yeux).
+- La main de la photo « Les ongles finis » est redessinée : poignet fin, main séparée du poignet, pouce, phalanges, ongles baby pink brillants, et le bracelet qui fait le tour du poignet.
+- L'ancien code des visages dessinés (coiffures, yeux, lunettes…) est supprimé. `phPerso` ne dessine plus que le corps et pose la vraie tête.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`, `2026/js/medias.js`, `2026/js/fichiers.js`, `2026/media/persos/detoures/` (6 fichiers).
+
 ## 25 novembre 2026 (14 h 30) : nouveaux dessins pour toutes les photos-indices (version 1795612358)
 
 - Les 11 dessins des pièces du dossier sont refaits, plus détaillés et plus jolis : lumière, ombres, vrais visages dessinés (yeux, cheveux, vêtements), décors complets (bibliothèque de la BU, resto en briques avec guirlande, labo de TP, salle de bain carrelée), interface façon Instagram ou Snapchat, horodatages.

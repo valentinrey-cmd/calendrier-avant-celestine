@@ -42,6 +42,15 @@ const COUPLE = 'media/jeux/puzzle-final-couple.jpg';
 const VFIN = 'media/boss-final/fin.webp';
 const VIMG = { v: 'media/persos/valentin.webp', c: 'media/persos/celestine.webp' };
 const VBPH = { gene: 'media/boss-final/photo-genante.jpg', bebe: 'media/boss-final/photo-bebe.jpg' };
+// vraies têtes détourées, pour les photos-indices du dossier (PH dans js/enquete/suspects-pieces.js)
+const PHTETE = {
+  celestine: 'media/persos/detoures/celestine.webp',
+  noemie: 'media/persos/detoures/noemie.webp',
+  emma: 'media/persos/detoures/emma.webp',
+  nora: 'media/persos/detoures/nora.webp',
+  erika: 'media/persos/detoures/erika.webp',
+  eya: 'media/persos/detoures/eya.webp'
+};
 const SIMG = {
   'edgar': 'media/persos/edgar.webp',
   'emma': 'media/persos/emma.webp',

@@ -187,66 +187,51 @@ const phBracelet = (p, x1, y1, x2, y2, sag, o = {}) => {
     });
   return s;
 };
-// un personnage dessiné : tête centrée en (x, y), taille 1 = tête de ~44 px
+// Les vraies têtes détourées (media/persos/detoures/…, chemins dans PHTETE de js/medias.js) :
+// position des yeux (x, y), écart entre les yeux, largeur et hauteur de l'image (en pixels), et couleur de peau pour le cou.
+const PHQUI = {
+  celestine: { t: [279.0, 324.0, 234.0, 579, 720], pc: '#efc49f' },
+  noemie: { t: [267.5, 185.5, 213.2, 605, 580], pc: '#deb594' },
+  emma: { t: [227.0, 263.5, 162.7, 572, 565], pc: '#ca9a92' },
+  nora: { t: [204.0, 310.0, 167.4, 422, 620], pc: '#a16340' },
+  erika: { t: [228.5, 360.2, 245.1, 564, 727], pc: '#ac6f4a' },
+  eya: { t: [230.0, 273.0, 167.4, 425, 583], pc: '#b55d3b' }
+};
+// un personnage : corps dessiné et vraie tête, les yeux en (x, y - 1), échelle s ; o.haut = couleur du haut, o.blouse, o.lunettes = 'labo'
 const phPerso = (p, x, y, s, o) => {
-  const sk = o.peau || '#f1c9a9',
-    sk2 = phSh(sk, -0.14),
-    hr = o.cheveux || '#3a2416',
-    hr2 = phSh(hr, 0.18),
-    hr3 = phSh(hr, -0.3),
+  const q = PHQUI[o.qui],
+    sk = q.pc,
+    sk2 = phSh(sk, -0.16),
+    sk3 = phSh(sk, -0.3),
     top = o.haut || '#2f4a6b',
     top2 = phSh(top, -0.25),
-    yeux = o.yeux || '#4a2f1c';
-  const dos = {
-    long: `<path d="M-23 -6 C-26 -32 26 -32 23 -6 L27 40 Q0 50 -27 40Z" fill="${hr3}"/>`,
-    carre: `<path d="M-23 -6 C-26 -32 26 -32 23 -6 L25 18 Q0 24 -25 18Z" fill="${hr3}"/>`,
-    queue: `<path d="M-21 -8 C-24 -32 24 -32 21 -8Z" fill="${hr3}"/><path d="M14 -18 Q34 -8 26 26 Q22 34 18 20 Q24 0 12 -12Z" fill="${hr}"/>`,
-    chignon: `<circle cx="0" cy="-30" r="11" fill="${hr}"/><circle cx="-3" cy="-33" r="4" fill="${hr2}" opacity=".5"/>`,
-    boucles: `${[-22, -14, 14, 22, -24, 24].map((a, i) => `<circle cx="${a}" cy="${i > 3 ? 14 : -4 + (i % 2) * 12}" r="11" fill="${hr3}"/>`).join('')}`,
-    court: ''
-  }[o.coiffure || 'long'];
-  const devant = {
-    long: `<path d="M-21 -4 C-24 -30 4 -36 20 -20 C24 -14 23 -8 22 -2 C16 -14 6 -20 -6 -17 C-12 -15 -17 -10 -21 -4Z" fill="${hr}"/><path d="M-12 -20 C-4 -27 8 -26 14 -20" fill="none" stroke="${hr2}" stroke-width="1.5" opacity=".7"/>`,
-    carre: `<path d="M-22 4 C-26 -30 24 -32 22 -2 C18 -12 10 -16 2 -15 C-6 -18 -16 -12 -18 2Z" fill="${hr}"/><path d="M-14 -20 C-4 -26 8 -26 14 -20" fill="none" stroke="${hr2}" stroke-width="1.4" opacity=".7"/>`,
-    queue: `<path d="M-21 -4 C-22 -28 20 -32 21 -6 C14 -18 -4 -22 -21 -4Z" fill="${hr}"/><path d="M-10 -21 C-2 -26 10 -25 15 -18" fill="none" stroke="${hr2}" stroke-width="1.4" opacity=".7"/>`,
-    chignon: `<path d="M-21 -2 C-22 -28 20 -30 21 -4 C12 -20 -10 -20 -21 -2Z" fill="${hr}"/><path d="M-12 -19 C-4 -24 8 -24 14 -18" fill="none" stroke="${hr2}" stroke-width="1.3" opacity=".7"/>`,
-    boucles: `${[-16, -8, 0, 8, 16].map((a, i) => `<circle cx="${a}" cy="${-20 + Math.abs(i - 2) * 3}" r="8" fill="${hr}"/>`).join('')}<circle cx="-4" cy="-24" r="3" fill="${hr2}" opacity=".5"/>`,
-    court: `<path d="M-21 -6 C-22 -30 22 -32 21 -6 C16 -16 4 -18 -6 -16 C-14 -14 -18 -10 -21 -6Z" fill="${hr}"/>`
-  }[o.coiffure || 'long'];
-  const lun = o.lunettes
-    ? `<g fill="${o.lunettes == 'labo' ? '#dff4ff55' : 'none'}" stroke="${o.lunettes == 'labo' ? '#9cc8e0' : '#2a2a2a'}" stroke-width="1.4"><rect x="-14" y="-6" width="11" height="9" rx="3"/><rect x="3" y="-6" width="11" height="9" rx="3"/><path d="M-3 -2 h6"/></g>`
-    : '';
-  const bouche =
-    o.bouche == 'o'
-      ? `<ellipse cx="0" cy="12" rx="2.6" ry="3" fill="#8a2f3c"/>`
-      : o.bouche == 'rire'
-        ? `<path d="M-6 9 Q0 17 6 9Z" fill="#8a2f3c"/><path d="M-4.6 9.6 h9.2" stroke="#fff" stroke-width="1.6"/>`
-        : `<path d="M-5 10 Q0 14 5 10" fill="none" stroke="#a8404f" stroke-width="1.6" stroke-linecap="round"/>`;
-  const oeil = dx =>
-    o.yeuxFermes
-      ? `<path d="M${dx - 3.4} -1 Q${dx} 1.6 ${dx + 3.4} -1" fill="none" stroke="#3a2a22" stroke-width="1.3" stroke-linecap="round"/>`
-      : `<ellipse cx="${dx}" cy="-1" rx="3.4" ry="2.7" fill="#fff"/><circle cx="${dx + (o.regard || 0)}" cy="-0.8" r="2" fill="${yeux}"/><circle cx="${dx + (o.regard || 0)}" cy="-0.8" r="1" fill="#120a06"/><circle cx="${dx + 0.7 + (o.regard || 0)}" cy="-1.6" r=".6" fill="#fff"/><path d="M${dx - 3.8} -2.2 Q${dx} -5 ${dx + 3.8} -2.4" fill="none" stroke="#2a1a12" stroke-width="1.1"/>`;
-  const corps =
-    o.corps === false
-      ? ''
-      : `<path d="M-6 18 L-6 28 L6 28 L6 18Z" fill="${sk2}"/>
-<path d="M-8 26 Q-34 30 -40 62 L40 62 Q34 30 8 26 Q0 32 -8 26Z" fill="${top}"/>
-<path d="M-8 26 Q0 32 8 26" fill="none" stroke="${top2}" stroke-width="1.4"/>${o.blouse ? `<path d="M-8 26 L-3 44 L0 34 L3 44 L8 26" fill="#fff" stroke="#d6dde3" stroke-width=".8"/><path d="M-40 62 Q-34 30 -8 26 L-3 44 L-6 62Z M40 62 Q34 30 8 26 L3 44 L6 62Z" fill="#fdfdfd" stroke="#d6dde3" stroke-width=".8"/>` : ''}
-<path d="M-26 40 Q-22 52 -24 62 M24 40 Q22 52 25 62" fill="none" stroke="${top2}" stroke-width="1.2" opacity=".6"/>`;
-  return `<g transform="translate(${x} ${y}) scale(${s})">${corps}${dos}
-<ellipse cx="-20.5" cy="2" rx="3" ry="4.4" fill="${sk2}"/><ellipse cx="20.5" cy="2" rx="3" ry="4.4" fill="${sk2}"/>
-<ellipse cx="0" cy="0" rx="20" ry="23" fill="${sk}"/><path d="M-20 0 Q-18 20 0 23 Q-12 16 -14 0Z" fill="${sk2}" opacity=".35"/>
-<ellipse cx="-11" cy="7" rx="4" ry="2.4" fill="#ff8a8a" opacity=".3"/><ellipse cx="11" cy="7" rx="4" ry="2.4" fill="#ff8a8a" opacity=".3"/>
-${oeil(-8)}${oeil(8)}
-<path d="M-12 -7.5 Q-8 -10 -4 -8.4 M4 -8.4 Q8 -10 12 -7.5" fill="none" stroke="${hr3}" stroke-width="1.6" stroke-linecap="round"/>
-<path d="M0 0 Q-1.6 5 -2.4 6.2 Q0 7.4 2.2 6.4" fill="none" stroke="${sk2}" stroke-width="1.2" stroke-linecap="round"/>
-${bouche}${lun}${devant}${o.extra || ''}</g>`;
+    top3 = phSh(top, 0.18),
+    [ex, ey, iod, iw, ih] = q.t,
+    k = 16 / iod;
+  const corps = `<path d="M-6.5 18 L-7 30 Q0 34 7 30 L6.5 18Z" fill="${sk2}"/><path d="M-6.5 24 Q0 30 6.5 24" fill="none" stroke="${sk3}" stroke-width=".8" opacity=".6"/>
+<path d="M-8 28 Q-32 31 -40 66 L40 66 Q32 31 8 28 Q0 36 -8 28Z" fill="${top}"/>
+<path d="M-8 28 Q-32 31 -40 66 L-30 66 Q-28 40 -10 31Z" fill="${top3}" opacity=".35"/>
+<path d="M-8 28 Q0 36 8 28" fill="none" stroke="${top2}" stroke-width="1.6"/>${
+    o.blouse
+      ? `<path d="M-40 66 Q-34 31 -8 28 L-3 48 L-6 66Z M40 66 Q34 31 8 28 L3 48 L6 66Z" fill="#fdfdfd" stroke="#cfd8de" stroke-width=".8"/><path d="M-8 28 L-3 48 L-12 40Z M8 28 L3 48 L12 40Z" fill="#eef2f5" stroke="#cfd8de" stroke-width=".6"/><rect x="-30" y="48" width="10" height="8" rx="1" fill="none" stroke="#cfd8de"/><path d="M-27 48 v-5" stroke="#3a6aa8" stroke-width="1.4"/>`
+      : ''
+  }
+<path d="M-28 42 Q-24 54 -26 66 M27 42 Q24 54 27 66 M-14 50 Q-10 58 -12 66" fill="none" stroke="${top2}" stroke-width="1.1" opacity=".55"/>`;
+  const tete = `<image href="${PHTETE[o.qui]}" x="${-ex * k}" y="${-1 - ey * k}" width="${iw * k}" height="${ih * k}"/>`;
+  const labo =
+    o.lunettes == 'labo'
+      ? `<g fill="#dff4ff40" stroke="#9cc8e0" stroke-width="1.4"><rect x="-17" y="-7" width="34" height="12" rx="5"/></g><path d="M-17 -3 L-21 -4 M17 -3 L21 -4" stroke="#9cc8e0" stroke-width="1.6"/><path d="M-13 -4 l6 -2" stroke="#fff" stroke-width="1.2" opacity=".8"/>`
+      : '';
+  return `<g transform="translate(${x} ${y}) scale(${s})">${corps}${tete}${labo}</g>`;
 };
-// un bras (épaule → main), avec manche et main ; renvoie aussi la position du poignet via o.poignet
+// un bras (épaule → main), avec manche et une vraie main
 const phBras = (x1, y1, x2, y2, peau, manche, w = 9) => {
-  const mx = x1 + (x2 - x1) * 0.62,
-    my = y1 + (y2 - y1) * 0.62;
-  return `<path d="M${x1} ${y1} L${mx} ${my}" stroke="${manche}" stroke-width="${w + 3}" stroke-linecap="round"/><path d="M${mx} ${my} L${x2} ${y2}" stroke="${peau}" stroke-width="${w * 0.8}" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="${w * 0.62}" fill="${peau}"/><path d="M${x2 - w * 0.3} ${y2 - w * 0.3} q${w * 0.2} ${-w * 0.25} ${w * 0.45} 0" fill="none" stroke="${phSh(peau, -0.2)}" stroke-width=".8"/>`;
+  const mx = x1 + (x2 - x1) * 0.6,
+    my = y1 + (y2 - y1) * 0.6,
+    a = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI,
+    p2 = phSh(peau, -0.18),
+    m2 = phSh(manche, -0.22);
+  return `<path d="M${x1} ${y1} L${mx} ${my}" stroke="${manche}" stroke-width="${w + 3}" stroke-linecap="round"/><path d="M${x1} ${y1} L${mx} ${my}" stroke="${m2}" stroke-width="${(w + 3) * 0.3}" stroke-linecap="round" opacity=".35" transform="translate(${w * 0.25} ${w * 0.25})"/><path d="M${mx} ${my} L${x2} ${y2}" stroke="${peau}" stroke-width="${w * 0.78}" stroke-linecap="round"/><g transform="translate(${x2} ${y2}) rotate(${a}) scale(${w / 10})"><path d="M-3 -4.6 C2 -6 7 -5 9 -3 C11 -1.6 11 1.6 9 3 C7 5 2 6 -3 4.6Z" fill="${peau}"/><path d="M1 -5.4 C3 -9 6 -9 6.6 -6.6 C6 -5 4 -4.4 2.4 -4Z" fill="${peau}"/><path d="M4 -1.8 L9.6 -1.2 M4 0.6 L10 1 M4 2.8 L9 3.2" stroke="${p2}" stroke-width=".55" stroke-linecap="round"/></g>`;
 };
 // en-tête façon appli (story, snap…) et horodatage
 const phStory = (p, nom, quand, coul) =>
@@ -350,27 +335,32 @@ ${phStory('sn', 'noemie.nails', '18 h 05', 96)}
   // 5. les ongles finis, le bracelet de nouveau au poignet
   ongles: phSvg(
     'og',
-    `<rect width="320" height="220" fill="#f4e3ec"/><circle cx="60" cy="40" r="80" fill="#fff" opacity=".45" filter="url(#ogfl)"/>
-<path d="M0 170 Q160 150 320 176 V220 H0Z" fill="#e8cfdb"/>
-<g transform="translate(172 120) rotate(-8) scale(.9)">
-<path d="M-50 130 L-46 34 Q-44 8 -24 4 L34 2 Q54 6 56 32 L60 130Z" fill="#efc4a3"/>
-<path d="M-44 34 Q-42 60 -48 120 L-56 120Z" fill="#dba886" opacity=".7"/>
+    `<rect width="320" height="220" fill="#f4e3ec"/><circle cx="70" cy="60" r="90" fill="#fff" opacity=".5" filter="url(#ogfl)"/>
+<path d="M0 176 Q160 160 320 184 V220 H0Z" fill="#ead2dd"/>
+<g transform="translate(178 152) rotate(-7) scale(1.12)">
+<ellipse cx="6" cy="40" rx="34" ry="8" fill="#b98aa0" opacity=".25" filter="url(#ogom)"/>
+<path d="M-21 150 L-20 40 Q-21 24 -25 12 Q-31 -6 -31 -22 Q-31 -38 -24 -44 L22 -44 Q30 -38 30 -22 Q30 -4 24 12 Q20 24 20 40 L22 150Z" fill="#f0c6a6"/>
+<path d="M20 40 Q20 24 24 12 Q30 -4 30 -22 Q30 -38 22 -44 L18 -40 Q24 -30 22 -12 Q18 8 14 28 L14 150 L22 150Z" fill="#d9a483" opacity=".55"/>
+<path d="M-31 -22 Q-31 -6 -25 12 L-21 30 Q-26 8 -27 -20Z" fill="#fff" opacity=".18"/>
+<g transform="translate(-28 -18) rotate(-38)"><rect x="-7.5" y="-40" width="15" height="44" rx="7.5" fill="#f0c6a6"/><path d="M-7.5 -18 Q0 -14 7.5 -18" fill="none" stroke="#d29c7b" stroke-width=".9"/><rect x="-5.6" y="-38.4" width="11.2" height="13" rx="5.6" fill="#ffb3cc"/><rect x="-3.6" y="-36.6" width="2.4" height="8" rx="1.2" fill="#fff" opacity=".85"/></g>
 ${[
-  [-34, -44, 17, -5],
-  [-13, -62, 17.5, -1.5],
-  [8, -66, 17.5, 1.5],
-  [29, -56, 16.5, 4],
-  [42, -22, 15.5, 38]
+  [-18, -84, 13.2],
+  [-4, -92, 13.8],
+  [10, -88, 13.2],
+  [23, -72, 11.4]
 ]
   .map(
-    ([fx, fy, w, r]) =>
-      `<g transform="rotate(${r} ${fx} 10)"><rect x="${fx - w / 2}" y="${fy}" width="${w}" height="${(10 - fy) * 1.02}" rx="${w / 2}" fill="#efc4a3"/><path d="M${fx - w / 2 + 1} ${fy + 26} h${w - 2} M${fx - w / 2 + 1.5} ${fy + 42} h${w - 3}" stroke="#d29c7b" stroke-width=".9"/><rect x="${fx - w / 2 + 1.6}" y="${fy + 1.4}" width="${w - 3.2}" height="16" rx="${(w - 3.2) / 2}" fill="#ffb2cb"/><rect x="${fx - w / 2 + 3}" y="${fy + 3}" width="2.2" height="10" rx="1.1" fill="#fff" opacity=".85"/><path d="M${fx - w / 2 + 1.6} ${fy + 12} q${(w - 3.2) / 2} 5 ${w - 3.2} 0" fill="none" stroke="#f08db0" stroke-width=".8"/></g>`
+    ([fx, fy, w]) =>
+      `<rect x="${fx - w / 2}" y="${fy}" width="${w}" height="${-38 - fy}" rx="${w / 2}" fill="#f0c6a6"/><path d="M${fx - w / 2 + 1.4} ${fy + (-38 - fy) * 0.38} q${w / 2 - 1.4} 2.4 ${w - 2.8} 0 M${fx - w / 2 + 1.6} ${fy + (-38 - fy) * 0.7} q${w / 2 - 1.6} 2 ${w - 3.2} 0" fill="none" stroke="#d29c7b" stroke-width=".8"/><rect x="${fx - w / 2 + 1.8}" y="${fy + 1.6}" width="${w - 3.6}" height="13" rx="${(w - 3.6) / 2}" fill="#ffb3cc"/><path d="M${fx - w / 2 + 1.8} ${fy + 12} q${(w - 3.6) / 2} 4 ${w - 3.6} 0" fill="none" stroke="#f08db0" stroke-width=".8"/><rect x="${fx - w / 2 + 3.2}" y="${fy + 3.4}" width="2.2" height="8" rx="1.1" fill="#fff" opacity=".85"/>`
   )
   .join('')}
-${phBracelet('og', -52, 82, 62, 82, 12, { n: 40, h: 5, hs: 11, w: 1.8, sw: 1.2, eclat: [[-10, 98, 4]] })}
+${[-18, -4, 10, 23].map(fx => `<ellipse cx="${fx}" cy="-38" rx="4.6" ry="2.2" fill="#e3ad8c" opacity=".6"/>`).join('')}
+<path d="M-14 -30 Q-12 -6 -8 14 M-3 -32 L-1 12 M9 -30 Q8 -6 6 12" fill="none" stroke="#dfa988" stroke-width="1.1" opacity=".45"/>
+<path d="M-20 40 Q0 46 20 40" fill="none" stroke="#d9a483" stroke-width="1" opacity=".7"/>
+${phBracelet('og', -21, 34, 21, 34, 12, { n: 26, h: 5, hs: 8.5, w: 1.5, sw: 1.1, eclat: [[-4, 54, 3.4]] })}
 </g>
 ${phStory('og', 'noemie.nails', '19 h 40', 230)}
-<g transform="translate(86 74) rotate(-6)"><rect x="-58" y="-15" width="116" height="28" rx="14" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#e0567f">Baby pink 💗</text></g>`
+<g transform="translate(78 82) rotate(-6)"><rect x="-58" y="-15" width="116" height="28" rx="14" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#e0567f">Baby pink 💗</text></g>`
   ),
   // 6. selfie d'Erika à la BU, mercredi 13 h
   bu: phSvg(
@@ -387,10 +377,10 @@ ${Array.from(
     }).join('')
 ).join('')}
 <rect x="0" y="132" width="320" height="88" fill="#cbb9a0"/>
-${phPerso('bu', 50, 120, 1.12, { peau: '#c98e64', cheveux: '#151010', coiffure: 'boucles', haut: '#d9b36a', regard: 0.6 })}
-${phPerso('bu', 270, 118, 1.12, { peau: '#e9b896', cheveux: '#5a3a24', coiffure: 'chignon', haut: '#4a6b8a', regard: -0.6 })}
-${phPerso('bu', 120, 112, 1.22, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#f0e6dc', bouche: 'rire' })}
-${phPerso('bu', 196, 116, 1.18, { peau: '#f0c8a8', cheveux: '#d9b36a', coiffure: 'queue', haut: '#7a2f3a', regard: -0.4 })}
+${phPerso('bu', 50, 120, 1.12, { qui: 'eya', haut: '#d9b36a' })}
+${phPerso('bu', 270, 118, 1.12, { qui: 'nora', haut: '#4a6b8a' })}
+${phPerso('bu', 120, 112, 1.22, { qui: 'celestine', haut: '#f0e6dc' })}
+${phPerso('bu', 196, 116, 1.18, { qui: 'erika', haut: '#7a2f3a' })}
 ${phBras(146, 150, 154, 98, '#f3cfb3', '#f0e6dc', 11)}
 <g transform="translate(154 96)"><rect x="-5" y="-20" width="5" height="14" rx="2.5" fill="#f3cfb3"/><rect x="1" y="-22" width="5" height="16" rx="2.5" fill="#f3cfb3"/></g>
 ${phBras(220, 160, 236, 214, '#f0c8a8', '#7a2f3a', 12)}
@@ -409,9 +399,9 @@ ${Array.from({ length: 11 }, (_, i) => {
     y = 22 + Math.sin(i * 0.9) * 7;
   return `<circle cx="${x}" cy="${y}" r="10" fill="#ffcf70" opacity=".25" filter="url(#refl)"/><circle cx="${x}" cy="${y}" r="3" fill="#ffe7a8"/>`;
 }).join('')}
-${phPerso('re', 64, 96, 1.1, { peau: '#f0c8a8', cheveux: '#c99a4a', coiffure: 'carre', haut: '#2a2a3a', bouche: 'rire', regard: 0.5 })}
-${phPerso('re', 256, 94, 1.1, { peau: '#f3d2b8', cheveux: '#2a1a10', coiffure: 'long', haut: '#5a3a7a', regard: -0.6, lunettes: 1 })}
-${phPerso('re', 160, 90, 1.16, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#a8323e', bouche: 'rire' })}
+${phPerso('re', 64, 96, 1.1, { qui: 'noemie', haut: '#2a2a3a' })}
+${phPerso('re', 256, 94, 1.1, { qui: 'emma', haut: '#5a3a7a' })}
+${phPerso('re', 160, 90, 1.16, { qui: 'celestine', haut: '#a8323e' })}
 <path d="M0 156 L320 156 L320 220 L0 220Z" fill="#7a4a2a"/><path d="M0 156 L320 156" stroke="#9a6a44" stroke-width="3"/>
 <g transform="translate(160 184)"><ellipse cx="0" cy="6" rx="78" ry="16" fill="#000" opacity=".3"/><ellipse cx="0" cy="0" rx="74" ry="15" fill="#d8d8d8"/><ellipse cx="0" cy="-2" rx="62" ry="12" fill="#e0a040"/><ellipse cx="0" cy="-3" rx="54" ry="9.5" fill="#d9472e"/>${[
       [-30, -4],
@@ -451,7 +441,7 @@ ${phTampon(10, 210, 'JEU. 21:12 · « les meufs 🍕 »')}`
 ${Array.from({ length: 6 }, (_, r) => Array.from({ length: 9 }, (_, i) => `<rect x="${i * 38 + (r % 2) * 19 - 10}" y="${r * 20}" width="34" height="16" rx="2" fill="#6a2e1e" opacity="${0.5 + ((i + r) % 3) * 0.12}"/>`).join('')).join('')}
 ${Array.from({ length: 6 }, (_, i) => `<circle cx="${i * 60 + 20}" cy="${18 + (i % 2) * 6}" r="11" fill="#ffcf70" opacity=".25" filter="url(#r2fl)"/><circle cx="${i * 60 + 20}" cy="${18 + (i % 2) * 6}" r="3" fill="#ffe7a8"/>`).join('')}
 <g transform="translate(236 104)"><rect x="-26" y="-10" width="52" height="80" rx="6" fill="#5a3320"/><rect x="-30" y="66" width="60" height="10" rx="3" fill="#4a2a18"/><path d="M-22 -6 Q-30 30 -18 70 L18 70 Q26 30 22 -6 Q0 4 -22 -6Z" fill="#c0233a"/><path d="M-6 -2 L-2 70 M8 -2 L4 70" stroke="#8a1a2a" stroke-width="1.6"/><text x="0" y="-16" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#ffe0b0">la chaise de Célestine</text></g>
-${phPerso('r2', 96, 76, 1.08, { peau: '#f3d2b8', cheveux: '#2a1a10', coiffure: 'long', haut: '#5a3a7a', regard: 1.6, lunettes: 1 })}
+${phPerso('r2', 96, 76, 1.08, { qui: 'emma', haut: '#5a3a7a' })}
 <path d="M44 140 L148 140 L150 150 L42 150Z" fill="#4a2f52"/>
 <g transform="translate(98 150)"><path d="M-44 -6 L44 -6 L38 46 L-38 46Z" fill="#2f2523"/><path d="M-44 -6 L44 -6 L42 6 L-42 6Z" fill="#43342f"/><path d="M-24 -6 C-22 -36 22 -36 24 -6" fill="none" stroke="#2f2523" stroke-width="5"/><rect x="-10" y="16" width="20" height="13" rx="2" fill="#3e302c" stroke="#c9a45a"/><path d="M-30 -6 Q-20 -18 -6 -10" fill="none" stroke="#f48fb5" stroke-width="7" stroke-linecap="round"/><text x="0" y="40" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="8" font-weight="700" fill="#ffe0b0">sac de Célestine</text></g>
 ${phBras(66, 120, 62, 146, '#f3d2b8', '#5a3a7a', 9)}${phBras(126, 120, 150, 134, '#f3d2b8', '#5a3a7a', 9)}
@@ -467,8 +457,8 @@ ${phTampon(10, 210, 'JEU. 21:40 · chaise vide 👀')}`
     `<rect width="320" height="220" fill="#e8eef2"/>
 ${Array.from({ length: 4 }, (_, i) => `<rect x="${12 + i * 78}" y="10" width="68" height="70" rx="2" fill="#bcd8ea"/><path d="M${12 + i * 78} 45 h68 M${46 + i * 78} 10 v70" stroke="#fff" stroke-width="3"/><path d="M${18 + i * 78} 70 L${60 + i * 78} 16" stroke="#fff" stroke-width="6" opacity=".35"/>`).join('')}
 <rect x="0" y="84" width="320" height="8" fill="#cfd8de"/>
-${phPerso('tp', 80, 98, 1.0, { peau: '#f0c8a8', cheveux: '#d9b36a', coiffure: 'queue', haut: '#ffffff', blouse: 1, lunettes: 'labo', regard: 1.2 })}
-${phPerso('tp', 196, 92, 1.14, { peau: '#c98e64', cheveux: '#151010', coiffure: 'chignon', haut: '#ffffff', blouse: 1, lunettes: 'labo', regard: -1.4 })}
+${phPerso('tp', 80, 98, 1.0, { qui: 'eya', haut: '#ffffff', blouse: 1 })}
+${phPerso('tp', 196, 92, 1.14, { qui: 'nora', haut: '#ffffff', blouse: 1, lunettes: 'labo' })}
 <path d="M0 150 L320 150 L320 220 L0 220Z" fill="#2a3440"/><path d="M0 150 L320 150" stroke="#46566a" stroke-width="3"/>
 ${phBras(170, 132, 150, 150, '#c98e64', '#ffffff', 10)}${phBras(222, 132, 196, 156, '#c98e64', '#ffffff', 10)}
 <g transform="translate(172 152) rotate(-8)"><rect x="-30" y="-11" width="60" height="22" rx="10" fill="#f48fb5"/><rect x="-30" y="-11" width="60" height="9" rx="7" fill="#f9b4cd"/><path d="M-24 0 h48" stroke="#b9577e" stroke-width="1.6" stroke-dasharray="2 1.2"/><text x="0" y="8.5" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="7" fill="#fff">Célestine</text></g>
@@ -512,7 +502,7 @@ ${Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 0 V220" stroke="#d7e1
       }
     )}</g>
 <g transform="translate(222 74)"><rect x="-6" y="-24" width="12" height="24" rx="3" fill="#bcdaf0"/><rect x="-2" y="-36" width="2" height="16" fill="#4fb0e8"/></g><g transform="translate(304 74)"><rect x="-5" y="-20" width="10" height="20" rx="3" fill="#f3c6a0"/></g>
-${phPerso('sp', 112, 104, 1.5, { peau: '#f3cfb3', cheveux: '#4a2a18', coiffure: 'long', haut: '#c9a27a', bouche: 'o' })}
+${phPerso('sp', 112, 104, 1.5, { qui: 'celestine', haut: '#c9a27a' })}
 <path d="M64 196 L64 220 M160 196 V220" stroke="#a8825e" stroke-width="2"/><path d="M98 150 L112 200 L126 150" fill="none" stroke="#a8825e" stroke-width="2"/>
 ${phBras(150, 170, 166, 112, '#f3cfb3', '#c9a27a', 13)}
 <g transform="translate(168 98) rotate(8)"><rect x="-15" y="-27" width="30" height="54" rx="6" fill="#1a1a1a"/><rect x="-12" y="-24" width="24" height="48" rx="4" fill="#2a2a2a"/><circle cx="-6" cy="-18" r="3.4" fill="#111" stroke="#555"/><circle cx="-6" cy="-18" r="1.4" fill="#3a6aa8"/></g>
