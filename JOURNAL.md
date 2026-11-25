@@ -4,6 +4,13 @@
 
 ---
 
+## 25 novembre 2026 (fin de matinée) : ménage des anciennes vidéos
+
+- Supprimé des sources : l'ancienne version « illustrée » de Tenerife (`outils/videos/4-tenerife/tenerife.html`) et le dossier `versions/` (deux copies .mp4). Seule la version BD, celle de l'album, reste. Rien ne change dans le calendrier.
+- Vérifié : plus aucune trace des vidéos « boules de neige » et « bouquet » dans le site.
+- `CLAUDE.md` : nouvelle règle n°9, « quand une vidéo est remplacée, supprimer l'ancienne partout ».
+- Fichiers : `outils/videos/4-tenerife/` (render.py, decors.js, LISEZMOI.md), `CLAUDE.md`.
+
 ## 25 novembre 2026 (après-midi) : tout se débloque dans l'ordre chronologique
 
 - **Vidéos :** elles ne sont plus liées à un boss précis. Le 1er boss vaincu, quel qu'il soit (boss final compris), débloque la 1re vidéo, le 2e boss la 2e, et ainsi de suite. Liste remise dans l'ordre chronologique : Tenerife, crêpe, ski, slow, tour du monde, papy. Le boss final compte comme un boss et affiche la nouvelle vidéo s'il en débloque une.

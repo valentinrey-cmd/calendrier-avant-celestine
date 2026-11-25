@@ -1,5 +1,4 @@
-// Décors et scènes communs aux deux versions de la vidéo de Tenerife
-// (tenerife.html = style illustré, tenerife-bd.html = style des autres vidéos, avec vos visages).
+// Décors de la vidéo de Tenerife, utilisés par tenerife-bd.html.
 
 // Vidéo n°4 de l'album : « Notre voyage à Tenerife » (août 2026).
 // Style « carnet de voyage illustré » : paysages en couches, lumière, brume, petites silhouettes du couple.

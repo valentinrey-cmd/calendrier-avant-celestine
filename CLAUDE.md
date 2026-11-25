@@ -17,7 +17,8 @@ Calendrier de l'Avent 2026 fait par Valentin pour sa copine Célestine : une enq
 6. **Ne change rien de ce que Célestine voit sans que Valentin l'ait demandé.**
 7. **Ne touche pas à `2026/avent.apk` ni à `suivi/suivi.apk`.** Ils sont refaits automatiquement par GitHub Actions à chaque push (commits « APK Android mis à jour [skip ci] »).
 8. Écris les messages de commit en français, courts, dans le style de l'historique, par exemple `Air hockey : 5 buts gagnants`.
-9. Pousse directement sur `main`, sauf si Valentin demande autre chose. Le site se met à jour tout seul sur GitHub Pages.
+9. **Quand une vidéo (ou une photo, un jeu…) est remplacée, supprime l'ancienne partout** : ses fichiers dans `2026/videos/` ou `2026/media/`, sa ligne dans `js/contenu.js` ou `js/medias.js`, sa traduction dans `js/langue-anglais.js`, et ses sources dans `outils/videos/`. Ne garde aucune ancienne version dans le projet.
+10. Pousse directement sur `main`, sauf si Valentin demande autre chose. Le site se met à jour tout seul sur GitHub Pages.
 
 ## Comment le code est fait (à savoir avant de modifier)
 
