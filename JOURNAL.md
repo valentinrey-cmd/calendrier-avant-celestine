@@ -1,8 +1,14 @@
 # Journal des modifications
 
-> **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal : la date, ce qui a changé en français simple et les fichiers touchés. Lis d'abord `CLAUDE.md`, qui contient la carte du code.
+> **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+
+## 25 novembre 2026 (11 h 20) : les 3 règles d'or dans CLAUDE.md (version 1795601827)
+
+- `CLAUDE.md` : ajout en tête des règles des « 3 règles d'or » à appliquer à chaque demande : supprimer l'ancienne version, noter la modification en haut de ce journal avec le numéro de version, ranger le code au bon endroit.
+- En-tête de ce journal mis à jour dans le même sens. Rien ne change dans le calendrier.
+- Fichiers : `CLAUDE.md`, `JOURNAL.md`.
 
 ## 25 novembre 2026 (fin de matinée) : ménage des anciennes vidéos
 

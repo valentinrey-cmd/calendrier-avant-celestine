@@ -9,8 +9,13 @@ Calendrier de l'Avent 2026 fait par Valentin pour sa copine Célestine : une enq
 
 ## ⚠️ Règles pour toute IA qui travaille sur ce projet (Claude ou une autre)
 
+> **Les 3 règles d'or de Valentin, à appliquer à CHAQUE nouvelle demande, même petite :**
+> 1. **Supprimer l'ancienne version.** Quand quelque chose est modifié ou remplacé (vidéo, photo, jeu, texte, fonction, style…), l'ancienne version disparaît complètement du projet : fichiers, lignes de code, traductions, sources dans `outils/`. On ne garde ni copie, ni code mort, ni dossier « versions ».
+> 2. **Noter la modification tout en haut de `JOURNAL.md`**, juste sous la règle, avant les entrées plus anciennes : la date, ce qui a changé en français simple, le numéro de la nouvelle version et les fichiers touchés. Une entrée par demande.
+> 3. **Ranger le code au bon endroit**, en suivant le tableau « Où mettre le code » et la carte plus bas. Pas de nouveau fichier si un fichier existant correspond, et tout nouveau fichier est ajouté dans `2026/js/fichiers.js`.
+
 1. **Commence par lire ce fichier et les dernières entrées de [`JOURNAL.md`](JOURNAL.md).** Ne relis pas tout le code : la carte ci-dessous dit où se trouve chaque chose. Ouvre seulement les fichiers concernés (`grep -rn` est ton ami).
-2. **Après CHAQUE modification, ajoute une entrée en haut de `JOURNAL.md`** : la date, ce qui a changé (en français simple) et les fichiers touchés. C'est obligatoire, même pour une petite correction, et que tu sois Claude ou une autre IA. C'est ce qui permet à la prochaine session de reprendre vite.
+2. **Après CHAQUE modification, ajoute une entrée en haut de `JOURNAL.md`** : la date, ce qui a changé (en français simple), le numéro de version et les fichiers touchés. C'est obligatoire, même pour une petite correction, et que tu sois Claude ou une autre IA. C'est ce qui permet à la prochaine session de reprendre vite.
 3. **Change le numéro de version à chaque modification**, avec le même nombre dans `2026/index.html` (`const APPV='…'`) et dans `2026/version.json`. La commande la plus simple est `python3 outils/verifier.py --nouvelle-version`. Sans ça, les applis de Célestine ne se mettent pas à jour toutes seules.
 4. **Lance `python3 outils/verifier.py` avant de pousser.** Il vérifie la version, la liste des fichiers, les noms en double et la syntaxe.
 5. **Nouveau fichier JS, CSS ou média ? Ajoute-le dans `2026/js/fichiers.js`**, au bon endroit, car l'ordre compte. `index.html` et le mode hors-ligne (`sw.js`) lisent cette liste.
