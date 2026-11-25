@@ -4,6 +4,21 @@
 
 ---
 
+## 25 novembre 2026 (16 h 30) : histoire plus naturelle, moins d'indices trop directs (version 1795615188)
+
+- **Prologue :** Pépin prend une déposition normale (« Je prends votre déclaration. Vous l'avez depuis quand ? ») au lieu de « Je ne sais rien de vous, rien de ce bracelet… ». Célestine cite elle-même Valentin parmi les gens vus dans la semaine : Pépin ne demande plus « quelqu'un qui a les clés de chez vous ? ». « Noté quand même… c'est ce qui m'intrigue » devient « Je note tout le monde, c'est la procédure. »
+- **Retiré parce que ça désignait trop Valentin :**
+  - sa fiche ne dit plus « Il vit avec elle, donc forcément… » ;
+  - jour 17 : « J'ai demandé à Gérald qui pouvait entrer chez vous » ;
+  - la veille : « Êtes-vous vraiment sûre de l'avoir mis dans votre trousse ? » et « quelqu'un regarde l'heure… et sourit » ;
+  - le fax du 24 : la silhouette « Elle ne va quand même pas… » et « Si. » ;
+  - la scène du SMS masqué du jour 13 (« Il est entre de bonnes mains ») ;
+  - jour 22 : « Il me regarde à peine… » et « Un truc pour moi. Je note. » ;
+  - l'accusation d'Eya : « quelqu'un soupire de soulagement… ».
+- **Retiré parce que trop « too much » :** les répliques de Pépin au casino (« je ne suis pas là, en civil et en pause ») et « Surtout ce qui a l'air bête ».
+- Gardé à la demande de Valentin : « Votre mère aussi, donc », « Officieusement… je m'ennuie », la pause pub du prologue et « Gardez-le en tête » au labo.
+- Fichiers : `2026/js/histoire.js`, `2026/js/menu-demarrer.js` (scène `mid` retirée de `storyCheck`), `2026/js/enquete/suspects-pieces.js`, `2026/js/langue-anglais.js`.
+
 ## 25 novembre 2026 (16 h 15) : fausses mises à jour réalistes au lancement (version 1795614665)
 
 - Nouvelle **fausse mise à jour**, sérieuse cette fois (pas de blague). Elle doit faire croire que Valentin travaille toujours sur l'appli.

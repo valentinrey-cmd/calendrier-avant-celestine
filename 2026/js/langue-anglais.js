@@ -3054,7 +3054,6 @@ window.TRADUCTIONS_EN = {
     'Accusing your only witness. Bold. I saw that once, in 2009. It ended badly for everyone. ☕',
   'Je retourne à mon shopping. Et toi, relis tes messages. LENTEMENT. 💅':
     'I’m going back to my shopping. And you, reread your messages. SLOWLY. 💅',
-  'Quelque part, quelqu’un soupire de soulagement…': 'Somewhere, someone sighs with relief…',
   'Reyrieux. Edgar ouvre la porte, un tacos XL à la main.': 'Reyrieux. Edgar opens the door, an XL tacos in his hand.',
   'Petite sœur ! Tu viens manger ? Il reste de la sauce fromagère. 🌯': 'Little sister! Coming to eat? There’s cheese sauce left. 🌯',
   'Edgar. Vendredi soir, tu as pris de l’argent dans mon porte-monnaie. Maman me l’a dit.':

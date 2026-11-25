@@ -1039,7 +1039,6 @@ function storyCheck() {
       ['egg1', ne >= 1],
       ['lose1', lost],
       ['s9', op.includes(9)],
-      ['mid', op.includes(13)],
       ['casino', op.includes(14)],
       ['s17', op.includes(17)],
       ['s20', op.includes(20)],

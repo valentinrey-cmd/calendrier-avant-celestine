@@ -12,11 +12,7 @@ Object.assign(STORY, {
         'Bonjour… je viens déclarer la disparition d’un bracelet. Une chaîne fine en or, avec des petits cœurs roses. 😢',
         { fx: 'cin' }
       ],
-      [
-        'e',
-        'Un bracelet. D’accord. Je ne sais rien de vous, rien de ce bracelet… Alors on reprend tout depuis le début. 📝',
-        { fx: 'pop:📝' }
-      ],
+      ['e', 'D’accord. Je prends votre déclaration. Vous l’avez depuis quand ? 📝', { fx: 'pop:📝' }],
       ['c', 'C’est Valentin, mon copain, qui me l’a offert à Noël dernier. Je l’enlève seulement pour les TP et pour la douche.'],
       ['e', 'Et la dernière fois que vous l’avez vu ?'],
       ['c', 'Vendredi matin, je crois. Je pensais l’avoir rangé dans ma trousse pour mon TP. Et dimanche soir, en rentrant… plus rien.'],
@@ -34,9 +30,12 @@ Object.assign(STORY, {
       ['c', 'Ma MÈRE ?! Vous êtes sérieux ? 😳', { fx: 'shake' }],
       ['e', 'Je suis toujours sérieux avant mon cinquième café.'],
       ['c', 'Samedi, je travaillais à la pharmacie, avec Sandrine. 💊', { fx: 'sus:sandrine' }],
-      ['e', 'Quelqu’un d’autre ? Quelqu’un qui a les clés de chez vous, par exemple ?'],
-      ['c', '…Valentin. On vit ensemble. Mais il était au travail vendredi, puis à Écully tout le week-end.', { fx: 'sus:valentin' }],
-      ['e', 'Noté quand même. Tout le monde a une bonne raison d’être innocent. C’est justement ce qui m’intrigue. 🗂️'],
+      [
+        'c',
+        'Et Valentin, mon copain : on vit ensemble la semaine. Vendredi, il travaillait, puis il est parti à Écully pour le week-end.',
+        { fx: 'sus:valentin' }
+      ],
+      ['e', 'Je note tout le monde, c’est la procédure. 🗂️'],
       [
         'e',
         'Officiellement, une main courante, ce n’est pas une enquête. Officieusement… je m’ennuie. Alors je vais enquêter. 🕵️',
@@ -73,8 +72,7 @@ Object.assign(STORY, {
         'e',
         'Gérald en a glissé un dans chacune de vos cases, pour se faire pardonner. Recollez-les dans l’onglet 🧩 Puzzle. Le 24, le formulaire sera complet.'
       ],
-      ['e', 'En attendant, vos premières pièces sont dans le dossier : votre main courante, et les photos du bracelet. 📁', { fx: 'clue' }],
-      ['e', 'Lisez tout. Même ce qui a l’air bête. Surtout ce qui a l’air bête.']
+      ['e', 'En attendant, vos premières pièces sont dans le dossier : votre main courante, et les photos du bracelet. 📁', { fx: 'clue' }]
     ]
   },
   lab: {
@@ -257,7 +255,6 @@ Object.assign(STORY, {
       ['n', 'Dernière audition. Valentin s’assoit en souriant.', { fx: 'vin' }],
       ['v', 'C’est pour la forme, hein ? Je vis avec elle, j’allais forcément y passer. 😅'],
       ['e', 'Exactement. Pour la forme.', { fx: 'ein' }],
-      ['c', 'Il me regarde à peine…', { fx: 'cin' }],
       ['v', 'Bon… je peux y aller ? J’ai mon métro. 🚇', { fx: 'vout' }],
       ['e', 'Il… il est parti ?! Célestine, suivez-le !', { fx: 'shake' }]
     ]
@@ -269,8 +266,7 @@ Object.assign(STORY, {
       ['n', 'Quai de la ligne D. Valentin s’arrête, essoufflé.', { fx: 'vin' }],
       ['v', 'Mon vendredi ? Boulot, métro, Écully. Rien de spécial.'],
       ['e', 'Rien du tout ? Même pas à Bellecour ?', { fx: 'ein' }],
-      ['v', 'Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir.'],
-      ['e', '« Un truc pour moi. » Je note.']
+      ['v', 'Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir.']
     ]
   },
   s5: {
@@ -312,27 +308,10 @@ Object.assign(STORY, {
       ['e', 'Lisez. Puis demandez-vous ce qu’il a vu dans ce sac. 🧐', { fx: 'clue' }]
     ]
   },
-  mid: {
-    t: 'Numéro masqué',
-    sc: 'pole',
-    l: [
-      ['n', 'Dimanche 13 décembre, 3 h 14 du matin. Le portable de Pépin vibre.', { fx: 'pop:📱' }],
-      ['n', 'Un SMS. Numéro masqué.', { fx: 'shadow' }],
-      ['v', '« Arrêtez de chercher, lieutenant. Il est entre de bonnes mains. »', { fx: ['peek', 'shake'] }],
-      ['e', 'De bonnes mains… Il se moque de moi.', { fx: ['ein', 'shake'] }],
-      ['n', 'La silhouette range son téléphone.', { fx: 'vout' }],
-      ['e', 'Célestine, si le voleur s’inquiète, c’est que vous approchez. Continuez.']
-    ]
-  },
   casino: {
     t: 'Le casino clandestin',
     sc: 'night',
-    l: [
-      ['n', 'Derrière une porte sans nom, rue de la Charité, un casino clandestin ouvre ses portes. 🎰', { fx: 'pop:🎰' }],
-      ['e', 'Célestine. Je n’ai rien vu. Je ne suis pas là.', { fx: 'ein' }],
-      ['c', 'Vous êtes policier.', { fx: 'cin' }],
-      ['e', 'En civil. Et en pause. Méfiez-vous : la roulette est truquée. …Un peu. 😏']
-    ]
+    l: [['n', 'Derrière une porte sans nom, rue de la Charité, un casino clandestin ouvre ses portes. 🎰', { fx: 'pop:🎰' }]]
   },
   s17: {
     t: 'Rapport · Le selfie',
@@ -342,7 +321,7 @@ Object.assign(STORY, {
       ['c', 'Je suis horrible dessus, j’étais en retard…', { fx: 'cin' }],
       ['e', 'Regardez derrière vous. Sur l’étagère.', { fx: 'pop:🔍' }],
       ['c', '…Le vide-poche ? 😳', { fx: 'shake' }],
-      ['e', 'Je ne conclus rien. J’ai juste demandé à Gérald qui pouvait entrer chez vous ce jour-là. Tout est au dossier.', { fx: 'clue' }]
+      ['e', 'Je ne conclus rien. Tout est au dossier.', { fx: 'clue' }]
     ]
   },
   s20: {
@@ -381,9 +360,7 @@ Object.assign(STORY, {
       ['e', 'Célestine, le dossier est complet. Il n’y aura plus aucune pièce.', { fx: 'ein' }],
       ['e', 'Demain, vous recollez le formulaire, vous le faxez… et vous écrivez un nom.'],
       ['e', 'Un seul. Si vous vous trompez, l’affaire est classée pour de bon.'],
-      ['c', 'Pas de pression, donc. 😅', { fx: 'cin' }],
-      ['e', 'Une dernière question, pour la route : êtes-vous vraiment sûre de l’avoir mis dans votre trousse ? 🧐'],
-      ['n', 'Quelque part dans Lyon, quelqu’un regarde l’heure… et sourit.', { fx: ['shadow', 'peek'] }]
+      ['c', 'Pas de pression, donc. 😅', { fx: 'cin' }]
     ]
   },
   fichok: {
@@ -402,10 +379,7 @@ Object.assign(STORY, {
     l: [
       ['n', 'Célestine glisse le formulaire dans le fax…', { fx: ['cin', 'pop:📜'] }],
       ['n', 'Bip… crrrr… crrrrrr… Le fax hurle comme en 1998. 📠', { fx: ['shake', 'pop:📠'] }],
-      ['e', 'Il passe ! Il faut attendre le feu vert du procureur. Ensuite : un nom.', { fx: ['ein', 'pop:🎉'] }],
-      ['n', 'Quelque part, quelqu’un range vite son téléphone…', { fx: 'shadow' }],
-      ['v', 'Elle ne va quand même pas… 😅', { fx: 'peek' }],
-      ['c', 'Si. 😤', { fx: 'cin' }]
+      ['e', 'Il passe ! Il faut attendre le feu vert du procureur. Ensuite : un nom.', { fx: ['ein', 'pop:🎉'] }]
     ]
   },
   acc_valentin: {
@@ -437,10 +411,18 @@ Object.assign(STORY, {
       ['b', 'Attends… tu m’accuses MOI ? Ta manucure attitrée ? Celle qui t’a fait un baby pink PARFAIT ? 😱', { fx: 'shake' }],
       ['c', 'Mardi soir, mon bracelet était sur ta table. Je l’ai vu sur ta story.', { fx: ['cin', 'pop:📸'] }],
       ['b', 'Évidemment ! Tu l’avais ENLEVÉ pour le gel. Je ne vernis pas les bijoux, moi.'],
-      ['b', '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅', { fx: 'pop:💅' }],
+      [
+        'b',
+        '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅',
+        { fx: 'pop:💅' }
+      ],
       ['e', 'Colle à ongles sur un bijou en or. Je note : « dégradation, mais avec talent ». 📝', { fx: 'ein' }],
       ['b', 'Et regarde ma photo de 19 h 40 : mes ongles finis… et le bracelet À TON POIGNET.', { fx: 'pop:📸' }],
-      ['e', 'Mercredi à la BU, il est encore à votre poignet. Jeudi au resto aussi. Ça fait beaucoup de poignet pour un vol, madame.', { fx: 'clue' }],
+      [
+        'e',
+        'Mercredi à la BU, il est encore à votre poignet. Jeudi au resto aussi. Ça fait beaucoup de poignet pour un vol, madame.',
+        { fx: 'clue' }
+      ],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:noemie' }],
       ['b', 'Pour me faire pardonner… de MON innocence, je t’offre une pose gratuite. Attends. C’est toi qui devrais t’excuser !'],
       ['c', '…Pardon Noémie. Je prends quand même la pose gratuite. 😳', { fx: 'cin' }],
@@ -454,12 +436,23 @@ Object.assign(STORY, {
     l: [
       ['n', 'Emma entre en salle d’audition, lunettes sur le nez, regard d’ophtalmo qui a déjà tout vu.', { fx: 'bin' }],
       ['b', 'Laisse-moi deviner. C’est Valentin qui t’a soufflé mon nom ? 🙄'],
-      ['c', 'Jeudi au resto, pendant que j’étais aux toilettes, tu avais mon sac sur les genoux. Noémie a une photo.', { fx: ['cin', 'pop:📸'] }],
+      [
+        'c',
+        'Jeudi au resto, pendant que j’étais aux toilettes, tu avais mon sac sur les genoux. Noémie a une photo.',
+        { fx: ['cin', 'pop:📸'] }
+      ],
       ['b', 'Bien sûr que j’avais ton sac. J’y cherchais… ça.', { fx: 'pop:👓' }],
       ['n', 'Elle pose sur la table un étui à lunettes… et un petit paquet cadeau.', { fx: 'pop:🎁' }],
-      ['b', 'J’ai testé tes verres avec mon appli. Ta correction a bougé, au fait. Je voulais t’offrir de nouvelles lunettes pour Noël. Surprise. Ratée. Merci.'],
+      [
+        'b',
+        'J’ai testé tes verres avec mon appli. Ta correction a bougé, au fait. Je voulais t’offrir de nouvelles lunettes pour Noël. Surprise. Ratée. Merci.'
+      ],
       ['e', 'Et le bracelet, pendant ce temps ? 🧐', { fx: 'ein' }],
-      ['b', 'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.', { fx: 'pop:🍕' }],
+      [
+        'b',
+        'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.',
+        { fx: 'pop:🍕' }
+      ],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:emma' }],
       ['c', 'Emma… je suis la pire. 😳', { fx: 'cin' }],
       ['b', 'Je sais. Avec tes nouvelles lunettes, tu liras mieux ton prochain suspect. 😌'],
@@ -473,11 +466,19 @@ Object.assign(STORY, {
     l: [
       ['n', 'À la BU, Nora révise derrière une forteresse de fiches. Célestine s’avance.', { fx: 'bin' }],
       ['b', 'Chut ! Je suis au chapitre des anti-inflammatoires. Tu as dix secondes. 📚'],
-      ['c', 'Vendredi au TP, tu tenais ma trousse. Erika a une photo. Et c’est là que j’avais rangé mon bracelet.', { fx: ['cin', 'pop:🧪'] }],
+      [
+        'c',
+        'Vendredi au TP, tu tenais ma trousse. Erika a une photo. Et c’est là que j’avais rangé mon bracelet.',
+        { fx: ['cin', 'pop:🧪'] }
+      ],
       ['b', '…Je peux tout expliquer.', { fx: 'shake' }],
       ['b', 'J’ai pris ta trousse à 8 h 45 pour ton correcteur. Et… j’ai un peu copié tes résultats de dosage. Beaucoup. Tout, en fait.'],
       ['c', 'NORA ! 😤', { fx: 'shake' }],
-      ['b', 'Mais il n’y avait PAS de bracelet ! Des stylos, ton surligneur rose et un vieux chewing-gum. Rien qui brille !', { fx: 'pop:🖊️' }],
+      [
+        'b',
+        'Mais il n’y avait PAS de bracelet ! Des stylos, ton surligneur rose et un vieux chewing-gum. Rien qui brille !',
+        { fx: 'pop:🖊️' }
+      ],
       ['e', 'Si la trousse était déjà vide à 8 h 45… peut-être que le bracelet n’y a jamais été. 🧐', { fx: ['ein', 'clue'] }],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:nora' }],
       ['b', 'Par contre… tu peux ne pas parler des résultats copiés au prof ?'],
@@ -515,12 +516,14 @@ Object.assign(STORY, {
       ['b', '…quand je suis allée faire du shopping à Bellecour, oui. 🛍️'],
       ['b', 'Attends. ATTENDS. Tu m’accuses, moi ?! C’est MOI qui t’ai envoyé le message !', { fx: ['shake', 'pop:💬'] }],
       ['c', 'Quel message ?'],
-      ['b', '« J’ai vu Valentin sortir d’une petite boutique vers 12 h 35. Il avait l’air de cacher un truc. » Tu l’as lu jusqu’au bout, au moins ?'],
+      [
+        'b',
+        '« J’ai vu Valentin sortir d’une petite boutique vers 12 h 35. Il avait l’air de cacher un truc. » Tu l’as lu jusqu’au bout, au moins ?'
+      ],
       ['c', '…Je l’ai lu en diagonale. 😳'],
       ['e', 'Accuser son seul témoin. Audacieux. J’ai vu ça une fois, en 2009. Ça s’est mal fini pour tout le monde. ☕', { fx: 'ein' }],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:eya' }],
       ['b', 'Je retourne à mon shopping. Et toi, relis tes messages. LENTEMENT. 💅'],
-      ['n', 'Quelque part, quelqu’un soupire de soulagement…'],
       ['n', 'Le vrai coupable court toujours… Retour au dossier. 🗂️', { fx: 'shake' }]
     ]
   },
@@ -534,8 +537,15 @@ Object.assign(STORY, {
       ['c', 'Edgar. Vendredi soir, tu as pris de l’argent dans mon porte-monnaie. Maman me l’a dit.', { fx: ['cin', 'pop:💬'] }],
       ['b', '20 balles. Un prêt. Un prêt d’urgence alimentaire.', { fx: 'shake' }],
       ['c', 'Et pour trouver mon porte-monnaie, tu as fouillé TOUT mon sac. Là où devait être mon bracelet.'],
-      ['b', 'Justement ! J’ai tout retourné : la trousse, les poches, la doublure. J’ai même trouvé un ticket de 2023. Mais de bracelet : zéro.'],
-      ['e', 'Le ticket de caisse dit 23 h 04 : un tacos XL poulet, frites, sauce fromagère. Payé avec un billet de 20 €. Pas avec un bijou en or. 🧾', { fx: ['ein', 'clue'] }],
+      [
+        'b',
+        'Justement ! J’ai tout retourné : la trousse, les poches, la doublure. J’ai même trouvé un ticket de 2023. Mais de bracelet : zéro.'
+      ],
+      [
+        'e',
+        'Le ticket de caisse dit 23 h 04 : un tacos XL poulet, frites, sauce fromagère. Payé avec un billet de 20 €. Pas avec un bijou en or. 🧾',
+        { fx: ['ein', 'clue'] }
+      ],
       ['b', 'Tu vois ! Je suis un voleur… honnête.'],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:edgar' }],
       ['c', 'Tu me dois quand même 20 €. 😒', { fx: 'cin' }],
@@ -554,7 +564,10 @@ Object.assign(STORY, {
       ['b', 'Tu… accuses… ta MÈRE ? 😱', { fx: 'shake' }],
       ['c', 'Samedi matin, tu as rangé mon sac. Tu l’as eu entre les mains. Seule.'],
       ['b', 'Ma chérie, je range ton sac depuis que tu as 12 ans. Je connais chaque miette qu’il y a dedans.'],
-      ['b', 'Samedi : ta trousse rose, ton porte-monnaie (moins 20 €, merci Edgar), tes clés et un paquet de mouchoirs. AUCUN bijou. Sinon, je l’aurais mis de côté, comme d’habitude.'],
+      [
+        'b',
+        'Samedi : ta trousse rose, ton porte-monnaie (moins 20 €, merci Edgar), tes clés et un paquet de mouchoirs. AUCUN bijou. Sinon, je l’aurais mis de côté, comme d’habitude.'
+      ],
       ['e', 'J’ai lu sa lettre. Elle a même noté l’état des mouchoirs. C’est plus précis que nos rapports. 📝', { fx: 'ein' }],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:parents' }],
       ['b', 'La prochaine fois que tu accuses ta mère, préviens-moi : je ferai un gâteau pour la garde à vue.'],
@@ -572,7 +585,11 @@ Object.assign(STORY, {
       ['b', 'Pour ta crème pour les mains ! J’avais les mains plus sèches qu’un comprimé effervescent sans eau ! 🧴', { fx: 'shake' }],
       ['c', 'Et mon bracelet était peut-être dans mon sac, dans ce casier…'],
       ['b', 'Il y avait ton sac et ton manteau. J’ai pris UNE noisette de crème. Je n’ai pas ouvert ton sac. Je ne suis pas un monstre.'],
-      ['e', 'Et samedi matin, avant la pharmacie, sa mère avait déjà rangé ce sac. Aucun bijou dedans. Ce casier n’a rien pu cacher. 🧐', { fx: ['ein', 'clue'] }],
+      [
+        'e',
+        'Et samedi matin, avant la pharmacie, sa mère avait déjà rangé ce sac. Aucun bijou dedans. Ce casier n’a rien pu cacher. 🧐',
+        { fx: ['ein', 'clue'] }
+      ],
       ['b', 'Tu vois ! Je suis préparatrice, pas cambrioleuse. Je prépare des gélules, pas des casses.'],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:sandrine' }],
       ['b', 'Tiens, pour la peine : un tube de crème neuf. Le tien est presque vide… à cause de moi.'],
@@ -607,7 +624,6 @@ const STORD = [
   's9',
   'b11',
   'w11',
-  'mid',
   'casino',
   'b15',
   'w15',

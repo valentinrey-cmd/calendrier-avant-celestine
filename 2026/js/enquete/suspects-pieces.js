@@ -102,7 +102,7 @@ const SUSP = [
       '🧗 Escalade à MRoc',
       '😏 L’appelle « nulos »'
     ],
-    d: 'Il vit avec elle, donc forcément… Mais il n’a jamais approché le sac de la semaine.',
+    d: 'Son copain. Ils vivent ensemble la semaine ; vendredi, il travaillait, puis il est parti à Écully pour le week-end.',
     dep: '« Vendredi, j’étais au travail, puis direct à Écully. Ton sac, je ne l’ai même pas vu. »',
     a: ''
   }
