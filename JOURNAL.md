@@ -4,6 +4,11 @@
 
 ---
 
+## 25 novembre 2026 (15 h 30) : jonction main-doigts refaite (version 1795613874)
+
+- Main des « ongles finis » : les doigts sont dessinés d'abord, puis la paume par-dessus. Elle remonte entre les doigts avec des creux arrondis et marque les jointures, au lieu de doigts posés sur une paume plate. Le pouce part aussi de l'intérieur de la paume.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`.
+
 ## 25 novembre 2026 (15 h 15) : main des « ongles finis » redessinée (version 1795613762)
 
 - La main de Célestine sur la photo « Les ongles finis » est refaite avec des proportions naturelles : doigts longs et fins qui s'affinent vers le bout, légèrement écartés, phalanges, pouce bien attaché, paume plus étroite. Le poignet et le bracelet ne changent pas.
