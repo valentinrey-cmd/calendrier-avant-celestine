@@ -4,6 +4,11 @@
 
 ---
 
+## 25 novembre 2026 (15 h 45) : main des « ongles finis » retouchée (version 1795614008)
+
+- Main de Célestine : la bosse à gauche de l'index est enlevée, les doigts sont moins écartés (ils se rejoignent à la base, plus de vide entre eux) et environ 15 % plus courts.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`.
+
 ## 25 novembre 2026 (15 h 30) : jonction main-doigts refaite (version 1795613874)
 
 - Main des « ongles finis » : les doigts sont dessinés d'abord, puis la paume par-dessus. Elle remonte entre les doigts avec des creux arrondis et marque les jointures, au lieu de doigts posés sur une paume plate. Le pouce part aussi de l'intérieur de la paume.

@@ -346,18 +346,18 @@ ${(() => {
     doigt = (bx, by, L, w, a) =>
       `<g transform="translate(${bx} ${by}) rotate(${a})"><path d="M${-w / 2} 4 L${-w * 0.4} ${-L + w * 0.42} A${w * 0.4} ${w * 0.42} 0 0 1 ${w * 0.4} ${-L + w * 0.42} L${w / 2} 4Z" fill="${pe}"/><path d="M${w * 0.18} ${-L * 0.9} L${w * 0.3} 0" stroke="${om}" stroke-width="${w * 0.22}" opacity=".35" stroke-linecap="round"/><path d="M${-w * 0.3} ${-L * 0.36} q${w * 0.3} 1.6 ${w * 0.6} 0 M${-w * 0.28} ${-L * 0.64} q${w * 0.28} 1.3 ${w * 0.56} 0" fill="none" stroke="${om}" stroke-width=".7" opacity=".8"/><rect x="${-w * 0.3}" y="${-L + w * 0.12}" width="${w * 0.6}" height="${L * 0.25}" rx="${w * 0.3}" fill="#ffb3cc"/><path d="M${-w * 0.3} ${-L + w * 0.12 + L * 0.2} q${w * 0.3} ${w * 0.25} ${w * 0.6} 0" fill="none" stroke="#ef8fb1" stroke-width=".6"/><rect x="${-w * 0.16}" y="${-L + w * 0.3}" width="${w * 0.16}" height="${L * 0.13}" rx="${w * 0.08}" fill="#fff" opacity=".85"/></g>`;
   const dg = [
-    [-14, -38, 46, 10.4, -7],
-    [-2, -41, 52, 10.8, -1.5],
-    [9.5, -39, 48, 10.2, 4],
-    [19.5, -32, 36, 8.6, 11]
+    [-14, -38, 39, 10.6, -4],
+    [-2.4, -40, 44, 10.8, -1],
+    [8.8, -38.5, 41, 10.4, 2.5],
+    [19.2, -33, 31, 8.8, 7]
   ];
   // les doigts d'abord, puis la paume par-dessus : elle remonte entre les doigts (creux arrondis) et dessine les jointures
   return `${dg.map(d => doigt(...d)).join('')}
 <g transform="translate(-21 -2) rotate(-34)"><path d="M-5.5 10 L-5 -26 A5 5.4 0 0 1 5 -26 L5.5 10Z" fill="${pe}"/><path d="M-4 -12 q4 1.6 8 0" fill="none" stroke="${om}" stroke-width=".7"/><rect x="-3.4" y="-30" width="6.8" height="9.5" rx="3.4" fill="#ffb3cc"/><rect x="-1.6" y="-28.4" width="1.4" height="5.4" rx=".7" fill="#fff" opacity=".85"/></g>
-<path d="M-17 150 L-17 36 Q-18 22 -22 8 Q-26 -8 -25 -22 Q-24 -32 -19.4 -35 Q-14 -41 -8.2 -34.5 Q-2.2 -43 4 -33.6 Q9.6 -41 15.2 -29 Q20 -35 23.6 -26 Q24.6 -18 23.6 -10 Q22 -6 20 8 Q17 22 17 36 L18 150Z" fill="${pe}"/>
-<path d="M17 36 Q17 22 20 8 Q22 -6 23.6 -10 Q24.6 -18 23.6 -26 L20.6 -24 Q21 -12 17 -2 Q14 14 12 30 L12 150 L18 150Z" fill="${om}" opacity=".4"/>
+<path d="M-17 150 L-17 36 Q-18 22 -21 8 Q-23 -12 -20.2 -34 Q-14 -42.5 -8.4 -38.6 Q-2.4 -44.5 3.4 -38.2 Q8.8 -43 14.4 -34.4 Q19.2 -38.8 23.6 -29 Q24.6 -18 23.6 -10 Q22 -6 20 8 Q17 22 17 36 L18 150Z" fill="${pe}"/>
+<path d="M17 36 Q17 22 20 8 Q22 -6 23.6 -10 Q24.6 -18 23.6 -29 L20.6 -24 Q21 -12 17 -2 Q14 14 12 30 L12 150 L18 150Z" fill="${om}" opacity=".4"/>
 <path d="M-24 -18 Q-23 0 -19 16" fill="none" stroke="#fff" stroke-width="3" opacity=".22" stroke-linecap="round"/>
-<path d="M-17.5 -33 Q-14 -36.5 -10.5 -33 M-5.5 -35 Q-2 -38.8 1.6 -35 M6.4 -33.4 Q9.6 -36.6 12.8 -33 M16.6 -28.4 Q19.4 -31 22 -27.6" fill="none" stroke="${om}" stroke-width=".9" opacity=".75" stroke-linecap="round"/>
+<path d="M-17.5 -35 Q-14 -38.4 -10.5 -35 M-5.8 -36.6 Q-2.4 -40.2 1 -36.6 M5.6 -35.6 Q8.8 -38.8 12 -35.4 M16.4 -30.6 Q19.2 -33.2 21.8 -30" fill="none" stroke="${om}" stroke-width=".9" opacity=".75" stroke-linecap="round"/>
 <path d="M-11 -26 Q-10 -6 -7 12 M-1 -28 L0 12 M9 -26 Q8 -6 5 12" fill="none" stroke="${om}" stroke-width=".9" opacity=".35"/>
 <path d="M-17 40 Q0 45 17 40" fill="none" stroke="${om}" stroke-width=".9" opacity=".6"/>`;
 })()}
