@@ -3115,5 +3115,22 @@ window.TRADUCTIONS_EN = {
   'La prochaine fois que tu accuses ta mère, préviens-moi : je ferai un gâteau pour la garde à vue.':
     'Next time you accuse your mother, warn me: I’ll bake a cake for the police custody.',
   '…Pardon maman. 😳': '…Sorry Mum. 😳',
-  'Suspect n°7 · la mère': 'Suspect no. 7 · the mother'
+  'Suspect n°7 · la mère': 'Suspect no. 7 · the mother',
+  'Mise à jour disponible': 'Update available',
+  'Nouveautés': "What's new",
+  'Préparation…': 'Preparing…',
+  'Installation…': 'Installing…',
+  'Redémarrage…': 'Restarting…',
+  'Corrections de bugs et amélioration de la stabilité': 'Bug fixes and stability improvements',
+  'Chargement des jeux plus rapide': 'Faster game loading',
+  'Meilleur affichage sur iPad': 'Better display on iPad',
+  'Correction d’un problème de son sur certains appareils': 'Fixed a sound issue on some devices',
+  'Nouveaux détails dans le dossier d’enquête': 'New details in the case file',
+  'Ajustements de la difficulté de certains jeux': 'Difficulty tweaks in some games',
+  'Consommation de batterie réduite': 'Reduced battery usage',
+  'Animations plus fluides': 'Smoother animations',
+  'Corrections dans l’album photo': 'Photo album fixes',
+  'Sauvegarde de la progression plus fiable': 'More reliable progress saving',
+  'Amélioration des cinématiques': 'Improved cutscenes',
+  'Corrections dans les textes': 'Text fixes'
 };

@@ -4,6 +4,15 @@
 
 ---
 
+## 25 novembre 2026 (16 h 15) : fausses mises à jour réalistes au lancement (version 1795614665)
+
+- Nouvelle **fausse mise à jour**, sérieuse cette fois (pas de blague). Elle doit faire croire que Valentin travaille toujours sur l'appli.
+- **Quand :** seulement quand Célestine reprend une partie en cours depuis le menu (« Continuer »), jamais pendant le jeu ni pour une nouvelle partie. Une chance sur trois environ, et au plus une fois toutes les 18 h.
+- **Ce qu'elle montre :** une fenêtre façon iPhone avec l'icône de l'appli, « Mise à jour disponible », « Dossier n°24 · version 2.4.x · 2 à 5 Mo », 3 nouveautés crédibles tirées au hasard, une barre de téléchargement en Mo, puis « Installation… » et « Redémarrage… ». Ensuite la partie s'ouvre normalement. Le numéro de version augmente à chaque fois.
+- **Suivi :** chaque fausse mise à jour est notée dans le suivi (🎭).
+- Nouveaux champs de sauvegarde : `S.majT` (date de la dernière) et `S.majV` (compteur de versions).
+- Fichiers : `2026/js/gags.js` (`majFausse`, liste `MAJN`), `2026/js/menu-demarrer.js` (branchement au lancement), `2026/css/12-gags.css`, `2026/js/langue-anglais.js`.
+
 ## 25 novembre 2026 (16 h) : 4 gags supprimés (version 1795614413)
 
 - Supprimés complètement, à la demande de Valentin :

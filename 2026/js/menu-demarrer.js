@@ -803,7 +803,7 @@ function smOpen(force, at) {
     };
     step();
   };
-  const MODE = { 'Facile': 'mode_facile', 'Experte': 'mode_experte', 'Célestine': 'mode_celestine' };
+  const MODE = { Facile: 'mode_facile', Experte: 'mode_experte', Célestine: 'mode_celestine' };
   const finish = () => {
     if (diff && MODE[diff]) {
       const id = MODE[diff];
@@ -833,6 +833,13 @@ function smOpen(force, at) {
         }
       }, 650);
       return;
+    }
+    // partie en cours reprise : parfois une (fausse) mise à jour avant d'entrer (js/gags.js)
+    if (!finish.maj) {
+      finish.maj = 1;
+      try {
+        if (majFausse(finish)) return;
+      } catch (_) {}
     }
     const pv = S.lastPlay;
     S.startDone = S.startDone || Date.now();

@@ -390,6 +390,63 @@ function funWanted() {
     return r;
   };
 }
+/* 9) Fausse mise à jour, au lancement d'une partie en cours (doit paraître vraie : Valentin « travaille encore dessus ») */
+const MAJN = [
+  'Corrections de bugs et amélioration de la stabilité',
+  'Chargement des jeux plus rapide',
+  'Meilleur affichage sur iPad',
+  'Correction d’un problème de son sur certains appareils',
+  'Nouveaux détails dans le dossier d’enquête',
+  'Ajustements de la difficulté de certains jeux',
+  'Consommation de batterie réduite',
+  'Animations plus fluides',
+  'Corrections dans l’album photo',
+  'Sauvegarde de la progression plus fiable',
+  'Amélioration des cinématiques',
+  'Corrections dans les textes'
+];
+// renvoie true si une mise à jour s'affiche (go est alors appelé à la fin), false sinon
+function majFausse(go) {
+  if (!S.startDone || (S.majT && Date.now() - S.majT < 18 * 3600000) || Math.random() > 0.35) return false;
+  S.majT = Date.now();
+  S.majV = (S.majV || 2) + 1;
+  save();
+  const v = `2.${4 + Math.floor(S.majV / 4)}.${S.majV % 4}`,
+    mo = (1.8 + Math.random() * 3.6).toFixed(1),
+    n = shuffle([...MAJN]).slice(0, 3);
+  funLog('Fausse mise à jour ' + v);
+  const o = document.createElement('div');
+  o.className = 'maj';
+  o.innerHTML = `<div class="maj-in"><img class="maj-ic" src="icon-192.png" alt=""><b class="maj-t">Mise à jour disponible</b><p class="maj-v">Dossier n°24 · version ${v} · ${mo.replace('.', ',')} Mo</p><div class="maj-n"><small>Nouveautés</small><ul>${n.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div><div class="maj-bar"><i></i></div><p class="maj-p">Préparation…</p></div>`;
+  document.body.appendChild(o);
+  const I = o.querySelector('.maj-bar i'),
+    P = o.querySelector('.maj-p'),
+    B = o.querySelector('.maj-bar');
+  let p = 0;
+  const dl = () => {
+    if (!o.isConnected) return go();
+    p = Math.min(100, p + 4 + Math.random() * 11);
+    I.style.width = p + '%';
+    P.textContent = `Téléchargement… ${((mo * p) / 100).toFixed(1).replace('.', ',')} Mo sur ${mo.replace('.', ',')} Mo`;
+    if (p < 100) return setTimeout(dl, 160 + Math.random() * 260);
+    setTimeout(() => {
+      B.classList.add('inst');
+      P.textContent = 'Installation…';
+      setTimeout(() => {
+        P.textContent = 'Redémarrage…';
+        setTimeout(() => {
+          o.classList.add('out');
+          setTimeout(() => {
+            o.remove();
+            go();
+          }, 500);
+        }, 900);
+      }, 1700);
+    }, 350);
+  };
+  setTimeout(dl, 900);
+  return true;
+}
 /* Calendrier : surprises */
 {
   const CV = calView;
