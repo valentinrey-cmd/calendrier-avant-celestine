@@ -45,43 +45,7 @@ const funLog = t => {
     slog('🎭', t);
   } catch (_) {}
 };
-/* 1) Fausse mise à jour */
-function funUpd() {
-  funMark('upd');
-  funLog('Fausse mise à jour');
-  const o = funOv(
-    'fun-upd',
-    `<div class="fu-box"><div class="fu-ic">⬇️</div><b class="fu-t">Mise à jour disponible</b><p class="fu-v">Célestine 2.0</p><ul class="fu-n"><li>✨ Rire encore plus contagieux</li><li>💖 Capacité câlins : +30 %</li><li>🛠️ Correctif : « J’ai froid » dit 14 fois par jour</li><li>🧦 Pieds gelés : problème connu, pas de solution</li><li>🐛 Défauts supprimés : 0 (aucun trouvé)</li></ul><div class="fu-bar"><i></i></div><p class="fu-p">Installation… 0 %</p><button class="fu-ok" style="visibility:hidden">OK 😌</button></div>`
-  );
-  const I = o.querySelector('.fu-bar i'),
-    P = o.querySelector('.fu-p'),
-    B = o.querySelector('.fu-ok');
-  let p = 0;
-  const st = () => {
-    if (!o.isConnected) return;
-    if (p < 99) {
-      p = Math.min(99, p + 3 + Math.random() * 12);
-      I.style.width = p + '%';
-      P.textContent = 'Installation… ' + Math.floor(p) + ' %';
-      return setTimeout(st, 180 + Math.random() * 250);
-    }
-    P.textContent = 'Installation… 99 %';
-    setTimeout(() => {
-      P.textContent = 'Installation… 99 % 😬';
-      setTimeout(() => {
-        o.querySelector('.fu-box').classList.add('fail');
-        o.querySelector('.fu-ic').textContent = '❌';
-        o.querySelector('.fu-t').textContent = 'Mise à jour annulée';
-        P.innerHTML = 'Raison : impossible d’améliorer la perfection. ❤️';
-        funBip(300, 0.2);
-        B.style.visibility = 'visible';
-      }, 1500);
-    }, 1200);
-  };
-  setTimeout(st, 700);
-  B.onclick = () => o.__close();
-}
-/* 2) Le chat qui passe */
+/* 1) Le chat qui passe */
 const CATI = [
   'Indice : le coupable a deux yeux. 👀',
   'Indice : le coupable aime Noël. Comme tout le monde.',
@@ -118,7 +82,7 @@ function funCat() {
   };
   setTimeout(() => c.remove(), 16000);
 }
-/* 3) Pépin dort la nuit */
+/* 2) Pépin dort la nuit */
 function funSleep() {
   const h = new Date().getHours();
   const old = document.getElementById('fslp');
@@ -156,7 +120,7 @@ setInterval(() => {
     }
   } catch (_) {}
 }, 1500);
-/* 4) Lettre recommandée */
+/* 3) Lettre recommandée */
 function funLetter(days) {
   funLog('Lettre recommandée (' + days + ' jours sans ouvrir)');
   const sig = funSig();
@@ -168,69 +132,7 @@ function funLetter(days) {
   setTimeout(() => funBip(220, 0.25), 300);
   o.querySelector('.fl-ok').onclick = () => o.__close();
 }
-/* 5) Commentateur Pépin pendant les mini-jeux */
-const COM = [
-  'ET C’EST PARTI ! 🎙️',
-  'Quelle concentration… on entendrait un flocon tomber. ❄️',
-  'Oh, joli geste technique ! 👏',
-  'Le public est en délire ! (le public, c’est moi.)',
-  'Elle respire, elle se concentre… magnifique.',
-  'Attention… ATTENTION… ah non, rien. Fausse alerte.',
-  'On n’avait pas vu ça depuis… hier. 😮',
-  'Tout le commissariat retient son souffle ! 😤',
-  'Si elle gagne, je mange mon bonnet. 🎩',
-  'Un style inimitable. Les juges notent : 10, 10 et… 9 (le juge est jaloux).',
-  'Oh non… on va dire que c’était voulu. 😅',
-  'Calme, sang-froid, élégance. Une vraie pro.',
-  'Je rappelle que ce jeu a été testé par Gérald. Il a pleuré.',
-  'Pub : ce commentaire vous est offert par Tacos Pépin®.',
-  'Et là, elle a clairement un plan. Je ne sais pas lequel, mais elle en a un.',
-  'Edgar aurait déjà abandonné. Pas elle !',
-  'Incroyable ! Enfin… crédible. Enfin… pas mal !',
-  'Silence dans les tribunes… ❄️',
-  'Respirez, Célestine, respirez. (moi, j’ai arrêté.)'
-];
-let comT = 0,
-  comNext = 0,
-  comWas = 0;
-function funCom(t) {
-  let b = document.getElementById('fcom');
-  if (!b) {
-    b = document.createElement('div');
-    b.id = 'fcom';
-    b.innerHTML = '<span class="fco-m">🎙️</span><span class="fco-e">👮</span><span class="fco-t"></span>';
-    document.body.appendChild(b);
-  }
-  b.querySelector('.fco-t').textContent = t;
-  b.classList.remove('on');
-  void b.offsetWidth;
-  b.classList.add('on');
-  clearTimeout(comT);
-  comT = setTimeout(() => b.classList.remove('on'), 4200);
-}
-setInterval(() => {
-  try {
-    const pl = document.body.classList.contains('playing') && document.getElementById('gwin');
-    const now = Date.now();
-    if (!pl) {
-      comWas = 0;
-      const b = document.getElementById('fcom');
-      if (b) b.classList.remove('on');
-      return;
-    }
-    if (!comWas) {
-      comWas = 1;
-      comNext = now + 3500;
-      return;
-    }
-    if (now >= comNext) {
-      funCom(comNext && comWas == 1 ? COM[0] : COM[1 + Math.floor(Math.random() * (COM.length - 1))]);
-      comWas = 2;
-      comNext = now + 15000 + Math.random() * 9000;
-    }
-  } catch (_) {}
-}, 800);
-/* 6) Fausses pubs (parodies de pubs connues) */
+/* 4) Fausses pubs (parodies de pubs connues) */
 const MGB =
   '<p class="fp-mb">Pour votre santé, mangez au moins 5 fruits et légumes par jour. Les tacos ne comptent pas. <u>www.mangerbouger.fr</u></p>';
 const PUBS = [
@@ -299,68 +201,7 @@ function funPub(go, ad) {
     return L0(d, pr);
   };
 }
-/* 7) Mode pitié après 3 échecs */
-const PRF = {};
-function funPity() {
-  funLog('Mode pitié');
-  const o = funOv(
-    'fun-pity',
-    `<div class="fy-in"><div class="fy-elf">${CINE.elf()}<span class="fy-band">🩹</span></div><b class="fy-t">MODE PITIÉ ACTIVÉ 🩹</b><p>Bon. Je ne peux pas changer le jeu…</p><p>…mais je te fais un câlin très fort, et je dirai à tout le monde que c’était un bug. 🤗</p><p class="fy-s">(Le brigadier Gérald a mis un pansement géant sur ton écran, par solidarité.)</p><button class="fy-ok">Merci Pépin 🥲</button></div>`
-  );
-  funBip(400, 0.2);
-  o.querySelector('.fy-ok').onclick = () => o.__close();
-}
-{
-  const R0 = result;
-  result = function (d, pr, ok, why) {
-    const r = R0.apply(this, arguments);
-    try {
-      if (!ok) {
-        let f;
-        if (pr) {
-          PRF[d] = (PRF[d] || 0) + 1;
-          f = PRF[d];
-        } else f = (S.days[d] || {}).fails || 0;
-        if (f > 0 && f % 3 == 0) setTimeout(funPity, 1100);
-      } else if (pr) PRF[d] = 0;
-    } catch (_) {}
-    return r;
-  };
-}
-/* 8) Secouer le téléphone pendant un jeu */
-let shkT = 0,
-  shkL = null;
-function funShake() {
-  if (Date.now() - shkT < 6000) return;
-  shkT = Date.now();
-  funLog('A secoué le téléphone');
-  const o = document.createElement('div');
-  o.className = 'fun-shk';
-  let h = '';
-  for (let i = 0; i < 34; i++)
-    h += `<i style="left:${Math.random() * 100}%;animation-delay:${Math.random() * 0.8}s;font-size:${12 + Math.random() * 18}px">❄</i>`;
-  o.innerHTML = h + `<span class="fk-elf">${CINE.elf()}</span><b class="fk-t">AAAAAH ! 😱</b>`;
-  document.body.appendChild(o);
-  funBip(900, 0.4);
-  setTimeout(() => {
-    const t = o.querySelector('.fk-t');
-    if (t) t.textContent = '…Aïe. 🤕';
-  }, 1500);
-  setTimeout(() => o.remove(), 3300);
-}
-window.addEventListener('devicemotion', e => {
-  try {
-    if (!document.body.classList.contains('playing')) return;
-    const a = e.accelerationIncludingGravity;
-    if (!a || a.x == null) return;
-    if (shkL) {
-      const d = Math.abs(a.x - shkL.x) + Math.abs(a.y - shkL.y) + Math.abs(a.z - shkL.z);
-      if (d > 32) funShake();
-    }
-    shkL = { x: a.x, y: a.y, z: a.z };
-  } catch (_) {}
-});
-/* 9) Carte de détective */
+/* 5) Carte de détective */
 function funCard() {
   if (S.detCard || document.querySelector('.fun-ov')) return;
   funLog('Carte de détective proposée');
@@ -465,7 +306,7 @@ function funBrand(x, go) {
     return SO(id);
   };
 }
-/* 10) Arrêt maladie de Pépin */
+/* 6) Arrêt maladie de Pépin */
 function funSickDay() {
   if (!S.sickDay) {
     S.sickDay = 7 + Math.floor(Math.random() * 10);
@@ -503,7 +344,7 @@ const FLUB = [
     return ST(id, cb, tst);
   };
 }
-/* 11) Avis de recherche du chat */
+/* 7) Avis de recherche du chat */
 function funWanted() {
   funLog('Regarde l’avis de recherche du chat');
   const o = funOv(
@@ -512,7 +353,7 @@ function funWanted() {
   );
   o.onclick = () => o.__close();
 }
-/* 12) Photobomb de Pépin dans l’album */
+/* 8) Photobomb de Pépin dans l’album */
 {
   const AZ = alZoom;
   alZoom = function (i) {
@@ -588,17 +429,6 @@ setInterval(() => {
       return;
     }
     funCardW = 0;
-    if (window.__funCalDone) return;
-    window.__funCalDone = 1;
-    setTimeout(() => {
-      try {
-        if (!funIdle()) {
-          window.__funCalDone = 0;
-          return;
-        }
-        if (!funD('upd') && Math.random() < 0.14) funUpd();
-      } catch (_) {}
-    }, 2500);
   } catch (_) {}
 }, 2000);
 setInterval(() => {

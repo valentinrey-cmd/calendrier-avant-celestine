@@ -4,6 +4,16 @@
 
 ---
 
+## 25 novembre 2026 (16 h) : 4 gags supprimés (version 1795614413)
+
+- Supprimés complètement, à la demande de Valentin :
+  - la **fausse mise à jour** « Célestine 2.0 » ;
+  - les **commentaires** de Pépin pendant les mini-jeux ;
+  - le **mode pitié** avec le lutin au pansement 🩹 après 3 échecs ;
+  - le **lutin qui tombe** quand on secoue le téléphone pendant un jeu.
+- Leur code (`js/gags.js`), leurs styles (`css/12-gags.css`, 31 règles) et leurs 28 traductions anglaises (`js/langue-anglais.js`) sont retirés. Les gags restants sont renumérotés de 1 à 8. Le champ `S.funD` de la sauvegarde est gardé.
+- Fichiers : `2026/js/gags.js`, `2026/css/12-gags.css`, `2026/js/langue-anglais.js`, `CLAUDE.md`.
+
 ## 25 novembre 2026 (15 h 45) : main des « ongles finis » retouchée (version 1795614008)
 
 - Main de Célestine : la bosse à gauche de l'index est enlevée, les doigts sont moins écartés (ils se rejoignent à la base, plus de vide entre eux) et environ 15 % plus courts.

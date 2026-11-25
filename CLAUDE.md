@@ -56,7 +56,7 @@ Avant d'écrire du code, choisis l'endroit selon ce tableau. **Ne crée pas de n
 | Ajouter une image, une photo ou un son | Mets le fichier dans `2026/media/…`, son chemin dans `js/medias.js` (ou `js/contenu.js`), **et** dans la liste `medias` de `js/fichiers.js`. |
 | Musique d'un écran, bruitage | Musique synthétisée : `js/musique.js`. Chansons du jour et lecteur : `js/musiques-jeux.js`. Petits bruits d'interface : `SFX` dans `js/sons.js`. Bruits des cinématiques : `CINE.sfx` dans `js/cinematiques.js`. |
 | Boutique, roue, casino, labo, succès | Le fichier du même nom (voir la carte). Les articles de la boutique sont dans `SHOP` (`js/jours.js`). |
-| Un nouveau gag | `js/gags.js`. |
+| Un nouveau gag | `js/gags.js` (ses styles dans `css/12-gags.css`). |
 | Un nouvel écran ou onglet | La vue va dans un nouveau fichier `js/nom.js` (ajouté dans `fichiers.js` **avant** `js/demarrage.js`). Inscris-la dans `render()` (`js/interface.js`) et ajoute le bouton d'onglet dans `index.html` si besoin. |
 | Un style (couleur, taille, animation) | Cherche la classe avec `grep -rn "classe" 2026/css` et modifie la règle existante. Un nouveau style se met dans le fichier CSS du même thème. |
 | Une nouvelle donnée à sauvegarder | Ajoute un champ à `S` (par exemple `S.monChamp = …; save();`). Ne renomme ni n'efface les champs existants. |
@@ -95,7 +95,7 @@ Avant d'écrire du code, choisis l'endroit selon ce tableau. **Ne crée pas de n
 | L'album photo (livre, pages, zoom) / les vidéos de l'album | `js/album.js` / `js/album-videos.js` |
 | La musique d'ambiance (synthétisée) / les chansons du jour, le fichier mystère, le lecteur | `js/musique.js` / `js/musiques-jeux.js` |
 | Les bruitages / la playlist et le pack de voix | `js/sons.js` / `js/playlist-voix.js` |
-| Les gags (fausse mise à jour, chat, pubs, carte de détective…) | `js/gags.js` |
+| Les gags (chat, pubs, carte de détective, arrêt maladie de Pépin…) | `js/gags.js` |
 | Les Trésors (onglet 🎁) / les Paramètres | `js/tresors.js` / `js/parametres.js` |
 | Le mode admin (toucher 7 fois la photo en haut à gauche, puis code 2412) | `js/admin.js` |
 | L'écran d'installation de l'appli | `js/installation.js` (+ page `app.html`) |
