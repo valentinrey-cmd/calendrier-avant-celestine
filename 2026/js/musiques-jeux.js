@@ -1409,7 +1409,7 @@ function mysLancer(cb, fic) {
     VMIN = 2.6, // force du lancer : jauge vide…
     VMAX = 9.5, // … et pleine
     REMPLI = 2.4; // secondes pour remplir la jauge
-  let W, H, dpr, f, hy, hc, F, rate, fin, raf, t0, fumees, flocons, etoiles, ville, voisins, eclats;
+  let W, H, dpr, f, hy, hc, F, rate, fin, raf, t0, fumees, flocons, flou, etoiles, ville, voisins, eclats;
   // Célestine (le personnage qu'on dirige) : elle tient le fichier tant qu'elle ne l'a pas lancé
   let C = { x: 0, z: 2.6, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, charge: 0, tir: -9, pTir: null, pose: -9 };
   // obstacles posés sur le toit : le fichier bute contre eux (cylindres : x, z, rayon, hauteur)
@@ -1634,17 +1634,44 @@ function mysLancer(cb, fic) {
     r: Math.random() * 1.3 + 0.3,
     p: Math.random() * 6
   }));
-  flocons = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random(), d: 0.3 + Math.random() * 0.7, p: Math.random() * 6 }));
+  flocons = Array.from({ length: 150 }, () => ({ x: Math.random(), y: Math.random(), d: Math.pow(Math.random(), 0.7), p: Math.random() * 6 }));
+  // quelques gros flocons tout près de l'objectif, flous (comme hors mise au point)
+  flou = Array.from({ length: 9 }, () => ({ x: Math.random(), y: Math.random(), r: 8 + Math.random() * 16, p: Math.random() * 6, v: 0.025 + Math.random() * 0.03 }));
   addEventListener('resize', taille);
 
   /* ===================== dessin ===================== */
+  // les nuages fins qui passent devant la lune, très lentement (positions dans le panorama, en largeurs d'écran)
+  // les lampadaires de la rue, loin en contrebas (des halos dans le panorama, sous l'horizon)
+  const LAMPADAIRES = Array.from({ length: 46 }, (_, i) => ({ x: Math.random() * 7, y: 0.12 + Math.random() * 0.5, r: 14 + Math.random() * 22, c: ['255,200,120', '255,222,150', '255,180,110'][i % 3] }));
+  const NUAGES = Array.from({ length: 7 }, (_, i) => ({ x: i + Math.random() * 0.6, y: 0.05 + Math.random() * 0.16, l: 0.5 + Math.random() * 0.6, e: 10 + Math.random() * 16, v: 0.004 + Math.random() * 0.006 }));
   const ciel = t => {
     let g = c.createLinearGradient(0, 0, 0, hy + 40);
-    g.addColorStop(0, '#070d22');
-    g.addColorStop(0.6, '#172a58');
-    g.addColorStop(1, '#3b4f8c');
+    g.addColorStop(0, '#050a1d');
+    g.addColorStop(0.55, '#142553');
+    g.addColorStop(0.88, '#33497f');
+    g.addColorStop(1, '#4c5a8c');
     c.fillStyle = g;
-    c.fillRect(0, 0, W, H);
+    c.fillRect(0, 0, W, hy + 1); // sous l'horizon, voir plus bas
+    // la lueur orangée de la ville, juste au-dessus de l'horizon
+    g = c.createLinearGradient(0, hy - 90, 0, hy + 10);
+    g.addColorStop(0, 'rgba(255,170,110,0)');
+    g.addColorStop(1, 'rgba(255,160,110,0.22)');
+    c.fillStyle = g;
+    c.fillRect(0, hy - 90, W, 100);
+    // sous l'horizon : le vide entre les immeubles, de plus en plus sombre, et tout en bas les halos des lampadaires de la rue
+    g = c.createLinearGradient(0, hy, 0, H);
+    g.addColorStop(0, '#3a4a82');
+    g.addColorStop(0.35, '#1d2a57');
+    g.addColorStop(1, '#0a1130');
+    c.fillStyle = g;
+    c.fillRect(0, hy, W, H - hy);
+    LAMPADAIRES.forEach(l => {
+      const x = pano((l.x / 7) * 2 * Math.PI * f, 60);
+      if (x == null) return;
+      const y = hy + l.y * (H - hy),
+        r = l.r * (0.6 + l.y);
+      haloEn(x, y, r, r, l.c, 0.35 + 0.1 * Math.sin(t * 1.3 + l.x * 9), 0.3);
+    });
     etoiles.forEach(s => {
       const sx = pano((s.x / 7) * 2 * Math.PI * f, 4);
       if (sx == null) return;
@@ -1663,6 +1690,12 @@ function mysLancer(cb, fic) {
     g.addColorStop(1, '#fff6d600');
     c.fillStyle = g;
     c.fillRect(mx - 90, my - 90, 180, 180);
+    // le halo de glace autour de la lune (un anneau très pâle)
+    c.strokeStyle = 'rgba(214,226,255,0.07)';
+    c.lineWidth = 10;
+    c.beginPath();
+    c.arc(mx, my, 78, 0, 7);
+    c.stroke();
     c.fillStyle = '#fbf3d6';
     c.beginPath();
     c.arc(mx, my, 22, 0, 7);
@@ -1676,6 +1709,25 @@ function mysLancer(cb, fic) {
       c.beginPath();
       c.arc(mx + a, my + b, r, 0, 7);
       c.fill();
+    });
+    nuagesDessin(t);
+  };
+  const nuagesDessin = t => {
+    NUAGES.forEach(n => {
+      const x = pano((((n.x + t * n.v) % 7) * W * 2 * Math.PI * f) / (7 * W), W);
+      if (x == null) return;
+      const y = n.y * H,
+        L = n.l * W * 0.5;
+      c.save();
+      c.translate(x, y);
+      c.scale(1, n.e / L);
+      const g = c.createRadialGradient(0, 0, 0, 0, 0, L);
+      g.addColorStop(0, 'rgba(150,168,220,0.2)');
+      g.addColorStop(0.6, 'rgba(120,140,200,0.08)');
+      g.addColorStop(1, 'rgba(120,140,200,0)');
+      c.fillStyle = g;
+      c.fillRect(-L, -L, 2 * L, 2 * L);
+      c.restore();
     });
   };
   const lyon = () => {
@@ -1709,63 +1761,15 @@ function mysLancer(cb, fic) {
       if (i % 4 == 1) c.fillRect(x + 8, base - b.h + 9, 2.5, 2.5);
     });
   };
+  // notre toit : la neige (voir neigeToit), ses bords enneigés avec leurs stalactites, et la guirlande du faîtage
   const toit = () => {
-    // pan de toit enneigé
-    if (
-      poly([
-        [-9, 0, 0.6],
-        [9, 0, 0.6],
-        [9, 0, RIDGE],
-        [-9, 0, RIDGE]
-      ])
-    ) {
-      const g = c.createLinearGradient(0, hy + 20, 0, H);
-      g.addColorStop(0, '#c9d6ee');
-      g.addColorStop(1, '#f4f8ff');
-      c.fillStyle = g;
-      c.fill();
-    }
-    // rangées de tuiles qui dépassent de la neige
-    c.strokeStyle = '#9fb0cf';
-    c.lineWidth = 1;
-    c.globalAlpha = 0.5;
-    for (let z = 1; z < RIDGE; z *= 1.16) {
-      c.beginPath();
-      let on = 0;
-      for (let x = -9; x <= 9; x += 0.3) {
-        const [px, py, sc, d] = P(x, 0, z);
-        if (d < 0.3) {
-          on = 0;
-          continue;
-        }
-        on ? c.lineTo(px, py) : c.moveTo(px, py);
-        on = 1;
-      }
-      c.stroke();
-    }
-    c.globalAlpha = 1;
-    // bords du toit enneigés : faîtage, gouttière, côtés
-    c.strokeStyle = '#e9eff9';
-    c.lineWidth = 5;
-    [
-      [-9, RIDGE, 9, RIDGE],
-      [-9, 0.6, 9, 0.6],
-      [-9, 0.6, -9, RIDGE],
-      [9, 0.6, 9, RIDGE]
-    ].forEach(([x1, z1, x2, z2]) => {
-      if (
-        poly([
-          [x1, 0, z1],
-          [x2, 0, z2],
-          [x2, 0.06, z2],
-          [x1, 0.06, z1]
-        ])
-      ) {
-        c.fillStyle = '#e9eff9';
-        c.fill();
-      }
-    });
-    guirlandeFaite(performance.now() / 1000);
+    neigeToit(-9, 9, BORD, RIDGE, 0, 0, [
+      [-9, RIDGE, 9, RIDGE, 0, 1, -1],
+      [-9, BORD, 9, BORD, 0, -1, 0],
+      [-9, BORD, -9, RIDGE, -1, 0, 1],
+      [9, BORD, 9, RIDGE, 1, 0, 2]
+    ]);
+    guirlandeFaite(T());
   };
   const ouverture = () => {
     c.beginPath();
@@ -2129,6 +2133,29 @@ function mysLancer(cb, fic) {
       p.z += VENT.z * dt * 0.5;
       const [x, y, s, d] = P(p.x, p.y, p.z);
       if (d < 0.3) return;
+      if (p.souffle) {
+        // la neige soulevée par une rafale : elle file au ras du toit dans le sens du vent
+        p.x += VENT.x * dt * 2.4;
+        p.z += VENT.z * dt * 2.4;
+        if (Math.abs(p.x) > 8.9 || p.z < BORD + 0.05 || p.z > RIDGE - 0.05) return (p.a = 0); // elle s'envole au bord du toit
+        p.y = 0.03 + Math.abs(Math.sin(p.y0 + p.a * 6)) * 0.12;
+        p.r = Math.min(p.r, 0.11);
+        c.fillStyle = `rgba(255,255,255,${p.a * 0.55})`;
+        c.beginPath();
+        c.ellipse(x, y, Math.max(1.5, p.r * s * 2), Math.max(0.8, p.r * s * 0.6), 0, 0, 7);
+        c.fill();
+        return;
+      }
+      if (p.braise) {
+        // une braise qui monte du feu en tremblotant
+        p.a -= dt * 0.45;
+        p.r = 0.012;
+        c.fillStyle = `rgba(255,${140 + Math.round(90 * p.a)},60,${Math.max(0, p.a)})`;
+        c.beginPath();
+        c.arc(x, y, Math.max(1, s * 0.012), 0, 7);
+        c.fill();
+        return;
+      }
       c.fillStyle = p.noir ? `rgba(48,40,38,${p.a})` : `rgba(225,232,245,${p.a})`;
       c.beginPath();
       c.arc(x, y, p.r * s, 0, 7);
@@ -2145,20 +2172,47 @@ function mysLancer(cb, fic) {
     });
     c.globalAlpha = 1;
   };
+  // la neige qui tombe, en trois profondeurs : au loin (petits points lents), au milieu, et tout près (flocons
+  // lumineux, plus quelques gros flocons flous). Elle suit le vent, et glisse sur le côté quand on tourne la vue (parallaxe).
   const neige = (dt, avant) => {
-    c.fillStyle = '#fff';
+    if (!avant) {
+      const d = neige.yaw == null ? 0 : V.yaw - neige.yaw;
+      neige.dy = Math.atan2(Math.sin(d), Math.cos(d));
+      neige.yaw = V.yaw;
+    }
+    const vx = (VENT.x * Math.cos(V.yaw) - VENT.z * Math.sin(V.yaw)) * 0.03;
     flocons.forEach(s => {
-      if (avant != s.d > 0.75) return;
-      s.y += dt * (0.03 + s.d * 0.06);
-      s.x += dt * (VENT.x * Math.cos(V.yaw) - VENT.z * Math.sin(V.yaw)) * 0.03 * s.d;
-      s.x = (s.x + 1) % 1;
-      s.p += dt;
+      if (avant != s.d > 0.72) return;
+      s.y += dt * (0.025 + s.d * 0.07);
+      s.x += dt * vx * (0.3 + s.d) - (neige.dy || 0) * (0.12 + s.d * 0.45);
+      s.x = ((s.x % 1) + 1) % 1;
+      s.p += dt * (1 + s.d);
       if (s.y > 1.02) ((s.y = -0.02), (s.x = Math.random()));
-      c.globalAlpha = 0.35 + s.d * 0.5;
+      const x = s.x * W + Math.sin(s.p) * 10 * s.d,
+        y = s.y * H,
+        r = 0.5 + s.d * s.d * 2.8;
+      c.globalAlpha = 0.25 + s.d * 0.6;
+      c.fillStyle = s.d > 0.72 ? '#ffffff' : '#e6edff';
       c.beginPath();
-      c.arc(s.x * W + Math.sin(s.p) * 8 * s.d, s.y * H, 0.6 + s.d * 2.2, 0, 7);
+      c.arc(x, y, r, 0, 7);
       c.fill();
+      if (s.d > 0.85) {
+        // un petit halo autour des flocons tout proches
+        c.globalAlpha = 0.18;
+        c.beginPath();
+        c.arc(x, y, r * 2.2, 0, 7);
+        c.fill();
+      }
     });
+    if (avant)
+      flou.forEach(b => {
+        b.y += dt * b.v;
+        b.x += dt * vx * 1.6 - (neige.dy || 0) * 0.9;
+        b.x = ((b.x % 1) + 1) % 1;
+        b.p += dt;
+        if (b.y > 1.1) ((b.y = -0.1), (b.x = Math.random()));
+        haloEn(b.x * W + Math.sin(b.p * 0.7) * 18, b.y * H, b.r, b.r, '240,245,255', 0.32, 0.45);
+      });
     c.globalAlpha = 1;
   };
 
@@ -3430,7 +3484,7 @@ function mysLancer(cb, fic) {
         // elle s'écrase sur le dos
         C.y = 0;
         C.vy = 0;
-        Object.assign(K, { e: 'glisse', te: T(), v: K.vs, sillon: 0 });
+        Object.assign(K, { e: 'glisse', te: T(), v: K.vs, sillon: null });
         bruit('boum');
         bruit('neige', 1);
         bruit('brique', 1);
@@ -3445,9 +3499,10 @@ function mysLancer(cb, fic) {
       K.v = Math.max(0, K.v - KO_FR * dt);
       if (avance(K.v)) K.v = 0;
       bruit('glisse', Math.min(1, K.v / 3));
-      if (K.v > 0.2 && T() - K.sillon > 0.06) {
-        K.sillon = T();
-        traces.push({ x: C.x + nx * 0.45, z: C.z + nz * 0.45, t: T(), sillon: [nx, nz] });
+      // le sillon suit son dos : une seule trace qui s'allonge
+      if (!K.sillon) traces.push((K.sillon = { x: C.x + nx * 0.45, z: C.z + nz * 0.45, x2: C.x + nx * 0.45, z2: C.z + nz * 0.45, t: T(), sillon: [nx, nz] }));
+      Object.assign(K.sillon, { x2: C.x + nx * 0.45, z2: C.z + nz * 0.45 });
+      if (K.v > 0.2 && Math.random() < 0.5) {
         const [x, y] = P(C.x - nx * 0.1, 0.1, C.z - nz * 0.1);
         for (let j = 0; j < 3; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 120, vy: -Math.random() * 90, t: 0.5, c: '#ffffff' });
       }
@@ -5110,69 +5165,6 @@ function mysLancer(cb, fic) {
   const ventEl = o.querySelector('.mysl-vent');
   // les empreintes de pas, les traces de glissade et l'ange dans la neige
   const traces = [];
-  const empreintes = () => {
-    const now = T();
-    traces.forEach(q => {
-      const age = now - q.t,
-        al = q.ange ? 0.55 : Math.max(0, 1 - age / 14) * 0.45;
-      if (al <= 0) return;
-      if (q.sillon || q.cratere) {
-        // le sillon de la glissade (un ruban creusé dans la neige) et le cratère où elle s'est écrasée
-        const [ax, az] = q.sillon || [1, 0],
-          px = -az,
-          pz = ax,
-          L2 = q.cratere ? 0.55 : 0.16,
-          l2 = q.cratere ? 0.45 : 0.3,
-          pts = q.cratere
-            ? Array.from({ length: 20 }, (_, i) => [q.x + Math.cos((i / 20) * 6.283) * L2, 0.01, q.z + Math.sin((i / 20) * 6.283) * l2])
-            : [
-                [q.x - ax * L2 - px * l2, 0.01, q.z - az * L2 - pz * l2],
-                [q.x + ax * L2 - px * l2, 0.01, q.z + az * L2 - pz * l2],
-                [q.x + ax * L2 + px * l2, 0.01, q.z + az * L2 + pz * l2],
-                [q.x - ax * L2 + px * l2, 0.01, q.z - az * L2 + pz * l2]
-              ];
-        if (poly(pts)) {
-          c.fillStyle = `rgba(140,160,205,${al * 1.2})`;
-          c.fill();
-        }
-        return;
-      }
-      if (q.ange) {
-        // la silhouette de l'ange : la tête, deux ailes balayées par les bras, la robe balayée par les jambes
-        const [ax, az] = q.ange,
-          px = -az,
-          pz = ax,
-          pt = (u, v) => [q.x + ax * u + px * v, 0.01, q.z + az * u + pz * v],
-          ovale = (u0, v0, ru, rv) =>
-            Array.from({ length: 24 }, (_, i) => pt(u0 + Math.cos((i / 24) * 6.283) * ru, v0 + Math.sin((i / 24) * 6.283) * rv)),
-          formes = [
-            ovale(0.62, 0.42, 0.42, 0.34), // aile
-            ovale(0.62, -0.42, 0.42, 0.34), // aile
-            [pt(0.55, 0.16), pt(0.55, -0.16), pt(-0.85, -0.5), pt(-0.95, 0), pt(-0.85, 0.5)], // robe
-            ovale(1.02, 0, 0.16, 0.15) // tête
-          ];
-        formes.forEach(f => {
-          if (poly(f)) {
-            c.fillStyle = `rgba(140,160,205,${al * 0.75})`;
-            c.fill();
-            c.strokeStyle = '#ffffffb0';
-            c.lineWidth = 1.4;
-            c.stroke();
-          }
-        });
-        return;
-      }
-      const [x, y, s, d] = P(q.x, 0, q.z);
-      if (d < 0.3) return;
-      const [x2, y2] = P(q.x + Math.sin(q.a) * 0.1, 0, q.z + Math.cos(q.a) * 0.1),
-        an = Math.atan2(y2 - y, x2 - x);
-      c.fillStyle = `rgba(110,130,175,${al})`;
-      c.beginPath();
-      if (q.g) c.ellipse(x, y, s * 0.06, s * 0.012, an, 0, 7);
-      else c.ellipse(x, y, s * 0.055, s * 0.024, an, 0, 7);
-      c.fill();
-    });
-  };
   // l'étoile filante : elle traverse le ciel de temps en temps ; on la touche du doigt pour faire un vœu
   const ETOILE = { t0: 0, prochaine: 0 };
   const etoileFilante = () => {
@@ -6743,63 +6735,516 @@ function mysLancer(cb, fic) {
     facade(-9, RIDGE, -9, 0.6, V.x < -9);
   };
   // le toit voisin : le même genre de toit que le nôtre (neige, tuiles, faîtage), séparé par une ruelle
-  const toitVoisin = (sous = false) => {
-    const { x0, x1, z0, z1, h } = VOISIN;
-    facade(x0, z1, x0, z0, V.x < x0); // côté ruelle, face à notre toit
-    facade(x0, z0, x1, z0, V.z < z0); // côté rue
-    if (sous) return; // caméra sous le niveau des toits : on ne voit que les façades
-    // le pan de toit enneigé
+  /* ===================== la neige au sol : le rendu des deux toits ===================== */
+  // La lune est à un cap fixe du panorama (dessinée à 80 % de la largeur dans ciel) : la lumière vient de là.
+  // Elle donne le reflet clair sur la neige, le côté éclairé des congères et des traces, et le sens des ombres portées.
+  const luneCap = () => (W * 0.3) / f;
+  const alea = (i, k = 1) => {
+    const v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+    return v - Math.floor(v);
+  };
+  const rvb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(','); // '#ff5a5f' → '255,90,95'
+  // les congères (grandes bosses douces) et les paillettes (cristaux qui scintillent selon l'angle) de chaque toit
+  const DERIVES = [],
+    PAILLETTES = [],
+    GLACONS = [];
+  const semer = (x0, x1, z0, z1, nD, nP, v) => {
+    for (let i = 0; i < nD; i++)
+      DERIVES.push({
+        v,
+        x: x0 + 0.6 + alea(i, 1 + v) * (x1 - x0 - 1.2),
+        z: z0 + 0.5 + alea(i, 2 + v) * (z1 - z0 - 1),
+        rx: 0.6 + alea(i, 3 + v) * 1.4,
+        rz: 0.3 + alea(i, 4 + v) * 0.6,
+        a: alea(i, 5 + v) * 3.14
+      });
+    for (let i = 0; i < nP; i++) PAILLETTES.push({ v, x: x0 + alea(i, 6 + v) * (x1 - x0), z: z0 + alea(i, 7 + v) * (z1 - z0), p: alea(i, 8 + v) * 60 });
+  };
+  semer(-9, 9, BORD, RIDGE, 26, 360, 0);
+  semer(VOISIN.x0, VOISIN.x1, VOISIN.z0, VOISIN.z1, 10, 140, 1);
+  // les stalactites de glace sous les bords qui donnent sur le vide (x, z : le point du bord ; [nx, nz] : vers l'extérieur)
+  const bordsGlace = [
+    [-9, BORD, 9, BORD, 0, -1, 0],
+    [-9, BORD, -9, RIDGE, -1, 0, 0],
+    [9, BORD, 9, RIDGE, 1, 0, 0],
+    [VOISIN.x0, VOISIN.z0, VOISIN.x1, VOISIN.z0, 0, -1, VOISIN.h],
+    [VOISIN.x0, VOISIN.z0, VOISIN.x0, VOISIN.z1, -1, 0, VOISIN.h]
+  ];
+  bordsGlace.forEach(([x1, z1, x2, z2, nx, nz, h], b) => {
+    const L = Math.hypot(x2 - x1, z2 - z1);
+    for (let s = 0.15, i = 0; s < L - 0.1; s += 0.17 + alea(i, 30 + b) * 0.12, i++) {
+      if (alea(i, 40 + b) < 0.28) continue;
+      const u = s / L;
+      GLACONS.push({ b, x: x1 + (x2 - x1) * u + nx * 0.07, z: z1 + (z2 - z1) * u + nz * 0.07, h, L: 0.05 + Math.pow(alea(i, 50 + b), 2) * 0.34, w: 0.02 + alea(i, 60 + b) * 0.025, nx, nz });
+    }
+  });
+  // la direction de la lumière à l'écran, sur le sol (recalculée à chaque image, pour le relief des traces)
+  const LUM = [0.6, -0.3];
+  const lumiereEcran = () => {
+    const A = luneCap(),
+      [x1, y1, , d1] = P(C.x, 0, C.z),
+      [x2, y2, , d2] = P(C.x + Math.sin(A), 0, C.z + Math.cos(A)),
+      n = Math.hypot(x2 - x1, y2 - y1);
+    if (d1 > 0.3 && d2 > 0.3 && n > 1) ((LUM[0] = (x2 - x1) / n), (LUM[1] = (y2 - y1) / n));
+  };
+  // un halo rond (dégradé de rayon 1, centré sur 0) d'une couleur donnée : créé une seule fois, puis réutilisé à chaque image
+  // en le déplaçant et en l'étirant (bien plus rapide que de recréer un dégradé pour chaque lumière)
+  const HALOS = {};
+  const halo = (rvb, milieu = 0.45) => {
+    const k = rvb + milieu;
+    if (!HALOS[k]) {
+      const g = c.createRadialGradient(0, 0, 0, 0, 0, 1);
+      g.addColorStop(0, `rgba(${rvb},1)`);
+      g.addColorStop(0.45, `rgba(${rvb},${milieu})`);
+      g.addColorStop(1, `rgba(${rvb},0)`);
+      HALOS[k] = g;
+    }
+    return HALOS[k];
+  };
+  const haloEn = (x, y, rx, ry, rvb, al, milieu) => {
+    c.save();
+    c.globalAlpha = Math.max(0, Math.min(1, al));
+    c.translate(x, y);
+    c.scale(rx, ry);
+    c.fillStyle = halo(rvb, milieu);
+    c.fillRect(-1, -1, 2, 2);
+    c.restore();
+  };
+  // une flaque de lumière posée sur la neige (feu de la cheminée, ampoules) : un halo aplati par la perspective
+  const flaque = (x, h, z, R, rvb, al) => {
+    const [px, py, s, d] = P(x, h, z);
+    if (d < 0.3 || px < -s * R || px > W + s * R) return;
+    const [, py2, , d2] = P(x, h, z + R),
+      rx = s * R,
+      ry = d2 > 0.3 ? Math.max(2, Math.abs(py2 - py)) : rx * 0.3;
+    haloEn(px, py, rx, ry, rvb, al);
+  };
+  // une ellipse posée au sol, orientée (pour les congères et les ombres)
+  const ellipseSol = (x, h, z, ra, rb, a, n = 16) =>
+    Array.from({ length: n }, (_, i) => {
+      const t = (i / n) * 6.283,
+        u = Math.cos(t) * ra,
+        w = Math.sin(t) * rb;
+      return [x + u * Math.cos(a) - w * Math.sin(a), h, z + u * Math.sin(a) + w * Math.cos(a)];
+    });
+  // le sol enneigé d'un toit (v = 0 : le nôtre, 1 : celui de Valentin)
+  const neigeSol = (x0, x1, z0, z1, h, v, t) => {
     if (
-      poly([
+      !poly([
         [x0, h, z0],
         [x1, h, z0],
         [x1, h, z1],
         [x0, h, z1]
       ])
+    )
+      return;
+    c.save();
+    c.clip();
+    // 1. le fond : bleuté et voilé au loin, d'un blanc presque chaud tout près
+    const g = c.createLinearGradient(0, hy, 0, H);
+    g.addColorStop(0, '#9aadd8');
+    g.addColorStop(0.16, '#bfcdec');
+    g.addColorStop(0.5, '#e2e9f8');
+    g.addColorStop(1, '#fbfcff');
+    c.fillStyle = g;
+    c.fillRect(0, hy - 2, W, H - hy + 2); // le sol est toujours sous l'horizon
+    const A = luneCap(),
+      lx = Math.sin(A),
+      lz = Math.cos(A);
+    // 2. le reflet de la lune : une grande traînée claire sur la neige, dans sa direction
+    const [mx, my, , md] = P(V.x + lx * 9, h, V.z + lz * 9);
+    if (md > 0.5) {
+      const r = W * 0.5;
+      c.save();
+      c.translate(mx, my);
+      c.scale(1, 0.3);
+      const gm = c.createRadialGradient(0, 0, 0, 0, 0, r);
+      gm.addColorStop(0, 'rgba(255,248,228,0.6)');
+      gm.addColorStop(0.35, 'rgba(240,244,255,0.25)');
+      gm.addColorStop(1, 'rgba(240,244,255,0)');
+      c.fillStyle = gm;
+      c.fillRect(-r, -r, 2 * r, 2 * r);
+      c.restore();
+    }
+    // 3. les congères : de grandes bosses douces, claires côté lune, ombrées bleu de l'autre côté
+    DERIVES.forEach(dv => {
+      if (dv.v != v) return;
+      const [ax, ay, , ad] = P(dv.x + lx * dv.rx * 0.7, h, dv.z + lz * dv.rx * 0.7),
+        [bx, by, , bd] = P(dv.x - lx * dv.rx * 0.7, h, dv.z - lz * dv.rx * 0.7);
+      if (ad < 0.4 || bd < 0.4 || !poly(ellipseSol(dv.x, h, dv.z, dv.rx, dv.rz, dv.a))) return;
+      const gd = c.createLinearGradient(ax, ay, bx, by);
+      gd.addColorStop(0, 'rgba(255,255,255,0.6)');
+      gd.addColorStop(0.45, 'rgba(255,255,255,0.08)');
+      gd.addColorStop(1, 'rgba(112,134,196,0.22)');
+      c.fillStyle = gd;
+      c.fill();
+    });
+    // 4. les tuiles sous la neige : des rangées de petites bosses en écailles (un trait d'ombre, et un trait de lumière juste
+    // au-dessus pour les rangées proches). Toutes les rangées sont tracées d'un coup (deux traits en tout, pour la vitesse).
+    const rangees = proche => {
+      c.beginPath();
+      for (let z = z0 + 0.32; z < z1 - 0.1; z += 0.38) {
+        const dz = Math.abs(z - V.z);
+        if (dz < 1.2 || dz > (proche ? 9 : 15)) continue;
+        let on = 0;
+        for (let x = x0; x <= x1 + 0.01; x += 0.24) {
+          const [px, py, , d] = P(x, h + 0.016 * Math.abs(Math.sin((x * Math.PI) / 0.32)), z);
+          if (d < 0.3) {
+            on = 0;
+            continue;
+          }
+          on ? c.lineTo(px, py) : c.moveTo(px, py);
+          on = 1;
+        }
+      }
+    };
+    rangees(false);
+    c.strokeStyle = 'rgba(126,146,196,0.2)';
+    c.lineWidth = 1.2;
+    c.stroke();
+    c.save();
+    c.translate(0, -1.2);
+    rangees(true);
+    c.strokeStyle = 'rgba(255,255,255,0.45)';
+    c.lineWidth = 1;
+    c.stroke();
+    c.restore();
+    // 5. les ombres portées des objets, du côté opposé à la lune (deux couches pour des bords doux)
+    const ombreP = (ox, oz, r, hh) => {
+      const L = 0.25 + hh * 0.85,
+        a = Math.atan2(-lz, -lx);
+      [
+        [1.25, 0.1],
+        [0.9, 0.14]
+      ].forEach(([k, al]) => {
+        if (poly(ellipseSol(ox - lx * L * 0.5, h, oz - lz * L * 0.5, (L * 0.5 + r) * k, r * k, a))) {
+          c.fillStyle = `rgba(82,100,165,${al})`;
+          c.fill();
+        }
+      });
+    };
+    if (v == 0) {
+      ombreP(0, CZ, CX, TOP);
+      OBS.forEach(ob => ombreP(ob.x, ob.z, ob.r, ob.h));
+    } else ombreP(VOISIN.cx, VOISIN.cz, VOISIN.ce, VOISIN.ch);
+    // 6. les lumières chaudes : le feu de la cheminée qui vacille, et chaque ampoule de la guirlande sur le faîtage
+    if (v == 0) {
+      flaque(0, h, CZ - CD - 0.2, 2, '255,150,70', 0.2 + 0.05 * Math.sin(t * 9) + 0.03 * Math.sin(t * 23));
+      for (let x = -8.6, i = 0; x <= 8.6; x += 0.45, i++) {
+        const k = Math.round(x / 0.45);
+        if (Math.sin(t * 2.5 + k) > -0.4) flaque(x, h, RIDGE - 0.12, 0.42, rvb(COUL[(k + 50) % 5]), 0.3);
+      }
+    }
+    // 7. les paillettes : de minuscules cristaux qui s'allument quand on bouge ou qu'on tourne la vue
+    const tw = t * 1.6 + V.yaw * 11 + V.x * 1.7 + V.z * 1.3;
+    c.fillStyle = '#ffffff';
+    PAILLETTES.forEach(pp => {
+      if (pp.v != v) return;
+      const k = Math.sin(tw + pp.p);
+      if (k < 0.8) return;
+      const [px, py, s, d] = P(pp.x, h, pp.z);
+      if (d < 0.4 || d > 16) return;
+      const r = Math.max(1, s * 0.014) * ((k - 0.8) / 0.2) * 2.4;
+      c.globalAlpha = 0.95;
+      c.fillRect(px - r, py - 0.5, r * 2, 1);
+      c.fillRect(px - 0.5, py - r * 0.8, 1, r * 1.6);
+      c.globalAlpha = 0.5;
+      c.fillRect(px - 1, py - 1, 2, 2);
+    });
+    c.globalAlpha = 1;
+    c.restore();
+  };
+  // le bord d'un toit : un bourrelet de neige arrondi qui déborde un peu, et des stalactites de glace en dessous
+  const corniche = (x1, z1, x2, z2, nx, nz, h, b) => {
+    const vers = nx * (V.x - x1) + nz * (V.z - z1) > 0, // on voit la face extérieure
+      o = 0.07;
+    // le dessus (une bande claire)
+    if (
+      poly([
+        [x1, h, z1],
+        [x2, h, z2],
+        [x2 + nx * o, h + 0.07, z2 + nz * o],
+        [x1 + nx * o, h + 0.07, z1 + nz * o]
+      ])
     ) {
-      const g = c.createLinearGradient(0, hy + 20, 0, H);
-      g.addColorStop(0, '#c4d1ea');
-      g.addColorStop(1, '#eef3fc');
-      c.fillStyle = g;
+      c.fillStyle = '#f7f9fe';
       c.fill();
     }
-    // rangées de tuiles
-    c.strokeStyle = '#9fb0cf';
-    c.lineWidth = 1;
-    c.globalAlpha = 0.5;
-    for (let z = 1; z < z1; z *= 1.16) {
-      c.beginPath();
-      let on = 0;
-      for (let x = x0; x <= x1; x += 0.3) {
-        const [px, py, , d] = P(x, h, z);
-        if (d < 0.3) {
-          on = 0;
-          continue;
-        }
-        on ? c.lineTo(px, py) : c.moveTo(px, py);
-        on = 1;
-      }
-      c.stroke();
-    }
-    c.globalAlpha = 1;
-    // bords enneigés : le long de la ruelle, le faîtage et la gouttière
-    [
-      [x0, z0, x0, z1],
-      [x0, z1, x1, z1],
-      [x0, z0, x1, z0]
-    ].forEach(([ax, az, bx, bz]) => {
+    if (vers) {
+      // la face qui déborde : blanche en haut, bleutée dessous (elle est arrondie)
+      const [ax, ay] = P((x1 + x2) / 2 + nx * o, h + 0.08, (z1 + z2) / 2 + nz * o),
+        [bx, by] = P((x1 + x2) / 2 + nx * o, h - 0.07, (z1 + z2) / 2 + nz * o);
       if (
         poly([
-          [ax, h, az],
-          [bx, h, bz],
-          [bx, h + 0.07, bz],
-          [ax, h + 0.07, az]
+          [x1 + nx * o, h + 0.08, z1 + nz * o],
+          [x2 + nx * o, h + 0.08, z2 + nz * o],
+          [x2 + nx * o, h - 0.07, z2 + nz * o],
+          [x1 + nx * o, h - 0.07, z1 + nz * o]
         ])
       ) {
-        c.fillStyle = '#f2f6fd';
+        const g = c.createLinearGradient(ax, ay, bx, by);
+        g.addColorStop(0, '#ffffff');
+        g.addColorStop(0.55, '#dfe7f7');
+        g.addColorStop(1, '#9fb0d8');
+        c.fillStyle = g;
         c.fill();
       }
+      // les stalactites
+      GLACONS.forEach(q => {
+        if (q.b != b) return;
+        const tx = -nz,
+          tz = nx,
+          [p1x, p1y, s, d] = P(q.x - tx * q.w, q.h - 0.06, q.z - tz * q.w),
+          [p2x, p2y] = P(q.x + tx * q.w, q.h - 0.06, q.z + tz * q.w),
+          [p3x, p3y] = P(q.x, q.h - 0.06 - q.L, q.z);
+        if (d < 0.3 || d > 20 || p1x < -20 || p1x > W + 20) return;
+        const g = c.createLinearGradient(p1x, p1y, p3x, p3y);
+        g.addColorStop(0, 'rgba(240,248,255,0.95)');
+        g.addColorStop(0.6, 'rgba(196,226,255,0.7)');
+        g.addColorStop(1, 'rgba(170,215,255,0.1)');
+        c.fillStyle = g;
+        c.beginPath();
+        c.moveTo(p1x, p1y);
+        c.lineTo(p2x, p2y);
+        c.lineTo(p3x, p3y);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = 'rgba(255,255,255,0.8)';
+        c.lineWidth = Math.max(0.6, s * 0.006);
+        c.beginPath();
+        c.moveTo(p1x * 0.65 + p2x * 0.35, p1y * 0.65 + p2y * 0.35);
+        c.lineTo(p3x, p3y);
+        c.stroke();
+      });
+    }
+  };
+  // la neige d'un toit et tous ses bords enneigés
+  const neigeToit = (x0, x1, z0, z1, h, v, bords) => {
+    const t = T();
+    neigeSol(x0, x1, z0, z1, h, v, t);
+    bords.forEach(([a, b, cc, d, nx, nz, i]) => corniche(a, b, cc, d, nx, nz, h, i));
+  };
+
+  /* ===================== les traces dans la neige ===================== */
+  // un creux dans la neige : fond bleuté, ombre intérieure du côté de la lumière, liseré clair sur le bord d'en face
+  const creux = (trace, al, fond) => {
+    trace();
+    c.fillStyle = fond || `rgba(104,124,182,${al * 0.45})`;
+    c.fill();
+    c.save();
+    trace();
+    c.clip();
+    c.translate(-LUM[0] * 2.2, -LUM[1] * 2.2);
+    trace();
+    c.lineWidth = 4;
+    c.strokeStyle = `rgba(58,76,140,${al * 0.5})`;
+    c.stroke();
+    c.restore();
+    c.save();
+    c.translate(-LUM[0] * 1.1, -LUM[1] * 1.1);
+    trace();
+    c.lineWidth = 1.3;
+    c.strokeStyle = `rgba(255,255,255,${al * 0.9})`;
+    c.stroke();
+    c.restore();
+  };
+  // un chemin fait de plusieurs formes au sol (points [x, y, z]), projetées ; null si une forme passe derrière la caméra
+  const chemin = formes => {
+    const pr = formes.map(f => f.map(([x, y, z]) => P(x, y, z)));
+    if (pr.some(f => f.some(p => p[3] < 0.25))) return null;
+    return () => {
+      c.beginPath();
+      pr.forEach(f => {
+        f.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+        c.closePath();
+      });
+    };
+  };
+  // un éventail (ce qu'un bras ou les jambes balaient), au sol : centre (cu, cv), rayon R, angles a0 → a1 (repère u/v)
+  // (r0 : rayon intérieur, pour que l'éventail parte en douceur près de l'épaule ou des hanches, sans pointe)
+  const eventail = (pt, cu, cv, R, a0, a1, cote = 1, r0 = 0) => {
+    const pts = [];
+    for (let i = 0; i <= 14; i++) {
+      const a = a0 + ((a1 - a0) * i) / 14,
+        rr = R * (0.97 + 0.03 * Math.sin(i * 1.7)); // un bord pas tout à fait régulier, comme dans la vraie neige
+      pts.push(pt(cu + Math.cos(a) * rr, cv + Math.sin(a) * rr * cote));
+    }
+    for (let i = 14; i >= 0; i -= 2) {
+      const a = a0 + ((a1 - a0) * i) / 14;
+      pts.push(pt(cu + Math.cos(a) * r0, cv + Math.sin(a) * r0 * cote));
+    }
+    return pts;
+  };
+  const empreintes = () => {
+    const now = T();
+    lumiereEcran();
+    // les vieilles empreintes de pas disparaissent (l'ange, le sillon et le cratère restent)
+    for (let i = traces.length - 1; i >= 0; i--) if (!traces[i].ange && !traces[i].sillon && !traces[i].cratere && now - traces[i].t > 24) traces.splice(i, 1);
+    traces.forEach(q => {
+      const age = now - q.t,
+        [, , , dq] = P(q.x, 0, q.z);
+      if (dq < 0.3 || dq > 22) return;
+      if (q.ange) {
+        // l'ange : deux ailes balayées par les bras (avec les stries du balayage), la robe des jambes, le corps et la tête
+        const [ax, az] = q.ange,
+          px = -az,
+          pz = ax,
+          pt = (u, w) => [q.x + ax * u + px * w, 0.012, q.z + az * u + pz * w],
+          ailes = [1, -1].map(s => eventail(pt, 0.55, 0.16 * s, 0.72, 0.35, 2.75, s, 0.14)),
+          robe = eventail(pt, 0.05, 0, 1, Math.PI - 0.62, Math.PI + 0.62, 1, 0.2),
+          corps = Array.from({ length: 16 }, (_, i) => pt(0.32 + Math.cos((i / 16) * 6.283) * 0.4, Math.sin((i / 16) * 6.283) * 0.2)),
+          tete = Array.from({ length: 14 }, (_, i) => pt(0.98 + Math.cos((i / 14) * 6.283) * 0.14, Math.sin((i / 14) * 6.283) * 0.13)),
+          tr = chemin([...ailes, robe, corps, tete]);
+        if (!tr) return;
+        const [cx, cy, s] = P(...pt(0.3, 0)),
+          g = c.createRadialGradient(cx, cy, 0, cx, cy, s * 1.2);
+        g.addColorStop(0, 'rgba(92,114,178,0.5)');
+        g.addColorStop(1, 'rgba(150,170,218,0.3)');
+        creux(tr, 0.85, g);
+        // les stries laissées par les bras et les jambes
+        c.lineWidth = 1;
+        const arc = (cu, cv, R, a0, a1, s2) => {
+          const pts = [];
+          for (let i = 0; i <= 14; i++) {
+            const a = a0 + ((a1 - a0) * i) / 14;
+            pts.push(pt(cu + Math.cos(a) * R, cv + Math.sin(a) * R * s2));
+          }
+          const pr = pts.map(q2 => P(...q2));
+          if (pr.some(q2 => q2[3] < 0.25)) return;
+          c.beginPath();
+          pr.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+          c.stroke();
+        };
+        c.save();
+        tr();
+        c.clip();
+        [1, -1].forEach(s2 =>
+          [0.42, 0.54, 0.64].forEach(R => {
+            c.strokeStyle = 'rgba(255,255,255,0.4)';
+            arc(0.55, 0.16 * s2, R, 0.45, 2.65, s2);
+          })
+        );
+        [0.7, 0.85].forEach(R => {
+          c.strokeStyle = 'rgba(255,255,255,0.35)';
+          arc(0.05, 0, R, Math.PI - 0.55, Math.PI + 0.55, 1);
+        });
+        c.restore();
+        return;
+      }
+      if (q.cratere) {
+        // le cratère : un bourrelet de neige soulevé tout autour, des mottes, et un creux profond au milieu
+        const rebord = chemin([ellipseSol(q.x, 0.015, q.z, 0.78, 0.6, 0.3, 22)]),
+          trou = chemin([ellipseSol(q.x, 0.012, q.z, 0.6, 0.45, 0.3, 22)]);
+        if (!rebord || !trou) return;
+        rebord();
+        c.fillStyle = 'rgba(255,255,255,0.85)';
+        c.fill();
+        c.strokeStyle = 'rgba(140,160,210,0.35)';
+        c.lineWidth = 1.5;
+        c.stroke();
+        creux(trou, 1, 'rgba(98,118,178,0.42)');
+        for (let i = 0; i < 7; i++) {
+          const a = alea(i, 70) * 6.283,
+            [mx, my, s] = P(q.x + Math.cos(a) * 0.95, 0.04, q.z + Math.sin(a) * 0.75);
+          c.fillStyle = '#ffffff';
+          c.beginPath();
+          c.ellipse(mx, my, s * 0.05, s * 0.03, 0, 0, 7);
+          c.fill();
+          c.fillStyle = 'rgba(140,160,210,0.4)';
+          c.beginPath();
+          c.ellipse(mx, my + s * 0.012, s * 0.05, s * 0.018, 0, 0, Math.PI);
+          c.fill();
+        }
+        return;
+      }
+      if (q.sillon) {
+        // le sillon de la glissade : une longue rigole aux bouts arrondis, la neige repoussée sur les côtés
+        const [ax, az] = q.sillon,
+          px = -az,
+          pz = ax,
+          L = Math.hypot(q.x2 - q.x, q.z2 - q.z),
+          mx = (q.x + q.x2) / 2,
+          mz = (q.z + q.z2) / 2,
+          capsule = (w, y) => {
+            const pts = [];
+            // les deux bouts arrondis, et des bords un peu irréguliers le long de la rigole
+            for (let i = 0; i <= 8; i++) {
+              const a = -Math.PI / 2 + (Math.PI * i) / 8;
+              pts.push([mx + ax * (L / 2 + Math.cos(a) * w) + px * Math.sin(a) * w, y, mz + az * (L / 2 + Math.cos(a) * w) + pz * Math.sin(a) * w]);
+            }
+            for (let u = L / 2 - 0.15; u > -L / 2; u -= 0.15) {
+              const ww = -w * (1 + 0.1 * Math.sin(u * 13 + w * 40));
+              pts.push([mx + ax * u + px * ww, y, mz + az * u + pz * ww]);
+            }
+            for (let i = 0; i <= 8; i++) {
+              const a = Math.PI / 2 + (Math.PI * i) / 8;
+              pts.push([mx + ax * (-L / 2 + Math.cos(a) * w) + px * Math.sin(a) * w, y, mz + az * (-L / 2 + Math.cos(a) * w) + pz * Math.sin(a) * w]);
+            }
+            for (let u = -L / 2 + 0.15; u < L / 2; u += 0.15) {
+              const ww = w * (1 + 0.1 * Math.sin(u * 11 + w * 30));
+              pts.push([mx + ax * u + px * ww, y, mz + az * u + pz * ww]);
+            }
+            return pts;
+          },
+          bord = chemin([capsule(0.3, 0.016)]),
+          rig = chemin([capsule(0.22, 0.012)]);
+        if (!bord || !rig) return;
+        bord();
+        c.fillStyle = 'rgba(255,255,255,0.6)';
+        c.fill();
+        creux(rig, 0.8, 'rgba(104,124,182,0.3)');
+        return;
+      }
+      // une empreinte de botte (semelle + talon) ou la trace allongée d'une glissade ; elle s'efface avec le temps
+      const al = Math.max(0, 1 - age / 24);
+      if (al <= 0) return;
+      const fx = Math.sin(q.a),
+        fz = Math.cos(q.a),
+        forme = (cx, cz, a, b) =>
+          Array.from({ length: 12 }, (_, i) => {
+            const t = (i / 12) * 6.283,
+              u = Math.cos(t) * a,
+              w = Math.sin(t) * b;
+            return [cx + fx * u + fz * w, 0.012, cz + fz * u - fx * w];
+          }),
+        tr = q.g ? chemin([forme(q.x, q.z, 0.3, 0.05)]) : chemin([forme(q.x + fx * 0.045, q.z + fz * 0.045, 0.085, 0.046), forme(q.x - fx * 0.085, q.z - fz * 0.085, 0.04, 0.04)]);
+      if (!tr) return;
+      if (q.g) {
+        // la glissade : beaucoup de traces qui se chevauchent, donc juste un léger voile bleuté, sans relief
+        tr();
+        c.fillStyle = `rgba(112,132,188,${al * 0.09})`;
+        c.fill();
+        return;
+      }
+      creux(tr, al * 0.85);
+      // les crans de la semelle, quand on est assez près pour les voir
+      const [, , s] = P(q.x, 0, q.z);
+      if (!q.g && s > 70) {
+        c.strokeStyle = `rgba(72,92,150,${al * 0.35})`;
+        c.lineWidth = 1;
+        for (let k = -1; k <= 2; k++) {
+          const u = 0.045 + k * 0.035,
+            [x1, y1] = P(q.x + fx * u + fz * 0.03, 0.012, q.z + fz * u - fx * 0.03),
+            [x2, y2] = P(q.x + fx * u - fz * 0.03, 0.012, q.z + fz * u + fx * 0.03);
+          c.beginPath();
+          c.moveTo(x1, y1);
+          c.lineTo(x2, y2);
+          c.stroke();
+        }
+      }
     });
+  };
+  const toitVoisin = (sous = false) => {
+    const { x0, x1, z0, z1, h } = VOISIN;
+    facade(x0, z1, x0, z0, V.x < x0); // côté ruelle, face à notre toit
+    facade(x0, z0, x1, z0, V.z < z0); // côté rue
+    if (sous) return; // caméra sous le niveau des toits : on ne voit que les façades
+    // le pan de toit enneigé (le même rendu que le nôtre) et ses bords : la ruelle, le faîtage, la rue
+    neigeToit(x0, x1, z0, z1, h, 1, [
+      [x0, z0, x0, z1, -1, 0, 4],
+      [x0, z1, x1, z1, 0, 1, -1],
+      [x0, z0, x1, z0, 0, -1, 3]
+    ]);
     // un petit conduit de cheminée en briques
     const { cx, cz, ce: e, ch: ht } = VOISIN;
     [
@@ -6858,6 +7303,24 @@ function mysLancer(cb, fic) {
     } finally {
       C = moi;
     }
+  };
+
+  // l'ambiance de toute l'image : les bords assombris, comme sur une photo de nuit
+  // une brume légère qui adoucit l'horizon (dessinée sur le décor et le sol, sous les personnages et les objets)
+  const brume = () => {
+    const b = c.createLinearGradient(0, hy - 30, 0, hy + 60);
+    b.addColorStop(0, 'rgba(170,186,230,0)');
+    b.addColorStop(0.45, 'rgba(170,186,230,0.16)');
+    b.addColorStop(1, 'rgba(170,186,230,0)');
+    c.fillStyle = b;
+    c.fillRect(0, hy - 30, W, 90);
+  };
+  const ambiance = () => {
+    const g = c.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.42, W / 2, H * 0.55, Math.hypot(W, H) * 0.62);
+    g.addColorStop(0, 'rgba(6,10,30,0)');
+    g.addColorStop(1, 'rgba(6,10,30,0.42)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, W, H);
   };
 
   /* ===================== boucle ===================== */
@@ -6949,6 +7412,27 @@ function mysLancer(cb, fic) {
     chatMaj(dt);
     pigeons(dt);
     boiteMaj();
+    // la buée de la respiration, dans le froid : une petite bouffée devant la bouche toutes les 2 à 3 secondes
+    [C, VAL].forEach(Q => {
+      if (!Q.souffleT || T() > Q.souffleT) {
+        Q.souffleT = T() + 2.2 + Math.random() * 0.9;
+        if (Q.chute || (Q == C && C.ko) || CAM + V.h < 0.15) return;
+        const fx = Math.sin(Q.phi),
+          fz = Math.cos(Q.phi),
+          b = Q == VAL ? VAL.base : C.y;
+        for (let i = 0; i < 3; i++)
+          fumees.push({ x: Q.x + fx * (0.16 + i * 0.03), y: b + 1.52 - i * 0.01, z: Q.z + fz * (0.16 + i * 0.03), r: 0.025 + i * 0.012, a: 0.32 - i * 0.06, v: 0.06 });
+      }
+    });
+    // quand le vent souffle fort, de la neige poudreuse file au ras du toit
+    if (CAM + V.h > 0.15 && Math.random() < dt * Math.max(0, VENT.f - 0.4) * 22) {
+      const a = Math.random() * 6.283,
+        r = 1 + Math.random() * 6;
+      fumees.push({ x: Math.max(-8.5, Math.min(8.5, C.x + Math.cos(a) * r)), y: 0.05, z: Math.max(BORD + 0.2, Math.min(RIDGE - 0.2, C.z + Math.sin(a) * r)), r: 0.05 + Math.random() * 0.05, a: 0.9, v: 0, souffle: 1, y0: Math.random() * 6 });
+    }
+    // des braises s'échappent du feu de la cheminée
+    if (Math.random() < dt * 2.2)
+      fumees.push({ x: (Math.random() - 0.5) * 0.6, y: TOP + 0.05, z: CZ + (Math.random() - 0.5) * 0.4, r: 0.012, a: 1, v: 0.7 + Math.random() * 0.9, braise: 1 });
     // le fichier recraché fume encore un moment
     if (vis.noir && F.noirT && T() - F.noirT < 3 && Math.random() < 0.2)
       fumees.push({ x: F.x, y: F.y + 0.05, z: F.z, r: 0.03, a: 0.28, v: 0.4, noir: 1 });
@@ -6966,6 +7450,7 @@ function mysLancer(cb, fic) {
     else if (V.x < VOISIN.x0) (toitVoisin(), facadesNous(), toit());
     else (facadesNous(), toit(), toitVoisin());
     if (!sous) empreintes();
+    brume();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
     const L = sous ? [] : OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
     if (!sous) {
@@ -7004,6 +7489,7 @@ function mysLancer(cb, fic) {
     particules(dt);
     neige(dt, true);
     devant(t);
+    ambiance();
     mangaFx(t);
     habillage(t);
     // fondu au noir avant de réapparaître sur le toit, puis retour de l'image

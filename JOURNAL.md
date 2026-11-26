@@ -3,6 +3,28 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fichier mystère : tout le toit refait graphiquement (neige, traces, ciel, lumière, ambiance)
+- **La neige au sol**, sur notre toit et sur celui de Valentin. L'ancienne couche blanche unie avec ses lignes de tuiles est supprimée et remplacée par :
+  - un dégradé de profondeur : bleuté et voilé au loin, blanc presque chaud tout près ;
+  - un grand reflet de lune sur la neige, dans la direction de la lune ;
+  - des congères sculptées par le vent, claires côté lune et ombrées bleu de l'autre côté ;
+  - des tuiles qu'on devine sous la neige (petites écailles, discrètes de près et de loin) ;
+  - les ombres portées de la cheminée, du bonhomme, du sapin, des cadeaux, de l'antenne et de la boîte aux lettres, toutes du côté opposé à la lune ;
+  - la lueur orange du feu qui vacille sur la neige autour de la cheminée, et une flaque de couleur sous chaque ampoule de la guirlande ;
+  - des paillettes de glace qui scintillent quand on marche ou qu'on tourne la vue.
+- **Les bords du toit** : un bourrelet de neige arrondi qui déborde, et des stalactites de glace sous la gouttière, les côtés et les bords du toit de Valentin.
+- **Les traces dans la neige**, toutes refaites en creux, avec une ombre intérieure du côté de la lune et un liseré clair sur le bord :
+  - de vraies empreintes de bottes (semelle et talon, crans visibles de près), qui s'effacent en 24 s ;
+  - les glissades, en léger voile ;
+  - un vrai ange dans la neige : deux ailes en éventail avec les stries laissées par les bras, la robe des jambes, le corps et la tête ;
+  - après la patate, un cratère avec son bourrelet et des mottes de neige, et une seule rigole de glissade aux bords irréguliers (au lieu de dizaines de rectangles superposés).
+- **La neige qui tombe** : trois profondeurs (petits points lents au loin, flocons lumineux tout près, avec un halo), quelques gros flocons flous comme hors mise au point, et la neige qui glisse sur le côté quand on tourne la vue.
+- **Le ciel** : dégradé plus profond, lueur orangée de la ville à l'horizon, halo de glace autour de la lune et nuages fins qui passent lentement. Sous l'horizon, le vide entre les immeubles s'assombrit vers le bas, avec les halos des lampadaires de la rue tout en bas.
+- **L'ambiance** : brume légère sur l'horizon, bords de l'image assombris comme une photo de nuit, braises qui montent du feu, buée de la respiration de Célestine et de Valentin toutes les 2 à 3 s, et neige poudreuse qui file au ras du toit quand le vent souffle fort.
+- Optimisation : les halos de lumière sont créés une fois puis réutilisés, et toutes les rangées de tuiles sont tracées en deux traits.
+- Version : 1795737260
+- Fichiers : `2026/js/musiques-jeux.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Fichier mystère : la « patate » de Valentin, Célestine s'envole et s'écrase façon manga
 - **Valentin charge sa patate** pendant 1,1 s : une aura orange pulse autour de lui, des étincelles montent, un grondement monte, et il dit « Attention… 😈 » ou « Ça va chauffer… 🔥 ». Puis il crie « PATAAATE !!! 💥 » (ou « PRENDS ÇA !!! ☄️ », « TIR DE LA MORT !!! 💥 ») et tire à 28 m/s. Le fichier laisse une traînée de feu orange et jaune. Le message en haut dit « 😈 Valentin prépare une patate… esquive ! ».
 - **Si elle est touchée, c'est fait façon manga** :
