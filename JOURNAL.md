@@ -5,7 +5,7 @@
 ---
 ## 2026-11-26 · Ménage : capture d'écran de test retirée
 - Suppression de `integ0.png` à la racine du projet : une capture d'écran de test ajoutée par erreur. Rien ne change pour Célestine.
-- Version 
+- Version 1795709747
 - Fichiers : `integ0.png` (supprimé), `2026/index.html`, `2026/version.json`
 
 ## 2026-11-26 · Fichier mystère : Célestine fait du breakdance quand elle réussit
