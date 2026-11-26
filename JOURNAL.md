@@ -4,6 +4,15 @@
 
 ---
 
+## 26 novembre 2026 (10 h 20) : agenda du jour 2 détaillé, avec des infos inutiles (version 1795681438)
+
+- L'indice du jour 2 (« Agenda de Célestine · Sa semaine ») montre maintenant **toute sa semaine**, du lundi 23 au dimanche 29, en 27 lignes : cours, resto U, courses, lessive, pilates, soirées série et film, poste, sieste, raclette, balade…
+- Les moments importants (ongles, BU, resto, TP, Reyrieux, pharmacie) sont mélangés au reste : c'est à Célestine de trier.
+- La phrase de résumé ne dit plus « les moments où quelqu'un a pu approcher le bracelet ». Elle dit seulement « Toute sa semaine, du lundi au dimanche. »
+- La frise chronologique (`ev`) ne change pas.
+- Traductions anglaises des nouvelles lignes ajoutées.
+- Fichiers : `2026/js/enquete/suspects-pieces.js` (`p_agenda`), `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (10 h) : carte de l'enquête refaite, façon appli de cartes (version 1795681318)
 
 - **Problème :** les 6 lieux de Lyon (appart, fac, commissariat, Bellecour, resto, chez Noémie) sont à moins de 3 km les uns des autres alors que la carte va jusqu'à Reyrieux (25 km). Ils étaient empilés et illisibles.
