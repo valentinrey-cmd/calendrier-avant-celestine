@@ -975,7 +975,48 @@ async function mysMake(input) {
 /* ---------- Fichier mystère : avant de l'ouvrir, on le lance dans la cheminée du Père Noël ---------- */
 // Lancer « en profondeur » (façon paper toss) : on glisse le doigt vers le haut, le fichier part vers la cheminée.
 // Monde en mètres : x = gauche/droite, y = hauteur, z = profondeur. cb est appelé quand le fichier est tombé dedans.
-function mysLancer(cb) {
+function mysLancer(cb, fic) {
+  // l'apparence du fichier lancé dépend du fichier choisi : une photo s'affiche, un document prend l'icône de son type
+  const nom = (fic && fic.name) || 'fichier.avent',
+    ty = (fic && fic.type) || '',
+    ext = (nom.includes('.') ? nom.split('.').pop() : '?').slice(0, 5).toUpperCase(),
+    vis = { k: ext == 'AVENT' ? 'avent' : 'doc', ext, nom };
+  if (ty.startsWith('audio')) Object.assign(vis, { ico: '♪', col: '#7b4fd6' });
+  else if (ty.startsWith('video')) Object.assign(vis, { ico: '▶', col: '#d65a2f' });
+  else if (ty == 'application/pdf' || ext == 'PDF') Object.assign(vis, { ico: 'PDF', col: '#d0312d' });
+  else if (/^(DOCX?|ODT|RTF|TXT|PAGES)$/.test(ext)) Object.assign(vis, { ico: '¶', col: '#2b63c9' });
+  else if (/^(XLSX?|CSV|ODS|NUMBERS)$/.test(ext)) Object.assign(vis, { ico: '▦', col: '#1f8a4c' });
+  else if (/^(ZIP|RAR|7Z)$/.test(ext)) Object.assign(vis, { ico: '🗜', col: '#8a6a2b' });
+  else Object.assign(vis, { ico: '?', col: '#6b7487' });
+  const imgDe = src =>
+    new Promise(ok => {
+      const im = new Image();
+      im.onload = () => ok(im);
+      im.onerror = () => ok(null);
+      im.src = src;
+    });
+  if (fic && ty.startsWith('image')) {
+    const u = URL.createObjectURL(fic);
+    imgDe(u).then(im => im && Object.assign(vis, { k: 'photo', im }));
+  } else if (fic && ty.startsWith('video')) {
+    // une image de la vidéo sert de miniature
+    const u = URL.createObjectURL(fic),
+      v = document.createElement('video');
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = 'auto';
+    v.onloadeddata = () => (v.currentTime = Math.min(1, (v.duration || 2) / 3));
+    v.onseeked = () => {
+      try {
+        const k = document.createElement('canvas');
+        k.width = v.videoWidth;
+        k.height = v.videoHeight;
+        k.getContext('2d').drawImage(v, 0, 0);
+        Object.assign(vis, { k: 'photo', im: k, video: 1 });
+      } catch (_) {}
+    };
+    v.src = u;
+  }
   const o = document.createElement('div');
   o.className = 'mysl';
   o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
@@ -1269,6 +1310,76 @@ function mysLancer(cb) {
     c.ellipse(x, y, s * 0.17 * k + 2, s * 0.045 * k + 1, 0, 0, 7);
     c.fill();
   };
+  const photoDessin = () => {
+    // la vraie photo, en tirage avec un bord blanc (format conservé)
+    const im = vis.im,
+      iw = im.naturalWidth || im.width,
+      ih = im.naturalHeight || im.height,
+      r = iw / ih,
+      M = 62,
+      pw = r >= 1 ? M : M * r,
+      ph = r >= 1 ? M / r : M,
+      b = 4;
+    c.shadowColor = '#0006';
+    c.shadowBlur = 16;
+    c.shadowOffsetY = 8;
+    c.fillStyle = '#fbfaf6';
+    c.fillRect(-pw / 2 - b, -ph / 2 - b, pw + 2 * b, ph + 2 * b + (vis.video ? 0 : 6));
+    c.shadowColor = 'transparent';
+    c.drawImage(im, -pw / 2, -ph / 2, pw, ph);
+    c.strokeStyle = '#0002';
+    c.lineWidth = 0.6;
+    c.strokeRect(-pw / 2, -ph / 2, pw, ph);
+    if (vis.video) {
+      c.fillStyle = '#000a';
+      c.beginPath();
+      c.arc(0, 0, 9, 0, 7);
+      c.fill();
+      c.fillStyle = '#fff';
+      c.beginPath();
+      c.moveTo(-3, -5);
+      c.lineTo(6, 0);
+      c.lineTo(-3, 5);
+      c.fill();
+    }
+  };
+  const docDessin = () => {
+    // document générique : coin plié, bandeau de couleur du type, icône, extension et nom
+    c.shadowColor = '#0005';
+    c.shadowBlur = 16;
+    c.shadowOffsetY = 8;
+    c.fillStyle = '#fdfdfb';
+    c.beginPath();
+    c.moveTo(-25, -32);
+    c.lineTo(11, -32);
+    c.lineTo(25, -18);
+    c.lineTo(25, 32);
+    c.lineTo(-25, 32);
+    c.closePath();
+    c.fill();
+    c.shadowColor = 'transparent';
+    c.fillStyle = '#d6dbe3';
+    c.beginPath();
+    c.moveTo(11, -32);
+    c.lineTo(11, -18);
+    c.lineTo(25, -18);
+    c.closePath();
+    c.fill();
+    c.fillStyle = vis.col;
+    c.font = `800 ${vis.ico.length > 1 ? 11 : 20}px system-ui,sans-serif`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(vis.ico, 0, -10);
+    c.fillStyle = '#d3d8e0';
+    [4, 9].forEach((l, i) => rr(-17, l, i ? 22 : 34, 2.4, 1.2) || c.fill());
+    c.fillStyle = vis.col;
+    rr(-19, 16, 38, 11, 2);
+    c.fill();
+    c.fillStyle = '#fff';
+    c.font = '800 7px system-ui,sans-serif';
+    c.fillText('.' + vis.ext, 0, 21.8);
+    c.textBaseline = 'alphabetic';
+  };
   const fichier = () => {
     const [x, y, s] = P(F.x, F.y, F.z),
       k = s * 0.0042; // le fichier mesure ~ 50 × 64 « unités » à 1 m
@@ -1278,6 +1389,16 @@ function mysLancer(cb) {
     c.translate(x, y);
     c.rotate(F.a);
     c.scale(k, k);
+    if (vis.k == 'photo') {
+      photoDessin();
+      c.restore();
+      return;
+    }
+    if (vis.k == 'doc') {
+      docDessin();
+      c.restore();
+      return;
+    }
     c.shadowColor = '#0005';
     c.shadowBlur = 16;
     c.shadowOffsetY = 8;
@@ -1932,11 +2053,10 @@ function mysLancer(cb) {
     const D = CZ - Z0,
       vopt = Math.sqrt((G * D * D) / (2 * Math.cos(ANG) ** 2 * (Y0 + D * Math.tan(ANG) - TOP))),
       tt = D / (vopt * Math.cos(ANG));
-    let v = vopt * (vsy / (H * 1.7)),
-      vx = (vsx / W) * 2.4;
-    // aide discrète : un geste à peu près juste est guidé vers le centre
-    if (Math.abs(v - vopt) < vopt * 0.4) v = vopt + (v - vopt) * 0.12;
-    if (Math.abs(vx * tt) < 1.2) vx *= 0.1;
+    let v = vopt * 0.978 * Math.pow(vsy / (H * 1.7), 0.5), // il faut doser la force : un peu trop faible tape la cheminée, un peu trop fort passe derrière
+      vx = (vsx / W) * 1.5;
+    // pas d'aide : seul le petit tremblement naturel du doigt sur le côté est ignoré
+    if (Math.abs(vx * tt) < 0.12) vx = 0;
     const vy = v * Math.sin(ANG),
       vz = v * Math.cos(ANG);
     Object.assign(F, { vx, vy, vz, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
@@ -1952,7 +2072,7 @@ function mysOpen(input) {
   const f = input.files[0];
   input.value = '';
   if (!f) return;
-  mysLancer(() => mysLire(f));
+  mysLancer(() => mysLire(f), f);
 }
 async function mysLire(f) {
   try {
