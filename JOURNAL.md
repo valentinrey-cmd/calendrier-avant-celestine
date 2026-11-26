@@ -3,6 +3,12 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Remise à zéro de la progression sur tous les appareils
+- Au prochain lancement, chaque appareil (téléphone, tablette, PC, appli Android, vraie version et version de test) efface une seule fois toute la progression : les 3 sauvegardes, la signature des CGU (à refaire), la photo, les musiques importées et les secrets trouvés. Ensuite, plus rien n'est effacé.
+- Pour refaire une remise à zéro plus tard, il suffit de changer la date `REMISE_A_ZERO` dans `js/config.js` (noté dans CLAUDE.md).
+- Version 1795699892
+- Fichiers : `2026/js/config.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : traîneau plus facile à toucher, compteur de secrets corrigé
 - Le compteur de secrets ne compte plus que les secrets qui existent encore (il affichait « 6/5 » à cause de l'ancienne surprise de la lune, gardée dans la sauvegarde de test).
 - Le traîneau était presque impossible à toucher : il demandait la même précision que la cheminée en plus du bon moment. Il vole maintenant plus bas, plus lentement (toutes les 13 s) et il est plus grand. Sa zone de contact correspond à sa vraie taille, rennes compris. Un lancer fort au bon moment le touche, mais un lancer trop fort passe au-dessus.
