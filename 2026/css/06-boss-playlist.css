@@ -1629,6 +1629,121 @@ p.vc-b {
   top: 54px;
   text-align: center;
 }
+.mysl-lance u {
+  position: absolute;
+  right: -6px;
+  top: -8px;
+  font: 900 1.6rem system-ui;
+  color: #ffe08a;
+  text-decoration: none;
+  text-shadow: 0 2px 6px #0008;
+}
+.mysl-vent {
+  --r: 0rad;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 3px 8px 3px 4px;
+  border-radius: 999px;
+  background: #0b1430aa;
+  border: 1px solid #ffffff33;
+  font: 700 0.72rem system-ui, sans-serif;
+  color: #dfe8f8;
+  vertical-align: middle;
+}
+.mysl-vent i {
+  width: 18px;
+  height: 18px;
+  transform: rotate(var(--r));
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23bfe3ff' d='M12 2l6 9h-4v11h-4V11H6z'/%3E%3C/svg%3E");
+}
+.mysl-vent em {
+  font-style: normal;
+}
+.mysl-emo {
+  position: absolute;
+  right: 132px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+}
+.mysl-emo-b {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #ffffffaa;
+  background: #0b1430b3;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 14px #0006;
+}
+.mysl-emo div {
+  position: absolute;
+  bottom: 58px;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  transform: translateX(-50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.18s,
+    opacity 0.18s;
+}
+.mysl-emo.ouvert div {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.mysl-emo div button {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #ffffffcc;
+  background: #ffffffee;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 12px #0005;
+}
+.mysl-n.trophee::after {
+  content: ' 🏆';
+}
+.mysl-trophee {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 26px;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 20%, #fff3c4, #f2c14e);
+  color: #5a3a08;
+  box-shadow:
+    0 0 0 4px #fff8dc,
+    0 14px 40px #0008;
+  animation: myslTrophee 0.6s cubic-bezier(0.2, 1.6, 0.4, 1);
+  pointer-events: none;
+  text-align: center;
+}
+.mysl-trophee i {
+  font-size: 3.4rem;
+  font-style: normal;
+}
+.mysl-trophee b {
+  font: 900 1.3rem system-ui;
+}
+.mysl-trophee small {
+  font: 600 0.85rem system-ui;
+}
+@keyframes myslTrophee {
+  from {
+    transform: translate(-50%, -50%) scale(0.2) rotate(-20deg);
+    opacity: 0;
+  }
+}
 .mysl-lance.vide {
   opacity: 0.45;
   filter: grayscale(0.6);

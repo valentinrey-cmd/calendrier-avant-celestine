@@ -3,6 +3,19 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : vent, tir à effet, course et glissade, emotes, ange, Valentin, étoile filante, 10 secrets
+- **Vent** : il change de sens et de force toutes les 9 à 14 s (parfois presque calme). Il dévie le fichier en vol et pousse la neige et la fumée. Une flèche avec la vitesse en km/h s'affiche sous le titre (tournée selon la vue), et une girouette dorée tourne en haut de l'antenne.
+- **Tir à effet** : en relâchant « Lancer », glisser le doigt sur le côté fait partir le fichier en courbe de ce côté (↶ / ↷ s'affichent sur le bouton). Au clavier, on garde une flèche gauche/droite en relâchant l'espace.
+- **Course et glissade** : le joystick poussé à fond un moment (ou Maj) la fait courir. Si on lâche en pleine course, elle glisse sur la neige, bras écartés, avec des traces. À chaque pas, une empreinte de botte reste dans la neige un moment.
+- **Emotes** : un bouton 😊 ouvre 👋 salut, 😘 bisou (cœurs), 💃 danse, 😤 bouder (dos tourné, bras croisés), avec une bulle. Au clavier : touches 1 à 4.
+- **Ange dans la neige** : si on ne touche à rien pendant 6 s, elle s'allonge et fait l'ange. La silhouette (tête, ailes, robe) reste dessinée sur le toit.
+- **Valentin sur le toit voisin** : un bâtiment voisin à droite, de l'autre côté du vide. Valentin (même personnage en volume, doudoune verte, cheveux courts, sans lunettes) la regarde, lui fait coucou avec une bulle (« Coucou ! 👋 »…) et lui lance parfois une boule de neige (« Hé ! 😆 » si elle est touchée). Si le fichier le touche, il tombe sur les fesses (« Aïe ! 😵 »).
+- **Étoile filante** : elle traverse le ciel de temps en temps. La toucher du doigt fait un vœu.
+- **10 secrets et trophée** : en plus des 5 anciens, il y a Valentin touché, la boule de neige reçue, l'étoile filante, l'ange et une grande glissade. Le compteur passe à /10. Quand les 10 sont trouvés, un trophée doré s'affiche (enregistré dans `S.mysTrophee`, envoyé au suivi) et 🏆 reste à côté de « Livré ».
+- Les couleurs et la coiffure du personnage sont maintenant réglables (`TENUE` : Célestine, Valentin).
+- Version 1795712424
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : traîneau du Père Noël refait en vraie 3D
 - L'ancien traîneau (un dessin plat aplati selon l'angle) est supprimé. Le nouveau est un vrai modèle 3D, vu correctement sous tous les angles : traîneau rouge à deux flancs et liserés dorés, patins dorés recourbés, hotte de cadeaux, Père Noël (barbe, ceinture, bonnet à pompon), quatre rennes en deux paires (corps, pattes au galop, cou, tête, bois, queue, harnais), Rudolph au nez rouge qui brille, et rênes dorées.
 - Nouvelle trajectoire : il arrive de loin derrière le toit (on le voit petit dans le ciel), plonge vers nous en rasant le toit en suivant la pente, puis remonte et repart au loin. Un passage dure 11 s, toutes les 17 s.
