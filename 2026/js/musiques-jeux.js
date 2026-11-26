@@ -1227,6 +1227,12 @@ function mysSons(A, musique = true) {
       souffle(t + 0.55, 0.5, 0.28, 'lowpass', 200, 2200, 0.8, 0.03);
       ton(t + 0.55, 90, 0.35, 0.2, 'sine', 220);
     },
+    // le volet du replay : un « whoosh » qui balaie
+    replay: () => {
+      const t = now();
+      souffle(t, 0.45, 0.14, 'bandpass', 400, 3200, 1.2, 0.05);
+      ton(t, 220, 0.4, 0.04, 'sine', 660);
+    },
     // des pigeons qui s'envolent : battements d'ailes et petits roucoulements
     pigeons: () => {
       const t = now();
@@ -1298,7 +1304,7 @@ function mysLancer(cb, fic) {
     const nom = (fic && fic.name) || 'fichier.avent',
       ty = (fic && fic.type) || '',
       ext = (nom.includes('.') ? nom.split('.').pop() : '?').slice(0, 5).toUpperCase();
-    Object.assign(vis, { k: ext == 'AVENT' ? 'avent' : 'doc', ext, nom, ok: !fic || ext == 'AVENT' });
+    Object.assign(vis, { k: ext == 'AVENT' ? 'avent' : 'doc', ext, nom, ok: !!fic && ext == 'AVENT' });
     if (fic)
       fic
         .slice(0, 9)
@@ -1602,6 +1608,8 @@ function mysLancer(cb, fic) {
   );
   taille();
   nouveau();
+  // les mains vides : le fichier est dans la boîte aux lettres
+  if (!fic) ((C.tient = 0), (F.al = 0), (tip.textContent = '📮 Va prendre le fichier dans la boîte aux lettres !'));
   rate = fin = 0;
   fumees = [];
   eclats = [];
@@ -2782,6 +2790,7 @@ function mysLancer(cb, fic) {
       const lev = pres ? 1 : 0;
       pave(0.17, 0.19, 0.95, 1.2 + lev * 0.12, 0.1, 0.13, '#8a8f99');
       pave(0.17, 0.19, 1.12 + lev * 0.12, 1.2 + lev * 0.12, 0.13, 0.27, '#d63a3a');
+      if (!fc) fleche(t, ob.x, 1.05, ob.z); // tant qu'elle n'a pas pris de fichier, une flèche montre la boîte
     } else if (ob.t == 'cadeaux') {
       // de vraies boîtes : on voit le dessus et les côtés tournés vers nous, rubans et nœuds compris
       const boite = (cx, cz, w, dd, h, an, col, rub, y0 = 0, couv = 0) => {
@@ -3328,21 +3337,14 @@ function mysLancer(cb, fic) {
     majPasses();
     fete.recs = () => {
       if (passesFin) record('passes', passesFin);
-      if (distFin) record('dist', distFin);
+      if (distFin) (record('dist', distFin), record('reussi', distFin));
       if (lancers) record('lancers', lancers);
     };
     // le tir gagnant est rejoué au ralenti (voir replay) ; la fête et la danse viennent après
-    const hh = HIST.filter(q => T() - q.t < 1.6);
-    if (hh.length > 5) {
-      hh.push({ t: T(), x: 0, y: TOP - 0.3, z: CZ, a: F.a });
-      RP = { t0: T() + 0.5, h: hh, d: (hh[hh.length - 1].t - hh[0].t) / RALENTI };
-      o.classList.add('replay');
-      F.vol = 0;
-      bruit('lance', 0.25);
-    } else fete(0);
+    replayPrepare(distFin);
   };
   // après le replay (ou tout de suite s'il n'y en a pas) : fumée, étincelles, confettis, puis la danse et l'ouverture
-  const fete = att => {
+  const fete = () => {
     o.classList.remove('replay');
     if (fete.recs) setTimeout(fete.recs, 900);
     o.querySelector('.mysl-n i').textContent = '1';
@@ -3373,7 +3375,6 @@ function mysLancer(cb, fic) {
         confetti();
       } catch (_) {}
     }, 400);
-    if (att) bruit('entre');
     // Célestine fête ça : une chorégraphie de breakdance (voir danse), puis on ouvre le fichier
     C.danse = T() + 0.5;
     setTimeout(() => bruit('beat'), 500);
@@ -3406,8 +3407,8 @@ function mysLancer(cb, fic) {
   };
   // le fichier sorti du toit retombe du ciel, à un endroit libre du toit
   // flèche rose qui rebondit au-dessus du fichier à ramasser
-  const fleche = t => {
-    const [x, y, s, d] = P(F.x, F.y + 0.5 + Math.abs(Math.sin(t * 4)) * 0.12, F.z);
+  const fleche = (t, fx = F.x, fy = F.y, fz = F.z) => {
+    const [x, y, s, d] = P(fx, fy + 0.5 + Math.abs(Math.sin(t * 4)) * 0.12, fz);
     if (d < 0.4) return;
     const k = Math.max(8, s * 0.09);
     c.fillStyle = '#ff6fa3';
@@ -4051,6 +4052,7 @@ function mysLancer(cb, fic) {
     C.pTir = null;
     C.tient = 0;
     lancers++;
+    tLache = T();
     F = {
       moi: 1,
       x0: m.x,
@@ -5094,6 +5096,7 @@ function mysLancer(cb, fic) {
   const REC = {
     lancers: { t: 'Livré en le moins de lancers', u: n => `${n} lancer${n > 1 ? 's' : ''}`, mieux: (a, b) => a < b },
     dist: { t: 'Plus long lancer', u: n => `${n.toFixed(1).replace('.', ',')} m`, mieux: (a, b) => a > b + 0.05 },
+    reussi: { t: 'Plus long lancer réussi', u: n => `${n.toFixed(1).replace('.', ',')} m`, mieux: (a, b) => a > b + 0.05 },
     passes: { t: 'Plus de passes avec Valentin', u: n => `${n} passe${n > 1 ? 's' : ''}`, mieux: (a, b) => a > b }
   };
   const recs = () => {
@@ -5117,15 +5120,17 @@ function mysLancer(cb, fic) {
     const R = recs(),
       old = R[k];
     if (old != null && !REC[k].mieux(v, old)) return;
-    R[k] = k == 'dist' ? Math.round(v * 10) / 10 : v;
+    R[k] = k == 'dist' || k == 'reussi' ? Math.round(v * 10) / 10 : v;
     try {
       save();
       slog('🏆', `Fichier mystère : record « ${REC[k].t} » : ${REC[k].u(R[k])}`);
     } catch (_) {}
     majRec();
     if (old == null && k == 'dist') return; // le tout premier lancer n'est pas annoncé
-    annonce('🏆 Nouveau record !', `${REC[k].t} : ${REC[k].u(R[k])}`);
-    bruit('voeu');
+    // plusieurs records d'un coup : ils s'affichent l'un après l'autre
+    const att = Math.max(0, (record.suite || 0) - T());
+    record.suite = T() + att + 2;
+    setTimeout(() => (annonce('🏆 Nouveau record !', `${REC[k].t} : ${REC[k].u(R[k])}`), bruit('voeu')), att * 1000);
   };
   majRec();
   o.querySelector('.mysl-rec-b').onclick = () => (majRec(), recEl.classList.toggle('on'));
@@ -5363,202 +5368,704 @@ function mysLancer(cb, fic) {
     c.restore();
   };
 
-  // --- les pigeons : posés sur le faîtage et la gouttière, ils s'envolent quand le fichier, Célestine ou une boule de neige
-  // passe trop près (ses voisins aussi), font un tour et reviennent se poser
+  // --- les pigeons : posés sur le faîtage et la gouttière, ils picorent, marchent en hochant la tête et se retournent.
+  // Si le fichier, Célestine ou une boule de neige passe trop près, la bande s'envole d'un coup, tourne en cercle au-dessus
+  // des toits, puis chacun revient se poser à sa place en planant (ailes ouvertes, freinage au dernier moment).
   const PIG = [
     [-5.4, RIDGE - 0.1],
-    [-4.9, RIDGE - 0.1],
+    [-4.85, RIDGE - 0.1],
     [-4.3, RIDGE - 0.1],
     [3.6, RIDGE - 0.1],
-    [4.3, RIDGE - 0.1],
+    [4.25, RIDGE - 0.1],
     [-3.6, BORD + 0.1],
-    [-3.1, BORD + 0.1],
+    [-3.05, BORD + 0.1],
     [4.4, BORD + 0.1]
-  ].map(([x, z]) => ({ hx: x, hz: z, x, y: 0, z, e: 'pose', t: 0, ph: Math.random() * 6, phi: Math.random() < 0.5 ? 1 : -1 }));
+  ].map(([x, z], i) => ({
+    hx: x,
+    hz: z,
+    x,
+    y: 0,
+    z,
+    e: 'pose',
+    cap: Math.random() < 0.5 ? Math.PI / 2 : -Math.PI / 2, // le sens où il regarde (0 = vers le faîtage)
+    capV: 0,
+    ail: 0, // battement d'ailes
+    pas: Math.random() * 6, // marche (hochement de tête)
+    pic: 0, // il picore
+    tilt: 0, // tangage (cabré à l'atterrissage)
+    plan: 0, // ailes ouvertes en planant
+    i,
+    prochain: T() + 1 + Math.random() * 4
+  }));
   let pigBruit = 0;
-  const envol = (p, fx, fz) => {
-    if (p.e != 'pose') return;
-    const a = Math.atan2(p.x - fx, p.z - fz) + (Math.random() - 0.5) * 1.2,
-      v = 2.4 + Math.random() * 1.5;
-    Object.assign(p, { e: 'vol', t: T(), vx: Math.sin(a) * v, vz: Math.cos(a) * v, vy: 2 + Math.random() * 1.2 });
-    p.phi = p.vx >= 0 ? 1 : -1;
+  const envol = (fx, fz, p0) => {
+    // toute la bande autour de lui part ensemble, sur un même cercle
+    const bande = PIG.filter(q => q.e == 'pose' && Math.hypot(q.x - p0.x, q.z - p0.z) < 2.6),
+      a = Math.atan2(p0.x - fx, p0.z - fz),
+      G = {
+        cx: p0.x + Math.sin(a) * 4.5,
+        cz: p0.z + Math.cos(a) * 4.5,
+        r: 4 + Math.random() * 2,
+        alt: 4 + Math.random() * 2,
+        w: (Math.random() < 0.5 ? 1 : -1) * (0.55 + Math.random() * 0.2),
+        t: T(),
+        d: 6 + Math.random() * 3
+      };
+    bande.forEach((q, j) => {
+      const th = Math.atan2(q.z - G.cz, q.x - G.cx);
+      Object.assign(q, { e: 'decolle', t: T() + j * 0.07, G, th0: th, dec: j * 0.35, x0: q.x, y0: q.y, z0: q.z });
+    });
     if (T() - pigBruit > 0.6) ((pigBruit = T()), bruit('pigeons'));
-    PIG.forEach(q => q != p && Math.hypot(q.x - p.x, q.z - p.z) < 2.2 && setTimeout(() => envol(q, fx, fz), 80 + Math.random() * 250));
   };
   const pigeons = dt => {
+    const vers = (p, cible, k) => (p.cap += Math.atan2(Math.sin(cible - p.cap), Math.cos(cible - p.cap)) * Math.min(1, dt * k));
     PIG.forEach(p => {
-      if (p.e == 'pose') {
+      const px = p.x,
+        py = p.y,
+        pz = p.z;
+      if (p.e == 'pose' || p.e == 'marche') {
         const pres = (a, b, cc, r) => Math.hypot(a - p.x, b - p.y, cc - p.z) < r;
-        if (F.vol && !F.sol && !F.in && pres(F.x, F.y, F.z, 1.4)) envol(p, F.x, F.z);
-        else if (Math.hypot(C.x - p.x, C.z - p.z) < 1.2) envol(p, C.x, C.z);
-        else boules.forEach(b => pres(b.x, b.y, b.z, 1.3) && envol(p, b.x, b.z));
-        if (Math.random() < dt * 0.25) p.phi = -p.phi; // il se retourne
-        p.ph += dt * (Math.sin(T() * 0.7 + p.hx) > 0.3 ? 5 : 0); // il picore de temps en temps
-      } else if (p.e == 'vol') {
-        p.vy += dt * 0.8;
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.z += p.vz * dt;
-        p.ph += dt * 26;
-        if (T() - p.t > 3.2) Object.assign(p, { e: 'loin', t: T() + 10 + Math.random() * 8 });
-      } else if (p.e == 'loin') {
-        if (T() > p.t && !fin) {
-          // il revient en planant, d'un peu plus loin et plus haut
-          const a = Math.random() * 6.3;
-          Object.assign(p, { e: 'retour', t: T(), x0: p.hx + Math.sin(a) * 7, y0: 6 + Math.random() * 2, z0: p.hz + Math.cos(a) * 7 });
+        if (F.vol && !F.sol && !F.in && F.al > 0 && pres(F.x, F.y, F.z, 1.5)) return envol(F.x, F.z, p);
+        if (Math.hypot(C.x - p.x, C.z - p.z) < 1.3) return envol(C.x, C.z, p);
+        const b = boules.find(q => pres(q.x, q.y, q.z, 1.4));
+        if (b) return envol(b.x, b.z, p);
+        p.ail = 0;
+        p.tilt *= 0.9;
+        if (p.e == 'marche') {
+          // quelques pas le long du toit : la tête avance et recule à chaque pas
+          const dx = p.cible - p.x;
+          vers(p, dx > 0 ? Math.PI / 2 : -Math.PI / 2, 8);
+          p.x += Math.sign(dx) * Math.min(Math.abs(dx), dt * 0.32);
+          p.pas += dt * 13;
+          if (Math.abs(dx) < 0.01) ((p.e = 'pose'), (p.prochain = T() + 1.5 + Math.random() * 4));
+        } else if (T() > p.prochain) {
+          // il choisit : picorer, se retourner ou faire quelques pas
+          const r = Math.random();
+          if (r < 0.4) p.pic = T();
+          else if (r < 0.65) p.capV = p.cap + Math.PI;
+          else ((p.e = 'marche'), (p.cible = p.hx + (Math.random() - 0.5) * 1.1));
+          p.prochain = T() + 1.2 + Math.random() * 3.5;
         }
-      } else if (p.e == 'retour') {
-        const u = Math.min(1, (T() - p.t) / 2.4),
-          e2 = 1 - (1 - u) * (1 - u);
-        p.x = p.x0 + (p.hx - p.x0) * e2;
-        p.z = p.z0 + (p.hz - p.z0) * e2;
-        p.y = p.y0 * (1 - e2);
-        p.phi = p.hx >= p.x0 ? 1 : -1;
-        p.ph += dt * (u > 0.8 ? 26 : 8);
-        if (u >= 1) Object.assign(p, { e: 'pose', x: p.hx, y: 0, z: p.hz });
+        if (p.capV) (vers(p, p.capV, 6), Math.abs(Math.sin((p.capV - p.cap) / 2)) < 0.02 && (p.capV = 0));
+        return;
       }
+      const G = p.G,
+        tt = T() - p.t;
+      if (p.e == 'decolle') {
+        // décollage : un bond, puis des battements rapides en montant
+        if (tt < 0) return;
+        const u = Math.min(1, tt / 0.9),
+          th = p.th0 + G.w * Math.max(0, T() - G.t),
+          tx = G.cx + Math.cos(th) * G.r,
+          tz = G.cz + Math.sin(th) * G.r;
+        p.x = p.x0 + (tx - p.x0) * u * u;
+        p.z = p.z0 + (tz - p.z0) * u * u;
+        p.y = p.y0 + (G.alt + Math.sin(p.dec) * 0.5) * (1 - (1 - u) * (1 - u));
+        p.ail += dt * 30;
+        p.tilt = -0.5 * (1 - u);
+        if (u >= 1) p.e = 'vol';
+      } else if (p.e == 'vol') {
+        // la ronde au-dessus des toits : battements, puis ailes ouvertes en plané, et ainsi de suite
+        const th = p.th0 + G.w * (T() - G.t),
+          tx = G.cx + Math.cos(th) * G.r,
+          tz = G.cz + Math.sin(th) * G.r,
+          ty = G.alt + Math.sin(p.dec + T() * 1.3) * 0.4,
+          k = Math.min(1, dt * 3);
+        p.x += (tx - p.x) * k;
+        p.y += (ty - p.y) * k;
+        p.z += (tz - p.z) * k;
+        p.plan = Math.sin(T() * 1.1 + p.dec * 3) > 0.35 ? Math.min(1, p.plan + dt * 3) : Math.max(0, p.plan - dt * 3);
+        p.ail += dt * 24 * (1 - p.plan);
+        p.tilt *= 0.9;
+        if (T() - G.t > G.d + p.dec) Object.assign(p, { e: 'atterrit', t: T(), x0: p.x, y0: p.y, z0: p.z });
+      } else if (p.e == 'atterrit') {
+        // retour en plané (une courbe qui descend), puis freinage, cabré, ailes qui battent fort, et il se pose
+        const u = Math.min(1, tt / 2.6),
+          e = u * u * (3 - 2 * u),
+          mx = (p.x0 + p.hx) / 2,
+          mz = (p.z0 + p.hz) / 2,
+          L = (a, b, cc) => (1 - e) * (1 - e) * a + 2 * (1 - e) * e * b + e * e * cc;
+        p.x = L(p.x0, mx, p.hx);
+        p.z = L(p.z0, mz, p.hz);
+        p.y = L(p.y0, p.y0 * 0.55 + 0.8, 0);
+        const fin2 = u > 0.78;
+        p.plan = fin2 ? 0 : 1;
+        p.ail += dt * (fin2 ? 34 : 0);
+        p.tilt = fin2 ? -0.7 : 0.12;
+        if (u >= 1) Object.assign(p, { e: 'pose', y: 0, x: p.hx, z: p.hz, tilt: 0, plan: 0, prochain: T() + 2 + Math.random() * 3 });
+      }
+      // en vol, il regarde là où il va
+      const vx = p.x - px,
+        vz = p.z - pz;
+      if (Math.hypot(vx, vz) > 1e-4) vers(p, Math.atan2(vx, vz), 8);
+      p.vy = (p.y - py) / (dt || 1);
     });
   };
+  // un pigeon posé, vu de profil, de face ou de dos selon l'angle de la caméra (1 unité = 1 cm environ)
   const pigeonDessin = p => {
+    if (p.e != 'pose' && p.e != 'marche') return pigeonVol(p);
     const [x, y, s, d] = P(p.x, p.y, p.z);
     if (d < 0.3) return;
-    const k = s * 0.012;
+    const [x2] = P(p.x + Math.sin(p.cap) * 0.3, p.y, p.z + Math.cos(p.cap) * 0.3),
+      cote = Math.max(-1, Math.min(1, (x2 - x) / (s * 0.3))), // > 0 : il regarde vers la droite de l'écran
+      face = Math.sin(p.cap) * (V.x - p.x) + Math.cos(p.cap) * (V.z - p.z) > 0, // il nous regarde
+      k = s * 0.011,
+      tt = T();
+    const GRIS = '#9ba3b4',
+      GRIS2 = '#7f889b',
+      BARRE = '#353a46';
+    c.fillStyle = '#1e283c33';
+    c.beginPath();
+    c.ellipse(x, y, 9 * k, 2.2 * k, 0, 0, 7);
+    c.fill();
     c.save();
     c.translate(x, y);
-    c.scale(k * p.phi, k);
-    const vole = p.e == 'vol' || (p.e == 'retour' && T() - p.t > 1.9),
-      pic = p.e == 'pose' && Math.sin(p.ph) > 0.7;
-    if (!vole && p.e == 'pose') {
-      c.strokeStyle = '#d98a8a';
+    c.scale(k, k);
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
+    const corpsDegrade = (y0, y1) => {
+      const g = c.createLinearGradient(0, y0, 0, y1);
+      g.addColorStop(0, '#8a93a7');
+      g.addColorStop(1, '#c2c8d4');
+      return g;
+    };
+    const oeil = (ex, ey) => {
+      c.fillStyle = '#ff8a24';
+      c.beginPath();
+      c.arc(ex, ey, 0.95, 0, 7);
+      c.fill();
+      c.fillStyle = '#111';
+      c.beginPath();
+      c.arc(ex, ey, 0.45, 0, 7);
+      c.fill();
+    };
+    const irise = (cx, cy, rx, ry) => {
+      const g = c.createLinearGradient(cx - rx, cy - ry, cx + rx, cy + ry);
+      g.addColorStop(0, '#4fa27e');
+      g.addColorStop(0.55, '#6d7fa8');
+      g.addColorStop(1, '#9a5fa6');
+      c.fillStyle = g;
+      c.globalAlpha = 0.85;
+      c.beginPath();
+      c.ellipse(cx, cy, rx, ry, 0, 0, 7);
+      c.fill();
+      c.globalAlpha = 1;
+    };
+    if (Math.abs(cote) > 0.45) {
+      // ---- de profil (il regarde vers +x) ----
+      c.scale(Math.sign(cote) * Math.max(0.6, Math.abs(cote)), 1);
+      const marche = p.e == 'marche',
+        pk = p.pic && tt - p.pic < 0.9 ? Math.sin(((tt - p.pic) / 0.9) * Math.PI) : 0,
+        bob = marche ? Math.sin(p.pas) * 1.6 : 0, // la tête avance et recule à chaque pas
+        hx = 8.6 + bob + pk * 3.5,
+        hy = -17.5 + pk * 11;
+      // pattes roses
+      c.strokeStyle = '#e48b8b';
       c.lineWidth = 1.2;
-      [-2, 2].forEach(px => {
+      const pa = marche ? Math.sin(p.pas) * 1.8 : 0;
+      [
+        [-0.5 + pa, 0],
+        [2.5 - pa, 0]
+      ].forEach(([fx]) => {
         c.beginPath();
-        c.moveTo(px, -4);
-        c.lineTo(px, 0);
+        c.moveTo(fx * 0.6, -4);
+        c.lineTo(fx, 0);
+        c.lineTo(fx + 2.2, 0.2);
         c.stroke();
       });
-    }
-    // queue, corps, aile
-    c.fillStyle = '#6f7686';
-    c.beginPath();
-    c.moveTo(-9, -9);
-    c.lineTo(-19, -6);
-    c.lineTo(-18, -11);
-    c.closePath();
-    c.fill();
-    c.fillStyle = '#9097a7';
-    c.beginPath();
-    c.ellipse(0, -9, 11, 6.5, vole ? 0 : -0.1, 0, 7);
-    c.fill();
-    if (vole) {
-      const w = Math.sin(p.ph);
-      c.fillStyle = '#7d8494';
-      [1, -1].forEach(q => {
+      // queue
+      c.fillStyle = GRIS2;
+      c.beginPath();
+      c.moveTo(-7, -10.5);
+      c.lineTo(-18.5, -8.2);
+      c.lineTo(-18.5, -5.8);
+      c.lineTo(-7, -6.5);
+      c.fill();
+      c.fillStyle = BARRE;
+      c.beginPath();
+      c.moveTo(-15.5, -8.7);
+      c.lineTo(-18.5, -8.2);
+      c.lineTo(-18.5, -5.8);
+      c.lineTo(-15.5, -6.1);
+      c.fill();
+      // corps dodu : dos, poitrail bombé, ventre
+      c.fillStyle = corpsDegrade(-15, -3);
+      c.beginPath();
+      c.moveTo(-9, -10.5);
+      c.bezierCurveTo(-4, -15, 3, -15.5, 6.5, -13.5);
+      c.bezierCurveTo(10.5, -11, 9.5, -4.5, 3.5, -3.6);
+      c.bezierCurveTo(-2, -3, -6.5, -5.5, -9, -8);
+      c.closePath();
+      c.fill();
+      // aile repliée avec ses deux barres noires
+      c.fillStyle = GRIS;
+      c.beginPath();
+      c.moveTo(4, -12.5);
+      c.bezierCurveTo(0, -14, -7, -12.5, -13, -9.5);
+      c.bezierCurveTo(-7, -7.5, -1, -7.5, 4, -9);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = BARRE;
+      c.lineWidth = 1.1;
+      [-2.5, -5.5].forEach(bx => {
         c.beginPath();
-        c.moveTo(-4, -11);
-        c.lineTo(5, -11);
-        c.lineTo(-2 + q * 3, -11 - w * 16 * q);
-        c.closePath();
+        c.moveTo(bx, -12.6);
+        c.lineTo(bx - 1.6, -8.6);
+        c.stroke();
+      });
+      // cou irisé, puis tête
+      c.strokeStyle = GRIS2;
+      c.lineWidth = 5.5;
+      c.beginPath();
+      c.moveTo(5.5, -12.5);
+      c.lineTo(hx - 0.8, hy + 1.5);
+      c.stroke();
+      irise((5.5 + hx) / 2, (-12.5 + hy) / 2 + 1, 3.4, 3.6);
+      c.fillStyle = GRIS2;
+      c.beginPath();
+      c.arc(hx, hy, 3.3, 0, 7);
+      c.fill();
+      c.fillStyle = '#2d2d2d';
+      c.beginPath();
+      c.moveTo(hx + 2.7, hy - 0.3);
+      c.lineTo(hx + 5.4, hy + 0.6);
+      c.lineTo(hx + 2.7, hy + 1.1);
+      c.fill();
+      c.fillStyle = '#eef0f4';
+      c.beginPath();
+      c.ellipse(hx + 2.8, hy - 0.5, 0.9, 0.55, 0, 0, 7);
+      c.fill();
+      oeil(hx + 1, hy - 0.8);
+    } else {
+      // ---- de face ou de dos ----
+      const pk = p.pic && tt - p.pic < 0.9 ? Math.sin(((tt - p.pic) / 0.9) * Math.PI) : 0;
+      c.strokeStyle = '#e48b8b';
+      c.lineWidth = 1.2;
+      [-2, 2].forEach(fx => {
+        c.beginPath();
+        c.moveTo(fx, -4);
+        c.lineTo(fx, 0);
+        c.stroke();
+      });
+      if (!face) {
+        c.fillStyle = GRIS2;
+        c.beginPath();
+        c.moveTo(-2.6, -7);
+        c.lineTo(-3.4, -1.5);
+        c.lineTo(3.4, -1.5);
+        c.lineTo(2.6, -7);
+        c.fill();
+        c.fillStyle = BARRE;
+        c.fillRect(-3.4, -3, 6.8, 1.5);
+      }
+      c.fillStyle = corpsDegrade(-16, -3);
+      c.beginPath();
+      c.ellipse(0, -9.5, 6.6, 7.2, 0, 0, 7);
+      c.fill();
+      // ailes repliées sur les côtés (avec leurs barres, vues de dos)
+      c.fillStyle = GRIS;
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.ellipse(q * 4.6, -9.5, 2.6, 5.5, q * 0.15, 0, 7);
         c.fill();
       });
-    } else {
-      c.fillStyle = '#7d8494';
+      if (!face) {
+        c.strokeStyle = BARRE;
+        c.lineWidth = 1;
+        [-1, 1].forEach(q =>
+          [-10, -7.5].forEach(by => {
+            c.beginPath();
+            c.moveTo(q * 3, by);
+            c.lineTo(q * 6, by + 0.8);
+            c.stroke();
+          })
+        );
+      }
+      const hy = -18 + pk * 7;
+      irise(0, -15 + pk * 3, 4.6, 2.6);
+      c.fillStyle = GRIS2;
       c.beginPath();
-      c.ellipse(-2, -10, 7, 4, -0.15, 0, 7);
+      c.arc(0, hy, 3.4, 0, 7);
       c.fill();
-      c.strokeStyle = '#3e4350';
-      c.lineWidth = 1;
-      [-4, -1].forEach(px => {
+      if (face) {
+        oeil(-1.7, hy - 0.6);
+        oeil(1.7, hy - 0.6);
+        c.fillStyle = '#eef0f4';
         c.beginPath();
-        c.moveTo(px, -12);
-        c.lineTo(px + 2, -7.5);
-        c.stroke();
-      });
+        c.ellipse(0, hy + 0.9, 0.9, 0.5, 0, 0, 7);
+        c.fill();
+        c.fillStyle = '#2d2d2d';
+        c.beginPath();
+        c.moveTo(-0.7, hy + 1.3);
+        c.lineTo(0.7, hy + 1.3);
+        c.lineTo(0, hy + 3);
+        c.fill();
+      }
     }
-    // tête (qui picore), cou irisé, bec, œil
-    const hx = pic ? 12 : 9,
-      hy = pic ? -6 : -16;
-    c.fillStyle = '#5f8f7a';
-    c.beginPath();
-    c.ellipse(7, -12, 4, 3.5, 0.6, 0, 7);
-    c.fill();
-    c.fillStyle = '#7b8192';
-    c.beginPath();
-    c.arc(hx, hy, 4.2, 0, 7);
-    c.fill();
-    c.fillStyle = '#3a3a3a';
-    c.beginPath();
-    c.moveTo(hx + 3.5, hy - 0.5);
-    c.lineTo(hx + 7, hy + 0.8);
-    c.lineTo(hx + 3.5, hy + 1.4);
-    c.fill();
-    c.fillStyle = '#ff8c3a';
-    c.beginPath();
-    c.arc(hx + 1.3, hy - 1, 1.1, 0, 7);
-    c.fill();
     c.restore();
   };
 
-  // --- le replay du tir gagnant : les 1,6 dernières secondes du vol, rejouées au ralenti, caméra sur le côté
-  const HIST = [],
-    RALENTI = 0.3;
-  let RP = null;
-  const hist = () => {
-    if (!F.vol || F.in || RP) return;
-    HIST.push({ t: T(), x: F.x, y: F.y, z: F.z, a: F.a });
-    while (HIST.length && T() - HIST[0].t > 1.8) HIST.shift();
+  // un pigeon en vol, en vraie 3D : chaque point (corps, tête, queue, bouts des ailes) est placé autour de lui selon son cap,
+  // son tangage et le battement des ailes, puis projeté. Il est donc juste sous tous les angles (dessous, dessus, de face…)
+  const pigeonVol = p => {
+    const [bx, by, s, d] = P(p.x, p.y, p.z);
+    if (d < 0.3) return;
+    const t = p.tilt,
+      fx = Math.sin(p.cap) * Math.cos(t),
+      fy = -Math.sin(t),
+      fz = Math.cos(p.cap) * Math.cos(t),
+      rx = Math.cos(p.cap),
+      rz = -Math.sin(p.cap),
+      pt = (a, b, h) => P(p.x + fx * a + rx * b, p.y + fy * a + h, p.z + fz * a + rz * b),
+      aile = p.plan ? 0.12 + Math.sin(T() * 3 + p.i) * 0.05 : Math.sin(p.ail), // -1 (en bas) … 1 (en haut)
+      w = aile * 0.95,
+      versNous = q => rx * q * (V.x - p.x) + rz * q * (V.z - p.z) > 0, // cette aile est de notre côté
+      chemin = pts => {
+        c.beginPath();
+        pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+        c.closePath();
+      };
+    const aileDessin = q => {
+      const cw = Math.cos(w),
+        sw = Math.sin(w),
+        A = (a, e) => pt(a, q * e * cw, e * sw + 0.02),
+        plumes = [];
+      for (let f = 0; f <= 4; f++) plumes.push(A(-0.07 - f * 0.012 - (f % 2) * 0.012, 0.32 - f * 0.035));
+      chemin([pt(0.04, q * 0.03, 0.02), A(0.06, 0.15), A(0.02, 0.28), A(-0.04, 0.33), ...plumes, A(-0.1, 0.12), pt(-0.07, q * 0.04, 0.01)]);
+      c.fillStyle = versNous(q) ? '#9ea6b7' : '#7c8497';
+      c.fill();
+      // bouts des ailes plus sombres, et les deux barres noires
+      chemin([A(-0.04, 0.33), A(0.02, 0.28), A(-0.02, 0.24), A(-0.09, 0.24)]);
+      c.fillStyle = '#4a505e';
+      c.fill();
+      c.strokeStyle = '#353a46';
+      c.lineWidth = Math.max(0.8, s * 0.006);
+      c.beginPath();
+      const [x1, y1] = A(-0.01, 0.08),
+        [x2, y2] = A(-0.05, 0.16);
+      c.moveTo(x1, y1);
+      c.lineTo(x2, y2);
+      c.stroke();
+    };
+    const proche = versNous(1) ? 1 : -1;
+    aileDessin(-proche); // l'aile du fond d'abord
+    // queue en éventail, bout noir
+    chemin([pt(-0.1, 0.025, 0), pt(-0.21, 0.06, -0.005), pt(-0.22, -0.06, -0.005), pt(-0.1, -0.025, 0)]);
+    c.fillStyle = '#7f889b';
+    c.fill();
+    chemin([pt(-0.19, 0.055, -0.004), pt(-0.22, 0.06, -0.005), pt(-0.22, -0.06, -0.005), pt(-0.19, -0.055, -0.004)]);
+    c.fillStyle = '#353a46';
+    c.fill();
+    // pattes repliées vers l'avant à l'atterrissage
+    if (p.e == 'atterrit' && t < -0.3) {
+      c.strokeStyle = '#e48b8b';
+      c.lineWidth = Math.max(1, s * 0.008);
+      [-1, 1].forEach(q => {
+        const [ax, ay] = pt(0, q * 0.02, -0.035),
+          [bx2, by2] = pt(0.06, q * 0.025, -0.1);
+        c.beginPath();
+        c.moveTo(ax, ay);
+        c.lineTo(bx2, by2);
+        c.stroke();
+      });
+    }
+    // le corps : un fuseau allongé dans le sens du vol (jamais plus mince que sa vraie épaisseur)
+    const [hx, hy] = pt(0.12, 0, 0.01),
+      [qx, qy] = pt(-0.11, 0, 0),
+      L = Math.max(Math.hypot(hx - qx, hy - qy) / 2, s * 0.05),
+      g = c.createLinearGradient(bx, by - s * 0.05, bx, by + s * 0.05);
+    g.addColorStop(0, '#8a93a7');
+    g.addColorStop(1, '#c2c8d4');
+    c.fillStyle = g;
+    c.beginPath();
+    c.ellipse((hx + qx) / 2, (hy + qy) / 2, L, s * 0.048, Math.atan2(hy - qy, hx - qx), 0, 7);
+    c.fill();
+    // cou irisé et tête
+    const [nx, ny] = pt(0.1, 0, 0.02),
+      gi = c.createRadialGradient(nx, ny, 0, nx, ny, s * 0.035);
+    gi.addColorStop(0, '#4fa27e');
+    gi.addColorStop(0.6, '#7d6fab');
+    gi.addColorStop(1, '#7f889b00');
+    c.fillStyle = gi;
+    c.beginPath();
+    c.arc(nx, ny, s * 0.035, 0, 7);
+    c.fill();
+    const [tx, ty, , td] = pt(0.15, 0, 0.035),
+      [kx, ky] = pt(0.2, 0, 0.03);
+    c.strokeStyle = '#2d2d2d';
+    c.lineWidth = Math.max(1, s * 0.012);
+    c.beginPath();
+    c.moveTo(tx, ty);
+    c.lineTo(kx, ky);
+    c.stroke();
+    c.fillStyle = '#7f889b';
+    c.beginPath();
+    c.arc(tx, ty, s * 0.032, 0, 7);
+    c.fill();
+    // l'œil orange, du côté qu'on voit
+    if (td > 0.3) {
+      const [ex, ey] = pt(0.16, proche * 0.022, 0.045);
+      c.fillStyle = '#ff8a24';
+      c.beginPath();
+      c.arc(ex, ey, Math.max(0.8, s * 0.008), 0, 7);
+      c.fill();
+    }
+    aileDessin(proche);
   };
-  const replay = () => {
-    if (!RP) return null;
-    const h = RP.h,
-      tt = Math.max(0, T() - RP.t0) * RALENTI + h[0].t;
+  // --- le replay du tir gagnant, façon retransmission sportive. Un volet balaie l'écran, puis l'action est rejouée en
+  // trois plans, avec un ralenti qui varie (plus lent au lâcher et à l'arrivée) :
+  // 1. Célestine qui arme et lâche le fichier, en contre-plongée, de trois quarts face ;
+  // 2. le fichier en vol, suivi de près par une caméra qui le poursuit (traînée lumineuse, bandeau « Célestine ») ;
+  // 3. gros plan au ras de la cheminée quand il tombe dedans : flash, secousse, gerbe d'étincelles.
+  // Puis un volet de sortie, et la fête reprend (fete). Célestine et le fichier sont rejoués d'après l'enregistrement HIST.
+  const HIST = [];
+  let RP = null,
+    tLache = 0;
+  const hist = () => {
+    if (RP || fin) return;
+    HIST.push({
+      t: T(),
+      f: [F.x, F.y, F.z, F.a, F.al],
+      c: [C.x, C.y, C.z, C.phi, C.charge ? 1 : 0, T() - C.tir, T() - (C.pose || -9)],
+      tient: C.tient
+    });
+    while (HIST.length && T() - HIST[0].t > 3) HIST.shift();
+  };
+  // le tir gagnant vient d'entrer : on prépare le replay (sinon, la fête tout de suite)
+  const replayPrepare = dist => {
+    const tE = T(),
+      lanceur = F.moi && tLache && tE - tLache < 2.6,
+      t0 = Math.max(HIST.length ? HIST[0].t : tE, lanceur ? tLache - 0.65 : tE - 1.8),
+      h = HIST.filter(q => q.t >= t0);
+    if (h.length < 8) return fete();
+    h.push({ ...h[h.length - 1], t: tE, f: [0, TOP - 0.25, CZ, F.a, 1], tient: 0 });
+    RP = { h, tE, tL: lanceur ? tLache : 0, tau: h[0].t, t0: tE + 0.35, etat: 'attente', plan: 0, dist, sauve: { x: C.x, y: C.y, z: C.z, phi: C.phi } };
+    F.vol = 0;
+  };
+  const DEBUT3 = 0.38; // le plan sur la cheminée commence 0,38 s (enregistrées) avant l'arrivée
+  const vitesse = tau => (tau > RP.tE - DEBUT3 ? 0.17 : RP.tL && Math.abs(tau - RP.tL) < 0.2 ? 0.2 : RP.tL && tau < RP.tL ? 0.42 : 0.5);
+  const etatA = tau => {
+    const h = RP.h;
     let i = 0;
-    while (i < h.length - 2 && h[i + 1].t < tt) i++;
+    while (i < h.length - 2 && h[i + 1].t < tau) i++;
     const a = h[i],
       b = h[i + 1],
-      u = Math.max(0, Math.min(1, (tt - a.t) / (b.t - a.t || 1)));
-    for (const q of ['x', 'y', 'z', 'a']) F[q] = a[q] + (b[q] - a[q]) * u;
-    F.in = F.y < TOP && Math.abs(F.x) < OX && Math.abs(F.z - CZ) < OZ ? 1 : 0;
-    if (T() - RP.t0 > RP.d + 0.6) {
+      u = Math.max(0, Math.min(1, (tau - a.t) / (b.t - a.t || 1))),
+      m = (p, q) => p.map((v, j) => v + (q[j] - v) * u);
+    return { f: m(a.f, b.f), c: u < 0.5 ? a.c : b.c, cp: m(a.c.slice(0, 4), b.c.slice(0, 4)), tient: a.tient };
+  };
+  const planA = tau => (tau > RP.tE - DEBUT3 ? 3 : RP.tL && tau < RP.tL + 0.25 ? 1 : 2);
+  const visee = (cx, cy, cz, tx, ty, tz) => {
+    const dh = Math.hypot(tx - cx, tz - cz) || 1e-3;
+    return { x: cx, z: cz, yaw: Math.atan2(tx - cx, tz - cz), h: cy - CAM, p: Math.atan2(cy - ty, dh) };
+  };
+  const camPlan = (pl, e, k) => {
+    const [fx, fy, fz] = e.f;
+    if (pl == 1) {
+      // contre-plongée de trois quarts face, qui se rapproche doucement
+      const [cx, cy, cz, phi] = e.cp,
+        a = phi + 0.95,
+        dd = 2.35 - 0.4 * k;
+      return visee(cx + Math.sin(a) * dd, 0.95, cz + Math.cos(a) * dd, cx, cy + 1.35, cz);
+    }
+    // sens du vol (d'après l'enregistrement juste avant)
+    const av = etatA(Math.max(RP.h[0].t, RP.tau - 0.12)).f,
+      dx0 = fx - av[0],
+      dz0 = fz - av[2],
+      n0 = Math.hypot(dx0, dz0),
+      dx = n0 > 0.02 ? dx0 / n0 : -fx / (Math.hypot(fx, CZ - fz) || 1),
+      dz = n0 > 0.02 ? dz0 / n0 : (CZ - fz) / (Math.hypot(fx, CZ - fz) || 1);
+    if (pl == 2) {
+      // caméra de poursuite : derrière le fichier, un peu sur le côté et au-dessus, elle regarde un peu devant lui
+      const cx = fx - dx * 1.7 + dz * 0.7,
+        cz = fz - dz * 1.7 - dx * 0.7;
+      return visee(cx, Math.max(0.6, fy + 0.35), cz, fx + dx * 0.5, fy, fz + dz * 0.5);
+    }
+    // au ras de la cheminée, de côté par rapport à l'arrivée du fichier, qui se rapproche
+    const a = Math.atan2(dx, dz) + (RP.cote || (RP.cote = Math.random() < 0.5 ? 1.75 : -1.75)),
+      r = 1.45 - 0.3 * k;
+    return visee(Math.sin(a) * r, TOP + 0.3, CZ + Math.cos(a) * r, (fx + 0) / 2, Math.max(TOP - 0.05, (fy + TOP) / 2), (fz + CZ) / 2);
+  };
+  // le choc de l'arrivée : flash, étincelles dorées, bouffée de fumée
+  const impact = () => {
+    bruit('entre');
+    const [x, y] = P(0, TOP, CZ);
+    for (let i = 0; i < 60; i++)
+      eclats.push({ x, y, vx: (Math.random() - 0.5) * 520, vy: -120 - Math.random() * 380, t: 1, c: ['#ffd76a', '#fff3b0', '#ff9a3c', '#ffffff'][i % 4] });
+    for (let i = 0; i < 14; i++)
+      fumees.push({ x: (Math.random() - 0.5) * 0.4, y: TOP + 0.1, z: CZ, r: 0.08 + Math.random() * 0.08, a: 0.8, v: 0.8 + Math.random() });
+  };
+  const replay = dt => {
+    const R = RP;
+    if (!R) return null;
+    const now = T();
+    if (R.etat == 'attente') {
+      if (now < R.t0) return null;
+      Object.assign(R, { etat: 'volet', tv: now });
+      bruit('replay');
+      o.classList.add('replay');
+    }
+    if (R.etat == 'volet') {
+      if (now - R.tv < 0.22) return null; // le volet couvre l'écran : on coupe au milieu
+      R.etat = 'joue';
+    }
+    if (R.etat == 'joue') {
+      R.tau = Math.min(R.tE, R.tau + dt * vitesse(R.tau));
+      if (R.tau >= R.tE) (Object.assign(R, { etat: 'impact', ti: now }), impact());
+    }
+    if (R.etat == 'impact' && now - R.ti > 1) (Object.assign(R, { etat: 'sortie', ts: now }), bruit('replay'));
+    if (R.etat == 'sortie' && now - R.ts > 0.22) {
+      // fin du replay : tout reprend sa place, puis la fête
       RP = null;
-      Object.assign(F, { in: 1, vol: 1, x: 0, y: TOP - 0.3, z: CZ, vx: 0, vy: -1, vz: 0 });
-      fete(1);
+      R.fini = now;
+      volet.dernier = R;
+      Object.assign(C, R.sauve, { tient: 0, charge: 0, tir: -9, pose: -9 });
+      Object.assign(F, { in: 1, vol: 1, x: 0, y: TOP - 0.3, z: CZ, vx: 0, vy: -1, vz: 0, al: 1 });
+      fete();
       return null;
     }
-    // caméra : sur le côté de la trajectoire, du côté où l'on était, et elle suit le fichier
-    const A = h[0],
-      dx = -A.x,
-      dz = CZ - A.z,
-      n = Math.hypot(dx, dz) || 1,
-      mx = (A.x + 0) / 2,
-      mz = (A.z + CZ) / 2,
-      cote = (V.x - mx) * (dz / n) - (V.z - mz) * (dx / n) >= 0 ? 1 : -1,
-      L = Math.max(3.2, n * 0.75),
-      cx = mx + (dz / n) * cote * L,
-      cz = mz - (dx / n) * cote * L,
-      dh = Math.hypot(F.x - cx, F.z - cz) || 1;
-    return { x: cx, z: cz, yaw: Math.atan2(F.x - cx, F.z - cz), h: -0.9, p: Math.atan2(CAM - 0.9 - F.y, dh) * 0.85, kx: 2.2, kh: 2.2 };
+    // Célestine et le fichier, tels qu'ils étaient à cet instant
+    const e = etatA(R.tau),
+      [, , , , ch, ta, pa] = e.c;
+    // l'âge du tir et de l'atterrissage enregistrés : la pose de lancer est rejouée telle quelle
+    Object.assign(C, { x: e.cp[0], y: e.cp[1], z: e.cp[2], phi: e.cp[3], charge: ch, tir: now - ta, pose: now - pa, tient: 0, ange: 0, emote: null });
+    const [fx, fy, fz, fa] = e.f;
+    Object.assign(F, { x: fx, y: fy, z: fz, a: fa, al: 1, in: fy < TOP && Math.abs(fx) < OX && Math.abs(fz - CZ) < OZ ? 1 : 0 });
+    // la caméra du plan en cours (coupe franche à chaque changement de plan)
+    const pl = planA(R.tau);
+    if (pl != R.plan) Object.assign(R, { plan: pl, cut: now, debutPlan: R.tau, cam: null });
+    const finPlan = pl == 1 ? (R.tL || R.tau) + 0.25 : pl == 2 ? R.tE - DEBUT3 : R.tE,
+      k = Math.max(0, Math.min(1, (R.tau - R.debutPlan) / Math.max(0.05, finPlan - R.debutPlan))),
+      cible = camPlan(pl, e, k);
+    if (!R.cam) R.cam = cible;
+    else {
+      const q = Math.min(1, dt * (pl == 2 ? 7 : 4)),
+        ang = (a, b) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * q;
+      R.cam = { x: R.cam.x + (cible.x - R.cam.x) * q, z: R.cam.z + (cible.z - R.cam.z) * q, h: R.cam.h + (cible.h - R.cam.h) * q, yaw: ang(R.cam.yaw, cible.yaw), p: ang(R.cam.p, cible.p) };
+    }
+    return R.cam;
   };
-  // bandes noires façon retransmission sportive, et le badge « REPLAY »
-  const bandeau = t => {
-    if (!RP) return;
-    const k = Math.min(1, (T() - RP.t0 + 0.5) / 0.4),
-      b = H * 0.09 * k;
-    c.fillStyle = '#05070f';
-    c.fillRect(0, 0, W, b);
-    c.fillRect(0, H - b, W, b);
-    if (k < 1) return;
-    c.font = '800 15px system-ui,sans-serif';
-    c.textAlign = 'left';
-    c.textBaseline = 'middle';
-    c.fillStyle = Math.sin(t * 6) > 0 ? '#ff3b3b' : '#7a1d1d';
-    c.beginPath();
-    c.arc(22, H - b / 2, 6, 0, 7);
-    c.fill();
-    c.fillStyle = '#ffffff';
-    c.fillText('REPLAY', 36, H - b / 2);
-    c.fillStyle = '#ffffff99';
-    c.fillText('× 0,3', 108, H - b / 2);
+  // les volets d'entrée et de sortie : trois bandes en biais (rose, or, nuit) qui balaient l'écran
+  const volet = u => {
+    if (u <= 0 || u >= 1) return;
+    const sk = H * 0.45,
+      L = W + sk * 2;
+    [
+      ['#ff6fa3', 0],
+      ['#ffd76a', 0.08],
+      ['#0b1430', 0.16]
+    ].forEach(([col, dl]) => {
+      const v = Math.max(0, Math.min(1, (u - dl) / (1 - 0.16))),
+        x0 = -L + v * (L * 2 + W * 0.2),
+        w = W * 0.55;
+      c.fillStyle = col;
+      c.beginPath();
+      c.moveTo(x0, H);
+      c.lineTo(x0 + sk, 0);
+      c.lineTo(x0 + sk + w, 0);
+      c.lineTo(x0 + w, H);
+      c.closePath();
+      c.fill();
+    });
+    if (u > 0.3 && u < 0.7) {
+      c.fillStyle = '#ffffff';
+      c.font = `italic 900 ${Math.round(Math.min(W, H) * 0.09)}px Georgia,serif`;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText('REPLAY', W / 2, H / 2);
+    }
+  };
+  // l'habillage du replay : bandes noires, vignette, traînée derrière le fichier, logo « REPLAY », bandeau, flashs
+  const habillage = t => {
+    const R = RP || volet.dernier,
+      now = T();
+    if (!R) return;
+    if (R.fini) {
+      // le volet de sortie finit de passer, par-dessus la fête
+      volet(0.5 + (now - R.fini) / 0.45);
+      if (now - R.fini > 0.25) volet.dernier = null;
+      return;
+    }
+    if (R.etat == 'attente') return;
+    const dedans = R.etat != 'volet';
+    if (dedans) {
+      // vignette sombre sur les bords
+      const vg = c.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
+      vg.addColorStop(0, '#00000000');
+      vg.addColorStop(1, '#000000a0');
+      c.fillStyle = vg;
+      c.fillRect(0, 0, W, H);
+      // traînée lumineuse derrière le fichier en vol
+      const e = etatA(R.tau);
+      if (!e.tient && R.plan > 1) {
+        const pts = [];
+        for (let i = 0; i <= 12; i++) {
+          const q = etatA(Math.max(R.h[0].t, R.tau - 0.28 * (i / 12)));
+          if (q.tient) break;
+          const [x, y, , d] = P(q.f[0], q.f[1], q.f[2]);
+          if (d > 0.2) pts.push([x, y]);
+        }
+        for (let i = 1; i < pts.length; i++) {
+          const k = 1 - i / pts.length;
+          c.strokeStyle = `rgba(255,${200 + Math.round(40 * k)},${220},${0.65 * k})`;
+          c.lineWidth = 2 + 10 * k;
+          c.lineCap = 'round';
+          c.beginPath();
+          c.moveTo(pts[i - 1][0], pts[i - 1][1]);
+          c.lineTo(pts[i][0], pts[i][1]);
+          c.stroke();
+        }
+      }
+      // flash blanc à chaque coupe, et grand flash à l'arrivée
+      const fl = Math.max(R.cut ? 0.5 * Math.max(0, 1 - (now - R.cut) / 0.12) : 0, R.ti ? 0.85 * Math.max(0, 1 - (now - R.ti) / 0.35) : 0);
+      if (fl > 0) {
+        c.fillStyle = `rgba(255,252,240,${fl})`;
+        c.fillRect(0, 0, W, H);
+      }
+      // bandes noires
+      const b = H * 0.085;
+      c.fillStyle = '#05070f';
+      c.fillRect(0, 0, W, b);
+      c.fillRect(0, H - b, W, b);
+      // logo « REPLAY » en haut à gauche, et la vitesse du ralenti
+      c.textBaseline = 'middle';
+      c.textAlign = 'left';
+      c.font = '900 14px system-ui,sans-serif';
+      const lx = 18,
+        ly = b / 2;
+      c.fillStyle = '#e0234e';
+      c.beginPath();
+      c.roundRect ? c.roundRect(lx, ly - 13, 104, 26, 6) : c.rect(lx, ly - 13, 104, 26);
+      c.fill();
+      c.fillStyle = '#ffffff';
+      c.fillText('⏪ REPLAY', lx + 10, ly + 1);
+      c.fillStyle = Math.sin(t * 7) > 0 ? '#ffffff' : '#ffffff55';
+      c.beginPath();
+      c.arc(lx + 118, ly, 4.5, 0, 7);
+      c.fill();
+      c.fillStyle = '#ffd76a';
+      c.font = '800 13px system-ui,sans-serif';
+      c.fillText(R.etat == 'impact' ? 'LIVRÉ !' : `RALENTI ×${String(vitesse(R.tau).toFixed(2)).replace('.', ',')}`, lx + 132, ly + 1);
+      // bandeau « Célestine » pendant le vol (il glisse depuis la gauche)
+      if (R.plan == 2 || R.plan == 3) {
+        const u = Math.min(1, (now - (R.bandeauT || (R.bandeauT = now))) / 0.35),
+          ez = 1 - (1 - u) * (1 - u),
+          bx = -260 + ez * 278,
+          by = H - b - 62;
+        c.fillStyle = '#0b1430e6';
+        c.fillRect(bx, by, 250, 46);
+        c.fillStyle = '#ff6fa3';
+        c.fillRect(bx, by, 6, 46);
+        c.fillStyle = '#ffffff';
+        c.font = '900 16px system-ui,sans-serif';
+        c.fillText('CÉLESTINE', bx + 16, by + 15);
+        c.fillStyle = '#ffd76a';
+        c.font = '700 13px system-ui,sans-serif';
+        c.fillText(R.dist ? `Livraison spéciale · ${R.dist.toFixed(1).replace('.', ',')} m` : 'Livraison spéciale', bx + 16, by + 33);
+      }
+    }
+    if (R.tv && now - R.tv < 0.45) volet((now - R.tv) / 0.45);
+    if (R.ts) volet((now - R.ts) / 0.45);
   };
   const dessinBoule = b => {
     const [x, y, s, d] = P(b.x, b.y, b.z);
@@ -6045,9 +6552,8 @@ function mysLancer(cb, fic) {
     const K = C.chute,
       dc = K ? T() - K.t : 0;
     let cible = { yaw: ctl.yaw, h: 0, p: 0, kx: 6, kh: 6 };
-    const rp = replay(); // le replay du tir gagnant prend la main sur la caméra
-    if (rp) cible = rp;
-    else if (K && dc < 1.15) {
+    const rp = replay(dt); // le replay du tir gagnant prend la main sur la caméra
+    if (K && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
         q = (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1,
@@ -6072,18 +6578,19 @@ function mysLancer(cb, fic) {
     Vt.z = cible.z != null ? cible.z : C.z - Math.cos(Vt.yaw) * 2.6;
     const kc = Math.min(1, dt * cible.kx),
       kh = Math.min(1, dt * cible.kh);
-    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K ? 4 : rp ? 6 : 14));
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K ? 4 : 14));
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
     V.h += (cible.h - V.h) * kh;
     V.p += (cible.p - V.p) * kh;
+    if (rp) Object.assign(V, rp);
     hy = hc - f * Math.tan(V.p);
-    // la secousse au moment où elle touche le sol
-    const sec = K && K.sol ? Math.max(0, 0.4 - (T() - K.sol)) : 0;
+    // la secousse au moment où elle touche le sol (ou à l'arrivée du fichier, pendant le replay)
+    const sec = Math.max(K && K.sol ? Math.max(0, 0.4 - (T() - K.sol)) : 0, RP && RP.ti ? Math.max(0, 0.35 - (T() - RP.ti)) : 0);
     V.sx = sec * (Math.random() - 0.5) * 30;
     V.sy = sec * (Math.random() - 0.5) * 30;
     hist();
-    marche(dt);
+    if (!RP || RP.etat == 'attente') marche(dt); // pendant le replay, Célestine est rejouée (voir replay)
     valentin(dt);
     chatMaj(dt);
     pigeons(dt);
@@ -6136,13 +6643,13 @@ function mysLancer(cb, fic) {
       boules.forEach(b => L.push([prof(b.x, b.z), () => dessinBoule(b)]));
       // le chat : sur la cheminée, il passe devant elle
       if (CHAT.e) L.push([prof(CHAT.x, CHAT.z) - (CHAT.y > TOP - 0.3 ? 0.05 : 0), () => chatDessin(t)]);
-      PIG.forEach(p => p.e != 'loin' && L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
+      PIG.forEach(p => L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
     }
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
     devant(t);
-    bandeau(t);
+    habillage(t);
     // fondu au noir avant de réapparaître sur le toit, puis retour de l'image
     const nr =
       C.chute && C.chute.noir ? Math.min(1, (T() - C.chute.noir) / 0.35) : C.revient ? Math.max(0, 1 - (T() - C.revient) / 0.5) : 0;
@@ -6280,11 +6787,9 @@ function mysLancer(cb, fic) {
 }
 
 // le fichier choisi : d'abord le lancer dans la cheminée, puis on l'ouvre
-function mysOpen(input) {
-  const f = input.files[0];
-  input.value = '';
-  if (!f) return;
-  mysLancer(g => mysLire(g || f), f);
+// on monte directement sur le toit, les mains vides : Célestine prend le fichier dans la boîte aux lettres (voir mysLancer)
+function mysToit() {
+  mysLancer(g => mysLire(g));
 }
 async function mysLire(f) {
   try {
@@ -6325,10 +6830,9 @@ addEventListener('change', e => {
   const t = e.target;
   if (!t.classList) return;
   if (t.classList.contains('mysmk')) mysMake(t);
-  else if (t.classList.contains('mysop')) mysOpen(t);
 });
 function mysBtn() {
-  return `<label class="btn mysb">🎁 Ouvrir le fichier mystère de Valentin<input type="file" class="fpick mysop"></label>`;
+  return `<label class="btn mysb" onclick="mysToit()">🎁 Ouvrir le fichier mystère de Valentin</label>`;
 }
 /* ---------- Mode admin : importer les MP3 ---------- */
 const nrm = t =>

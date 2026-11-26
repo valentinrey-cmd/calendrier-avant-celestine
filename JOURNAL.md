@@ -3,6 +3,26 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : on monte sur le toit les mains vides, pigeons et replay refaits, record du plus long lancer réussi
+- **Ouvrir le fichier mystère** (menu de démarrage, Paramètres, Trésors) n'ouvre plus le sélecteur de fichiers : on arrive directement sur le toit, les mains vides. Un message dit « 📮 Va prendre le fichier dans la boîte aux lettres ! » et une flèche rose rebondit au-dessus de la boîte jusqu'à ce qu'un fichier soit pris. Le texte de l'écran « Avant de commencer… » l'explique aussi. L'ancien `mysOpen()` et les champs de fichier cachés sont supprimés.
+- **Pigeons refaits** :
+  - Posés, ce sont de vrais pigeons vus de profil, de face ou de dos selon la caméra : corps dodu, cou irisé vert-violet, deux barres noires sur l'aile, queue à bout noir, œil orange, pattes roses.
+  - Ils picorent, se retournent et marchent en hochant la tête.
+  - Quand on les dérange, toute la bande décolle d'un coup (bond et battements rapides). Elle tourne en rond au-dessus des toits en alternant battements et vol plané, puis chacun revient en planant et se cabre pour se poser.
+  - En vol, ils sont dessinés en vraie 3D : ailes déployées qui battent, bouts d'ailes sombres. Ils sont justes sous tous les angles.
+- **Replay refait, façon retransmission sportive** :
+  - Un volet rose, or et nuit balaie l'écran avec « REPLAY », puis l'action est rejouée en trois plans :
+    1. Célestine qui arme et lâche le fichier (contre-plongée de trois quarts face, elle est rejouée avec ses vrais gestes) ;
+    2. une caméra qui poursuit le fichier en vol, avec une traînée lumineuse et un bandeau « CÉLESTINE · Livraison spéciale · 4,4 m » ;
+    3. un gros plan au ras de la cheminée quand il tombe dedans.
+  - Le ralenti varie : plus lent au lâcher et à l'arrivée.
+  - Flash blanc à chaque coupe, logo « ⏪ REPLAY » et « RALENTI ×0,17 » en haut, vignette et bandes noires.
+  - À l'arrivée : grand flash, secousse et gerbe d'étincelles dorées, puis un volet de sortie, la fête et la danse.
+  - Les boutons et les messages sont cachés pendant le replay. Nouveau bruitage « whoosh » pour les volets.
+- **Records** : nouveau record « Plus long lancer réussi », la plus longue distance d'un lancer qui entre dans la cheminée. Quand plusieurs records tombent en même temps, ils s'annoncent l'un après l'autre.
+- Version : 1795722628
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/menu-demarrer.js`, `2026/js/puzzle.js`, `2026/js/langue-anglais.js`, `2026/css/06-boss-playlist.css`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-26 · Fichier mystère : boîte aux lettres, fichier noirci, passes, chat, pigeons, records, replay
 - **Boîte aux lettres 📮** : une boîte jaune sur un poteau, à gauche sur le toit. Quand Célestine s'en approche, un anneau brille dans la neige, le drapeau se lève et un bouton « 📮 Choisir un fichier » apparaît. Il ouvre le sélecteur du téléphone (Photos, Fichiers, Téléchargements, appareil photo…). Le fichier choisi apparaît dans sa main avec son vrai aspect.
 - **Mauvais fichier recraché** : seul le vrai fichier mystère (vérifié par son contenu, pas seulement son nom) s'ouvre dans la cheminée. Un autre fichier est recraché vers Célestine, noirci de suie, avec des bords qui rougeoient et une fumée noire (« Ho ho… ce n’est pas le bon fichier ! 🎅 Choisis-en un autre dans la boîte aux lettres 📮 »). Ça ne compte pas comme un raté. Avant, un mauvais fichier finissait en erreur après le lancer.

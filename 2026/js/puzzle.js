@@ -439,7 +439,7 @@ setInterval(() => {
 /* ---------- Image du puzzle (import + recadrage) ---------- */
 addEventListener('change', e => {
   const c = e.target.classList;
-  if (e.target.type == 'file' && !c.contains('mpick') && !c.contains('mysmk') && !c.contains('mysop')) onPick(e);
+  if (e.target.type == 'file' && !c.contains('mpick') && !c.contains('mysmk')) onPick(e);
 });
 function onPick(e) {
   const f = e.target.files[0];

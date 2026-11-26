@@ -1705,12 +1705,12 @@ p.vc-b {
   font-size: 1.4rem;
   box-shadow: 0 4px 12px #0005;
 }
-.mysl.replay .mysl-h small,
+.mysl.replay .mysl-h,
+.mysl.replay .mysl-tip,
+.mysl.replay .mysl-sec,
 .mysl.replay .mysl-joy,
 .mysl.replay .mysl-lance,
-.mysl.replay .mysl-emo,
-.mysl.replay .mysl-rec-b,
-.mysl.replay .mysl-pas {
+.mysl.replay .mysl-emo {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;

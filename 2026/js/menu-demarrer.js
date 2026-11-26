@@ -301,7 +301,7 @@ function smOpen(force, at) {
    <h3 class="sm-h">🎄 Décorations</h3>${deco.map(x => `<div class="sm-row"><span>${x.ic} ${esc(x.n)}</span><button class="sm-tg ${S[x.id] !== false ? 'on' : ''}" data-dc="${x.id}">${S[x.id] !== false ? 'ON' : 'OFF'}</button></div>`).join('') || '<p class="sm-small">Fabrique des décorations au 🧪 labo pour les activer ici.</p>'}
    <h3 class="sm-h">💘 Amour</h3><div class="sm-row col"><span>💘 Niveau d’amour</span><input type="range" class="sm-rg sm-love" min="0" max="100" value="100"><small class="sm-rv sm-lovev">100 %</small></div>
    <h3 class="sm-h">📲 Sauvegarde</h3><div class="sm-row"><span>📤 Copier mon code</span><button class="sm-tg on" data-a="exp">Copier</button></div><div class="sm-row"><span>📥 Coller un code</span><button class="sm-tg on" data-a="imp">Coller</button></div>
-   <div class="sm-row"><span>🎁 Fichier mystère</span><label class="sm-tg on sm-mys">Ouvrir<input type="file" class="fpick mysop"></label></div>
+   <div class="sm-row"><span>🎁 Fichier mystère</span><label class="sm-tg on sm-mys" onclick="mysToit()">Ouvrir</label></div>
    ${(() => {
      try {
        return APP.web() && !APP.standalone()
@@ -720,7 +720,7 @@ function smOpen(force, at) {
         log('fichier mystère demandé');
         panel(
           '🎁 Fichier mystère',
-          `<div class="sm-c" style="font-size:64px;line-height:1">🎁🔒</div><p class="sm-c big">Avant de commencer…</p><p class="sm-c">Valentin t’a préparé un <b>fichier mystère</b>. Il faut l’ouvrir pour pouvoir lancer le jeu.</p><p class="sm-small center"><b>1.</b> Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).<br><b>2.</b> Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.</p><p class="center"><a class="sm-tg sm-mysdl" href="${CONTENU.mysLien}" target="_blank" rel="noopener">📥 Télécharger le fichier mystère</a></p><p class="center"><label class="sm-tg on sm-mys sm-mysbig">🎁 Ouvrir le fichier mystère<input type="file" class="fpick mysop"></label></p>`,
+          `<div class="sm-c" style="font-size:64px;line-height:1">🎁🔒</div><p class="sm-c big">Avant de commencer…</p><p class="sm-c">Valentin t’a préparé un <b>fichier mystère</b>. Il faut l’ouvrir pour pouvoir lancer le jeu.</p><p class="sm-small center"><b>1.</b> Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).<br><b>2.</b> Reviens ici et touche le second bouton : sur le toit, prends le fichier dans la boîte aux lettres 📮 et choisis-le dans tes téléchargements.</p><p class="center"><a class="sm-tg sm-mysdl" href="${CONTENU.mysLien}" target="_blank" rel="noopener">📥 Télécharger le fichier mystère</a></p><p class="center"><label class="sm-tg on sm-mys sm-mysbig" onclick="mysToit()">🎁 Ouvrir le fichier mystère</label></p>`,
           [
             ['← Retour', () => scr('menu'), 'alt'],
             ['😢 Je ne l’ai pas', () => toastM('📩 Demande-le à Valentin : sans lui, l’enquête ne peut pas commencer !'), 'alt']
