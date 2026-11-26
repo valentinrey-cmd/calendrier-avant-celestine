@@ -4,6 +4,19 @@
 
 ---
 
+## 26 novembre 2026 (9 h 30) : fiches des suspects cohérentes, plus de « témoin » (version 1795680570)
+
+- **« Témoin » retiré** partout pour Valentin (liste des auditions, nom du boss du jour 22, titre de la scène, source de la pièce). Il est traité comme les autres suspects.
+- **Photo de Valérie :** le cadre rond blanc sur fond doré est enlevé. C'est maintenant une photo pleine avec un fond flou, comme les autres (`media/persos/valerie.webp` remplacée).
+- **Fiches des suspects :** la description ne dit plus d'avance ce qu'on découvrira (« Mardi, le bracelet est resté une heure sur sa table », « Elle a ouvert le casier »…). Elle dit seulement qui est la personne et quand Célestine l'a vue.
+- **Premières déclarations :** tout le monde ne ment plus.
+  - Seul Edgar ment franchement (« Ton sac ? Je n'y ai pas touché »).
+  - Noémie, Emma, Nora, Eya et Sandrine disent des choses vraies mais incomplètes : elles taisent ce qu'elles avoueront plus tard.
+  - Erika, Valérie et Valentin disent la vérité.
+- **Liste des auditions :** le prénom est sur sa propre ligne (il était collé au texte « Pas encore convoqué·e »).
+- Traductions anglaises des nouveaux textes ajoutées, et l'ancienne de Valérie retirée.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`, `2026/js/enquete/dossier-accusation.js`, `2026/js/boss/boss.js`, `2026/js/histoire.js`, `2026/js/langue-anglais.js`, `2026/css/08-dossier.css`, `2026/media/persos/valerie.webp`, `CLAUDE.md`.
+
 ## 25 novembre 2026 (16 h 30) : histoire plus naturelle, moins d'indices trop directs (version 1795615188)
 
 - **Prologue :** Pépin prend une déposition normale (« Je prends votre déclaration. Vous l'avez depuis quand ? ») au lieu de « Je ne sais rien de vous, rien de ce bracelet… ». Célestine cite elle-même Valentin parmi les gens vus dans la semaine : Pépin ne demande plus « quelqu'un qui a les clés de chez vous ? ». « Noté quand même… c'est ce qui m'intrigue » devient « Je note tout le monde, c'est la procédure. »

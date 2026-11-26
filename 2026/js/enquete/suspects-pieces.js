@@ -11,8 +11,8 @@ const SUSP = [
       '💼 Lance son entreprise d’ongles',
       '💑 En couple avec Jean-Baptiste'
     ],
-    d: 'Amie de lycée de Célestine. Mardi, le bracelet est resté une heure sur sa table.',
-    dep: '« Pendant les ongles, tu as gardé ton bracelet au poignet. Je n’y ai pas touché. »',
+    d: 'Amie de lycée de Célestine. Mardi soir, elle lui a posé ses ongles chez elle.',
+    dep: '« Tu avais ton bracelet en arrivant, et tu l’avais en repartant. »',
     a: 'Le bracelet était au poignet de Célestine le mercredi et le jeudi.'
   },
   {
@@ -27,8 +27,8 @@ const SUSP = [
       '💑 En couple avec Côme, parti au Vietnam',
       '🏠 Parents à Neuville'
     ],
-    d: 'Amie de lycée de Célestine. Jeudi, elle avait son sac sur les genoux.',
-    dep: '« Ton sac ? Je n’y ai pas touché de la soirée. »',
+    d: 'Amie de lycée de Célestine. Jeudi soir, elles ont dîné au resto avec Noémie.',
+    dep: '« Pizza, potins, dessert. Une soirée normale. »',
     a: 'Pendant qu’elle avait le sac, le bracelet était au poignet de Célestine.'
   },
   {
@@ -37,8 +37,8 @@ const SUSP = [
     img: 'nora',
     r: 'Copine de fac (pharma)',
     tr: ['🧪 Au TP vendredi matin', '📚 Toujours à la BU'],
-    d: 'Copine de promo. Elle était juste à côté de Célestine au TP du vendredi.',
-    dep: '« Ta trousse ? Je ne l’ai jamais ouverte. »',
+    d: 'Copine de promo. Au TP du vendredi matin, elle était à côté de Célestine.',
+    dep: '« J’étais à fond sur ma manip, je n’ai rien remarqué. »',
     a: 'À 8 h 45, la trousse était déjà vide.'
   },
   {
@@ -47,8 +47,8 @@ const SUSP = [
     img: 'erika',
     r: 'Copine de fac (pharma)',
     tr: ['🤳 Prend des photos de tout', '🧪 Au TP vendredi matin'],
-    d: 'Copine de promo. Ses photos ont souvent un temps d’avance.',
-    dep: '« J’ai rien vu, j’étais concentrée sur ma manip. »',
+    d: 'Copine de promo. Elle était aussi au TP du vendredi matin.',
+    dep: '« J’ai pris quelques photos, comme d’hab. Je te les envoie si ça peut aider ! »',
     a: 'Ses photos montrent tout le monde… sauf elle près du sac.'
   },
   {
@@ -57,8 +57,8 @@ const SUSP = [
     img: 'eya',
     r: 'Copine de fac (pharma)',
     tr: ['🛍️ Adore Bellecour', '🧪 A quitté le TP en avance vendredi'],
-    d: 'Copine de promo. Vendredi, elle est partie du TP avant tout le monde.',
-    dep: '« Vendredi après-midi, j’étais à la BU. »',
+    d: 'Copine de promo. Vendredi, elle a quitté le TP avant la fin.',
+    dep: '« Je suis partie un peu plus tôt, j’avais un truc à faire. »',
     a: 'Elle était à Bellecour… et c’est elle qui a vu quelque chose.'
   },
   {
@@ -67,7 +67,7 @@ const SUSP = [
     img: 'edgar',
     r: 'Le grand frère de Célestine',
     tr: ['🏠 Chez sa mère, Valérie, à Reyrieux', '🌯 Fan de tacos', '🥂 Le roi des toasts', '🛫 Agence de location à Saint-Exupéry'],
-    d: 'Deux ans de plus que Célestine. Le sac est resté tout le week-end dans l’entrée de sa maison.',
+    d: 'Son grand frère, deux ans de plus qu’elle. Il était à Reyrieux tout le week-end.',
     dep: '« Ton sac ? Je n’y ai pas touché de tout le week-end. »',
     a: 'Il a vidé tout le sac vendredi soir : il n’y avait déjà plus de bracelet.'
   },
@@ -77,7 +77,7 @@ const SUSP = [
     img: 'parents',
     r: 'La mère de Célestine',
     tr: ['🏡 Reyrieux', '🧺 Range tout ce qui traîne'],
-    d: 'Elle a accueilli Célestine tout le week-end et a rangé son sac samedi matin.',
+    d: 'Sa mère. Elle a accueilli Célestine à Reyrieux tout le week-end.',
     dep: '« J’ai juste rangé ton sac dans ta chambre, ma chérie. »',
     a: 'Valérie a rangé le sac samedi : trousse, porte-monnaie, clés, et rien d’autre.'
   },
@@ -87,8 +87,8 @@ const SUSP = [
     img: 'sandrine',
     r: 'Collègue à la pharmacie',
     tr: ['💊 Préparatrice à la pharmacie de Reyrieux', '🧴 Toujours les mains sèches'],
-    d: 'Collègue du samedi. Elle a ouvert le casier de Célestine.',
-    dep: '« Ton casier ? Je ne l’ai jamais ouvert. »',
+    d: 'Collègue de Célestine à la pharmacie de Reyrieux, le samedi.',
+    dep: '« Un samedi de rush, comme d’habitude. Je n’ai même pas eu le temps de déjeuner. »',
     a: 'Dans le casier, il n’y avait que le sac, sans bracelet.'
   },
   {
@@ -876,7 +876,7 @@ const PIECES = [
     id: 'a22',
     a: 22,
     ic: '🗣️',
-    src: 'Audition de Valentin (témoin)',
+    src: 'Audition de Valentin',
     t: 'Déclaration · Valentin',
     k: 'aveu',
     who: 'valentin',

@@ -245,7 +245,7 @@ Object.assign(STORY, {
     ]
   },
   b22: {
-    t: 'Audition · Valentin (témoin)',
+    t: 'Audition · Valentin',
     sc: 'audit',
     l: [
       ['n', 'Jour 22. Dernière convocation sur le bureau de Pépin.', { fx: 'ein' }],

@@ -162,7 +162,7 @@ function enqHTML(t) {
           won = (S.boss || {})[d],
           done = A[d],
           g = PIECES.find(p => p.id == a.gain);
-        return `<div class="au-c ${done ? 'done' : ''}"><div class="au-p">${susPic(x)}</div><div><small>Jour ${d}</small><b>${esc(a.n)}${a.who == 'valentin' ? ' · témoin' : ''}</b>${done ? `<q>${esc(g.body.replace(/^« | »$/g, ''))}</q>` : won ? `<button class="sm" onclick="audGo(${d})">🗣️ Lire ${a.who == 'valentin' ? 'sa déposition' : 'ses aveux'}</button>` : `<span class="pn">${+d <= unl() ? 'Bats le boss du jour pour l’auditionner.' : 'Pas encore convoqué·e.'}</span>`}</div></div>`;
+        return `<div class="au-c ${done ? 'done' : ''}"><div class="au-p">${susPic(x)}</div><div><small>Jour ${d}</small><b>${esc(a.n)}</b>${done ? `<q>${esc(g.body.replace(/^« | »$/g, ''))}</q>` : won ? `<button class="sm" onclick="audGo(${d})">🗣️ Lire ${a.who == 'valentin' ? 'sa déposition' : 'ses aveux'}</button>` : `<span class="pn">${+d <= unl() ? 'Bats le boss du jour pour l’auditionner.' : 'Pas encore convoqué·e.'}</span>`}</div></div>`;
       })
       .join('')}`;
   }

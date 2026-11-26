@@ -128,7 +128,7 @@ Avant d'écrire du code, choisis l'endroit selon ce tableau. **Ne crée pas de n
 - 19 2048 (boss : Sandrine)
 - 20 Les 7 différences
 - 21 Relier les points
-- 22 Sauve Célestine (boss : Valentin, témoin)
+- 22 Sauve Célestine (boss : Valentin)
 - 23 Tu me connais par cœur ?
 - 24 Puzzle final, puis l'accusation et le boss final
 

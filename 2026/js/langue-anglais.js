@@ -3097,8 +3097,6 @@ window.TRADUCTIONS_EN = {
   'Le vrai coupable court toujours… Retour au dossier. 🗂️': 'The real culprit is still on the loose… Back to the file. 🗂️',
   'La mère de Célestine': 'Célestine’s mother',
   '🧺 Range tout ce qui traîne': '🧺 Tidies up everything lying around',
-  'Elle a accueilli Célestine tout le week-end et a rangé son sac samedi matin.':
-    'She had Célestine over all weekend and tidied her bag on Saturday morning.',
   '« J’ai juste rangé ton sac dans ta chambre, ma chérie. »': '“I just put your bag away in your room, sweetheart.”',
   '🏠 Chez sa mère, Valérie, à Reyrieux': '🏠 At his mother Valérie’s in Reyrieux',
   'Personnes vues dans la semaine : Noémie, Emma, Nora, Erika, Eya, Edgar, Valérie, Sandrine, Valentin.':
@@ -3131,5 +3129,19 @@ window.TRADUCTIONS_EN = {
   'Corrections dans l’album photo': 'Photo album fixes',
   'Sauvegarde de la progression plus fiable': 'More reliable progress saving',
   'Amélioration des cinématiques': 'Improved cutscenes',
-  'Corrections dans les textes': 'Text fixes'
+  'Corrections dans les textes': 'Text fixes',
+  'Amie de lycée de Célestine. Mardi soir, elle lui a posé ses ongles chez elle.': "Célestine's high-school friend. On Tuesday evening, she did her nails at her place.",
+  '« Tu avais ton bracelet en arrivant, et tu l’avais en repartant. »': '“You had your bracelet when you arrived, and you had it when you left.”',
+  'Amie de lycée de Célestine. Jeudi soir, elles ont dîné au resto avec Noémie.': "Célestine's high-school friend. On Thursday evening, they had dinner at a restaurant with Noémie.",
+  '« Pizza, potins, dessert. Une soirée normale. »': '“Pizza, gossip, dessert. A normal evening.”',
+  'Copine de promo. Au TP du vendredi matin, elle était à côté de Célestine.': "Classmate. At Friday morning's lab, she was next to Célestine.",
+  '« J’étais à fond sur ma manip, je n’ai rien remarqué. »': "“I was fully into my experiment, I didn't notice anything.”",
+  'Copine de promo. Elle était aussi au TP du vendredi matin.': "Classmate. She was also at Friday morning's lab.",
+  '« J’ai pris quelques photos, comme d’hab. Je te les envoie si ça peut aider ! »': "“I took a few photos, as usual. I'll send them if it helps!”",
+  'Copine de promo. Vendredi, elle a quitté le TP avant la fin.': 'Classmate. On Friday, she left the lab before the end.',
+  '« Je suis partie un peu plus tôt, j’avais un truc à faire. »': '“I left a bit early, I had something to do.”',
+  'Son grand frère, deux ans de plus qu’elle. Il était à Reyrieux tout le week-end.': 'Her big brother, two years older. He was in Reyrieux all weekend.',
+  'Sa mère. Elle a accueilli Célestine à Reyrieux tout le week-end.': 'Her mother. She had Célestine over in Reyrieux all weekend.',
+  'Collègue de Célestine à la pharmacie de Reyrieux, le samedi.': "Célestine's colleague at the Reyrieux pharmacy, on Saturdays.",
+  '« Un samedi de rush, comme d’habitude. Je n’ai même pas eu le temps de déjeuner. »': "“A busy Saturday, as usual. I didn't even have time for lunch.”"
 };

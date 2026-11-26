@@ -324,6 +324,13 @@
 .au-c.done {
   border-color: #2f8f5b;
 }
+.au-c b {
+  display: block;
+}
+.au-c .pn {
+  font-size: 0.82rem;
+  color: #6f5a44;
+}
 .au-c small {
   display: block;
   color: #8a6a3a;
