@@ -3,6 +3,15 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : on lance depuis l'endroit où Célestine a marché
+- Le saut et le bouton « Sauter » sont supprimés (code, styles, bruit, traductions). À pied, on ne fait que marcher.
+- « 🎯 Revenir au lancer » place la caméra un peu derrière Célestine, à l'endroit où elle s'est arrêtée, et dans la direction où elle regarde. On lance droit devant soi : si elle ne regarde pas la cheminée, on ne peut pas la mettre dedans. On peut aussi aller derrière la cheminée et lancer de là, ou lancer dans n'importe quelle autre direction.
+- Toute la scène s'affiche maintenant depuis n'importe quel point du toit et dans n'importe quelle direction : le ciel, la lune, la ville et les maisons voisines forment un panorama sur 360°, le toit (tuiles, faîtage, gouttière, côtés) et la cheminée sont dessinés en vrai volume (on voit les côtés tournés vers nous), et les objets derrière la caméra sont cachés. La caméra se déplace en douceur entre la vue d'ensemble (à pied) et la vue derrière Célestine.
+- La précision demandée s'adapte à la distance (plus on est près, plus il faut être précis), pour que la difficulté reste la même partout.
+- Le fichier qui sort par la gouttière (en bas du toit) tombe du toit au lieu de rebondir.
+- Version 1795707790
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Célestine à pied : vrai personnage en volume, elle pivote sans effet « feuille de papier »
 - Les trois dessins séparés (dos, face, profil) et leur demi-tour « aplati » sont supprimés. Célestine est maintenant un personnage en volume : chaque partie (tête, visage, lunettes, nez, oreilles, queue-de-cheval, écharpe, bras, moufles, jambes, bottes, doudoune, capuche, fermeture éclair) a sa vraie place autour d'elle. Elle pivote en continu vers l'endroit où elle va, avec toutes les positions intermédiaires (trois-quarts dos, profil, trois-quarts face).
 - Style revu : fins contours, ombres sur le côté loin de nous, reflet dans les cheveux, bottes qui pointent vers l'avant. Elle marche avec de vraies enjambées sous tous les angles, et elle se tourne vers nous pour fêter la réussite.

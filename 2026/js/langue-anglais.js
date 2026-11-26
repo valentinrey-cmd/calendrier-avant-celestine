@@ -3241,7 +3241,5 @@ window.TRADUCTIONS_EN = {
   '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
   '🚶 Y aller à pied': '🚶 Go on foot',
   '🎯 Revenir au lancer': '🎯 Back to throwing',
-  'Sauter': 'Jump',
-  'Touche le toit pour la faire marcher, puis saute devant la cheminée.': 'Tap the roof to make her walk, then jump in front of the chimney.',
-  'Mets-toi bien en face de la cheminée, puis saute ! 🦘': 'Stand right in front of the chimney, then jump! 🦘'
+  'Touche le toit pour la faire marcher. Reviens au lancer : tu lanceras d’où elle est, dans la direction où elle regarde.': 'Tap the roof to make her walk. Go back to throwing: you’ll throw from where she stands, in the direction she’s facing.'
 };

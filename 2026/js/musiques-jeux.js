@@ -1144,16 +1144,11 @@ function mysSons(A, musique = true) {
       feu.g.gain.setTargetAtTime(0.07, t + 1.4, 0.4);
       [1047, 1319, 1568, 2093, 2637].forEach((f, i) => cloche(t + 0.45 + i * 0.09, f, 0.05));
     },
-    // Célestine à pied : ses pas dans la neige, et son saut
+    // Célestine à pied : ses pas dans la neige
     pas: k => {
       const t = now();
       souffle(t, 0.09, 0.06 * (0.4 + k), 'lowpass', 1500, 450, 0.8, 0.005);
       souffle(t + 0.02, 0.03, 0.02, 'bandpass', 2600 + Math.random() * 900, 0, 2, 0.002);
-    },
-    hop: () => {
-      const t = now();
-      ton(t, 320, 0.18, 0.06, 'sine', 640);
-      souffle(t, 0.2, 0.05, 'bandpass', 600, 1600, 1, 0.02);
     },
     // les surprises
     eboule: () => {
@@ -1269,7 +1264,7 @@ function mysLancer(cb, fic) {
   }
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass on">🚶 Y aller à pied</button><button class="mysl-saut">Sauter</button>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass on">🚶 Y aller à pied</button>`;
   document.body.appendChild(o);
   // les bruitages et la musique (sauf si le son est coupé dans les paramètres)
   let son = null;
@@ -1389,7 +1384,7 @@ function mysLancer(cb, fic) {
             : 0.05
           : ob.r;
   const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
-    BORD = 0.75; // bord du toit côté caméra (la gouttière)
+    BORD = 0.6; // gouttière (le bas du toit) : au-delà, le fichier tombe du toit
   const taille = () => {
     dpr = Math.min(2, devicePixelRatio || 1);
     W = innerWidth;
@@ -1401,22 +1396,90 @@ function mysLancer(cb, fic) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     f = Math.min(W * 0.95, H * 0.55);
     hy = H * 0.3;
-    voisins = Array.from({ length: Math.ceil(W / 70) + 2 }, (_, i) => ({
+    voisins = Array.from({ length: Math.ceil((2 * Math.PI * f) / 70) }, (_, i) => ({
       x: i * 70 - 30 + ((i * 23) % 17),
       w: 60 + ((i * 31) % 30),
       h: 16 + ((i * 17) % 14)
     }));
-    ville = Array.from({ length: Math.ceil(W / 14) + 2 }, (_, i) => ({
+    ville = Array.from({ length: Math.ceil((2 * Math.PI * f) / 14) }, (_, i) => ({
       x: i * 14 - 7,
       h: 10 + ((i * 37) % 23) + (i % 5 == 0 ? 14 : 0),
       w: (i * 13) % 4
     }));
   };
-  const P = (x, y, z) => [W / 2 + (x * f) / z, hy - ((y - CAM) * f) / z, f / z]; // projection : [x écran, y écran, échelle]
+  // caméra : par défaut au bord du toit, face à la cheminée ; en lançant depuis l'endroit où Célestine a marché,
+  // elle se place derrière elle et regarde dans la même direction (V = où elle est, Vt = où elle va, en douceur)
+  const V = { x: 0, z: 0, yaw: 0 },
+    Vt = { x: 0, z: 0, yaw: 0 };
+  const cam = (x, z) => {
+    const dx = x - V.x,
+      dz = z - V.z,
+      co = Math.cos(V.yaw),
+      si = Math.sin(V.yaw);
+    return [dx * co - dz * si, dx * si + dz * co]; // [à droite, devant]
+  };
+  // point « devant la caméra » (lx à droite, lz devant) → monde
+  const loc = (lx, lz) => [V.x + Math.cos(V.yaw) * lx + Math.sin(V.yaw) * lz, V.z - Math.sin(V.yaw) * lx + Math.cos(V.yaw) * lz];
+  const P = (x, y, z) => {
+    const [xr, zr] = cam(x, z),
+      zz = Math.max(0.05, zr);
+    return [W / 2 + (xr * f) / zz, hy - ((y - CAM) * f) / zz, f / zz, zr]; // projection : [x écran, y écran, échelle, profondeur]
+  };
+  const prof = (x, z) => cam(x, z)[1];
+  // polygone du monde (points [x, y, z]) coupé au ras de la caméra, puis dessiné
+  const poly = pts => {
+    const q = pts.map(([x, y, z]) => [...cam(x, z), y]),
+      out = [];
+    for (let i = 0; i < q.length; i++) {
+      const a = q[i],
+        b = q[(i + 1) % q.length],
+        ia = a[1] >= 0.12,
+        ib = b[1] >= 0.12;
+      if (ia) out.push(a);
+      if (ia != ib) {
+        const k = (0.12 - a[1]) / (b[1] - a[1]);
+        out.push([a[0] + (b[0] - a[0]) * k, 0.12, a[2] + (b[2] - a[2]) * k]);
+      }
+    }
+    c.beginPath();
+    out.forEach(([xr, zr, y], i) => {
+      const px = W / 2 + (xr * f) / zr,
+        py = hy - ((y - CAM) * f) / zr;
+      i ? c.lineTo(px, py) : c.moveTo(px, py);
+    });
+    c.closePath();
+    return out.length > 2;
+  };
+  // le ciel et la ville au loin forment un panorama tout autour (PW = un tour complet, en pixels)
+  const pano = (px, marge = 120) => {
+    const PW = 2 * Math.PI * f;
+    let x = (((px - V.yaw * f) % PW) + PW) % PW;
+    if (x > PW - marge) x -= PW;
+    return x < W + marge ? x : null;
+  };
   // nouveau fichier : il remonte en douceur depuis le bas de l'écran
   const depart = () => (
     bruit('glisse', 0),
-    (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 })
+    (F = {
+      lx: 0,
+      x: 0,
+      y: Y0,
+      z: Z0,
+      vx: 0,
+      vy: 0,
+      vz: 0,
+      a: -0.08,
+      va: 0,
+      vol: 0,
+      in: 0,
+      sol: 0,
+      t: 0,
+      arret: 0,
+      al: 1,
+      ent: 1,
+      tombe: 0
+    }),
+    ([F.x, F.z] = loc(0, Z0))
   );
   taille();
   depart();
@@ -1424,8 +1487,8 @@ function mysLancer(cb, fic) {
   idle = 0;
   fumees = [];
   eclats = [];
-  etoiles = Array.from({ length: 90 }, () => ({
-    x: Math.random(),
+  etoiles = Array.from({ length: 560 }, () => ({
+    x: Math.random() * 7, // en « largeurs d'écran » autour du panorama
     y: Math.random() * 0.33,
     r: Math.random() * 1.3 + 0.3,
     p: Math.random() * 6
@@ -1442,15 +1505,18 @@ function mysLancer(cb, fic) {
     c.fillStyle = g;
     c.fillRect(0, 0, W, H);
     etoiles.forEach(s => {
+      const sx = pano((s.x / 7) * 2 * Math.PI * f, 4);
+      if (sx == null) return;
       c.globalAlpha = 0.45 + 0.4 * Math.sin(t * 2 + s.p);
       c.fillStyle = '#fff';
       c.beginPath();
-      c.arc(s.x * W, s.y * H, s.r, 0, 7);
+      c.arc(sx, s.y * H, s.r, 0, 7);
       c.fill();
     });
     c.globalAlpha = 1;
-    const mx = W * 0.8,
+    const mx = pano(W * 0.8),
       my = H * 0.13;
+    if (mx == null) return;
     g = c.createRadialGradient(mx, my, 10, mx, my, 90);
     g.addColorStop(0, '#fff6d655');
     g.addColorStop(1, '#fff6d600');
@@ -1472,76 +1538,96 @@ function mysLancer(cb, fic) {
     });
   };
   const lyon = () => {
-    // colline de Fourvière et sa basilique, puis les toits de la ville
-    const base = hy + 6;
+    // colline de Fourvière et sa basilique, puis les toits de la ville, tout autour
+    const base = hy + 6,
+      fx = pano(0, W * 0.35);
     c.fillStyle = '#121d3f';
-    c.beginPath();
-    c.moveTo(0, base);
-    c.quadraticCurveTo(W * 0.12, base - 52, W * 0.3, base - 30);
-    c.lineTo(W * 0.3, base);
-    c.fill();
-    const bx = W * 0.15,
-      by = base - 50;
-    c.fillRect(bx - 18, by - 12, 36, 14);
-    c.fillRect(bx - 18, by - 22, 6, 12);
-    c.fillRect(bx + 12, by - 22, 6, 12);
-    c.fillRect(bx - 4, by - 18, 8, 8);
-    c.fillStyle = '#ffd27a';
-    c.fillRect(bx - 1, by - 8, 2, 3);
-    c.fillStyle = '#18264f';
-    ville.forEach(b => {
-      c.fillRect(b.x, base - b.h, 13, b.h + 4);
-      if (b.w == 1) c.fillRect(b.x + 3, base - b.h - 5, 3, 5);
-    });
-    c.fillStyle = '#ffcf6e';
+    if (fx != null) {
+      c.beginPath();
+      c.moveTo(fx, base);
+      c.quadraticCurveTo(fx + W * 0.12, base - 52, fx + W * 0.3, base - 30);
+      c.lineTo(fx + W * 0.3, base);
+      c.fill();
+      const bx = fx + W * 0.15,
+        by = base - 50;
+      c.fillRect(bx - 18, by - 12, 36, 14);
+      c.fillRect(bx - 18, by - 22, 6, 12);
+      c.fillRect(bx + 12, by - 22, 6, 12);
+      c.fillRect(bx - 4, by - 18, 8, 8);
+      c.fillStyle = '#ffd27a';
+      c.fillRect(bx - 1, by - 8, 2, 3);
+    }
     ville.forEach((b, i) => {
-      if (i % 3 == 0) c.fillRect(b.x + 3, base - b.h + 4, 2.5, 2.5);
-      if (i % 4 == 1) c.fillRect(b.x + 8, base - b.h + 9, 2.5, 2.5);
+      const x = pano(b.x, 20);
+      if (x == null) return;
+      c.fillStyle = '#18264f';
+      c.fillRect(x, base - b.h, 13, b.h + 4);
+      if (b.w == 1) c.fillRect(x + 3, base - b.h - 5, 3, 5);
+      c.fillStyle = '#ffcf6e';
+      if (i % 3 == 0) c.fillRect(x + 3, base - b.h + 4, 2.5, 2.5);
+      if (i % 4 == 1) c.fillRect(x + 8, base - b.h + 9, 2.5, 2.5);
     });
   };
   const toit = () => {
-    // pan de toit enneigé qui part au loin
-    const pts = [P(-9, 0, 0.6), P(9, 0, 0.6), P(9, 0, 8.5), P(-9, 0, 8.5)];
-    let g = c.createLinearGradient(0, pts[2][1], 0, H);
-    g.addColorStop(0, '#c9d6ee');
-    g.addColorStop(1, '#f4f8ff');
-    c.fillStyle = g;
-    c.beginPath();
-    pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
-    c.closePath();
-    c.fill();
+    // le bas des maisons voisines (on le voit quand on regarde le long du toit)
+    c.fillStyle = '#1a2850';
+    c.fillRect(0, hy + 30, W, H);
+    // pan de toit enneigé
+    if (
+      poly([
+        [-9, 0, 0.6],
+        [9, 0, 0.6],
+        [9, 0, RIDGE],
+        [-9, 0, RIDGE]
+      ])
+    ) {
+      const g = c.createLinearGradient(0, hy + 20, 0, H);
+      g.addColorStop(0, '#c9d6ee');
+      g.addColorStop(1, '#f4f8ff');
+      c.fillStyle = g;
+      c.fill();
+    }
     // rangées de tuiles qui dépassent de la neige
     c.strokeStyle = '#9fb0cf';
-    for (let z = 1; z < 8.5; z *= 1.16) {
-      const [a, ay] = P(-9, 0, z),
-        [b] = P(9, 0, z),
-        s = f / z;
-      c.lineWidth = Math.max(0.5, s * 0.012);
-      c.globalAlpha = 0.55;
+    c.globalAlpha = 0.55;
+    for (let z = 1; z < RIDGE; z *= 1.16) {
       c.beginPath();
-      for (let x = Math.max(a, -20); x < Math.min(b, W + 20); x += Math.max(6, s * 0.18)) {
-        c.moveTo(x, ay);
-        c.quadraticCurveTo(x + s * 0.045, ay + s * 0.02, x + s * 0.09, ay);
+      let on = 0;
+      for (let x = -9; x <= 9; x += 0.3) {
+        const [px, py, sc, d] = P(x, 0, z);
+        if (d < 0.3) {
+          on = 0;
+          continue;
+        }
+        c.lineWidth = Math.max(0.5, sc * 0.012);
+        on ? c.lineTo(px, py) : c.moveTo(px, py);
+        on = 1;
       }
       c.stroke();
     }
     c.globalAlpha = 1;
-    // faîtage au loin
-    const [rx1, ry1] = P(-9, 0, 8.5),
-      [rx2] = P(9, 0, 8.5);
-    c.fillStyle = '#e9eff9';
-    c.fillRect(rx1, ry1 - 3, rx2 - rx1, 5);
+    // bords du toit enneigés : faîtage, gouttière, côtés
+    c.strokeStyle = '#e9eff9';
+    c.lineWidth = 5;
+    [
+      [-9, RIDGE, 9, RIDGE],
+      [-9, 0.6, 9, 0.6],
+      [-9, 0.6, -9, RIDGE],
+      [9, 0.6, 9, RIDGE]
+    ].forEach(([x1, z1, x2, z2]) => {
+      if (
+        poly([
+          [x1, 0, z1],
+          [x2, 0, z2],
+          [x2, 0.06, z2],
+          [x1, 0.06, z1]
+        ])
+      ) {
+        c.fillStyle = '#e9eff9';
+        c.fill();
+      }
+    });
     guirlandeFaite(performance.now() / 1000);
-  };
-  const quad = (a, b, d, e, col) => {
-    c.fillStyle = col;
-    c.beginPath();
-    c.moveTo(a[0], a[1]);
-    c.lineTo(b[0], b[1]);
-    c.lineTo(d[0], d[1]);
-    c.lineTo(e[0], e[1]);
-    c.closePath();
-    c.fill();
   };
   const ouverture = () => {
     c.beginPath();
@@ -1552,20 +1638,90 @@ function mysLancer(cb, fic) {
     }
     c.closePath();
   };
-  const chemineeFond = t => {
-    // côtés et dessus (derrière le fichier quand il est loin)
-    const fl = [P(-CX, 0, CZ - CD), P(CX, 0, CZ - CD), P(CX, TOP, CZ - CD), P(-CX, TOP, CZ - CD)],
-      bl = [P(-CX, 0, CZ + CD), P(CX, 0, CZ + CD), P(CX, TOP, CZ + CD), P(-CX, TOP, CZ + CD)];
-    // ombre au sol
+  // les 4 côtés de la cheminée : coins du bas (x, z) et sens vers l'extérieur
+  const FACES = [
+    [
+      [-CX, CZ - CD],
+      [CX, CZ - CD],
+      [0, -1]
+    ],
+    [
+      [CX, CZ - CD],
+      [CX, CZ + CD],
+      [1, 0]
+    ],
+    [
+      [CX, CZ + CD],
+      [-CX, CZ + CD],
+      [0, 1]
+    ],
+    [
+      [-CX, CZ + CD],
+      [-CX, CZ - CD],
+      [-1, 0]
+    ]
+  ];
+  const faceVue = ([a, b, [nx, nz]]) => nx * (V.x - (a[0] + b[0]) / 2) + nz * (V.z - (a[1] + b[1]) / 2) > 0;
+  const briques = ([a, b, [nx]]) => {
+    // un côté en briques, vu sous n'importe quel angle
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]),
+      at = (u, y) => P(a[0] + (b[0] - a[0]) * u, y, a[1] + (b[1] - a[1]) * u);
+    poly([
+      [a[0], 0, a[1]],
+      [b[0], 0, b[1]],
+      [b[0], TOP, b[1]],
+      [a[0], TOP, a[1]]
+    ]);
+    const [x0] = at(0, 0),
+      [x1] = at(1, 0),
+      g = c.createLinearGradient(x0, 0, x1, 0);
+    g.addColorStop(0, nx ? '#94382a' : '#b4462f');
+    g.addColorStop(1, nx ? '#7d2f22' : '#9a3b28');
+    c.fillStyle = g;
+    c.fill();
+    const sc = at(0.5, 0)[2];
+    c.strokeStyle = '#6e2619';
+    c.lineWidth = Math.max(0.6, sc * 0.012);
+    for (let r = 0, y = 0; y < TOP - 0.01; r++, y += 0.11) {
+      const p = at(0, y),
+        q = at(1, y);
+      c.beginPath();
+      c.moveTo(p[0], p[1]);
+      c.lineTo(q[0], q[1]);
+      for (let u = ((r % 2) * 0.13) / L; u < 1; u += 0.26 / L) {
+        const m = at(u, y),
+          n = at(u, Math.min(TOP, y + 0.11));
+        c.moveTo(m[0], m[1]);
+        c.lineTo(n[0], n[1]);
+      }
+      c.stroke();
+    }
+    // neige accumulée au pied
+    const p1 = P(a[0] + (a[0] - b[0]) * 0.12, 0, a[1] + (a[1] - b[1]) * 0.12),
+      p2 = P(b[0] + (b[0] - a[0]) * 0.12, 0, b[1] + (b[1] - a[1]) * 0.12);
+    c.fillStyle = '#ffffff';
+    c.beginPath();
+    c.moveTo(p1[0], p1[1]);
+    c.quadraticCurveTo((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2 - sc * 0.16, p2[0], p2[1]);
+    c.fill();
+  };
+  // la cheminée entière : dessus, braise au fond, fichier qui tombe dedans, puis les côtés visibles
+  const cheminee = (t, dedans) => {
     c.fillStyle = '#8796b833';
     const [sx, sy, ss] = P(0.35, 0, CZ + 0.6);
     c.beginPath();
     c.ellipse(sx, sy, ss * 0.9, ss * 0.18, 0, 0, 7);
     c.fill();
-    quad(fl[1], bl[1], bl[2], fl[2], '#7d2f22'); // côté droit
-    quad(fl[0], bl[0], bl[3], fl[3], '#8e3626'); // côté gauche
-    // dessus : couronne de pierre + neige
-    quad(fl[3], fl[2], bl[2], bl[3], '#cfd8e6');
+    // couronne de pierre et neige
+    const E = 0.06;
+    poly([
+      [-CX - E, TOP, CZ - CD - E],
+      [CX + E, TOP, CZ - CD - E],
+      [CX + E, TOP, CZ + CD + E],
+      [-CX - E, TOP, CZ + CD + E]
+    ]);
+    c.fillStyle = '#e4eaf3';
+    c.fill();
     ouverture();
     const [ox, oy, os] = P(0, TOP, CZ),
       g = c.createRadialGradient(ox, oy + os * 0.05, 2, ox, oy, os * 0.5);
@@ -1577,63 +1733,37 @@ function mysLancer(cb, fic) {
     c.strokeStyle = '#6a6f7c';
     c.lineWidth = Math.max(1, os * 0.03);
     c.stroke();
+    if (dedans) dedans();
+    FACES.filter(faceVue).forEach(fa => {
+      briques(fa);
+      // rebord de pierre au-dessus du côté
+      const [a, b, [nx, nz]] = fa;
+      poly([
+        [a[0] + nx * E - nz * E, TOP - 0.02, a[1] + nz * E + nx * E],
+        [b[0] + nx * E + nz * E, TOP - 0.02, b[1] + nz * E - nx * E],
+        [b[0] + nx * E + nz * E, TOP + 0.05, b[1] + nz * E - nx * E],
+        [a[0] + nx * E - nz * E, TOP + 0.05, a[1] + nz * E + nx * E]
+      ]);
+      c.fillStyle = '#d8dee8';
+      c.fill();
+      // neige en festons sur le rebord
+      const p = P(a[0] + nx * E, TOP + 0.05, a[1] + nz * E),
+        q = P(b[0] + nx * E, TOP + 0.05, b[1] + nz * E),
+        sc = (p[2] + q[2]) / 2;
+      c.fillStyle = '#ffffff';
+      c.beginPath();
+      c.moveTo(p[0], p[1]);
+      for (let i = 1; i <= 10; i++) {
+        const xx = p[0] + ((q[0] - p[0]) * i) / 10,
+          yy = p[1] + ((q[1] - p[1]) * i) / 10;
+        c.quadraticCurveTo(xx - (q[0] - p[0]) / 20, yy - sc * (0.05 + (i % 3) * 0.015), xx, yy - sc * 0.01);
+      }
+      c.lineTo(q[0], q[1] + sc * 0.03);
+      c.lineTo(p[0], p[1] + sc * 0.03);
+      c.fill();
+    });
     // petite fumée tranquille
     if (Math.random() < 0.12) fumees.push({ x: (Math.random() - 0.5) * 0.3, y: TOP + 0.05, z: CZ, r: 0.08, a: 0.35, v: 0.35 });
-  };
-  const briques = (x0, x1, y0, y1, z) => {
-    const a = P(x0, y0, z),
-      b = P(x1, y1, z),
-      s = f / z;
-    let g = c.createLinearGradient(a[0], 0, b[0], 0);
-    g.addColorStop(0, '#b4462f');
-    g.addColorStop(1, '#9a3b28');
-    c.fillStyle = g;
-    c.fillRect(a[0], b[1], b[0] - a[0], a[1] - b[1]);
-    const rh = 0.11 * s,
-      bw = 0.26 * s;
-    c.strokeStyle = '#6e2619';
-    c.lineWidth = Math.max(0.6, s * 0.012);
-    for (let r = 0, yy = a[1]; yy > b[1]; r++, yy -= rh) {
-      c.beginPath();
-      c.moveTo(a[0], yy);
-      c.lineTo(b[0], yy);
-      c.stroke();
-      for (let xx = a[0] + (r % 2) * bw * 0.5; xx < b[0]; xx += bw) {
-        c.beginPath();
-        c.moveTo(xx, yy);
-        c.lineTo(xx, Math.max(b[1], yy - rh));
-        c.stroke();
-      }
-    }
-    // reflets de lune
-    c.fillStyle = '#ffffff10';
-    c.fillRect(a[0], b[1], (b[0] - a[0]) * 0.18, a[1] - b[1]);
-  };
-  const chemineeDevant = () => {
-    briques(-CX, CX, 0, TOP, CZ - CD);
-    // rebord de pierre et neige
-    const a = P(-CX - 0.06, TOP, CZ - CD),
-      b = P(CX + 0.06, TOP, CZ - CD),
-      s = f / (CZ - CD);
-    c.fillStyle = '#d8dee8';
-    c.fillRect(a[0], a[1] - s * 0.02, b[0] - a[0], s * 0.07);
-    c.fillStyle = '#ffffff';
-    c.beginPath();
-    c.moveTo(a[0], a[1]);
-    for (let i = 0; i <= 10; i++) {
-      const xx = a[0] + ((b[0] - a[0]) * i) / 10;
-      c.quadraticCurveTo(xx - s * 0.03, a[1] - s * (0.05 + (i % 3) * 0.015), xx, a[1] - s * 0.01);
-    }
-    c.lineTo(b[0], a[1] + s * 0.03);
-    c.quadraticCurveTo((a[0] + b[0]) / 2, a[1] + s * 0.09, a[0], a[1] + s * 0.03);
-    c.fill();
-    // neige accumulée au pied
-    const p1 = P(-CX - 0.15, 0, CZ - CD - 0.05),
-      p2 = P(CX + 0.15, 0, CZ - CD - 0.05);
-    c.beginPath();
-    c.moveTo(p1[0], p1[1]);
-    c.quadraticCurveTo((p1[0] + p2[0]) / 2, p1[1] - s * 0.16, p2[0], p2[1]);
-    c.fill();
   };
   const rr = (x, y, w, h, r) => {
     c.beginPath();
@@ -1646,8 +1776,8 @@ function mysLancer(cb, fic) {
   };
   const ombre = () => {
     if (F.in) return;
-    const [x, y, s] = P(F.x, 0, Math.max(0.6, F.z));
-    if (y > H + 20) return;
+    const [x, y, s, d] = P(F.x, 0, F.z);
+    if (d < 0.3 || y > H + 20) return;
     if (F.tombe || F.al <= 0) return;
     const k = Math.max(0.15, 1 - F.y / 4) * Math.min(1, F.al);
     c.fillStyle = `rgba(60,75,110,${0.28 * k})`;
@@ -1726,9 +1856,9 @@ function mysLancer(cb, fic) {
     c.textBaseline = 'alphabetic';
   };
   const fichier = () => {
-    const [x, y, s] = P(F.x, F.y, F.z),
+    const [x, y, s, d] = P(F.x, F.y, F.z),
       k = s * 0.0042; // le fichier mesure ~ 50 × 64 « unités » à 1 m
-    if (F.al <= 0) return;
+    if (F.al <= 0 || d < 0.15) return;
     c.save();
     c.globalAlpha = Math.max(0, Math.min(1, F.al));
     c.translate(x, y);
@@ -1799,7 +1929,8 @@ function mysLancer(cb, fic) {
       p.y += p.v * dt;
       p.r += dt * 0.12;
       p.x += Math.sin(p.y * 3) * dt * 0.05;
-      const [x, y, s] = P(p.x, p.y, p.z);
+      const [x, y, s, d] = P(p.x, p.y, p.z);
+      if (d < 0.3) return;
       c.fillStyle = `rgba(225,232,245,${p.a})`;
       c.beginPath();
       c.arc(x, y, p.r * s, 0, 7);
@@ -1832,10 +1963,10 @@ function mysLancer(cb, fic) {
   };
   const guide = t => {
     // main qui montre le geste, tant qu'on n'a pas lancé
-    if (F.vol || drag || fin || C) return;
+    if (F.vol || drag || fin || pied) return;
     idle += 1;
     if (idle < 70) return;
-    const [x, y, s] = P(0, Y0, Z0),
+    const [x, y, s] = P(...(([a, b]) => [a, Y0, b])(loc(0, Z0))),
       k = ((t * 0.9) % 1.4) / 1.4,
       yy = y + s * 0.05 - k * s * 0.55;
     c.globalAlpha = Math.sin(Math.min(1, k * 1.4) * Math.PI) * 0.9;
@@ -1865,7 +1996,10 @@ function mysLancer(cb, fic) {
   const voisinsDessin = t => {
     // une rangée de toits voisins enneigés, avec leurs fenêtres allumées
     const base = hy + 30;
-    voisins.forEach((v, i) => {
+    voisins.forEach((v0, i) => {
+      const x = pano(v0.x, v0.w + 10);
+      if (x == null) return;
+      const v = { ...v0, x };
       c.fillStyle = '#1d2c5a';
       c.fillRect(v.x, base - v.h, v.w, v.h + 40);
       c.beginPath();
@@ -1966,10 +2100,11 @@ function mysLancer(cb, fic) {
   const traineau = (t, dt) => {
     const tp = traineauPos(t);
     if (tp) {
-      const [x, y, s] = P(tp.x, tp.y, TZ);
+      const [x, y, s, d] = P(tp.x, tp.y, TZ);
+      if (d < 4) return; // trop près de la caméra : il passe au-dessus de nous
       return traineauDessin(x - s * 0.15, y, 0, t, traineauEchelle(s));
     }
-    if (!crash) return;
+    if (!crash || prof(crash.x, TZ) < 1) return;
     // touché : il tournoie et s'écrase sur le toit
     if (!crash.boum) {
       crash.vy -= G * dt;
@@ -2021,8 +2156,8 @@ function mysLancer(cb, fic) {
   const guirlandeFaite = t => {
     // guirlande d'ampoules le long du faîtage
     for (let x = -8.6; x <= 8.6; x += 0.45) {
-      const [px, py, s] = P(x, 0.02 + Math.abs(Math.sin(x * 3.5)) * 0.05, RIDGE);
-      if (px < -10 || px > W + 10) continue;
+      const [px, py, s, d] = P(x, 0.02 + Math.abs(Math.sin(x * 3.5)) * 0.05, RIDGE);
+      if (d < 0.3 || px < -10 || px > W + 10) continue;
       const i = Math.round(x / 0.45);
       ampoule(px, py - s * 0.02, Math.max(1.3, s * 0.03), COUL[(i + 50) % 5], Math.sin(t * 2.5 + i) > -0.4);
     }
@@ -2043,7 +2178,8 @@ function mysLancer(cb, fic) {
     return 1;
   };
   const obstacle = (ob, t) => {
-    const [x, y, s] = P(ob.x, 0, ob.z);
+    const [x, y, s, d] = P(ob.x, 0, ob.z);
+    if (d < 0.4) return; // derrière la caméra
     // ombre
     c.fillStyle = '#7d8db033';
     c.beginPath();
@@ -2415,12 +2551,8 @@ function mysLancer(cb, fic) {
     }
     if (F.tombe) return;
     // bord du toit côté caméra : il ne revient pas vers nous
-    if (F.z < BORD && F.y < 0.5) {
-      F.z = BORD;
-      F.vz = Math.abs(F.vz) * 0.25;
-    }
     // il passe le faîtage (ou sort tout à fait sur le côté) : il tombe de l'autre côté, caché derrière le faîtage
-    if (F.z > RIDGE || Math.abs(F.x) > 9) {
+    if (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9) {
       if (F.y < 0.05 && !F.tombe) {
         F.tombe = 1;
         bruit('tombe');
@@ -2461,7 +2593,6 @@ function mysLancer(cb, fic) {
     F.vz *= 0.2;
     if (fin) return;
     fin = 1;
-    if (C) C.joie = T();
     o.querySelector('.mysl-n i').textContent = '1';
     o.querySelector('.mysl-n').classList.add('ok');
     tip.textContent = 'Ho ho ho ! 🎅 Bien reçu !';
@@ -2520,49 +2651,43 @@ function mysLancer(cb, fic) {
   };
   /* ===================== Célestine à pied ===================== */
   // Bouton « Y aller à pied » : une petite Célestine (vue de dos) apparaît avec le fichier à la main.
-  // On touche le toit pour qu'elle y marche, puis « Sauter » devant la cheminée pour y glisser le fichier.
+  // On touche le toit pour qu'elle y marche ; en revenant au lancer, on lance d'où elle est, dans la direction où elle regarde.
   let C = null,
     cible = null;
-  const saut = o.querySelector('.mysl-saut'),
-    consigne = o.querySelector('.mysl-h small'),
+  const consigne = o.querySelector('.mysl-h small'),
     CONSIGNE = consigne.textContent;
   const sol = (sx, sy) => {
     // point du toit (y = 0) sous le doigt
     if (sy <= hy + 4) return null;
-    const z = (CAM * f) / (sy - hy);
-    return { x: ((sx - W / 2) * z) / f, z };
+    const zr = (CAM * f) / (sy - hy),
+      [x, z] = loc(((sx - W / 2) * zr) / f, zr);
+    return { x, z };
   };
-  // bien placée pour sauter : juste devant (ou derrière) la cheminée
-  const presDe = () => C && Math.abs(Math.abs(C.z - CZ) - CD - 0.5) < 0.42 && Math.abs(C.x) < CX + 0.25;
-  const enFace = () => presDe() && Math.abs(C.x) < OX - 0.12;
   // Célestine est un petit personnage « en volume » : chaque partie a sa place autour d'elle (en cm, X = sa droite,
   // Y = hauteur, Z = devant elle). C.phi = le sens où elle regarde : 0 = de dos (elle s'éloigne), π/2 = vers la droite,
   // π = vers nous. Elle pivote vraiment : toutes les positions entre de dos, de profil et de face existent.
   const proj = (X, Y, Z) => {
-    const cs = Math.cos(C.phi),
-      sn = Math.sin(C.phi);
+    const cs = Math.cos(C.phi - V.yaw),
+      sn = Math.sin(C.phi - V.yaw);
     return [X * cs + Z * sn, -Y, X * sn - Z * cs]; // [x écran, y écran, profondeur vers nous]
   };
   const poses = () => {
     const sw = Math.sin(C.ph),
-      a = C.amp,
-      joie = C.joie && T() - C.joie < 2.5,
-      w = Math.sin(T() * 12) * 4;
-    if (joie) return { d: [19, 196 + w, 4], g: [-19, 196 - w, 4] };
-    if (C.saute && C.tient) return { d: [9, 198, 6], g: [-30, 122, 2] };
-    if (C.saute) return { d: [30, 122, 2], g: [-30, 122, 2] };
+      a = C.amp;
     return { d: [25, 87 + sw * 1.5 * a, sw * 10 * a], g: [-24 + Math.abs(sw) * 1.5 * a, 85 - Math.abs(sw) * 2 * a, -sw * 18 * a] };
   };
   const main = () => {
     // le fichier suit sa main droite (même calcul que le dessin)
+    // (proj donne un décalage à droite de la caméra et une profondeur vers elle : on les remet dans le monde)
     const [X, Y, Z] = poses().d,
       [px, , pd] = proj(X, Y, Z),
       bob = Math.abs(Math.cos(C.ph)) * 0.022 * C.amp,
-      haut = Y > 150;
+      co = Math.cos(V.yaw),
+      si = Math.sin(V.yaw);
     return {
-      x: C.x + px / 100,
-      y: C.y + bob + Y / 100 + (haut ? 0.1 : -0.11),
-      z: C.z - pd / 100,
+      x: C.x + (co * px - si * pd) / 100,
+      y: C.y + bob + Y / 100 - 0.11,
+      z: C.z + (-si * px - co * pd) / 100,
       a: 0.1 * Math.cos(C.phi) + Math.sin(C.ph) * 0.1 * C.amp
     };
   };
@@ -2650,106 +2775,43 @@ function mysLancer(cb, fic) {
     }
     return lisse;
   };
+  // « Y aller à pied » : la caméra recule pour voir tout le toit et Célestine marche où on touche ;
+  // « Revenir au lancer » : la caméra se place derrière elle, et on lance dans la direction où elle regarde
+  let pied = 0;
   const aPied = on => {
     if (fin || (F.vol && !F.fin)) return;
     if (on) {
-      C = {
-        x: 0,
-        z: 1.5,
-        y: 0,
-        vy: 0,
-        ph: 0,
-        v: 0,
-        amp: 0,
-        pen: 0,
-        tient: 1,
-        saute: 0,
-        lache: 0,
-        joie: 0,
-        phi: 0,
-        way: [{ x: 0, z: 2.6 }]
-      };
-      cible = { x: 0, z: 2.6 };
+      pied = 1;
+      Object.assign(Vt, { x: 0, z: 0, yaw: 0 });
+      if (!C) {
+        C = { x: 0, z: 1.5, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, way: [{ x: 0, z: 2.6 }] };
+        cible = { x: 0, z: 2.6 };
+      }
+      C.tient = 1;
       F.vol = 0;
-      consigne.textContent = 'Touche le toit pour la faire marcher, puis saute devant la cheminée.';
+      consigne.textContent =
+        'Touche le toit pour la faire marcher. Reviens au lancer : tu lanceras d’où elle est, dans la direction où elle regarde.';
       tip.textContent = '';
       pass.textContent = '🎯 Revenir au lancer';
-      saut.classList.add('on');
     } else {
-      C = cible = null;
+      pied = 0;
+      C.way = [];
+      cible = null;
+      Object.assign(Vt, { x: C.x - Math.sin(C.phi) * 1.2, z: C.z - Math.cos(C.phi) * 1.2, yaw: C.phi }); // la caméra se met un peu derrière elle
       depart();
       F.ent = 0;
       tip.textContent = '';
       consigne.textContent = CONSIGNE;
       pass.textContent = '🚶 Y aller à pied';
-      saut.classList.remove('on', 'pret');
     }
   };
-  pass.onclick = () => aPied(!C);
-  saut.onclick = () => {
-    if (!C || C.y > 0.01 || C.vy || fin) return;
-    const pret = presDe() && C.tient;
-    C.vy = pret ? 3.3 : 2.4;
-    C.saute = 1;
-    C.lache = pret;
-    cible = null;
-    C.way = [];
-    bruit('hop');
-  };
-  const lacherMain = () => {
-    // en haut du saut, elle laisse tomber le fichier vers le centre de la cheminée, juste devant elle
-    const m = main(),
-      d = m.y - TOP,
-      tt = (0.6 + Math.sqrt(0.36 + 4 * 4.5 * d)) / 9;
-    F = {
-      x: m.x,
-      y: m.y,
-      z: m.z,
-      vx: (C.x - m.x) / tt,
-      vy: 0.6,
-      vz: (CZ - m.z) / tt,
-      a: m.a,
-      va: 2,
-      vol: 1,
-      in: 0,
-      sol: 0,
-      t: 0,
-      arret: 0,
-      al: 1,
-      ent: 1,
-      tombe: 0
-    };
-    C.tient = 0;
-    bruit('lance', 0.4);
-  };
+  pass.onclick = () => aPied(!pied);
   const marche = dt => {
-    if (!C) return;
-    // saut
-    if (C.saute) {
-      C.vy -= G * dt;
-      C.y += C.vy * dt;
-      if (C.lache && C.tient && C.vy <= 0) lacherMain();
-      if (C.y <= 0) {
-        C.y = 0;
-        C.vy = 0;
-        C.saute = 0;
-        bruit('neige', 0.5);
-        const [x, y] = P(C.x, 0, C.z);
-        for (let i = 0; i < 12; i++)
-          eclats.push({
-            x: x + (Math.random() - 0.5) * 30,
-            y,
-            vx: (Math.random() - 0.5) * 120,
-            vy: -Math.random() * 90,
-            t: 0.5,
-            c: '#ffffff'
-          });
-      }
-    }
+    if (!C || !pied) return;
     // marche vers le point touché, étape par étape (le chemin contourne les obstacles)
     let vx = 0,
       vz = 0;
-    if (C.way.length && !C.saute) {
+    if (C.way.length) {
       const w = C.way[0],
         fin2 = C.way[C.way.length - 1],
         dx = w.x - C.x,
@@ -2762,9 +2824,8 @@ function mysLancer(cb, fic) {
         vz = (dz / d) * C.v;
       } else if (C.way.shift() && !C.way.length) cible = null;
     }
-    // elle pivote vers là où elle va (et se tourne vers nous pour fêter la réussite)
-    const joie = C.joie && T() - C.joie < 2.5,
-      vise = joie ? Math.PI : vx || vz ? Math.atan2(vx, vz) : null;
+    // elle pivote vers là où elle va
+    const vise = vx || vz ? Math.atan2(vx, vz) : null;
     if (vise != null) {
       let dphi = vise - C.phi;
       dphi = Math.atan2(Math.sin(dphi), Math.cos(dphi));
@@ -2809,11 +2870,10 @@ function mysLancer(cb, fic) {
     if (C.bloque > 0.2) ((cible = null), (C.way = []));
     // le fichier suit sa main
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
-    saut.classList.toggle('pret', enFace() && C.tient);
   };
   // la petite croix dans la neige là où elle va
   const marque = t => {
-    if (!cible || !C) return;
+    if (!cible || !C || prof(cible.x, cible.z) < 0.5) return;
     const [x, y, s] = P(cible.x, 0, cible.z),
       k = 1 + Math.sin(t * 6) * 0.08;
     c.strokeStyle = '#ffffffcc';
@@ -2827,6 +2887,7 @@ function mysLancer(cb, fic) {
     c.stroke();
   };
   const celestine = t => {
+    if (prof(C.x, C.z) < 0.5) return;
     const [x, yb, s] = P(C.x, C.y, C.z),
       [sx, sy, ss] = P(C.x, 0, C.z),
       u = s / 100, // 1 unité = 1 cm
@@ -2834,7 +2895,6 @@ function mysLancer(cb, fic) {
       sw = Math.sin(C.ph),
       cw = Math.cos(C.ph),
       bob = -Math.abs(cw) * 2.2 * a,
-      air = C.saute ? 1 : 0,
       cs = Math.cos(C.phi),
       sn = Math.sin(C.phi),
       po = poses(),
@@ -2870,9 +2930,9 @@ function mysLancer(cb, fic) {
     };
     /* --- jambes --- */
     const jambe = cote => {
-      const lev = air ? (cote > 0 ? 5 : 7) : Math.max(0, cote * -sw) * 9 * a,
-        zf = air ? 4 : -cote * sw * 16 * a, // le pied avance et recule
-        plie = air ? 6 : Math.max(0, -cote * cw) * 7 * a,
+      const lev = Math.max(0, cote * -sw) * 9 * a,
+        zf = -cote * sw * 16 * a, // le pied avance et recule
+        plie = Math.max(0, -cote * cw) * 7 * a,
         X = cote * 8.5,
         H = proj(X, 80, 0),
         K = proj(X, 43 + lev * 0.4, zf * 0.5 + plie),
@@ -3099,7 +3159,7 @@ function mysLancer(cb, fic) {
     /* --- queue-de-cheval --- */
     const queueP = () => {
       const B = proj(0, 157, -11),
-        E = proj(sw * 3 * a + C.pen * 4, 131 + (air ? (C.vy > 0 ? -3 : 4) : 0), -14 - a * 6),
+        E = proj(sw * 3 * a + C.pen * 4, 131, -14 - a * 6),
         M = proj(sw * 1.5 * a, 145, -15 - a * 3);
       return {
         d: B[2],
@@ -3381,7 +3441,7 @@ function mysLancer(cb, fic) {
       bruit('glisse', F.sol && !F.in && !F.tombe ? Math.hypot(F.vx, F.vz) : 0);
       if (!F.in) {
         const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
-        F.arret = arrete || F.tombe || F.z > 14 ? F.arret + dt : 0;
+        F.arret = arrete || F.tombe || prof(F.x, F.z) > 14 ? F.arret + dt : 0;
         // il s'efface doucement, puis un nouveau fichier arrive
         if (F.arret > (F.tombe ? 0.05 : 0.7)) F.al -= dt * (F.tombe ? 3 : 2.2);
         if (F.al <= 0 && !F.fin) {
@@ -3390,15 +3450,20 @@ function mysLancer(cb, fic) {
             aide();
             depart();
             F.ent = 0;
-            if (C) C.tient = 1; // à pied : un nouveau fichier revient dans sa main
           }
         }
       }
-    } else if (!drag && !fin && !C) {
+    } else if (!drag && !fin && !pied) {
+      [F.x, F.z] = loc(F.lx, Z0); // le fichier reste devant la caméra (même quand elle se déplace)
       F.ent = Math.min(1, F.ent + dt * 2.5);
       F.y = Y0 - (1 - F.ent) ** 2 * 0.6 + Math.sin(t * 2.2) * 0.015;
       F.al = F.ent;
     }
+    // la caméra rejoint en douceur sa place (vue d'ensemble, ou derrière Célestine)
+    const kc = Math.min(1, dt * 3.5);
+    V.x += (Vt.x - V.x) * kc;
+    V.z += (Vt.z - V.z) * kc;
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * kc;
     marche(dt);
     ciel(t);
     lyon();
@@ -3406,26 +3471,29 @@ function mysLancer(cb, fic) {
     neige(dt, false);
     toit();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
-    const L = OBS.map(ob => [ob.z, () => obstacle(ob, t)]);
-    L.push([TZ, () => traineau(t, dt)]);
-    L.push([CZ, () => (chemineeFond(t), F.in && (c.save(), ouverture(), c.clip(), fichier(), c.restore()), chemineeDevant())]);
-    if (C) L.push([99, () => marque(t)]);
-    if (!F.in && !(C && C.tient))
+    const L = OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
+    L.push([prof(0, TZ), () => traineau(t, dt)]);
+    L.push([prof(0, CZ), () => cheminee(t, F.in && (() => (c.save(), ouverture(), c.clip(), fichier(), c.restore())))]);
+    if (pied) L.push([99, () => marque(t)]);
+    if (!F.in && !(pied && C.tient))
       L.push([
-        F.z,
+        prof(F.x, F.z),
         () => {
           if (F.z <= RIDGE) return (ombre(), fichier());
           // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
-          const [, ry] = P(0, 0, RIDGE);
           c.save();
-          c.beginPath();
-          c.rect(0, 0, W, ry);
+          poly([
+            [-40, 0, RIDGE],
+            [40, 0, RIDGE],
+            [40, 60, RIDGE],
+            [-40, 60, RIDGE]
+          ]);
           c.clip();
           fichier();
           c.restore();
         }
       ]);
-    if (C) L.push([C.z, () => celestine(t)]);
+    if (pied) L.push([prof(C.x, C.z), () => celestine(t)]);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
@@ -3436,9 +3504,9 @@ function mysLancer(cb, fic) {
 
   /* ===================== toucher ===================== */
   cv.addEventListener('pointerdown', e => {
-    if (C) {
+    if (pied) {
       // à pied : elle marche jusqu'au point touché (toucher la cheminée l'y emmène, juste devant)
-      if (C.saute || fin) return;
+      if (fin) return;
       const [cx1, cy1] = P(-CX, TOP, CZ - CD),
         [cx2, cy2] = P(CX, 0, CZ - CD);
       let p =
@@ -3452,7 +3520,7 @@ function mysLancer(cb, fic) {
       cible = C.way[C.way.length - 1];
       return;
     }
-    if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45) return;
+    if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45 || Math.hypot(V.x - Vt.x, V.z - Vt.z) > 0.05) return;
     drag = 1;
     idle = 0;
     hist = [[e.clientX, e.clientY, performance.now()]];
@@ -3463,7 +3531,8 @@ function mysLancer(cb, fic) {
     hist.push([e.clientX, e.clientY, performance.now()]);
     if (hist.length > 12) hist.shift();
     const a = hist[0];
-    F.x = ((e.clientX - a[0]) / f) * Z0 * 0.4;
+    F.lx = ((e.clientX - a[0]) / f) * Z0 * 0.4;
+    [F.x, F.z] = loc(F.lx, Z0);
     F.y = Y0 - ((e.clientY - a[1]) / f) * Z0 * 0.4;
   });
   const lacher = () => {
@@ -3481,16 +3550,19 @@ function mysLancer(cb, fic) {
       return;
     }
     // lancer en cloche à angle fixe : la force du geste règle la distance
-    const D = CZ - Z0,
+    const D = Math.max(1, Math.hypot(F.x, F.z - CZ)), // distance jusqu'à la cheminée
       vopt = Math.sqrt((G * D * D) / (2 * Math.cos(ANG) ** 2 * (Y0 + D * Math.tan(ANG) - TOP))),
       tt = D / (vopt * Math.cos(ANG));
-    let v = vopt * 0.978 * Math.pow(vsy / (H * 1.7), 0.5), // il faut doser la force : un peu trop faible tape la cheminée, un peu trop fort passe derrière
+    let v = vopt * 0.978 * Math.pow(vsy / (H * 1.7), (0.5 * (CZ - Z0)) / D), // plus on est près, plus il faut être précis : même difficulté partout // il faut doser la force : un peu trop faible tape la cheminée, un peu trop fort passe derrière
       vx = (vsx / W) * 1.5;
     // pas d'aide : seul le petit tremblement naturel du doigt sur le côté est ignoré
     if (Math.abs(vx * tt) < 0.12) vx = 0;
+    // vitesse vue depuis la caméra → dans le monde (on lance droit devant soi)
     const vy = v * Math.sin(ANG),
-      vz = v * Math.cos(ANG);
-    Object.assign(F, { vx, vy, vz, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
+      vl = v * Math.cos(ANG),
+      co = Math.cos(V.yaw),
+      si = Math.sin(V.yaw);
+    Object.assign(F, { vx: co * vx + si * vl, vy, vz: -si * vx + co * vl, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
     bruit('lance', Math.min(1, v / vopt));
     tip.textContent = '';
   };
