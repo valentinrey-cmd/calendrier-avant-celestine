@@ -3,6 +3,19 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fichier mystère : la « patate » de Valentin, Célestine s'envole et s'écrase façon manga
+- **Valentin charge sa patate** pendant 1,1 s : une aura orange pulse autour de lui, des étincelles montent, un grondement monte, et il dit « Attention… 😈 » ou « Ça va chauffer… 🔥 ». Puis il crie « PATAAATE !!! 💥 » (ou « PRENDS ÇA !!! ☄️ », « TIR DE LA MORT !!! 💥 ») et tire à 28 m/s. Le fichier laisse une traînée de feu orange et jaune. Le message en haut dit « 😈 Valentin prépare une patate… esquive ! ».
+- **Si elle est touchée, c'est fait façon manga** :
+  1. Arrêt sur image : l'image passe en négatif, des lignes de vitesse noires convergent vers elle, une onomatopée géante apparaît (« DOOM !! », « BAAAM !! » ou « PAF !!! »), il y a une grosse secousse et un coup de zoom.
+  2. Elle s'envole en arrière (« AAAAH !! 😱 »), bras et jambes qui moulinent, en vrillant, avec des lignes de vitesse.
+  3. Elle s'écrase sur le dos : « CRAAASH ! », énorme gerbe de neige, secousse, cratère dans la neige.
+  4. Elle glisse sur le dos, bras traînant au-dessus de la tête, en creusant un sillon.
+  5. Elle reste sonnée avec des étoiles ⭐💫 (« J’ai vu des étoiles… ✨ »), se relève, s'époussette et lance « Tu vas me le payer ! 😤 » pendant que Valentin rigole (« HAHAHA ! 😂 », « STRIKE ! 🎳 »).
+- La distance du vol (jusqu'à 3,8 m) et de la glissade (jusqu'à 1,8 m) est calculée pour qu'elle ne tombe jamais du toit et ne traverse ni la cheminée ni un obstacle. La caméra la suit de côté en restant au-dessus du toit.
+- L'ancienne version (chute sur place en 2,9 s, tir à 17 m/s) est remplacée. Nouveaux bruitages : charge et impact de la patate.
+- Version : 1795736130
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Fichier mystère : tir canon de Valentin, Célestine tombe à la renverse, succès « Reine des toits »
 - **Nouveau succès** « 🏠 Reine des toits » (difficile, catégorie Secrets) : trouver les 10 secrets du toit dans la scène du fichier mystère. Il se débloque au moment où le 10e secret est trouvé (ou au prochain contrôle des succès si le trophée était déjà gagné). Fichier : `succes.js`.
 - **Plus de passes** : le compteur « 🤝 passes », son record et Célestine qui attrape le fichier au vol sont supprimés (code, style, traduction). L'ancien record des passes reste dans la sauvegarde mais n'est plus affiché.

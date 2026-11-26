@@ -1227,6 +1227,20 @@ function mysSons(A, musique = true) {
       souffle(t + 0.55, 0.5, 0.28, 'lowpass', 200, 2200, 0.8, 0.03);
       ton(t + 0.55, 90, 0.35, 0.2, 'sine', 220);
     },
+    // Valentin charge sa patate : un grondement qui monte
+    charge: () => {
+      const t = now();
+      ton(t, 70, 1.1, 0.07, 'sawtooth', 420);
+      ton(t, 140, 1.1, 0.03, 'square', 840);
+      souffle(t, 1.1, 0.08, 'bandpass', 300, 2400, 2, 0.4);
+    },
+    // la patate touche Célestine : gros coup sourd, claquement et souffle
+    patate: () => {
+      const t = now();
+      ton(t, 120, 0.45, 0.35, 'sine', 35);
+      souffle(t, 0.12, 0.4, 'highpass', 1800, 0, 0.7, 0.002);
+      souffle(t + 0.02, 0.6, 0.25, 'lowpass', 900, 120, 0.8, 0.01);
+    },
     // le volet du replay : un « whoosh » qui balaie
     replay: () => {
       const t = now();
@@ -3321,106 +3335,296 @@ function mysLancer(cb, fic) {
     const [x, y] = P(F.x, F.y, F.z);
     for (let i = 0; i < 10 * k; i++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, t: 0.6, c: '#ffffff' });
   };
-  // Célestine prend le tir canon de Valentin en pleine poitrine : elle tombe à la renverse, reste sonnée un moment
-  // (des étoiles tournent au-dessus de sa tête), puis se relève et s'époussette. La caméra se met de côté pour bien voir.
-  // Le fichier rebondit sur elle et retombe à ses pieds.
-  const KO = 2.9;
+  // La « patate » de Valentin, façon manga : Célestine la prend en pleine poitrine.
+  // 1. arrêt sur image (0,2 s) : image en négatif, lignes de vitesse vers elle, « DOOM !! » ;
+  // 2. elle s'envole en arrière, bras et jambes qui moulinent, en tournant sur elle-même ;
+  // 3. elle s'écrase sur le dos (gerbe de neige, « CRAAASH ! », secousse), puis glisse sur la neige en laissant un sillon ;
+  // 4. elle reste sonnée (étoiles au-dessus de la tête), se relève et s'époussette.
+  // La distance du vol et de la glissade est calculée pour qu'elle reste sur le toit sans traverser d'obstacle.
+  const KO_SOL = 1.4, // sonnée par terre
+    KO_REL = 0.5, // elle se relève
+    KO_SEC = 0.45, // elle s'époussette
+    KO_VY = 4.3, // vitesse de départ vers le haut (m/s)
+    KO_FR = 5; // freinage de la glissade (m/s²)
+  // on peut aller de (px, pz) à (x, z) : sur le toit, pas dans la cheminée, et sans se rapprocher d'un obstacle déjà tout près
+  const libre = (x, z, px = C.x, pz = C.z) =>
+    Math.abs(x) < 8.4 &&
+    z > BORD + 0.4 &&
+    z < RIDGE - 0.4 &&
+    !(Math.abs(x) < CX + 0.35 && Math.abs(z - CZ) < CD + 0.35) &&
+    !OBS.some(ob => {
+      const dn = Math.hypot(x - ob.x, z - ob.z);
+      return dn < rayon(ob, 0.3) + 0.35 && dn < Math.hypot(px - ob.x, pz - ob.z);
+    });
   const renverse = () => {
     const sp = Math.hypot(F.vx, F.vz) || 1,
       nx = F.vx / sp,
       nz = F.vz / sp;
-    C.ko = { t: T(), n: [nx, nz], cote: (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1 };
-    Object.assign(C, { charge: 0, pTir: null, glisse: 0, emote: null, ange: 0, idle: 0, phi: Math.atan2(-nx, -nz) });
+    // jusqu'où elle peut partir sans quitter le toit ni rentrer dans un obstacle
+    let dl = 0;
+    while (dl < 6 && libre(C.x + nx * (dl + 0.1), C.z + nz * (dl + 0.1), C.x + nx * dl, C.z + nz * dl)) dl += 0.1;
+    const air = Math.min(3.8, dl * 0.65),
+      glisse = Math.max(0, Math.min(1.8, dl - air - 0.15)),
+      tv = (2 * KO_VY) / G;
+    // la caméra se mettra de côté : du côté où l'on est déjà, sauf si elle sortirait du toit
+    const mil = (air + glisse) / 2,
+      surToit = q => {
+        const x = C.x + nx * mil - nz * q * 3.2,
+          z = C.z + nz * mil + nx * q * 3.2;
+        return Math.abs(x) < 9 && z > BORD && z < RIDGE;
+      },
+      q0 = (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1;
+    C.ko = {
+      t: T(),
+      n: [nx, nz],
+      cote: surToit(q0) || !surToit(-q0) ? q0 : -q0,
+      e: 'stop',
+      te: T(),
+      tv,
+      vh: air / tv,
+      vs: Math.sqrt(2 * KO_FR * glisse)
+    };
+    Object.assign(C, { charge: 0, pTir: null, glisse: 0, emote: null, ange: 0, idle: 0, phi: Math.atan2(-nx, -nz), vy: 0 });
     btn.classList.remove('on');
     btn.style.setProperty('--p', 0);
-    Object.assign(F, { deVal: 0, ko: 1, vx: -nx * 0.8, vz: -nz * 0.8, vy: 2.6, va: 14 });
+    // le fichier reste figé pendant l'arrêt sur image, puis rebondit sur elle
+    Object.assign(F, { deVal: 0, ko: 1, vol: 0, vx: -nx * 1.2, vz: -nz * 1.2, vy: 3.2, va: 18 });
+    bruit('patate');
     bruit('aie');
-    bruit('brique', 0.8);
-    choc(2.5);
-    parle(C, 'Ouf ! 😵', 0.9);
-    parle(VAL, ['Hahaha ! 😂', 'Strike ! 🎳', 'Oups… désolé ! 😇'][Math.floor(Math.random() * 3)], 2.2);
     tip.textContent = '';
+    manga.push({ k: 'impact', t: T(), txt: ['DOOM !!', 'BAAAM !!', 'PAF !!!'][Math.floor(Math.random() * 3)] });
+    parle(VAL, ['HAHAHA ! 😂', 'STRIKE ! 🎳', 'Oups… trop fort ? 😇'][Math.floor(Math.random() * 3)], 2.6);
   };
   const ko = dt => {
     const K = C.ko,
-      d = T() - K.t,
-      [nx, nz] = K.n;
+      d = T() - K.te,
+      [nx, nz] = K.n,
+      avance = v => {
+        const x = C.x + nx * v * dt,
+          z = C.z + nz * v * dt;
+        if (libre(x, z)) ((C.x = x), (C.z = z));
+        else return true; // bloquée
+      };
     C.v = 0;
     C.amp = 0;
     C.lean = 0;
     C.pen *= 0.9;
     C.idle = 0;
-    // elle recule en tombant (elle glisse sur la neige), sans quitter le toit ni traverser un obstacle
-    if (d < 0.75) {
-      const sp = 2.6 * Math.max(0, 1 - d / 0.75) * dt,
-        x = C.x + nx * sp,
-        z = C.z + nz * sp;
-      if (
-        Math.abs(x) < 8.4 &&
-        z > BORD + 0.4 &&
-        z < RIDGE - 0.4 &&
-        !(Math.abs(x) < CX + 0.35 && Math.abs(z - CZ) < CD + 0.35) &&
-        !OBS.some(ob => Math.hypot(x - ob.x, z - ob.z) < rayon(ob, 0.3) + 0.35)
-      )
-        ((C.x = x), (C.z = z));
-    }
-    if (d > 0.55 && !K.boum) {
-      // badaboum dans la neige
-      K.boum = 1;
-      bruit('boum');
-      bruit('neige', 1);
-      const [x, y] = P(C.x + nx * 0.4, 0.2, C.z + nz * 0.4);
-      for (let j = 0; j < 30; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 240, vy: -Math.random() * 200, t: 0.9, c: j % 3 ? '#ffffff' : '#cfe0ff' });
-      parle(C, ['Aïe… 😵‍💫', 'Ouille ! 🤕', 'J’ai vu des étoiles… ✨'][Math.floor(Math.random() * 3)], 1.4);
-    }
-    if (d > 2.45 && !K.dit) {
-      K.dit = 1;
-      parle(C, ['Tu vas voir ! 😤', 'Même pas mal ! 😝', 'Revanche ! 💪'][Math.floor(Math.random() * 3)], 1.6);
-    }
-    if (d > KO) C.ko = 0;
+    if (K.e == 'stop') {
+      if (d < 0.2) return; // arrêt sur image
+      Object.assign(K, { e: 'vol', te: T() });
+      C.vy = KO_VY;
+      F.vol = 1;
+      parle(C, 'AAAAH !! 😱', 1);
+      bruit('lance', 1);
+    } else if (K.e == 'vol') {
+      // elle s'envole en arrière
+      avance(K.vh);
+      C.vy -= G * dt;
+      C.y = Math.max(0, C.y + C.vy * dt);
+      if (Math.random() < 0.5) {
+        const [x, y] = P(C.x, C.y + 0.8, C.z);
+        eclats.push({ x, y, vx: -nx * 40 + (Math.random() - 0.5) * 40, vy: (Math.random() - 0.5) * 40, t: 0.4, c: '#ffffffaa' });
+      }
+      if (C.y <= 0 && d > 0.1) {
+        // elle s'écrase sur le dos
+        C.y = 0;
+        C.vy = 0;
+        Object.assign(K, { e: 'glisse', te: T(), v: K.vs, sillon: 0 });
+        bruit('boum');
+        bruit('neige', 1);
+        bruit('brique', 1);
+        manga.push({ k: 'crash', t: T(), txt: 'CRAAASH !' });
+        traces.push({ x: C.x + nx * 0.5, z: C.z + nz * 0.5, t: T(), cratere: 1 });
+        const [x, y] = P(C.x + nx * 0.5, 0.2, C.z + nz * 0.5);
+        for (let j = 0; j < 70; j++)
+          eclats.push({ x, y, vx: (Math.random() - 0.5) * 520, vy: -Math.random() * 420, t: 1.1, c: j % 3 ? '#ffffff' : '#cfe0ff' });
+      }
+    } else if (K.e == 'glisse') {
+      // elle glisse sur le dos en laissant un sillon dans la neige
+      K.v = Math.max(0, K.v - KO_FR * dt);
+      if (avance(K.v)) K.v = 0;
+      bruit('glisse', Math.min(1, K.v / 3));
+      if (K.v > 0.2 && T() - K.sillon > 0.06) {
+        K.sillon = T();
+        traces.push({ x: C.x + nx * 0.45, z: C.z + nz * 0.45, t: T(), sillon: [nx, nz] });
+        const [x, y] = P(C.x - nx * 0.1, 0.1, C.z - nz * 0.1);
+        for (let j = 0; j < 3; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 120, vy: -Math.random() * 90, t: 0.5, c: '#ffffff' });
+      }
+      if (K.v <= 0) {
+        Object.assign(K, { e: 'sol', te: T() });
+        bruit('glisse', 0);
+        parle(C, ['Aïe… 😵‍💫', 'Ouille ouille ouille… 🤕', 'J’ai vu des étoiles… ✨'][Math.floor(Math.random() * 3)], 1.4);
+      }
+    } else if (K.e == 'sol') {
+      if (d > KO_SOL) Object.assign(K, { e: 'releve', te: T() });
+    } else if (K.e == 'releve') {
+      if (d > KO_REL) {
+        Object.assign(K, { e: 'secoue', te: T() });
+        parle(C, ['Tu vas me le payer ! 😤', 'Même pas mal ! 😝', 'REVANCHE ! 💪'][Math.floor(Math.random() * 3)], 1.8);
+      }
+    } else if (d > KO_SEC) C.ko = 0;
   };
-  // les étoiles qui tournent au-dessus de sa tête pendant qu'elle est sonnée
-  // le tir canon de Valentin laisse des traits de vitesse derrière le fichier
+  // la « patate » de Valentin : une traînée de feu et d'énergie derrière le fichier
   const trainee = () => {
     if (!F.deVal || F.sol) return;
-    const [x, y, , d] = P(F.x, F.y, F.z);
+    const [x, y, s, d] = P(F.x, F.y, F.z);
     if (d < 0.3) return;
+    c.save();
     c.lineCap = 'round';
-    for (let i = -1; i <= 1; i++) {
-      const [x2, y2] = P(F.x - F.vx * 0.06, F.y - F.vy * 0.06 + i * 0.07, F.z - F.vz * 0.06);
-      const g = c.createLinearGradient(x, y, x2, y2);
-      g.addColorStop(0, '#ffffffcc');
-      g.addColorStop(1, '#ffffff00');
+    c.shadowColor = '#ff9a3c';
+    c.shadowBlur = 18;
+    [
+      ['#ff5a1f', 0.22, 0.2],
+      ['#ffb347', 0.16, 0.13],
+      ['#fff6c8', 0.09, 0.07]
+    ].forEach(([col, larg, long]) => {
+      const [x2, y2] = P(F.x - F.vx * long, F.y - F.vy * long, F.z - F.vz * long),
+        g = c.createLinearGradient(x, y, x2, y2);
+      g.addColorStop(0, col);
+      g.addColorStop(1, col + '00');
       c.strokeStyle = g;
-      c.lineWidth = i ? 2 : 3.5;
+      c.lineWidth = Math.max(3, s * larg);
       c.beginPath();
-      c.moveTo(x, y + i * 4);
+      c.moveTo(x, y);
       c.lineTo(x2, y2);
       c.stroke();
-    }
+    });
+    c.restore();
   };
+  // les étoiles qui tournent au-dessus de sa tête pendant qu'elle est sonnée
   const etoilesKO = t => {
-    const K = C.ko,
-      d = T() - K.t;
-    if (d < 0.6 || d > 2) return;
-    const [nx, nz] = K.n,
+    const K = C.ko;
+    if (K.e != 'sol') return;
+    const d = T() - K.te,
+      [nx, nz] = K.n,
       [x0, y0, sc, dd] = P(C.x, C.y + 0.2, C.z),
       [x1] = P(C.x + nx, C.y + 1, C.z + nz),
       [x2] = P(C.x, C.y + 1, C.z),
       s = x1 >= x2 ? 1 : -1,
       hx = x0 + s * 0.78 * sc, // sa tête, à l'écran (elle est tombée dans le sens du tir)
       hy = y0 - 0.08 * sc,
-      al = Math.min(1, (d - 0.6) / 0.2, (2 - d) / 0.2);
-    if (dd < 0.3) return;
+      al = Math.min(1, d / 0.2, (KO_SOL - d) / 0.2);
+    if (dd < 0.3 || al <= 0) return;
     c.globalAlpha = al;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
-    c.font = `${Math.max(12, sc * 0.13)}px system-ui,sans-serif`;
-    for (let i = 0; i < 4; i++) {
-      const a = t * 4 + (i * Math.PI) / 2;
-      c.fillText(i % 2 ? '💫' : '⭐', hx + Math.cos(a) * sc * 0.2, hy - sc * 0.12 + Math.sin(a) * sc * 0.06);
+    c.font = `${Math.max(14, sc * 0.16)}px system-ui,sans-serif`;
+    for (let i = 0; i < 5; i++) {
+      const a = t * 4 + (i * Math.PI * 2) / 5;
+      c.fillText(i % 2 ? '💫' : '⭐', hx + Math.cos(a) * sc * 0.22, hy - sc * 0.14 + Math.sin(a) * sc * 0.07);
     }
     c.globalAlpha = 1;
+  };
+  // Valentin charge sa patate : une aura orange qui pulse autour de lui, et des étincelles qui montent
+  const aura = t => {
+    const R = VAL.renvoi;
+    if (!R || R.e != 'charge') return;
+    const k = Math.min(1, (T() - R.t) / KO_CHARGE),
+      [x, y, s, d] = P(VAL.x, VAL.base + 0.95, VAL.z);
+    if (d < 0.3) return;
+    const r = s * (0.55 + 0.2 * k + 0.05 * Math.sin(t * 30)),
+      g = c.createRadialGradient(x, y, r * 0.2, x, y, r);
+    g.addColorStop(0, `rgba(255,240,170,${0.55 * k})`);
+    g.addColorStop(0.5, `rgba(255,150,40,${0.35 * k})`);
+    g.addColorStop(1, 'rgba(255,90,20,0)');
+    c.fillStyle = g;
+    c.beginPath();
+    c.ellipse(x, y, r * 0.7, r, 0, 0, 7);
+    c.fill();
+    c.strokeStyle = `rgba(255,220,120,${0.8 * k})`;
+    c.lineWidth = 2;
+    for (let i = 0; i < 9; i++) {
+      const a = i * 0.7 + t * 2,
+        u = (t * 2.2 + i * 0.37) % 1,
+        px = x + Math.cos(a) * r * 0.55,
+        py = y + r * 0.8 - u * r * 1.9;
+      c.beginPath();
+      c.moveTo(px, py);
+      c.lineTo(px, py - s * 0.12);
+      c.stroke();
+    }
+  };
+  // les effets manga par-dessus tout : image en négatif, lignes de vitesse vers elle, onomatopées géantes
+  const manga = [];
+  const mangaFx = t => {
+    const now = T();
+    for (let i = manga.length - 1; i >= 0; i--) {
+      const m = manga[i],
+        d = now - m.t;
+      if (d > 1.1) {
+        manga.splice(i, 1);
+        continue;
+      }
+      const [cx, cy] = P(C.x, C.y + 0.9, C.z);
+      if (m.k == 'impact') {
+        // arrêt sur image : image en négatif sur les toutes premières images, puis lignes de vitesse
+        if (d < 0.09) {
+          c.save();
+          c.globalCompositeOperation = 'difference';
+          c.fillStyle = '#ffffff';
+          c.fillRect(0, 0, W, H);
+          c.restore();
+        }
+        if (d < 0.5) {
+          const al = d < 0.2 ? 1 : 1 - (d - 0.2) / 0.3,
+            R = Math.hypot(W, H);
+          c.fillStyle = `rgba(10,10,18,${0.85 * al})`;
+          for (let j = 0; j < 46; j++) {
+            const a = (j / 46) * Math.PI * 2 + Math.sin(j * 12.9) * 0.05,
+              r0 = Math.min(W, H) * (0.16 + 0.1 * Math.abs(Math.sin(j * 7.3))),
+              w = 0.012 + 0.012 * Math.abs(Math.sin(j * 3.1));
+            c.beginPath();
+            c.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
+            c.lineTo(cx + Math.cos(a - w) * R, cy + Math.sin(a - w) * R);
+            c.lineTo(cx + Math.cos(a + w) * R, cy + Math.sin(a + w) * R);
+            c.closePath();
+            c.fill();
+          }
+        }
+      }
+      // l'onomatopée : elle jaillit, tremble, puis s'efface
+      const pop = Math.min(1, d / 0.08),
+        al = d < 0.75 ? 1 : 1 - (d - 0.75) / 0.35,
+        taille = Math.min(W, H) * (m.k == 'impact' ? 0.16 : 0.12) * (0.6 + 0.5 * pop),
+        tx = (m.k == 'impact' ? cx + W * 0.08 : cx) + (Math.random() - 0.5) * 6 * (1 - d),
+        ty = (m.k == 'impact' ? cy - H * 0.16 : cy - H * 0.06) + (Math.random() - 0.5) * 6 * (1 - d);
+      c.save();
+      c.globalAlpha = Math.max(0, al);
+      c.translate(tx, ty);
+      c.rotate(m.k == 'impact' ? -0.2 : 0.12);
+      c.font = `italic 900 ${Math.round(taille)}px Impact, 'Arial Black', system-ui, sans-serif`;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.lineJoin = 'round';
+      c.lineWidth = taille * 0.16;
+      c.strokeStyle = '#111';
+      c.strokeText(m.txt, 0, 0);
+      const g = c.createLinearGradient(0, -taille / 2, 0, taille / 2);
+      g.addColorStop(0, m.k == 'impact' ? '#fff27a' : '#ffffff');
+      g.addColorStop(1, m.k == 'impact' ? '#ff6a1f' : '#9fd0ff');
+      c.fillStyle = g;
+      c.fillText(m.txt, 0, 0);
+      c.restore();
+    }
+    // lignes de vitesse horizontales pendant qu'elle vole
+    if (C.ko && C.ko.e == 'vol') {
+      const [x1, y1] = P(C.x, C.y + 0.8, C.z),
+        [x2, y2] = P(C.x + C.ko.n[0], C.y + 0.8, C.z + C.ko.n[1]),
+        a = Math.atan2(y2 - y1, x2 - x1);
+      c.strokeStyle = '#ffffffb0';
+      c.lineWidth = 2;
+      for (let j = 0; j < 14; j++) {
+        const o = (Math.sin(j * 91.7 + Math.floor(t * 20)) * 0.5 + 0.5) * H * 0.5 - H * 0.25,
+          l = 60 + 80 * Math.abs(Math.sin(j * 5.1)),
+          px = x1 - Math.cos(a) * (40 + j * 12) - Math.sin(a) * o,
+          py = y1 - Math.sin(a) * (40 + j * 12) + Math.cos(a) * o;
+        c.beginPath();
+        c.moveTo(px, py);
+        c.lineTo(px - Math.cos(a) * l, py - Math.sin(a) * l);
+        c.stroke();
+      }
+    }
   };
   const entre = () => {
     if (!vis.ok) return recrache(); // ce n'est pas le fichier mystère : la cheminée n'en veut pas
@@ -3570,25 +3774,28 @@ function mysLancer(cb, fic) {
   const DANSE = 8;
   const danse = () => {
     if (C.ko) {
-      // à la renverse (voir renverse) : elle bascule dans le sens du tir, rebondit, reste étalée, puis se relève
-      const d = T() - C.ko.t,
-        [nx, nz] = C.ko.n,
+      // la patate (voir renverse) : elle bascule dans le sens du tir, tourne en l'air, s'écrase sur le dos, glisse, se relève
+      const K = C.ko,
+        d = T() - K.te,
+        [nx, nz] = K.n,
         L = (a, b, k) => a + (b - a) * k * k * (3 - 2 * k),
         [x1] = P(C.x + nx, C.y + 1, C.z + nz),
         [x0] = P(C.x, C.y + 1, C.z),
-        s = x1 >= x0 ? 1 : -1; // de quel côté de l'écran elle part
-      if (d < 0.12) return { e: 'ko', d, rot: s * 0.3 * (d / 0.12), ecart: 0, mx: 0 };
-      if (d < 0.55) {
-        const k = (d - 0.12) / 0.43;
-        return { e: 'ko', d, rot: s * (0.3 + (Math.PI / 2 - 0.3) * k * k), ecart: 12 * k, mx: 0, saut: Math.sin(k * Math.PI) * 24 };
+        s = x1 >= x0 ? 1 : -1, // de quel côté de l'écran elle part
+        H2 = Math.PI / 2;
+      if (K.e == 'stop') return { e: 'envol', d: T() - K.t, rot: s * 0.25, ecart: 6, mx: 0 };
+      if (K.e == 'vol') {
+        // une vrille en arrière qui retombe pile sur le dos
+        const u = Math.min(1, d / K.tv);
+        return { e: 'envol', d: T() - K.t, rot: s * (0.25 + (H2 - 0.25) * u + 1.1 * Math.sin(u * Math.PI)), ecart: 14 + 12 * Math.sin(d * 19), mx: 0 };
       }
-      if (d < 0.75) return { e: 'ko', d, rot: (s * Math.PI) / 2, ecart: 14, mx: 0, saut: Math.sin(((d - 0.55) / 0.2) * Math.PI) * 7 }; // petit rebond
-      if (d < 1.95) return { e: 'ko', d, rot: (s * Math.PI) / 2, ecart: 14 + 3 * Math.sin(d * 3), mx: 0 };
-      if (d < 2.45) {
-        const k = (d - 1.95) / 0.5;
-        return { e: 'releve', d, rot: s * L(Math.PI / 2, 0, k), ecart: 14 * (1 - k), mx: 0, saut: Math.sin(k * Math.PI) * 10 };
+      if (K.e == 'glisse') return { e: 'glisse', d: T() - K.t, rot: s * H2, ecart: 8, mx: 0, saut: d < 0.15 ? Math.sin((d / 0.15) * Math.PI) * 9 : 0 };
+      if (K.e == 'sol') return { e: 'ko', d: T() - K.t, rot: s * H2, ecart: 14 + 3 * Math.sin(d * 3), mx: 0 };
+      if (K.e == 'releve') {
+        const k = Math.min(1, d / KO_REL);
+        return { e: 'releve', d, rot: s * L(H2, 0, k), ecart: 14 * (1 - k), mx: 0, saut: Math.sin(k * Math.PI) * 10 };
       }
-      return { e: 'secoue', d, rot: Math.sin(d * 22) * 0.06 * (KO - d), ecart: 0, mx: 0 };
+      return { e: 'secoue', d, rot: Math.sin(d * 22) * 0.06 * Math.max(0, KO_SEC - d) * 2, ecart: 0, mx: 0 };
     }
     if (C.ange) {
       // l'ange dans la neige : elle se laisse tomber sur le dos, bat des bras et des jambes, puis se relève
@@ -3750,8 +3957,15 @@ function mysLancer(cb, fic) {
     if (dz) {
       const w = Math.sin(dz.d * 7);
       switch (dz.e) {
-        case 'ko': // bras projetés vers l'avant au choc, puis en croix dans la neige
-          return dz.d < 0.55 ? pose2(bA(1, 1.2, 1.2, 0.25), bA(-1, 1.2, 1.2, 0.25)) : pose2(bA(1, 0.1, 1.5 + 0.1 * w, 0.1), bA(-1, 0.1, 1.5 - 0.1 * w, 0.1));
+        case 'envol': {
+          // projetée en arrière : les bras moulinent dans tous les sens
+          const m = tt * 16;
+          return pose2(bA(1, m, 0.9 + 0.5 * Math.sin(m * 0.7), 0.35), bA(-1, m + Math.PI * 0.8, 0.9 + 0.5 * Math.cos(m * 0.6), 0.35), 2);
+        }
+        case 'glisse': // elle glisse sur le dos, les bras traînent au-dessus de la tête
+          return pose2(bA(1, -0.15, 2.5 + 0.1 * w, -0.2), bA(-1, -0.15, 2.5 - 0.1 * w, -0.2));
+        case 'ko': // étalée en croix dans la neige
+          return pose2(bA(1, 0.1, 1.5 + 0.1 * w, 0.1), bA(-1, 0.1, 1.5 - 0.1 * w, 0.1));
         case 'releve': // elle pousse sur ses mains pour se relever
           return pose2(bA(1, -0.4, 0.5, 0.6), bA(-1, -0.4, 0.5, 0.6));
         case 'secoue': // elle s'époussette
@@ -4902,6 +5116,27 @@ function mysLancer(cb, fic) {
       const age = now - q.t,
         al = q.ange ? 0.55 : Math.max(0, 1 - age / 14) * 0.45;
       if (al <= 0) return;
+      if (q.sillon || q.cratere) {
+        // le sillon de la glissade (un ruban creusé dans la neige) et le cratère où elle s'est écrasée
+        const [ax, az] = q.sillon || [1, 0],
+          px = -az,
+          pz = ax,
+          L2 = q.cratere ? 0.55 : 0.16,
+          l2 = q.cratere ? 0.45 : 0.3,
+          pts = q.cratere
+            ? Array.from({ length: 20 }, (_, i) => [q.x + Math.cos((i / 20) * 6.283) * L2, 0.01, q.z + Math.sin((i / 20) * 6.283) * l2])
+            : [
+                [q.x - ax * L2 - px * l2, 0.01, q.z - az * L2 - pz * l2],
+                [q.x + ax * L2 - px * l2, 0.01, q.z + az * L2 - pz * l2],
+                [q.x + ax * L2 + px * l2, 0.01, q.z + az * L2 + pz * l2],
+                [q.x - ax * L2 + px * l2, 0.01, q.z - az * L2 + pz * l2]
+              ];
+        if (poly(pts)) {
+          c.fillStyle = `rgba(140,160,205,${al * 1.2})`;
+          c.fill();
+        }
+        return;
+      }
       if (q.ange) {
         // la silhouette de l'ange : la tête, deux ailes balayées par les bras, la robe balayée par les jambes
         const [ax, az] = q.ange,
@@ -4996,6 +5231,7 @@ function mysLancer(cb, fic) {
   const geste = (Q, k, d) => (Q.emote = { k, t: T(), d });
   // Valentin et le fichier tombé sur son toit : il court le chercher, revient au bord de son toit et le relance à Célestine
   const VAL0 = { x: 11.05, z: 5.2 }; // sa place, au bord de son toit, face à notre toit
+  const KO_CHARGE = 1.1; // il charge sa patate pendant 1,1 s
   const valCourt = (dt, x, z, vmax) => {
     // il court vers (x, z) en contournant son petit conduit de cheminée ; renvoie vrai quand il y est
     const dx = x - VAL.x,
@@ -5022,7 +5258,7 @@ function mysLancer(cb, fic) {
     if (!R && !occupe && !fin && F.vol && F.sol && !F.in && !F.tombe && surVoisin(F.x, F.z)) {
       VAL.renvoi = { e: 'cherche', t: T() };
       parle(VAL, ['Oh ! Pour moi ? 😏', 'Raté ! Je te le renvoie 😆', 'Attends, je l’ai ! 🏃'][Math.floor(Math.random() * 3)], 1.6);
-      tip.textContent = '😈 Valentin prépare un tir canon… esquive !';
+      tip.textContent = '😈 Valentin prépare une patate… esquive !';
       return true;
     }
     if (!R) return false;
@@ -5050,12 +5286,22 @@ function mysLancer(cb, fic) {
       VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 6);
       // il attend que Célestine soit bien sur ses pieds, sur le toit
       if (T() - R.t > 0.6 && !C.chute && !C.danse && !C.ange && !C.ko && C.y <= 0.01) {
+        // il charge sa patate : aura orange, bruit qui monte
+        parle(VAL, ['Attention… 😈', 'Ça va chauffer… 🔥', 'Prépare-toi… 😏'][Math.floor(Math.random() * 3)], KO_CHARGE);
+        bruit('charge');
+        Object.assign(R, { e: 'charge', t: T() });
+      }
+    } else if (R.e == 'charge') {
+      VAL.v = 0;
+      const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
+      VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 6);
+      if (T() - R.t > KO_CHARGE) {
         geste(VAL, 'lance', 0.9);
-        parle(VAL, ['Attention ! 😈', 'Tir canon ! 💥', 'Prends ça ! 😆'][Math.floor(Math.random() * 3)], 1.4);
+        parle(VAL, ['PATAAATE !!! 💥', 'PRENDS ÇA !!! ☄️', 'TIR DE LA MORT !!! 💥'][Math.floor(Math.random() * 3)], 1.4);
         Object.assign(R, { e: 'lance', t: T() });
       }
     } else if (R.e == 'lance' && T() - R.t > 0.4) {
-      // il le lâche en fin de geste : un tir canon presque à plat (17 m/s), droit sur la poitrine de Célestine
+      // il le lâche en fin de geste : une patate presque à plat (28 m/s), droit sur la poitrine de Célestine
       VAL.tient = 0;
       VAL.renvoi = null;
       const x0 = F.x,
@@ -5064,7 +5310,7 @@ function mysLancer(cb, fic) {
         tx = C.x,
         ty = C.y + 1.1,
         tz = C.z,
-        TT = Math.max(0.25, Math.hypot(tx - x0, tz - z0) / 17);
+        TT = Math.max(0.2, Math.hypot(tx - x0, tz - z0) / 28);
       F = {
         deVal: 1,
         x: x0,
@@ -6604,6 +6850,7 @@ function mysLancer(cb, fic) {
     }
   };
   const dessineValentin = t => {
+    aura(t);
     const moi = C;
     C = VAL; // on réutilise le même personnage en volume, avec la tenue de Valentin
     try {
@@ -6645,16 +6892,17 @@ function mysLancer(cb, fic) {
       dc = K ? T() - K.t : 0;
     let cible = { yaw: ctl.yaw, h: 0, p: 0, kx: 6, kh: 6 };
     const rp = replay(dt), // le replay du tir gagnant prend la main sur la caméra
-      KOc = C.ko && T() - C.ko.t < KO - 0.3;
+      KOc = C.ko && C.ko.e != 'secoue';
     if (KOc) {
-      // à la renverse : la caméra se met de côté pour bien la voir tomber, puis se relever
+      // la patate : la caméra se met de côté et la suit pendant qu'elle vole et glisse (coup de zoom à l'impact)
       const [nx, nz] = C.ko.n,
         q = C.ko.cote,
-        mx = C.x + nx * 0.45,
-        mz = C.z + nz * 0.45,
-        cx = mx - nz * q * 3,
-        cz = mz + nx * q * 3;
-      cible = { x: cx, z: cz, yaw: Math.atan2(mx - cx, mz - cz), h: -1.2, p: 0.14, kx: 5, kh: 5 };
+        zoom = C.ko.e == 'stop' ? 2.2 : 3.2,
+        mx = C.x + nx * 0.6,
+        mz = C.z + nz * 0.6,
+        cx = mx - nz * q * zoom,
+        cz = mz + nx * q * zoom;
+      cible = { x: cx, z: cz, yaw: Math.atan2(mx - cx, mz - cz), h: -1.4 + C.y * 0.5, p: 0.1, kx: C.ko.e == 'stop' ? 12 : 5, kh: 5 };
     } else if (K && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
@@ -6688,7 +6936,11 @@ function mysLancer(cb, fic) {
     if (rp) Object.assign(V, rp);
     hy = hc - f * Math.tan(V.p);
     // la secousse au moment où elle touche le sol (ou à l'arrivée du fichier, pendant le replay)
-    const sec = Math.max(K && K.sol ? Math.max(0, 0.4 - (T() - K.sol)) : 0, RP && RP.ti ? Math.max(0, 0.35 - (T() - RP.ti)) : 0);
+    const sec = Math.max(
+      K && K.sol ? Math.max(0, 0.4 - (T() - K.sol)) : 0,
+      RP && RP.ti ? Math.max(0, 0.35 - (T() - RP.ti)) : 0,
+      ...manga.map(m => Math.max(0, (m.k == 'impact' ? 0.9 : 0.7) - (T() - m.t) * 1.6)) // la patate et le crash
+    );
     V.sx = sec * (Math.random() - 0.5) * 30;
     V.sy = sec * (Math.random() - 0.5) * 30;
     hist();
@@ -6752,6 +7004,7 @@ function mysLancer(cb, fic) {
     particules(dt);
     neige(dt, true);
     devant(t);
+    mangaFx(t);
     habillage(t);
     // fondu au noir avant de réapparaître sur le toit, puis retour de l'image
     const nr =

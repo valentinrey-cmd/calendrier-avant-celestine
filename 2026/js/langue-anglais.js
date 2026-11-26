@@ -3245,7 +3245,7 @@ window.TRADUCTIONS_EN = {
   'Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !': 'Joystick to walk, slide your finger to turn the view. Hold “Throw” and let go at the right moment!',
   'Va le ramasser, puis vise pile la cheminée 🎯': 'Go pick it up, then aim right at the chimney 🎯',
   'Raté ! Va ramasser le fichier 😉': 'Missed! Go pick up the file 😉',
-  '😈 Valentin prépare un tir canon… esquive !': '😈 Valentin is lining up a cannon shot… dodge!',
+  '😈 Valentin prépare une patate… esquive !': '😈 Valentin is winding up a haymaker… dodge!',
   '📮 Choisir un fichier': '📮 Choose a file',
   'Ho ho… ce n’est pas le bon fichier ! 🎅 Choisis-en un autre dans la boîte aux lettres 📮': 'Ho ho… that’s not the right file! 🎅 Pick another one from the mailbox 📮',
   'Mraaou ! 🐱 Le chat bouchait la cheminée.': 'Mraaow! 🐱 The cat was blocking the chimney.',
