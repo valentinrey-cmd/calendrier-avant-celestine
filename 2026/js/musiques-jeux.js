@@ -2535,18 +2535,150 @@ function mysLancer(cb, fic) {
   // bien placée pour sauter : juste devant (ou derrière) la cheminée
   const presDe = () => C && Math.abs(Math.abs(C.z - CZ) - CD - 0.5) < 0.42 && Math.abs(C.x) < CX + 0.25;
   const enFace = () => presDe() && Math.abs(C.x) < OX - 0.12;
-  const main = () => {
-    // position du fichier dans sa main droite (à droite de l'écran, puisqu'on la voit de dos), en suivant le dessin
+  // où sont ses mains (en cm, pieds au centre, y vers le haut négatif) selon la vue : de dos, de face ou de profil
+  const poses = () => {
     const sw = Math.sin(C.ph),
-      bob = Math.abs(Math.cos(C.ph)) * 0.022 * C.amp;
-    if (C.saute && C.tient) return { x: C.x + 0.12, y: C.y + 2.08, z: C.z - 0.01, a: 0.08 };
-    return { x: C.x + 0.27 + C.pen * 0.02, y: C.y + 0.77 + sw * 0.04 * C.amp + bob, z: C.z - 0.01, a: 0.1 + sw * 0.1 * C.amp };
+      a = C.amp,
+      v = C.vue,
+      sg = C.sg,
+      joie = C.joie && T() - C.joie < 2.5,
+      haut = C.saute && C.tient,
+      air = C.saute;
+    if (v == 'profil') {
+      const al = -sw * 0.55 * a,
+        pr = [sg * 48 * Math.sin(al), -133 + 48 * Math.cos(al)],
+        lo = [sg * 48 * Math.sin(-al), -133 + 48 * Math.cos(-al)];
+      if (joie) return { tient: [sg * 8, -198], libre: [-sg * 4, -196] };
+      if (haut) return { tient: [sg * 7, -198], libre: [-sg * 20, -122] };
+      if (air) return { tient: [sg * 22, -118], libre: [-sg * 20, -120] };
+      return { tient: pr, libre: lo };
+    }
+    const m = v == 'face' ? -1 : 1; // de face, sa main droite est à gauche de l'écran
+    if (joie) return { tient: [m * 20, -196 - Math.sin(T() * 12) * 4], libre: [-m * 20, -196 + Math.sin(T() * 12) * 4] };
+    if (haut) return { tient: [m * 12, -198], libre: [-m * 31, -122] };
+    if (air) return { tient: [m * 31, -122], libre: [-m * 31, -122] };
+    return { tient: [m * 27, -88 - sw * 4 * a], libre: [-m * (25 + Math.abs(sw) * 1.5 * a), -84 + sw * 7 * a] };
+  };
+  const main = () => {
+    // le fichier suit la main qui le tient (le dessin et le monde utilisent les mêmes positions)
+    const p = poses().tient,
+      bob = Math.abs(Math.cos(C.ph)) * 0.022 * C.amp,
+      haut = p[1] < -150,
+      pr = C.vue == 'profil';
+    return {
+      x: C.x + p[0] / 100,
+      y: C.y + bob - p[1] / 100 + (haut ? 0.1 : -0.11),
+      z: C.z - (pr ? 0.12 : 0.01),
+      a: pr ? C.sg * 0.15 : 0.1 + Math.sin(C.ph) * 0.1 * C.amp
+    };
+  };
+  /* --- chemin : elle contourne la cheminée et les obstacles (grille de 20 cm, recherche A*) --- */
+  const GR = 0.2,
+    GX0 = -6,
+    GZ0 = 1.4,
+    NX = 61,
+    NZ = Math.floor((RIDGE - 0.4 - GZ0) / GR) + 1;
+  const libre = (x, z) =>
+    !(Math.abs(x) < CX + 0.3 && Math.abs(z - CZ) < CD + 0.3) && OBS.every(ob => Math.hypot(x - ob.x, z - ob.z) > rayon(ob, 0.5) + 0.3);
+  const voit = (a, b) => {
+    const d = Math.hypot(b.x - a.x, b.z - a.z),
+      n = Math.ceil(d / 0.08);
+    for (let i = 1; i <= n; i++) if (!libre(a.x + ((b.x - a.x) * i) / n, a.z + ((b.z - a.z) * i) / n)) return false;
+    return true;
+  };
+  const chemin = (a, b) => {
+    const cell = p => [
+        Math.max(0, Math.min(NX - 1, Math.round((p.x - GX0) / GR))),
+        Math.max(0, Math.min(NZ - 1, Math.round((p.z - GZ0) / GR)))
+      ],
+      pt = (i, j) => ({ x: GX0 + i * GR, z: GZ0 + j * GR });
+    // point d'arrivée dans un obstacle : on prend l'endroit libre le plus proche
+    if (!libre(b.x, b.z)) {
+      let best = null,
+        bd = 1e9;
+      for (let j = 0; j < NZ; j++)
+        for (let i = 0; i < NX; i++) {
+          const p = pt(i, j),
+            d = Math.hypot(p.x - b.x, p.z - b.z);
+          if (d < bd && libre(p.x, p.z)) ((bd = d), (best = p));
+        }
+      b = best || b;
+    }
+    if (voit(a, b)) return [b];
+    const [si, sj] = cell(a),
+      [gi, gj] = cell(b),
+      N = NX * NZ,
+      g = new Float32Array(N).fill(1e9),
+      de = new Int32Array(N).fill(-1),
+      fait = new Uint8Array(N),
+      ouv = [si + sj * NX];
+    g[si + sj * NX] = 0;
+    const h = k => Math.hypot((k % NX) - gi, Math.floor(k / NX) - gj);
+    while (ouv.length) {
+      let bi = 0;
+      for (let k = 1; k < ouv.length; k++) if (g[ouv[k]] + h(ouv[k]) < g[ouv[bi]] + h(ouv[bi])) bi = k;
+      const k = ouv.splice(bi, 1)[0];
+      if (k == gi + gj * NX) break;
+      fait[k] = 1;
+      const i = k % NX,
+        j = Math.floor(k / NX);
+      for (let di = -1; di <= 1; di++)
+        for (let dj = -1; dj <= 1; dj++) {
+          const ni = i + di,
+            nj = j + dj;
+          if ((!di && !dj) || ni < 0 || nj < 0 || ni >= NX || nj >= NZ) continue;
+          const n = ni + nj * NX,
+            p = pt(ni, nj);
+          if (fait[n] || !libre(p.x, p.z)) continue;
+          const ng = g[k] + Math.hypot(di, dj);
+          if (ng < g[n]) {
+            g[n] = ng;
+            de[n] = k;
+            if (!ouv.includes(n)) ouv.push(n);
+          }
+        }
+    }
+    let k = gi + gj * NX;
+    if (de[k] < 0) return [b];
+    const pts = [];
+    for (; k >= 0 && k != si + sj * NX; k = de[k]) pts.unshift(pt(k % NX, Math.floor(k / NX)));
+    pts[pts.length - 1] = b;
+    // on lisse : à chaque fois, on va directement au point le plus loin qu'on voit
+    const lisse = [];
+    let cur = a,
+      i = 0;
+    while (i < pts.length) {
+      let j = pts.length - 1;
+      while (j > i && !voit(cur, pts[j])) j--;
+      lisse.push(pts[j]);
+      cur = pts[j];
+      i = j + 1;
+    }
+    return lisse;
   };
   const aPied = on => {
     if (fin || (F.vol && !F.fin)) return;
     if (on) {
-      C = { x: 0, z: 1.5, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, saute: 0, lache: 0, joie: 0, pasS: 0 };
-      cible = { x: 0, z: 2.6, t: -9 };
+      C = {
+        x: 0,
+        z: 1.5,
+        y: 0,
+        vy: 0,
+        ph: 0,
+        v: 0,
+        amp: 0,
+        pen: 0,
+        tient: 1,
+        saute: 0,
+        lache: 0,
+        joie: 0,
+        vue: 'dos',
+        sg: 1,
+        tour: 1,
+        avant: 'dos',
+        way: [{ x: 0, z: 2.6 }]
+      };
+      cible = { x: 0, z: 2.6 };
       F.vol = 0;
       consigne.textContent = 'Touche le toit pour la faire marcher, puis saute devant la cheminée.';
       tip.textContent = '';
@@ -2570,6 +2702,7 @@ function mysLancer(cb, fic) {
     C.saute = 1;
     C.lache = pret;
     cible = null;
+    C.way = [];
     bruit('hop');
   };
   const lacherMain = () => {
@@ -2622,19 +2755,36 @@ function mysLancer(cb, fic) {
           });
       }
     }
-    // marche vers le point touché
+    // marche vers le point touché, étape par étape (le chemin contourne les obstacles)
     let vx = 0,
       vz = 0;
-    if (cible && !C.saute) {
-      const dx = cible.x - C.x,
-        dz = cible.z - C.z,
-        d = Math.hypot(dx, dz);
-      if (d > 0.04) {
-        C.v = Math.min(1.5, C.v + dt * 4, d * 3);
+    if (C.way.length && !C.saute) {
+      const w = C.way[0],
+        fin2 = C.way[C.way.length - 1],
+        dx = w.x - C.x,
+        dz = w.z - C.z,
+        d = Math.hypot(dx, dz),
+        reste = Math.hypot(fin2.x - C.x, fin2.z - C.z);
+      if (d > (C.way.length > 1 ? 0.12 : 0.04)) {
+        C.v = Math.min(1.5, C.v + dt * 4, reste * 3 + 0.15);
         vx = (dx / d) * C.v;
         vz = (dz / d) * C.v;
-      } else cible = null;
+      } else if (C.way.shift() && !C.way.length) cible = null;
     }
+    // elle se tourne dans le sens de la marche : de dos (elle s'éloigne), de face (elle revient), de profil (sur le côté)
+    if (vx || vz) {
+      const an = Math.atan2(Math.abs(vx), vz),
+        nv = an < 0.7 ? 'dos' : an > 2.3 ? 'face' : 'profil',
+        ns = vx >= 0 ? 1 : -1;
+      if (nv != C.vue || (nv == 'profil' && ns != C.sg)) {
+        C.avant = C.vue;
+        C.asg = C.sg;
+        C.vue = nv;
+        C.sg = ns;
+        C.tour = 0;
+      }
+    }
+    C.tour = Math.min(1, C.tour + dt / 0.22);
     if (!vx && !vz) C.v = Math.max(0, C.v - dt * 6);
     const x0 = C.x,
       z0 = C.z;
@@ -2662,6 +2812,7 @@ function mysLancer(cb, fic) {
         C.z = ob.z + ((C.z - ob.z) / d) * m;
         surprise(ob.t);
         cible = null;
+        C.way = [];
       }
     });
     C.x = Math.max(-6, Math.min(6, C.x));
@@ -2670,7 +2821,7 @@ function mysLancer(cb, fic) {
     const bouge = Math.hypot(C.x - x0, C.z - z0),
       voulu = Math.hypot(vx, vz) * dt;
     C.bloque = voulu > 0 && bouge < voulu * 0.3 ? (C.bloque || 0) + dt : 0;
-    if (C.bloque > 0.2) cible = null;
+    if (C.bloque > 0.2) ((cible = null), (C.way = []));
     // le fichier suit sa main
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
     saut.classList.toggle('pret', enFace() && C.tient);
@@ -2696,9 +2847,14 @@ function mysLancer(cb, fic) {
       u = s / 100, // 1 unité = 1 cm
       a = C.amp,
       sw = Math.sin(C.ph),
-      bob = -Math.abs(Math.cos(C.ph)) * 2.2 * a,
+      cw = Math.cos(C.ph),
+      bob = -Math.abs(cw) * 2.2 * a,
       air = C.saute ? 1 : 0,
-      joie = C.joie && T() - C.joie < 2.5;
+      tour = C.avant != C.vue || C.asg != C.sg ? C.tour : 1,
+      vue = tour < 0.5 ? C.avant : C.vue,
+      sg = tour < 0.5 ? C.asg : C.sg,
+      ecrase = tour < 1 ? Math.max(0.15, Math.abs(1 - 2 * tour)) : 1, // demi-tour : elle « pivote »
+      po = poses();
     // ombre au sol
     c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y)})`;
     c.beginPath();
@@ -2706,8 +2862,8 @@ function mysLancer(cb, fic) {
     c.fill();
     c.save();
     c.translate(x, yb);
-    c.scale(u, u);
-    c.rotate(C.pen * 0.07);
+    c.scale(u * ecrase, u);
+    c.rotate(C.pen * 0.07 * (vue == 'profil' ? 0.4 : 1));
     c.translate(0, bob);
     c.lineJoin = c.lineCap = 'round';
     const forme = (pts, col) => {
@@ -2717,9 +2873,51 @@ function mysLancer(cb, fic) {
       c.closePath();
       c.fill();
     };
-    // --- jambes (jean) et bottes fourrées
-    const jambe = (cx, lev) => {
-      const ky = -8 - lev; // cheville
+    const PEAU = '#efc1a2',
+      ROSE = '#f07fa1',
+      ROSEF = '#d65b80',
+      ROSEO = '#c94f74',
+      FOURRURE = '#f6efe6',
+      ECAILLE = '#7a4a2a';
+    const moufle = (hx, hyy) => {
+      c.fillStyle = '#c0233a';
+      c.beginPath();
+      c.ellipse(hx, hyy - 1, 5.5, 2.5, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#f4ead8';
+      c.beginPath();
+      c.ellipse(hx, hyy + 4, 5, 6.2, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#e2d2bb';
+      c.beginPath();
+      c.ellipse(hx + Math.sign(hx || 1) * 3.5, hyy + 2, 2, 3, 0.4, 0, 7);
+      c.fill();
+    };
+    const fichierEnMain = () => {
+      if (!C.tient) return;
+      c.save();
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fichier();
+      c.restore();
+    };
+    // bras vu de face ou de dos (épaule → main)
+    const bras = (ex, hx, hyy, col = '#d8577d', clair = '#ee7b9d') => {
+      c.strokeStyle = col;
+      c.lineWidth = 9;
+      c.beginPath();
+      c.moveTo(ex, -132);
+      c.quadraticCurveTo((ex + hx) / 2 + Math.sign(ex) * 4, (-132 + hyy) / 2, hx, hyy);
+      c.stroke();
+      c.strokeStyle = clair;
+      c.lineWidth = 4;
+      c.beginPath();
+      c.moveTo(ex + Math.sign(ex) * 1.5, -130);
+      c.quadraticCurveTo((ex + hx) / 2 + Math.sign(ex) * 4, (-130 + hyy) / 2, hx, hyy - 2);
+      c.stroke();
+    };
+    // jambe vue de face ou de dos ; « bout » = on voit le bout de la botte (de face)
+    const jambe = (cx, lev, bout) => {
+      const ky = -8 - lev;
       const gj = c.createLinearGradient(cx - 7.5, 0, cx + 7.5, 0);
       gj.addColorStop(0, '#2a375c');
       gj.addColorStop(0.5, '#41558a');
@@ -2735,25 +2933,27 @@ function mysLancer(cb, fic) {
       c.strokeStyle = '#5b6fa3';
       c.lineWidth = 0.9;
       c.beginPath();
-      c.moveTo(cx + 2.5, -76);
-      c.lineTo(cx + 2, ky);
+      c.moveTo(cx + (bout ? -2.5 : 2.5), -76);
+      c.lineTo(cx + (bout ? -2 : 2), ky);
       c.stroke();
-      // plis derrière le genou
       c.strokeStyle = '#25304f';
       c.lineWidth = 0.8;
       [-44, -41].forEach(yk => {
         c.beginPath();
         c.moveTo(cx - 4.5, yk - lev * 0.4);
-        c.quadraticCurveTo(cx, yk + 1.5 - lev * 0.4, cx + 4.5, yk - lev * 0.4);
+        c.quadraticCurveTo(cx, yk + (bout ? -1.5 : 1.5) - lev * 0.4, cx + 4.5, yk - lev * 0.4);
         c.stroke();
       });
-      // botte
-      c.fillStyle = lev > 3 ? '#4a2f1c' : '#6e4a2e';
+      c.fillStyle = lev > 3 && !bout ? '#4a2f1c' : '#6e4a2e';
       c.beginPath();
-      c.roundRect(cx - 6.5, ky - 4, 13, 13 + Math.min(lev, 6) * 0.2, [3, 3, 4, 4]);
+      c.roundRect(cx - 6.5, ky - 4, 13, 13, [3, 3, 4, 4]);
       c.fill();
-      if (lev > 3) {
-        // on voit la semelle quand le pied se lève
+      if (bout) {
+        c.fillStyle = '#86603f';
+        c.beginPath();
+        c.ellipse(cx, ky + 6.5, 6.8, 3.4, 0, 0, 7);
+        c.fill();
+      } else if (lev > 3) {
         c.fillStyle = '#2a1a10';
         c.fillRect(cx - 6, ky + 6.5, 12, 2.5);
       }
@@ -2762,208 +2962,575 @@ function mysLancer(cb, fic) {
       c.roundRect(cx - 7.5, ky - 6, 15, 5, 2.5);
       c.fill();
     };
+    // la doudoune vue de face ou de dos
+    const manteau = face => {
+      const g = c.createLinearGradient(-24, 0, 24, 0);
+      g.addColorStop(0, ROSEF);
+      g.addColorStop(0.45, ROSE);
+      g.addColorStop(1, ROSEO);
+      forme(
+        [
+          [-18, -140],
+          [18, -140],
+          [21, -120],
+          [24, -76],
+          [12, -72],
+          [0, -73],
+          [-12, -72],
+          [-24, -76],
+          [-21, -120]
+        ],
+        g
+      );
+      c.strokeStyle = '#b8466a';
+      c.lineWidth = 1.1;
+      [-124, -110, -96, -84].forEach(yq => {
+        const w = 19 + (yq + 140) * 0.09;
+        c.beginPath();
+        c.moveTo(-w, yq);
+        c.quadraticCurveTo(0, yq + 3, w, yq);
+        c.stroke();
+      });
+      c.beginPath();
+      c.moveTo(0, face ? -138 : -128);
+      c.lineTo(0, -73);
+      c.stroke();
+      if (face) {
+        // fermeture éclair, tirette dorée et poches
+        c.fillStyle = '#e0b84a';
+        c.beginPath();
+        c.roundRect(-1.6, -116, 3.2, 6, 1);
+        c.fill();
+        c.strokeStyle = '#a83d62';
+        c.lineWidth = 1.4;
+        [-1, 1].forEach(q => {
+          c.beginPath();
+          c.moveTo(q * 10, -99);
+          c.lineTo(q * 15, -86);
+          c.stroke();
+        });
+      }
+    };
+    // tête de face : son visage, ses grandes lunettes écaille, ses taches de rousseur
+    const teteFace = () => {
+      const cligne = t % 4.2 < 0.13;
+      c.fillStyle = '#2e1c12';
+      c.beginPath();
+      c.ellipse(0, -155, 12.6, 13.6, 0, 0, 7);
+      c.fill();
+      c.fillStyle = PEAU;
+      c.fillRect(-3.8, -148, 7.6, 6);
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.ellipse(q * 10.4, -153, 2.3, 3.4, 0, 0, 7);
+        c.fill();
+      });
+      const gp = c.createRadialGradient(-2, -156, 2, 0, -153, 13);
+      gp.addColorStop(0, '#f6cfb3');
+      gp.addColorStop(1, '#e3ad8c');
+      c.fillStyle = gp;
+      c.beginPath();
+      c.ellipse(0, -153.5, 10.2, 12, 0, 0, 7);
+      c.fill();
+      // cheveux tirés en arrière, raie sur le côté
+      const gh = c.createLinearGradient(0, -170, 0, -150);
+      gh.addColorStop(0, '#5a3825');
+      gh.addColorStop(1, '#2e1c12');
+      c.fillStyle = gh;
+      c.beginPath();
+      c.moveTo(-11.6, -151);
+      c.quadraticCurveTo(-12.6, -167, 0, -169);
+      c.quadraticCurveTo(12.6, -167, 11.6, -151);
+      c.quadraticCurveTo(10.2, -160, 4, -162.5);
+      c.quadraticCurveTo(-2, -164.5, -6, -161.5);
+      c.quadraticCurveTo(-10.2, -159, -11.6, -151);
+      c.fill();
+      c.strokeStyle = '#7a5236';
+      c.lineWidth = 0.6;
+      for (let i = 0; i < 6; i++) {
+        c.beginPath();
+        c.moveTo(-8 + i * 3, -166.5 + Math.abs(i - 2.5) * 0.5);
+        c.quadraticCurveTo(-7 + i * 3.2, -163, -9 + i * 3.6, -161.5);
+        c.stroke();
+      }
+      // sourcils, yeux, lunettes
+      c.strokeStyle = '#4a2e1d';
+      c.lineWidth = 1;
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.moveTo(q * 2.4, -159.4);
+        c.quadraticCurveTo(q * 4.8, -160.8, q * 7.4, -159.4);
+        c.stroke();
+      });
+      [-1, 1].forEach(q => {
+        if (cligne) {
+          c.strokeStyle = '#3a2418';
+          c.lineWidth = 0.8;
+          c.beginPath();
+          c.moveTo(q * 4.6 - 1.8, -155.2);
+          c.quadraticCurveTo(q * 4.6, -154.4, q * 4.6 + 1.8, -155.2);
+          c.stroke();
+          return;
+        }
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.ellipse(q * 4.6, -155.3, 2.1, 1.4, 0, 0, 7);
+        c.fill();
+        c.fillStyle = '#5a3a22';
+        c.beginPath();
+        c.arc(q * 4.6, -155.3, 1.15, 0, 7);
+        c.fill();
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.arc(q * 4.6 + 0.4, -155.7, 0.35, 0, 7);
+        c.fill();
+      });
+      c.fillStyle = '#ffffff22';
+      c.strokeStyle = ECAILLE;
+      c.lineWidth = 1.15;
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.roundRect(q * 4.7 - 3.8, -159, 7.6, 6.8, 2);
+        c.fill();
+        c.stroke();
+      });
+      c.strokeStyle = '#a8703f';
+      c.lineWidth = 0.5;
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.moveTo(q * 4.7 - 3, -158.4);
+        c.lineTo(q * 4.7 + 1, -158.4);
+        c.stroke();
+      });
+      c.strokeStyle = ECAILLE;
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(-0.9, -156.5);
+      c.quadraticCurveTo(0, -157.4, 0.9, -156.5);
+      c.moveTo(-8.5, -157.5);
+      c.lineTo(-10, -156.8);
+      c.moveTo(8.5, -157.5);
+      c.lineTo(10, -156.8);
+      c.stroke();
+      // nez, taches de rousseur, joues, sourire
+      c.strokeStyle = '#c98a6a';
+      c.lineWidth = 0.7;
+      c.beginPath();
+      c.moveTo(0.2, -154);
+      c.quadraticCurveTo(1.2, -151.2, -0.6, -150.8);
+      c.stroke();
+      c.fillStyle = '#c98a6a99';
+      [
+        [-3.4, -151.6],
+        [-2.2, -150.6],
+        [-4.4, -150.4],
+        [3.2, -151.6],
+        [2.2, -150.5],
+        [4.4, -150.6],
+        [-1, -152.6],
+        [1.3, -152.6]
+      ].forEach(([fx, fy]) => {
+        c.beginPath();
+        c.arc(fx, fy, 0.32, 0, 7);
+        c.fill();
+      });
+      c.fillStyle = '#f2a0a055';
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.ellipse(q * 6.6, -150.2, 2.2, 1.3, 0, 0, 7);
+        c.fill();
+      });
+      c.fillStyle = '#ffffff';
+      c.strokeStyle = '#b0505a';
+      c.lineWidth = 0.7;
+      c.beginPath();
+      c.moveTo(-3.6, -148.3);
+      c.quadraticCurveTo(0, -144.4, 3.6, -148.3);
+      c.quadraticCurveTo(0, -146.9, -3.6, -148.3);
+      c.fill();
+      c.stroke();
+    };
+    // tête de dos : oreilles, branches des lunettes, cheveux et queue-de-cheval
+    const teteDos = () => {
+      c.save();
+      c.translate(C.pen * 1.2, 0);
+      c.fillStyle = '#e7b393';
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.ellipse(q * 10.8, -152, 2.4, 3.6, q * 0.2, 0, 7);
+        c.fill();
+      });
+      c.strokeStyle = ECAILLE;
+      c.lineWidth = 1.2;
+      [-1, 1].forEach(q => {
+        c.beginPath();
+        c.moveTo(q * 10.2, -155.5);
+        c.quadraticCurveTo(q * 12.4, -155, q * 13.4, -158);
+        c.stroke();
+      });
+      const gh = c.createRadialGradient(-3, -162, 2, 0, -154, 14);
+      gh.addColorStop(0, '#6a4329');
+      gh.addColorStop(1, '#2e1c12');
+      c.fillStyle = gh;
+      c.beginPath();
+      c.ellipse(0, -155, 11, 12.5, 0, 0, 7);
+      c.fill();
+      c.strokeStyle = '#80573a';
+      c.lineWidth = 0.7;
+      for (let i = -4; i <= 4; i++) {
+        c.beginPath();
+        c.moveTo(i * 2.4, -166.5 + Math.abs(i) * 0.6);
+        c.quadraticCurveTo(i * 2.2, -158, i * 0.4, -152);
+        c.stroke();
+      }
+      const q = sw * 3 * a + C.pen * 4 + (air ? -2 : 0),
+        qy = air ? (C.vy > 0 ? 3 : -4) : 0;
+      queue(0, -151, q, qy);
+      c.restore();
+    };
+    const queue = (bx, by, q, qy) => {
+      const gq = c.createLinearGradient(0, by, 0, by + 24);
+      gq.addColorStop(0, '#4a2e1d');
+      gq.addColorStop(1, '#2a190f');
+      c.fillStyle = gq;
+      c.beginPath();
+      c.moveTo(bx - 3.2, by);
+      c.quadraticCurveTo(bx - 5 + q * 0.4, by + 11, bx - 2.5 + q, by + 22 + qy);
+      c.quadraticCurveTo(bx + 0.5 + q * 1.1, by + 25 + qy, bx + 2 + q, by + 21 + qy);
+      c.quadraticCurveTo(bx + 4.5 + q * 0.4, by + 10, bx + 3.2, by);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = '#6a4329';
+      c.lineWidth = 0.6;
+      c.beginPath();
+      c.moveTo(bx, by + 1);
+      c.quadraticCurveTo(bx + q * 0.5, by + 11, bx + q * 0.9, by + 21 + qy);
+      c.stroke();
+      c.fillStyle = '#ff8fb8';
+      c.beginPath();
+      c.ellipse(bx, by - 0.5, 4.2, 2.4, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#ffc2d8';
+      c.beginPath();
+      c.ellipse(bx - 1, by - 1.3, 1.8, 0.9, 0, 0, 7);
+      c.fill();
+    };
     const levG = air ? 7 : Math.max(0, sw) * 9 * a,
       levD = air ? 5 : Math.max(0, -sw) * 9 * a;
-    jambe(-8.5, levG);
-    jambe(8.5, levD);
-    // --- bras (manches de la doudoune) : derrière le manteau pour la gauche qui balance
-    const bras = (sxx, hx, hyy, avant) => {
-      c.strokeStyle = '#d8577d';
-      c.lineWidth = 9;
-      c.beginPath();
-      c.moveTo(sxx, -132);
-      c.quadraticCurveTo((sxx + hx) / 2 + Math.sign(sxx) * 4, (-132 + hyy) / 2, hx, hyy);
-      c.stroke();
-      c.strokeStyle = '#ee7b9d';
-      c.lineWidth = 4;
-      c.beginPath();
-      c.moveTo(sxx + Math.sign(sxx) * 1.5, -130);
-      c.quadraticCurveTo((sxx + hx) / 2 + Math.sign(sxx) * 4, (-130 + hyy) / 2, hx, hyy - 2);
-      c.stroke();
-      if (avant !== false) moufle(hx, hyy);
-    };
-    const moufle = (hx, hyy) => {
-      c.fillStyle = '#c0233a';
-      c.beginPath();
-      c.ellipse(hx, hyy - 1, 5.5, 2.5, 0, 0, 7);
-      c.fill();
+
+    if (vue == 'dos' || vue == 'face') {
+      const face = vue == 'face',
+        [tx, ty] = po.tient,
+        [lx, ly] = po.libre;
+      jambe(-8.5, face ? levD : levG, face);
+      jambe(8.5, face ? levG : levD, face);
+      if (face) {
+        // la capuche dépasse derrière les épaules
+        c.fillStyle = FOURRURE;
+        c.beginPath();
+        c.ellipse(0, -141, 15, 5, 0, 0, 7);
+        c.fill();
+      }
+      manteau(face);
+      if (!face) {
+        // capuche fourrée posée dans le dos
+        forme(
+          [
+            [-14, -142],
+            [14, -142],
+            [11, -126],
+            [0, -121],
+            [-11, -126]
+          ],
+          '#cf5a7e'
+        );
+        c.fillStyle = FOURRURE;
+        c.beginPath();
+        c.moveTo(-15, -142);
+        c.quadraticCurveTo(0, -136, 15, -142);
+        c.quadraticCurveTo(12, -125, 0, -120);
+        c.quadraticCurveTo(-12, -125, -15, -142);
+        c.lineTo(-12.5, -140);
+        c.quadraticCurveTo(-9, -127, 0, -123.5);
+        c.quadraticCurveTo(9, -127, 12.5, -140);
+        c.closePath();
+        c.fill();
+      }
+      bras(lx < 0 ? -18 : 18, lx, ly);
+      moufle(lx, ly);
+      bras(tx < 0 ? -18 : 18, tx, ty);
+      fichierEnMain();
+      moufle(tx, ty);
+      // écharpe crème à rayures
       c.fillStyle = '#f4ead8';
       c.beginPath();
-      c.ellipse(hx, hyy + 4, 5, 6.2, 0, 0, 7);
+      c.roundRect(-11, -147, 22, 8, 4);
       c.fill();
-      c.fillStyle = '#e2d2bb';
-      c.beginPath();
-      c.ellipse(hx + Math.sign(hx || 1) * 3.5, hyy + 2, 2, 3, 0.4, 0, 7);
-      c.fill();
-    };
-    const gH = joie ? [-20, -196 + Math.sin(T() * 12) * 4] : air ? [-31, -122] : [-25 - Math.abs(sw) * 1.5 * a, -84 + sw * 7 * a],
-      dH = joie ? [20, -196 - Math.sin(T() * 12) * 4] : C.saute && C.tient ? [12, -198] : air ? [31, -122] : [27, -88 - sw * 4 * a];
-    // --- manteau (doudoune rose matelassée, capuche fourrée posée dans le dos)
-    c.save();
-    const g = c.createLinearGradient(-24, 0, 24, 0);
-    g.addColorStop(0, '#d65b80');
-    g.addColorStop(0.45, '#f07fa1');
-    g.addColorStop(1, '#c94f74');
-    forme(
-      [
-        [-18, -140],
-        [18, -140],
-        [21, -120],
-        [24, -76],
-        [12, -72],
-        [0, -73],
-        [-12, -72],
-        [-24, -76],
-        [-21, -120]
-      ],
-      g
-    );
-    c.strokeStyle = '#b8466a';
-    c.lineWidth = 1.1;
-    [-124, -110, -96, -84].forEach(yq => {
-      const w = 19 + (yq + 140) * 0.09;
-      c.beginPath();
-      c.moveTo(-w, yq);
-      c.quadraticCurveTo(0, yq + 3, w, yq);
-      c.stroke();
-    });
-    c.beginPath();
-    c.moveTo(0, -128);
-    c.lineTo(0, -73);
-    c.stroke();
-    // capuche
-    forme(
-      [
-        [-14, -142],
-        [14, -142],
-        [11, -126],
-        [0, -121],
-        [-11, -126]
-      ],
-      '#cf5a7e'
-    );
-    c.fillStyle = '#f6efe6';
-    c.beginPath();
-    c.moveTo(-15, -142);
-    c.quadraticCurveTo(0, -136, 15, -142);
-    c.quadraticCurveTo(12, -125, 0, -120);
-    c.quadraticCurveTo(-12, -125, -15, -142);
-    c.lineTo(-12.5, -140);
-    c.quadraticCurveTo(-9, -127, 0, -123.5);
-    c.quadraticCurveTo(9, -127, 12.5, -140);
-    c.closePath();
-    c.fill();
-    c.restore();
-    // bras gauche (il balance), bras droit (il tient le fichier)
-    bras(-18, gH[0], gH[1]);
-    if (C.tient || joie) {
-      bras(18, dH[0], dH[1], false);
-      if (C.tient) {
-        // le fichier, tenu à la main : il se dessine à sa place dans le monde (repère de l'écran)
-        c.save();
-        c.setTransform(dpr, 0, 0, dpr, 0, 0);
-        fichier();
-        c.restore();
+      const pan = sw * 2.5 * a + C.pen * 3;
+      if (face) {
+        // nœud devant et deux pans qui pendent
+        [
+          [2, -112, pan * 0.6],
+          [-3, -116, -pan * 0.4]
+        ].forEach(([bx, by, pp]) => {
+          c.fillStyle = '#f4ead8';
+          c.beginPath();
+          c.moveTo(bx - 3, -141);
+          c.lineTo(bx + 3.5, -141);
+          c.lineTo(bx + 3.5 + pp, by);
+          c.lineTo(bx - 3 + pp, by);
+          c.closePath();
+          c.fill();
+          c.fillStyle = '#c0233a';
+          [0.35, 0.65].forEach(k => c.fillRect(bx - 3 + pp * k, -141 + (by + 141) * k, 6.5, 2));
+        });
+        c.fillStyle = '#e8dcc6';
+        c.beginPath();
+        c.arc(0, -141, 3.6, 0, 7);
+        c.fill();
+      } else {
+        c.beginPath();
+        c.moveTo(-6, -142);
+        c.lineTo(2, -142);
+        c.quadraticCurveTo(2 + pan * 0.5, -128, 1 + pan, -116);
+        c.lineTo(-6 + pan, -116);
+        c.quadraticCurveTo(-6 + pan * 0.5, -128, -6, -142);
+        c.fill();
+        c.fillStyle = '#c0233a';
+        [-136, -128, -121].forEach(yq => c.fillRect(-6 + pan * ((yq + 142) / 26), yq, 7.5, 2));
       }
-      moufle(dH[0], dH[1]);
-    } else bras(18, dH[0], dH[1]);
-    // --- écharpe crème à rayures, un pan qui pend dans le dos
-    c.fillStyle = '#f4ead8';
-    c.beginPath();
-    c.roundRect(-11, -147, 22, 8, 4);
-    c.fill();
-    const pan = sw * 2.5 * a + C.pen * 3;
-    c.beginPath();
-    c.moveTo(-6, -142);
-    c.lineTo(2, -142);
-    c.quadraticCurveTo(2 + pan * 0.5, -128, 1 + pan, -116);
-    c.lineTo(-6 + pan, -116);
-    c.quadraticCurveTo(-6 + pan * 0.5, -128, -6, -142);
-    c.fill();
-    c.fillStyle = '#c0233a';
-    [-136, -128, -121].forEach(yq => {
-      const k = (yq + 142) / 26;
-      c.fillRect(-6 + pan * k, yq, 7.5, 2);
-    });
-    c.strokeStyle = '#e8dcc6';
-    c.lineWidth = 0.8;
-    for (let i = 0; i < 4; i++) {
+      if (face) teteFace();
+      else teteDos();
+    } else {
+      // ---- de profil : on dessine tournée vers la droite, et on retourne le dessin si elle va à gauche
+      c.scale(sg, 1);
+      const th = air ? 0.35 : sw * 0.5 * a,
+        kp = air ? 0.7 : Math.max(0, cw) * 0.7 * a,
+        kl = air ? 0.4 : Math.max(0, -cw) * 0.7 * a;
+      const jambeP = (an, plie, sombre) => {
+        const kx = Math.sin(an) * 38,
+          ky = -80 + Math.cos(an) * 38,
+          a2 = an - plie,
+          ax = kx + Math.sin(a2) * 36,
+          ay = ky + Math.cos(a2) * 36;
+        c.strokeStyle = sombre ? '#27324f' : '#3a4b7a';
+        c.lineWidth = 13;
+        c.beginPath();
+        c.moveTo(0, -80);
+        c.lineTo(kx, ky);
+        c.stroke();
+        c.lineWidth = 10.5;
+        c.beginPath();
+        c.moveTo(kx, ky);
+        c.lineTo(ax, ay);
+        c.stroke();
+        c.save();
+        c.translate(ax, ay);
+        c.rotate(-a2 * 0.6);
+        c.fillStyle = sombre ? '#56391f' : '#6e4a2e';
+        c.beginPath();
+        c.moveTo(-6, -8);
+        c.lineTo(5, -8);
+        c.lineTo(5, 2);
+        c.quadraticCurveTo(13, 2, 13, 7);
+        c.lineTo(13, 9);
+        c.lineTo(-6, 9);
+        c.closePath();
+        c.fill();
+        c.fillStyle = '#2a1a10';
+        c.fillRect(-6, 8, 19, 2);
+        c.fillStyle = sombre ? '#d9cdb9' : '#f1e7d8';
+        c.beginPath();
+        c.roundRect(-7, -11, 13, 5, 2.5);
+        c.fill();
+        c.restore();
+      };
+      const [tx, ty] = po.tient,
+        [lx, ly] = po.libre;
+      // bras du fond, jambe du fond
+      c.strokeStyle = '#b8466a';
+      c.lineWidth = 8.5;
       c.beginPath();
-      c.moveTo(-5 + pan + i * 2, -116);
-      c.lineTo(-5 + pan + i * 2 + pan * 0.1, -112.5);
+      c.moveTo(0, -133);
+      c.quadraticCurveTo((lx * sg) / 2 - 3, (-133 + ly) / 2, lx * sg, ly);
       c.stroke();
-    }
-    // --- tête vue de dos : oreilles, branches des lunettes, cheveux châtains et queue-de-cheval
-    c.save();
-    c.translate(C.pen * 1.2, 0);
-    c.fillStyle = '#e7b393';
-    [-1, 1].forEach(sg => {
+      moufle(lx * sg, ly);
+      jambeP(-th, kl, true);
+      jambeP(th, kp, false);
+      // capuche dans le dos
+      c.fillStyle = '#cf5a7e';
       c.beginPath();
-      c.ellipse(sg * 10.8, -152, 2.4, 3.6, sg * 0.2, 0, 7);
+      c.ellipse(-12, -134, 6, 10, -0.2, 0, 7);
       c.fill();
-    });
-    c.strokeStyle = '#7a4a2a';
-    c.lineWidth = 1.2;
-    [-1, 1].forEach(sg => {
+      c.strokeStyle = FOURRURE;
+      c.lineWidth = 3;
       c.beginPath();
-      c.moveTo(sg * 10.2, -155.5);
-      c.quadraticCurveTo(sg * 12.4, -155, sg * 13.4, -158);
+      c.ellipse(-12, -134, 6, 10, -0.2, -1.2, 1.9);
       c.stroke();
-    });
-    const gh = c.createRadialGradient(-3, -162, 2, 0, -154, 14);
-    gh.addColorStop(0, '#6a4329');
-    gh.addColorStop(1, '#2e1c12');
-    c.fillStyle = gh;
-    c.beginPath();
-    c.ellipse(0, -155, 11, 12.5, 0, 0, 7);
-    c.fill();
-    // mèches tirées vers l'élastique
-    c.strokeStyle = '#80573a';
-    c.lineWidth = 0.7;
-    for (let i = -4; i <= 4; i++) {
+      // doudoune de profil
+      const g = c.createLinearGradient(-14, 0, 15, 0);
+      g.addColorStop(0, ROSEO);
+      g.addColorStop(0.55, ROSE);
+      g.addColorStop(1, ROSEF);
+      c.fillStyle = g;
       c.beginPath();
-      c.moveTo(i * 2.4, -166.5 + Math.abs(i) * 0.6);
-      c.quadraticCurveTo(i * 2.2, -158, i * 0.4, -152);
+      c.moveTo(-11, -141);
+      c.quadraticCurveTo(4, -144, 11, -139);
+      c.quadraticCurveTo(15, -126, 14.5, -112);
+      c.lineTo(15.5, -76);
+      c.quadraticCurveTo(0, -72, -14.5, -76);
+      c.lineTo(-13.5, -112);
+      c.quadraticCurveTo(-14.5, -130, -11, -141);
+      c.fill();
+      c.strokeStyle = '#b8466a';
+      c.lineWidth = 1.1;
+      [-124, -110, -96, -84].forEach(yq => {
+        c.beginPath();
+        c.moveTo(-13.6, yq);
+        c.quadraticCurveTo(0, yq + 2.5, 14.6, yq);
+        c.stroke();
+      });
+      // écharpe : un pan qui vole derrière elle
+      const vol = -sw * 2 * a;
+      c.fillStyle = '#f4ead8';
+      c.beginPath();
+      c.roundRect(-7.5, -148, 16, 9, 4);
+      c.fill();
+      c.beginPath();
+      c.moveTo(-6, -146);
+      c.quadraticCurveTo(-12 - a * 3, -140 + vol, -16 - a * 6, -128 + vol);
+      c.lineTo(-11 - a * 6, -126 + vol);
+      c.quadraticCurveTo(-8 - a * 2, -138 + vol, -2, -142);
+      c.closePath();
+      c.fill();
+      c.fillStyle = '#c0233a';
+      c.fillRect(-12 - a * 4.5, -134 + vol, 5, 2);
+      // bras de devant (celui qui tient le fichier)
+      c.strokeStyle = ROSEF;
+      c.lineWidth = 9;
+      c.beginPath();
+      c.moveTo(1, -133);
+      c.quadraticCurveTo((tx * sg) / 2 + 3, (-133 + ty) / 2, tx * sg, ty);
       c.stroke();
+      c.strokeStyle = '#ee7b9d';
+      c.lineWidth = 3.5;
+      c.beginPath();
+      c.moveTo(2.5, -131);
+      c.quadraticCurveTo((tx * sg) / 2 + 4.5, (-131 + ty) / 2, tx * sg + 1, ty - 2);
+      c.stroke();
+      fichierEnMain();
+      moufle(tx * sg, ty);
+      // tête de profil
+      c.fillStyle = PEAU;
+      c.fillRect(-2, -150, 6.5, 8);
+      c.fillStyle = '#2e1c12';
+      c.beginPath();
+      c.ellipse(-1.5, -156, 11, 12.5, 0, 0, 7);
+      c.fill();
+      const gp = c.createLinearGradient(0, 0, 13, 0);
+      gp.addColorStop(0, '#e3ad8c');
+      gp.addColorStop(1, '#f6cfb3');
+      c.fillStyle = gp;
+      c.beginPath();
+      c.moveTo(2, -165);
+      c.quadraticCurveTo(9, -165, 10.6, -159.5);
+      c.lineTo(11.3, -156.8);
+      c.quadraticCurveTo(13.9, -153.6, 13.4, -152.9);
+      c.lineTo(11.5, -152.3);
+      c.quadraticCurveTo(12.1, -150.8, 11.4, -150);
+      c.quadraticCurveTo(11.9, -148.8, 11.2, -148.1);
+      c.quadraticCurveTo(11, -145, 8, -144.6);
+      c.quadraticCurveTo(3.5, -144.5, 1.5, -147.5);
+      c.lineTo(1, -160);
+      c.closePath();
+      c.fill();
+      // cheveux : le dessus et l'arrière
+      const gh = c.createLinearGradient(0, -170, 0, -150);
+      gh.addColorStop(0, '#5a3825');
+      gh.addColorStop(1, '#2e1c12');
+      c.fillStyle = gh;
+      c.beginPath();
+      c.moveTo(-12.4, -152);
+      c.quadraticCurveTo(-13.5, -168, -1, -169);
+      c.quadraticCurveTo(8, -169, 10.4, -161);
+      c.quadraticCurveTo(6, -163.5, 2.5, -161);
+      c.quadraticCurveTo(0.5, -157, 1, -151);
+      c.quadraticCurveTo(-5, -149, -12.4, -152);
+      c.fill();
+      c.strokeStyle = '#7a5236';
+      c.lineWidth = 0.6;
+      for (let i = 0; i < 5; i++) {
+        c.beginPath();
+        c.moveTo(8 - i * 3.5, -166 + i * 0.4);
+        c.quadraticCurveTo(-2 - i * 2, -165 + i, -10, -158 + i * 0.6);
+        c.stroke();
+      }
+      // oreille, lunettes (cercle de profil + branche), œil, sourcil, bouche, joue
+      c.fillStyle = '#e7b393';
+      c.beginPath();
+      c.ellipse(2.4, -154.5, 2.2, 3.4, 0.1, 0, 7);
+      c.fill();
+      c.strokeStyle = ECAILLE;
+      c.lineWidth = 1.1;
+      c.beginPath();
+      c.moveTo(9, -157.6);
+      c.lineTo(2.6, -156.4);
+      c.stroke();
+      c.fillStyle = '#ffffff22';
+      c.beginPath();
+      c.roundRect(8.6, -159.2, 3.4, 6.6, 1.4);
+      c.fill();
+      c.stroke();
+      if (t % 4.2 < 0.13) {
+        c.strokeStyle = '#3a2418';
+        c.lineWidth = 0.8;
+        c.beginPath();
+        c.moveTo(9.4, -155.6);
+        c.lineTo(11.2, -155.4);
+        c.stroke();
+      } else {
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.ellipse(10.5, -155.6, 1, 1.3, 0, 0, 7);
+        c.fill();
+        c.fillStyle = '#5a3a22';
+        c.beginPath();
+        c.ellipse(10.8, -155.6, 0.65, 1, 0, 0, 7);
+        c.fill();
+      }
+      c.strokeStyle = '#4a2e1d';
+      c.lineWidth = 0.9;
+      c.beginPath();
+      c.moveTo(8.6, -160.2);
+      c.quadraticCurveTo(10.4, -161, 11.6, -160);
+      c.stroke();
+      c.strokeStyle = '#b0505a';
+      c.lineWidth = 0.8;
+      c.beginPath();
+      c.moveTo(11.3, -149.6);
+      c.quadraticCurveTo(10.6, -148.6, 9.6, -149.2);
+      c.stroke();
+      c.fillStyle = '#f2a0a055';
+      c.beginPath();
+      c.ellipse(7.4, -151, 2.1, 1.4, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#c98a6a99';
+      [
+        [9.6, -152.4],
+        [8.4, -151.8],
+        [10.2, -151.5]
+      ].forEach(([fx, fy]) => {
+        c.beginPath();
+        c.arc(fx, fy, 0.32, 0, 7);
+        c.fill();
+      });
+      // queue-de-cheval qui rebondit derrière
+      c.save();
+      c.translate(-11.4, -157);
+      c.rotate(0.5 + a * 0.35 + (air ? 0.2 : 0));
+      queue(0, 0, sw * 2.5 * a, Math.abs(cw) * 1.5 * a);
+      c.restore();
     }
-    c.strokeStyle = '#1f130c';
-    c.lineWidth = 0.6;
-    for (let i = -3; i <= 3; i += 2) {
-      c.beginPath();
-      c.moveTo(i * 3, -164);
-      c.quadraticCurveTo(i * 2.6, -157, i * 0.5, -152.5);
-      c.stroke();
-    }
-    // queue-de-cheval qui se balance
-    const q = sw * 3 * a + C.pen * 4 + (air ? -2 : 0),
-      qy = air ? (C.vy > 0 ? 3 : -4) : 0;
-    const gq = c.createLinearGradient(0, -152, 0, -128);
-    gq.addColorStop(0, '#4a2e1d');
-    gq.addColorStop(1, '#2a190f');
-    c.fillStyle = gq;
-    c.beginPath();
-    c.moveTo(-3.2, -151);
-    c.quadraticCurveTo(-5 + q * 0.4, -140, -2.5 + q, -129 + qy);
-    c.quadraticCurveTo(0.5 + q * 1.1, -126 + qy, 2 + q, -130 + qy);
-    c.quadraticCurveTo(4.5 + q * 0.4, -141, 3.2, -151);
-    c.closePath();
-    c.fill();
-    c.strokeStyle = '#6a4329';
-    c.lineWidth = 0.6;
-    c.beginPath();
-    c.moveTo(0, -150);
-    c.quadraticCurveTo(q * 0.5, -140, q * 0.9, -130 + qy);
-    c.stroke();
-    // chouchou rose
-    c.fillStyle = '#ff8fb8';
-    c.beginPath();
-    c.ellipse(0, -151.5, 4.2, 2.4, 0, 0, 7);
-    c.fill();
-    c.fillStyle = '#ffc2d8';
-    c.beginPath();
-    c.ellipse(-1, -152.3, 1.8, 0.9, 0, 0, 7);
-    c.fill();
-    c.restore();
     c.restore();
   };
 
@@ -3046,7 +3613,8 @@ function mysLancer(cb, fic) {
       if (!p) return;
       p.x = Math.max(-6, Math.min(6, p.x));
       p.z = Math.max(1.4, Math.min(RIDGE - 0.4, p.z));
-      cible = { ...p, t: T() };
+      C.way = chemin(C, p);
+      cible = C.way[C.way.length - 1];
       return;
     }
     if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45) return;

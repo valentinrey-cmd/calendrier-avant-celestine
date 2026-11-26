@@ -3,6 +3,17 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Célestine à pied : elle se tourne dans le bon sens et contourne les obstacles
+- Elle a maintenant trois vues et se tourne vers l'endroit où elle va :
+  - de dos quand elle s'éloigne ;
+  - de face quand elle revient : son visage avec ses grandes lunettes écaille, ses yeux qui clignent, ses taches de rousseur, ses joues roses, son sourire, l'écharpe nouée devant et la fermeture éclair de la doudoune ;
+  - de profil quand elle va à gauche ou à droite : vraies enjambées (genoux qui plient, bottes vues de côté), bras qui balancent, écharpe et queue-de-cheval qui volent derrière elle.
+- Quand elle change de direction, elle pivote (petit demi-tour animé) au lieu de marcher en arrière.
+- Elle calcule un chemin (grille de 20 cm) pour contourner la cheminée, le bonhomme, les cadeaux, le sapin et l'antenne, et va tout droit quand rien ne gêne. Si on touche un obstacle, elle s'arrête à l'endroit libre le plus proche.
+- La main qui tient le fichier est la même pour le dessin et pour le fichier dans les trois vues.
+- Version 1795703422
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : Célestine y va à pied
 - Le bouton « Le déposer à la main » (qui n'apparaissait qu'après 6 ratés et déposait directement le fichier) est remplacé par « 🚶 Y aller à pied », toujours visible.
 - À pied, une petite Célestine dessinée apparaît, vue de dos : cheveux châtains en queue-de-cheval avec un chouchou rose, branches des lunettes, doudoune rose matelassée avec capuche fourrée, écharpe crème à rayures, jean, bottes fourrées, moufles. Elle tient le fichier choisi à la main (la photo, le document…).
