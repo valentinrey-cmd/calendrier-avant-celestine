@@ -2527,8 +2527,8 @@ window.TRADUCTIONS_EN = {
   'Rhône': 'Rhône',
   '🔍 Touche pour agrandir': '🔍 Tap to enlarge',
   '🗺️ Plan de l’enquête': '🗺️ Case map',
-  'Glisse pour te déplacer · pince ou utilise ＋ － pour zoomer · touche un lieu.':
-    'Drag to move · pinch or use ＋ － to zoom · tap a place.',
+  'Glisse pour te déplacer · pince ou utilise ＋ － pour zoomer · touche un lieu ou la bulle de Lyon.':
+    'Drag to move · pinch or use ＋ － to zoom · tap a place or the Lyon bubble.',
   'Monts d’Or': "Monts d'Or",
   'Fourvière': 'Fourvière',
   'Dossier n°24 · Lyon et ses environs': 'Case #24 · Lyon and around',

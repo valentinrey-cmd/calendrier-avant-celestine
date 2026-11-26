@@ -4,6 +4,17 @@
 
 ---
 
+## 26 novembre 2026 (10 h) : carte de l'enquête refaite, façon appli de cartes (version 1795681318)
+
+- **Problème :** les 6 lieux de Lyon (appart, fac, commissariat, Bellecour, resto, chez Noémie) sont à moins de 3 km les uns des autres alors que la carte va jusqu'à Reyrieux (25 km). Ils étaient empilés et illisibles.
+- **Épingles à taille fixe :** elles gardent la même taille quand on zoome, donc elles s'écartent au lieu de grossir. Elles sont dessinées hors du zoom et placées par `mapLay()`.
+- **Bulle « Lyon · 6 lieux » :** de loin, les lieux de Lyon sont regroupés en une bulle rouge. En la touchant, on zoome en douceur sur Lyon, et les 6 épingles apparaissent (à partir du zoom `MPZL` = 5). Sur la petite carte du dossier, la bulle ouvre directement la carte en plein écran zoomée sur Lyon.
+- **Zoom beaucoup plus profond :** jusqu'à ×30 au lieu de ×6. Nouveau bouton 🏙️ pour aller sur Lyon.
+- **Détails qui apparaissent au zoom :** rues principales, ponts, place Bellecour, et noms de quartiers (Presqu'île, Vieux Lyon, Croix-Rousse, Part-Dieu, Guillotière, Lyon 8e, Gerland, Confluence, parc de la Tête d'Or). Les rivières et autoroutes prennent leur vraie largeur, et les textes gardent une taille lisible.
+- **Plein écran :** l'échelle (5 km → 500 m → 100 m…) et le nord sont fixés à l'écran, et la vue de départ est centrée sur les lieux de l'enquête.
+- Supprimé : l'ancien tracé de trajet désactivé (code mort), et les épingles dessinées en coordonnées absolues.
+- Fichiers : `2026/js/enquete/plan-liege-notes.js` (`mapSVG`, `mpPin`, `mapLay`, `mapBig`, `mapLyon`), `2026/css/10-arene-plan-bilan.css`, `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (9 h 30) : fiches des suspects cohérentes, plus de « témoin » (version 1795680570)
 
 - **« Témoin » retiré** partout pour Valentin (liste des auditions, nom du boss du jour 22, titre de la scène, source de la pièce). Il est traité comme les autres suspects.
