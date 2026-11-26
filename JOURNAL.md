@@ -4,6 +4,26 @@
 
 ---
 
+## 26 novembre 2026 (11 h 15) : une enquête où il faut réfléchir (version 1795682360)
+
+Le scénario ne change pas. C'est la façon de découvrir les choses qui change : Célestine doit déduire elle-même.
+
+- **Pièces brutes :**
+  - les légendes des photos ne disent plus ce qu'il faut voir (« le bracelet au poignet »), seulement l'heure, le lieu et qui a pris la photo ;
+  - la frise chronologique ne conclut plus (« Photo au resto » au lieu de « Bracelet au poignet au resto ») ;
+  - le zoom du Dr Rodolphe n'affiche plus « FERMOIR » ni « 5 CŒURS ROSES », et sa légende ne dit plus « C'est le bracelet ». L'éclat dans le vide-poche du selfie de 7 h 51 est beaucoup plus discret ;
+  - les résumés `sum` de toutes les pièces (jamais affichés) sont supprimés.
+- **Pépin ne conclut plus :**
+  - après chaque aveu, « Noté : le bracelet était… » devient « Je note sa déposition. À vous de voir ce qu'elle vaut. » ;
+  - au jour 17, il ne dit plus « Regardez derrière vous. Sur l'étagère » ;
+  - au jour 20, il dit seulement « Lisez. » ;
+  - au jour 22, il ne dit plus « Dix minutes seul dans l'appartement ».
+- **Détails à repérer soi-même :** sur les photos du dossier, Célestine touche l'endroit qui l'intrigue. Si c'est un vrai détail, il est entouré en pointillés jaunes et noté sous la photo (« Je compte les cœurs : 5 », « Sur ses genoux : mon sac »…). Sinon, un petit rond s'efface. Les zones sont dans `PHZ` (`js/enquete/suspects-pieces.js`) et le toucher dans `phFig()` / `phTap()` (`js/enquete/dossier-accusation.js`). Les détails trouvés sont gardés dans `S.det` et envoyés au suivi (🔎).
+- **Fausse piste (jour 15) :** une annonce Vinted d'« erika_lyo » (Lyon 7e, samedi 16 h 12) pour un « bracelet doré cœurs roses » à 12 €. En comptant les cœurs (4 au lieu de 5) et en regardant le gros anneau, on voit que ce n'est pas le sien.
+- **Recoupement (jour 19) :** le relevé des badges de la BU du vendredi, avec beaucoup d'étudiants inconnus. Eya n'y apparaît jamais, alors que sa première déclaration dit maintenant « Je suis partie un peu plus tôt pour réviser à la BU ». Elle a menti, et le jour 20 explique pourquoi (Bellecour).
+- Traductions anglaises ajoutées pour tous les nouveaux textes, et les anciennes inutiles supprimées.
+- Fichiers : `2026/js/enquete/suspects-pieces.js` (`PHZ`, `PH.vinted`, `p_vinted`, `p_badges`, légendes, frise, Eya), `2026/js/enquete/dossier-accusation.js`, `2026/js/histoire.js`, `2026/css/08-dossier.css`, `2026/js/langue-anglais.js`, `CLAUDE.md`.
+
 ## 26 novembre 2026 (10 h 50) : agenda du jour 2, semaine de cours bien remplie (version 1795681818)
 
 - Du lundi au vendredi, Célestine a **cours de 8 h à 18 h** (pharmacologie, biochimie, physiologie, chimie analytique, immunologie, microbiologie, pharmacie clinique, galénique, statistiques, toxicologie, TP), et **la BU** dans tous les trous. Nouvelle couleur grise « BU » dans la légende.

@@ -117,7 +117,7 @@ Object.assign(STORY, {
         'b',
         'Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré.'
       ],
-      ['e', 'Noté : mardi soir, le bracelet était de nouveau à votre poignet.', { fx: 'ein' }]
+      ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
   },
   b8: {
@@ -150,7 +150,7 @@ Object.assign(STORY, {
         'b',
         'Ok, j’ai pris ton sac. J’ai sorti tes lunettes pour tester tes verres avec mon appli : je voulais t’en offrir des nouvelles pour Noël. Ta correction a bougé, d’ailleurs. Et ton bracelet, tu l’avais au poignet, en face de moi.'
       ],
-      ['e', 'Noté : jeudi soir, le bracelet était à votre poignet.', { fx: 'ein' }]
+      ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
   },
   b11: {
@@ -185,7 +185,7 @@ Object.assign(STORY, {
         'b',
         'J’avoue : 20 balles pour un tacos. Mais j’ai retourné TOUT ton sac pour trouver le porte-monnaie. La trousse, les poches, tout. Il n’y avait aucun bracelet, j’en suis sûr.'
       ],
-      ['e', 'Noté : quand il a fouillé votre sac, le bracelet n’y était déjà plus.', { fx: 'ein' }]
+      ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
   },
   b15: {
@@ -215,7 +215,7 @@ Object.assign(STORY, {
         'b',
         'Oui, j’ai pris ta trousse à 8 h 45 pour ton correcteur… et j’ai copié tes résultats, pardon. Mais je te jure, il n’y avait pas de bracelet dedans. Juste des stylos et ton surligneur rose.'
       ],
-      ['e', 'Noté : vendredi à 8 h 45, la trousse était déjà vide.', { fx: 'ein' }]
+      ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
   },
   b19: {
@@ -241,7 +241,7 @@ Object.assign(STORY, {
     l: [
       ['n', 'Le dernier client sort. Sandrine souffle enfin.', { fx: 'bin' }],
       ['b', 'D’accord, j’ai ouvert ton casier pour ta crème. Mais il n’y avait que ton sac et ton manteau. Pas de bijou, rien qui brille.'],
-      ['e', 'Noté : rien dans le casier non plus.', { fx: 'ein' }]
+      ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
   },
   b22: {
@@ -249,7 +249,7 @@ Object.assign(STORY, {
     sc: 'audit',
     l: [
       ['n', 'Jour 22. Dernière convocation sur le bureau de Pépin.', { fx: 'ein' }],
-      ['e', 'Vendredi, vous êtes partie à 7 h 55. Valentin, lui, est parti à 8 h 05. Dix minutes seul dans l’appartement.'],
+      ['e', 'Dernière audition de la liste. Votre copain.'],
       ['c', 'Valentin ? Il vit avec moi, il n’a aucune raison de…', { fx: 'cin' }],
       ['e', 'Simple vérification. Tout le monde passe en audition. Lui aussi.'],
       ['n', 'Dernière audition. Valentin s’assoit en souriant.', { fx: 'vin' }],
@@ -319,8 +319,6 @@ Object.assign(STORY, {
     l: [
       ['e', 'Célestine. Vos souvenirs Snapchat. Vendredi, 7 h 51.', { fx: 'ein' }],
       ['c', 'Je suis horrible dessus, j’étais en retard…', { fx: 'cin' }],
-      ['e', 'Regardez derrière vous. Sur l’étagère.', { fx: 'pop:🔍' }],
-      ['c', '…Le vide-poche ? 😳', { fx: 'shake' }],
       ['e', 'Je ne conclus rien. Tout est au dossier.', { fx: 'clue' }]
     ]
   },
@@ -330,7 +328,7 @@ Object.assign(STORY, {
     l: [
       ['n', 'Un message arrive sur le téléphone de Célestine, tard le soir.', { fx: 'pop:💬' }],
       ['c', 'C’est Eya… Elle a séché vendredi après-midi ?', { fx: 'cin' }],
-      ['e', 'Elle a surtout vu quelqu’un. Lisez lentement.', { fx: ['ein', 'clue'] }]
+      ['e', 'Lisez.', { fx: ['ein', 'clue'] }]
     ]
   },
   s21: {

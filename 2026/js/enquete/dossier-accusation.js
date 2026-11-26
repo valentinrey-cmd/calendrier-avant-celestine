@@ -101,6 +101,53 @@ function agTap(d, i) {
   o.innerHTML = `<b>${esc(e[3])}</b><br>${AGJ[e[0]]} · ${agH(e[1])} → ${e[2] >= 24 ? 'minuit' : agH(e[2])}${e[4] ? ' · avec ' + esc(e[4]) : ''}`;
   o.classList.add('on');
 }
+// une photo du dossier : on peut la toucher pour repérer soi-même des détails (zones dans PHZ, js/enquete/suspects-pieces.js)
+function phFig(f, cap) {
+  const Z = PHZ[f];
+  return `<figure class="pc-ph"><div class="ph-w" ${Z ? `onclick="phTap(event,'${f}')"` : ''}>${PH[f]}<div class="ph-mks" id="phm_${f}">${phMarks(f)}</div></div><figcaption>${esc(cap || '')}</figcaption>${
+    Z ? `<p class="ph-hint">🔍 Touche la photo pour repérer un détail.</p><ul class="ph-det" id="phd_${f}">${phList(f)}</ul>` : ''
+  }</figure>`;
+}
+const phMarks = f =>
+  (PHZ[f] || [])
+    .map(([x, y, r], i) =>
+      (S.det || {})[f + i]
+        ? `<i style="left:${((x - r) / 3.2).toFixed(2)}%;top:${((y - r) / 2.2).toFixed(2)}%;width:${((2 * r) / 3.2).toFixed(2)}%;height:${((2 * r) / 2.2).toFixed(2)}%"></i>`
+        : ''
+    )
+    .join('');
+const phList = f => (PHZ[f] || []).map((z, i) => ((S.det || {})[f + i] ? `<li>${esc(z[3])}</li>` : '')).join('');
+function phTap(ev, f) {
+  const w = ev.currentTarget,
+    r = w.querySelector('svg').getBoundingClientRect(),
+    x = ((ev.clientX - r.left) / r.width) * 320,
+    y = ((ev.clientY - r.top) / r.height) * 220,
+    i = (PHZ[f] || []).findIndex(([zx, zy, zr]) => Math.hypot(x - zx, y - zy) <= zr);
+  if (i < 0) {
+    const d = document.createElement('b');
+    d.className = 'ph-rien';
+    d.style.left = (x / 3.2).toFixed(1) + '%';
+    d.style.top = (y / 2.2).toFixed(1) + '%';
+    w.appendChild(d);
+    setTimeout(() => d.remove(), 600);
+    return;
+  }
+  S.det = S.det || {};
+  if (S.det[f + i]) return;
+  S.det[f + i] = 1;
+  save();
+  try {
+    SFX('ok');
+  } catch (_) {}
+  try {
+    slog('🔎', 'Détail repéré : ' + PHZ[f][i][3]);
+  } catch (_) {}
+  toast('🔎 Détail repéré !');
+  const m = document.getElementById('phm_' + f),
+    l = document.getElementById('phd_' + f);
+  if (m) m.innerHTML = phMarks(f);
+  if (l) l.innerHTML = phList(f);
+}
 function pieceBody(p) {
   const k = p.k;
   if (k == 'pv') return `<div class="pc-pv">${p.body.map((l, i) => `<p class="${i == 0 ? 'h' : ''}">${esc(l)}</p>`).join('')}</div>`;
@@ -110,8 +157,7 @@ function pieceBody(p) {
   if (k == 'agd') return agdHTML(p);
   if (k == 'tab')
     return `<table class="pc-tab"><tr>${p.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${p.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>${p.note ? `<p class="pc-note">${esc(p.note)}</p>` : ''}`;
-  if (k == 'photo')
-    return `<div class="pc-phs">${p.ph.map((f, i) => `<figure class="pc-ph">${PH[f]}<figcaption>${esc(p.cap[i] || '')}</figcaption></figure>`).join('')}</div>`;
+  if (k == 'photo') return `<div class="pc-phs">${p.ph.map((f, i) => phFig(f, p.cap[i])).join('')}</div>`;
   if (k == 'linky') return linkySVG();
   if (k == 'plan') return planSVG();
   if (k == 'lettre')

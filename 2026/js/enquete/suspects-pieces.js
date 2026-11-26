@@ -58,7 +58,7 @@ const SUSP = [
     r: 'Copine de fac (pharma)',
     tr: ['🛍️ Adore Bellecour', '🧪 A quitté le TP en avance vendredi'],
     d: 'Copine de promo. Vendredi, elle a quitté le TP avant la fin.',
-    dep: '« Je suis partie un peu plus tôt, j’avais un truc à faire. »',
+    dep: '« Je suis partie un peu plus tôt pour réviser à la BU. »',
     a: 'Elle était à Bellecour… et c’est elle qui a vu quelque chose.'
   },
   {
@@ -499,10 +499,7 @@ ${Array.from({ length: 9 }, (_, i) => `<path d="M${i * 40} 0 V220" stroke="#d7e1
         hs: 4,
         w: 0.9,
         sw: 0.7,
-        eclat: [
-          [2, -4, 4.2],
-          [-8, -5, 2.4]
-        ]
+        eclat: [[2, -4, 1.6]]
       }
     )}</g>
 <g transform="translate(222 74)"><rect x="-6" y="-24" width="12" height="24" rx="3" fill="#bcdaf0"/><rect x="-2" y="-36" width="2" height="16" fill="#4fb0e8"/></g><g transform="translate(304 74)"><rect x="-5" y="-20" width="10" height="20" rx="3" fill="#f3c6a0"/></g>
@@ -523,10 +520,47 @@ ${Array.from({ length: 17 }, (_, i) => `<path d="M${i * 20} 0 V220" stroke="#2c3
 <clipPath id="zmcl"><circle cx="150" cy="112" r="96"/></clipPath><ellipse cx="150" cy="150" rx="140" ry="40" fill="#fbe9ee" stroke="#d9a3b3" stroke-width="5" clip-path="url(#zmcl)"/>
 <g>${phBracelet('zm', 74, 92, 226, 92, 28, { n: 40, h: 5, hs: 19, w: 3, sw: 1.8, recolle: 2 })}</g>
 <circle cx="150" cy="112" r="96" fill="none" stroke="#c9d6de" stroke-width="7"/><circle cx="150" cy="112" r="102" fill="none" stroke="#7d8e99" stroke-width="3"/>
-<g font-family="'Courier New',monospace" font-size="10" fill="#9fe8ff" font-weight="700"><path d="M226 92 L262 58" stroke="#9fe8ff" stroke-width="1.2"/><text x="264" y="56">FERMOIR</text><path d="M190 120 L262 134" stroke="#9fe8ff" stroke-width="1.2"/><text x="264" y="132">5 CŒURS</text><text x="264" y="144">ROSES</text><path d="M154 128 L250 178" stroke="#ffb347" stroke-width="1.2"/><text x="252" y="184" fill="#ffb347">trace de</text><text x="252" y="196" fill="#ffb347">colle ?</text></g>
+<g font-family="'Courier New',monospace" font-size="10" fill="#9fe8ff" font-weight="700"><path d="M154 128 L250 178" stroke="#ffb347" stroke-width="1.2"/><text x="252" y="184" fill="#ffb347">trace de</text><text x="252" y="196" fill="#ffb347">colle ?</text></g>
 ${phTampon(8, 16, 'LABO · ×8 · VIDE-POCHE · 7:51')}
 <g transform="translate(26 196)"><path d="M0 0 h50 M0 -4 v8 M50 -4 v8" stroke="#9fe8ff" stroke-width="1.5"/><text x="25" y="-6" text-anchor="middle" font-family="'Courier New',monospace" font-size="8" fill="#9fe8ff">1 cm</text></g>`
+  ),
+  // 12. une annonce Vinted repérée par Gérald (fausse piste : 4 cœurs, gros anneau)
+  vinted: phSvg(
+    'vt',
+    `<rect width="320" height="220" fill="#f5f6f7"/>
+<rect x="0" y="0" width="320" height="24" fill="#ffffff"/><path d="M0 24 H320" stroke="#e3e6e8"/><text x="12" y="17" font-family="Inter,system-ui,sans-serif" font-size="13" font-weight="800" fill="#0f8f96">Vinted</text><text x="308" y="16" text-anchor="end" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#7a8288">sam. 28 nov. · 16:12</text>
+<rect x="8" y="32" width="166" height="180" rx="6" fill="#fbfaf7"/><path d="M8 150 Q90 136 174 154 V212 H8Z" fill="#efe9df"/>
+${phBracelet('vt', 28, 112, 150, 110, 34, { n: 34, h: 4, hs: 15, w: 2.6, sw: 1.7 })}
+<circle cx="157" cy="109" r="7" fill="none" stroke="url(#vtor)" stroke-width="2.6"/>
+<g font-family="Inter,system-ui,sans-serif"><text x="186" y="48" font-size="11.5" font-weight="700" fill="#1c1c1e">Bracelet doré</text><text x="186" y="62" font-size="11.5" font-weight="700" fill="#1c1c1e">cœurs roses</text>
+<text x="186" y="84" font-size="15" font-weight="800" fill="#1c1c1e">12,00 €</text><text x="186" y="98" font-size="8.5" fill="#7a8288">Très bon état · porté 2 fois</text>
+<path d="M186 108 H310" stroke="#e3e6e8"/><circle cx="198" cy="124" r="10" fill="#d9c6b0"/><text x="198" y="128" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">E</text>
+<text x="213" y="121" font-size="9.5" font-weight="700" fill="#1c1c1e">erika_lyo</text><text x="213" y="133" font-size="8.5" fill="#f0a500">★★★★★ <tspan fill="#7a8288">(38)</tspan></text>
+<text x="186" y="152" font-size="8.5" fill="#7a8288">📍 Lyon 7e · ajouté il y a 2 h</text>
+<rect x="186" y="164" width="124" height="22" rx="5" fill="#0f8f96"/><text x="248" y="179" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">Acheter</text>
+<rect x="186" y="190" width="124" height="20" rx="5" fill="#fff" stroke="#0f8f96"/><text x="248" y="204" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f8f96">Faire une offre</text></g>`
   )
+};
+
+// les détails à repérer soi-même en touchant les photos : [x, y, rayon (dessin de 320 × 220), ce qu'on remarque]
+const PHZ = {
+  bracelet: [[160, 128, 70, 'Je compte les cœurs : 5. Et un petit fermoir.']],
+  storyn: [[152, 174, 40, 'Sur la serviette, à côté des vernis : mon bracelet.']],
+  ongles: [[176, 190, 30, 'À mon poignet : le bracelet.']],
+  bu: [[153, 110, 16, 'À mon poignet, quelque chose de rose qui brille.']],
+  resto: [[181, 133, 16, 'À mon poignet, sur le bras qui lève le verre : le bracelet.']],
+  resto2: [
+    [98, 168, 42, 'Sur ses genoux : mon sac.'],
+    [160, 136, 16, 'Sur son téléphone : un test de vue.'],
+    [192, 162, 22, 'Mes lunettes, sorties de leur étui.']
+  ],
+  tp: [[172, 152, 30, 'Dans les mains de Nora : ma trousse rose.']],
+  snap: [[262, 70, 20, 'Au fond, dans le vide-poche : un petit éclat doré et rose.']],
+  zoom: [[150, 122, 26, 'Ce cœur-là a une petite fissure, comme s’il avait été recollé.']],
+  vinted: [
+    [90, 140, 56, 'Je compte les cœurs : 4.'],
+    [157, 109, 12, 'Un gros anneau rond au bout de la chaîne.']
+  ]
 };
 /* ---------- les pièces du dossier ---------- */
 const PIECES = [
@@ -537,7 +571,6 @@ const PIECES = [
     src: 'Commissariat du 8e',
     t: 'Main courante',
     k: 'pv',
-    sum: 'Célestine pense avoir rangé le bracelet dans sa trousse vendredi. Dimanche soir, il n’y est plus.',
     body: [
       'MAIN COURANTE · n° 2026/8e/12-018 · mardi 1er décembre 2026, 8 h 40',
       'Déclarante : Célestine, étudiante en pharmacie, Lyon 8e.',
@@ -555,8 +588,7 @@ const PIECES = [
     t: 'Le bracelet, le sac, le vide-poche',
     k: 'photo',
     ph: ['bracelet', 'sac', 'videpoche'],
-    cap: ['Le bracelet, le jour où Valentin l’a offert', 'Le sac vidé, dimanche soir', 'Le vide-poche de la salle de bain'],
-    sum: 'Le bracelet ; le sac vidé ; le vide-poche vide.'
+    cap: ['Le bracelet, le jour où Valentin l’a offert', 'Le sac vidé, dimanche soir', 'Le vide-poche de la salle de bain']
   },
   {
     id: 'p_agenda',
@@ -611,7 +643,6 @@ const PIECES = [
       [6, 18.5, 19.75, 'Route pour Lyon', '', 'perso'],
       [6, 20.17, 21, 'Retour à l’appart', '', 'perso']
     ],
-    sum: 'Toute sa semaine, du lundi au dimanche.',
     ev: [
       ['241800', 'Mar. 24 · 18 h', 'Ongles chez Noémie'],
       ['262000', 'Jeu. 26 · 20 h', 'Resto avec Emma et Noémie'],
@@ -627,9 +658,8 @@ const PIECES = [
     t: 'Story « Prête pour le gel »',
     k: 'photo',
     ph: ['storyn'],
-    cap: ['Mardi 18 h 05. Sur la table de Noémie, à côté des flacons : le bracelet.'],
-    sum: 'Mardi 18 h 05, le bracelet est posé sur la table de Noémie.',
-    ev: [['241805', 'Mar. 24 · 18 h 05', 'Le bracelet est sur la table de Noémie']]
+    cap: ['Mardi 18 h 05 · story de Noémie.'],
+    ev: [['241805', 'Mar. 24 · 18 h 05', 'Story de Noémie']]
   },
   {
     id: 'p_ongles',
@@ -639,9 +669,8 @@ const PIECES = [
     t: 'Les ongles finis',
     k: 'photo',
     ph: ['ongles'],
-    cap: ['Mardi 19 h 40. Les ongles de Célestine… et le bracelet de nouveau au poignet.'],
-    sum: 'Mardi 19 h 40, le bracelet est de retour au poignet.',
-    ev: [['241940', 'Mar. 24 · 19 h 40', 'Le bracelet est de retour au poignet']]
+    cap: ['Mardi 19 h 40 · story de Noémie.'],
+    ev: [['241940', 'Mar. 24 · 19 h 40', 'Photo des ongles finis']]
   },
   {
     id: 'p_bu',
@@ -651,9 +680,8 @@ const PIECES = [
     t: 'Selfie à la BU',
     k: 'photo',
     ph: ['bu'],
-    cap: ['Mercredi 13 h, BU Rockefeller. Au poignet de Célestine : l’éclat rose du bracelet.'],
-    sum: 'Mercredi 13 h, le bracelet est au poignet.',
-    ev: [['251300', 'Mer. 25 · 13 h', 'Bracelet au poignet à la BU']]
+    cap: ['Mercredi 13 h · BU Rockefeller · photo d’Erika.'],
+    ev: [['251300', 'Mer. 25 · 13 h', 'Selfie à la BU']]
   },
   {
     id: 'p_resto',
@@ -663,9 +691,8 @@ const PIECES = [
     t: 'Le resto de jeudi',
     k: 'photo',
     ph: ['resto'],
-    cap: ['Jeudi 21 h 12. Les trois, une pizza, et le bracelet au poignet de Célestine.'],
-    sum: 'Jeudi 21 h 12, le bracelet est au poignet.',
-    ev: [['262112', 'Jeu. 26 · 21 h 12', 'Bracelet au poignet au resto']]
+    cap: ['Jeudi 21 h 12 · au resto · photo d’Emma.'],
+    ev: [['262112', 'Jeu. 26 · 21 h 12', 'Photo au resto']]
   },
   {
     id: 'p_resto2',
@@ -675,9 +702,8 @@ const PIECES = [
     t: 'Pendant que Célestine est aux toilettes',
     k: 'photo',
     ph: ['resto2'],
-    cap: ['Jeudi 21 h 40. Emma, le sac de Célestine sur les genoux, un étui à lunettes ouvert devant elle.'],
-    sum: 'Jeudi 21 h 40, Emma a le sac de Célestine sur les genoux.',
-    ev: [['262140', 'Jeu. 26 · 21 h 40', 'Emma tient le sac de Célestine']]
+    cap: ['Jeudi 21 h 40 · au resto · photo de Noémie.'],
+    ev: [['262140', 'Jeu. 26 · 21 h 40', 'Photo de Noémie au resto']]
   },
   {
     id: 'p_valerie',
@@ -692,8 +718,7 @@ const PIECES = [
       ['them', '08:12', 'Ma chérie, Edgar a pris 20 € dans ton porte-monnaie hier soir, il te les rend 🙄'],
       ['them', '08:13', 'J’ai rangé ton sac dans ta chambre, il traînait dans l’entrée'],
       ['me', '08:40', 'PARDON ?? 😤']
-    ],
-    sum: 'Edgar a pris 20 € dans le porte-monnaie vendredi soir. Valérie a rangé le sac samedi matin.'
+    ]
   },
   {
     id: 'p_regle',
@@ -707,8 +732,7 @@ const PIECES = [
       ['Où les ranger', 'Dans son sac ou sa trousse, avant d’entrer'],
       ['Vendredi 27', 'TP de 8 h 30 à 12 h 30, salle 214'],
       ['Présents', 'Célestine, Nora, Erika, Eya (partie à 11 h 30)']
-    ],
-    sum: 'Pourquoi Célestine est sûre d’avoir rangé le bracelet dans sa trousse.'
+    ]
   },
   {
     id: 'p_kebab',
@@ -721,8 +745,7 @@ const PIECES = [
       ['Date', 'Vendredi 27 novembre, 23 h 04'],
       ['Commande', '1 tacos XL poulet, frites, sauce fromagère'],
       ['Payé', '20,00 € en espèces']
-    ],
-    sum: 'Vendredi 23 h 04, un tacos payé avec un billet de 20 €.'
+    ]
   },
   {
     id: 'p_smsv',
@@ -738,7 +761,6 @@ const PIECES = [
       ['them', '07:56', 'Courage pour le TP nulos ❤️'],
       ['them', '08:05', 'Je pars aussi, j’ai fermé à clé 🔑']
     ],
-    sum: 'Célestine part à 7 h 55. Valentin part à 8 h 05 et ferme à clé.',
     ev: [
       ['270755', 'Ven. 27 · 7 h 55', 'Célestine quitte l’appart'],
       ['270805', 'Ven. 27 · 8 h 05', 'Valentin quitte l’appart et ferme à clé']
@@ -752,9 +774,8 @@ const PIECES = [
     t: 'Photo de TP',
     k: 'photo',
     ph: ['tp'],
-    cap: ['Vendredi 8 h 50. Nora tient la trousse rose de Célestine.'],
-    sum: 'Vendredi 8 h 50, Nora tient la trousse de Célestine.',
-    ev: [['270850', 'Ven. 27 · 8 h 50', 'Nora tient la trousse de Célestine']]
+    cap: ['Vendredi 8 h 50 · TP, salle 214 · Snapchat d’Erika.'],
+    ev: [['270850', 'Ven. 27 · 8 h 50', 'Photo du TP']]
   },
   {
     id: 'p_sandrine',
@@ -768,9 +789,20 @@ const PIECES = [
       ['d', 'Sam. 28 nov.'],
       ['them', '14:02', 'J’ai pris un peu de ta crème pour les mains 🙈 la mienne est vide'],
       ['me', '14:30', 'Pas de souci 😘']
-    ],
-    sum: 'Samedi 14 h, Sandrine a ouvert le casier de Célestine.'
+    ]
   },
+  {
+    id: 'p_vinted',
+    d: 15,
+    ic: '🛍️',
+    src: 'Capture d’écran de Gérald',
+    t: 'Une annonce Vinted',
+    k: 'photo',
+    ph: ['vinted'],
+    cap: ['Samedi 28 nov., 16 h 12 · capture faite par Gérald pendant sa garde de nuit.'],
+    ev: [['281612', 'Sam. 28 · 16 h 12', 'Annonce Vinted d’erika_lyo']]
+  },
+
   {
     id: 'p_snap',
     d: 16,
@@ -779,11 +811,8 @@ const PIECES = [
     t: 'Selfie du vendredi matin',
     k: 'photo',
     ph: ['snap'],
-    cap: [
-      'Vendredi 7 h 51, dans le miroir de la salle de bain : « en retard 😭 ». Au fond, sur l’étagère, dans le vide-poche… un éclat doré et rose.'
-    ],
-    sum: 'Vendredi 7 h 51, juste avant de partir : quelque chose de doré et rose brille dans le vide-poche.',
-    ev: [['270751', 'Ven. 27 · 7 h 51', 'Selfie : un éclat doré et rose dans le vide-poche']]
+    cap: ['Vendredi 7 h 51 · souvenir Snapchat de Célestine.'],
+    ev: [['270751', 'Ven. 27 · 7 h 51', 'Selfie dans la salle de bain']]
   },
   {
     id: 'p_cles',
@@ -799,7 +828,6 @@ const PIECES = [
       ['Dimanche 20 h 10', 'Retour de Célestine'],
       ['Dimanche 21 h 15', 'Retour de Valentin']
     ],
-    sum: 'Après le départ de Valentin vendredi 8 h 05, personne n’entre avant le retour de Célestine.',
     ev: [
       ['292010', 'Dim. 29 · 20 h 10', 'Célestine rentre à l’appart'],
       ['292130', 'Dim. 29 · 21 h 30', 'Plus de bracelet nulle part']
@@ -813,10 +841,36 @@ const PIECES = [
     t: 'Agrandissement du selfie',
     k: 'photo',
     ph: ['zoom'],
-    cap: [
-      'Agrandissement ×8 du vide-poche : une chaîne dorée, un fermoir, cinq petits cœurs roses. Note : « C’est le bracelet. À 7 h 51, il n’était pas dans la trousse. »'
+    cap: ['Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.']
+  },
+  {
+    id: 'p_badges',
+    d: 19,
+    ic: '🪪',
+    src: 'Relevé de la BU Rockefeller',
+    t: 'Les badges de la BU, vendredi',
+    k: 'tab',
+    cols: ['Heure', 'Carte étudiante', 'Passage'],
+    rows: [
+      ['8 h 02', 'Hugo T.', 'Entrée'],
+      ['9 h 47', 'Inès B.', 'Entrée'],
+      ['11 h 15', 'Hugo T.', 'Sortie'],
+      ['12 h 58', 'Lucas M.', 'Entrée'],
+      ['13 h 38', 'Nora', 'Entrée'],
+      ['13 h 41', 'Erika', 'Entrée'],
+      ['14 h 10', 'Inès B.', 'Sortie'],
+      ['14 h 26', 'Sarah K.', 'Entrée'],
+      ['15 h 52', 'Lucas M.', 'Sortie'],
+      ['16 h 02', 'Célestine', 'Entrée'],
+      ['16 h 40', 'Thomas R.', 'Entrée'],
+      ['17 h 55', 'Nora', 'Sortie'],
+      ['18 h 01', 'Erika', 'Sortie'],
+      ['18 h 04', 'Célestine', 'Sortie'],
+      ['18 h 30', 'Sarah K.', 'Sortie'],
+      ['18 h 31', 'Thomas R.', 'Sortie']
     ],
-    sum: 'Le Dr Rodolphe confirme : vendredi 7 h 51, le bracelet est dans le vide-poche.'
+    note: 'Vendredi 27 novembre, de l’ouverture à la fermeture. Chaque étudiant badge à l’entrée et à la sortie.',
+    ev: [['271338', 'Ven. 27 · 13 h 38', 'Badges de la BU']]
   },
   {
     id: 'p_eya',
@@ -831,7 +885,6 @@ const PIECES = [
       ['them', '19:12', 'Je voulais rien dire parce que j’avais séché… mais vendredi midi j’étais à Bellecour'],
       ['them', '19:12', 'Et j’ai vu Valentin sortir d’une petite boutique, vers 12 h 35. Il avait l’air de cacher un truc 👀']
     ],
-    sum: 'Vendredi 12 h 35, Eya voit Valentin sortir d’une petite boutique à Bellecour.',
     ev: [['271235', 'Ven. 27 · 12 h 35', 'Eya voit Valentin sortir d’une boutique à Bellecour']]
   },
   {
@@ -847,8 +900,7 @@ const PIECES = [
       'Dedans : sa trousse rose, son porte-monnaie (moins 20 €, merci Edgar), ses clés et un paquet de mouchoirs.',
       'Aucun bijou. Je l’aurais vu, je l’aurais mis de côté.',
       'Valérie'
-    ],
-    sum: 'Samedi matin, il n’y a aucun bijou dans le sac.'
+    ]
   },
   /* aveux */
   {
@@ -859,8 +911,7 @@ const PIECES = [
     t: 'Aveux · Noémie',
     k: 'aveu',
     who: 'noemie',
-    body: '« Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré. »',
-    sum: 'Elle a ébréché un cœur et l’a recollé. Le bracelet est rendu mardi à 19 h 40.'
+    body: '« Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré. »'
   },
   {
     id: 'a8',
@@ -870,8 +921,7 @@ const PIECES = [
     t: 'Aveux · Emma',
     k: 'aveu',
     who: 'emma',
-    body: '« Ok, j’ai pris ton sac. J’ai sorti tes lunettes pour tester tes verres avec mon appli : je voulais t’en offrir des nouvelles pour Noël. Ta correction a bougé, d’ailleurs. Et ton bracelet, tu l’avais au poignet, en face de moi. »',
-    sum: 'Elle testait ses lunettes. Le bracelet était au poignet de Célestine pendant ce temps.'
+    body: '« Ok, j’ai pris ton sac. J’ai sorti tes lunettes pour tester tes verres avec mon appli : je voulais t’en offrir des nouvelles pour Noël. Ta correction a bougé, d’ailleurs. Et ton bracelet, tu l’avais au poignet, en face de moi. »'
   },
   {
     id: 'a11',
@@ -882,8 +932,7 @@ const PIECES = [
     k: 'aveu',
     who: 'edgar',
     body: '« J’avoue : 20 balles pour un tacos. Mais j’ai retourné TOUT ton sac pour trouver le porte-monnaie. La trousse, les poches, tout. Il n’y avait aucun bracelet, j’en suis sûr. »',
-    sum: 'Vendredi soir, il a vidé tout le sac : aucun bracelet.',
-    ev: [['272250', 'Ven. 27 · 22 h 50', 'Edgar vide le sac : aucun bracelet']]
+    ev: [['272250', 'Ven. 27 · 22 h 50', 'Edgar fouille le sac (selon lui)']]
   },
   {
     id: 'a15',
@@ -894,8 +943,7 @@ const PIECES = [
     k: 'aveu',
     who: 'nora',
     body: '« Oui, j’ai pris ta trousse à 8 h 45 pour ton correcteur… et j’ai copié tes résultats, pardon. Mais je te jure, il n’y avait pas de bracelet dedans. Juste des stylos et ton surligneur rose. »',
-    sum: 'Vendredi 8 h 45, la trousse était déjà sans bracelet.',
-    ev: [['270845', 'Ven. 27 · 8 h 45', 'Nora ouvre la trousse : pas de bracelet']]
+    ev: [['270845', 'Ven. 27 · 8 h 45', 'Nora ouvre la trousse (selon elle)']]
   },
   {
     id: 'a19',
@@ -905,8 +953,7 @@ const PIECES = [
     t: 'Aveux · Sandrine',
     k: 'aveu',
     who: 'sandrine',
-    body: '« D’accord, j’ai ouvert ton casier pour ta crème. Mais il n’y avait que ton sac et ton manteau. Pas de bijou, rien qui brille. »',
-    sum: 'Samedi, aucun bracelet dans le casier.'
+    body: '« D’accord, j’ai ouvert ton casier pour ta crème. Mais il n’y avait que ton sac et ton manteau. Pas de bijou, rien qui brille. »'
   },
   {
     id: 'a22',
@@ -916,8 +963,7 @@ const PIECES = [
     t: 'Déclaration · Valentin',
     k: 'aveu',
     who: 'valentin',
-    body: '« Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir. »',
-    sum: 'Valentin reconnaît s’être arrêté dans une boutique à Bellecour.'
+    body: '« Ah… si, je suis passé récupérer un truc à Bellecour. Un truc pour moi. Rien à voir. »'
   }
 ];
 /* ---------- les auditions ---------- */
@@ -1007,7 +1053,7 @@ const AUD = {
     gain: 'a22'
   }
 };
-const CLUES = PIECES.map(p => [p.id, p.ic, p.src, p.t, p.sum]);
+const CLUES = PIECES.map(p => [p.id, p.ic, p.src, p.t]);
 const MEF = [];
 const pcOn = p => (p.a ? !!(S.aud || {})[p.a] : p.d <= 0 || (S.opened || []).includes(p.d) || (S.demOn && p.d <= 24));
 function clueOn(c) {
