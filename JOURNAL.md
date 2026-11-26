@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Célestine à pied : vrai personnage en volume, elle pivote sans effet « feuille de papier »
+- Les trois dessins séparés (dos, face, profil) et leur demi-tour « aplati » sont supprimés. Célestine est maintenant un personnage en volume : chaque partie (tête, visage, lunettes, nez, oreilles, queue-de-cheval, écharpe, bras, moufles, jambes, bottes, doudoune, capuche, fermeture éclair) a sa vraie place autour d'elle. Elle pivote en continu vers l'endroit où elle va, avec toutes les positions intermédiaires (trois-quarts dos, profil, trois-quarts face).
+- Style revu : fins contours, ombres sur le côté loin de nous, reflet dans les cheveux, bottes qui pointent vers l'avant. Elle marche avec de vraies enjambées sous tous les angles, et elle se tourne vers nous pour fêter la réussite.
+- Le fichier suit toujours sa main droite (même calcul pour le dessin et pour le fichier).
+- Version 1795704866
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Célestine à pied : elle se tourne dans le bon sens et contourne les obstacles
 - Elle a maintenant trois vues et se tourne vers l'endroit où elle va :
   - de dos quand elle s'éloigne ;
