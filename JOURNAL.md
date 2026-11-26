@@ -3,6 +3,11 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Ménage : capture d'écran de test retirée
+- Suppression de `integ0.png` à la racine du projet : une capture d'écran de test ajoutée par erreur. Rien ne change pour Célestine.
+- Version 
+- Fichiers : `integ0.png` (supprimé), `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : Célestine fait du breakdance quand elle réussit
 - Quand le fichier tombe dans la cheminée, Célestine se tourne vers nous et danse, sur un petit rythme de breakdance (la boîte à musique se tait). La chorégraphie : pas de danse debout avec les poings qui alternent, descente au sol, rotation sur la tête jambes écartées en V et mains au sol, pose figée, puis elle se relève d'un saut et lève les bras.
 - Le fichier s'ouvre après la danse (5,6 s au lieu de 2 s). Pendant la danse, on ne la dirige plus.
