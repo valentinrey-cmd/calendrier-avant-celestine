@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : animations plus fluides, toit de Valentin refait, chute du toit
+- **Animations** : les gestes de Célestine passent en douceur d'une pose à l'autre (plus de bras qui « sautent »). Marche et course plus détaillées (coudes, balancement des bras, respiration à l'arrêt). Quand elle court, tout son corps se penche en avant (et en arrière quand elle glisse) : la tête, les lunettes et le buste restent bien ensemble. Emotes refaites : salut de l'avant-bras, bisou envoyé de la main, danse disco, bouderie bras croisés en tapant du pied.
+- **Toit de Valentin** : c'est maintenant un vrai toit enneigé à la même hauteur que le nôtre (tuiles, bords enneigés, petite cheminée en briques), de l'autre côté d'une ruelle. Les façades des deux immeubles descendent dans la nuit avec des fenêtres allumées. Valentin ne fait plus de « marche sur place » : il reste debout, bien posé sur son toit. Les boules de neige s'écrasent aussi sur son toit.
+- **Chute du toit** : il n'y a plus de barrière invisible sur la gouttière et les côtés (le faîtage reste bloquant). Au bord, Célestine se penche en moulinant des bras (« Oh oh… 😱 »), bascule et tombe. La caméra monte au-dessus du vide et regarde vers le bas : on la voit longer la façade et s'écraser dans la neige de la rue ou de la ruelle (« Aïe aïe aïe… »). Puis elle réapparaît au milieu du toit, caméra remise derrière elle (« Plus de peur que de mal ! 😅 »).
+- Version : 1795713488
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-26 · Fichier mystère : vent, tir à effet, course et glissade, emotes, ange, Valentin, étoile filante, 10 secrets
 - **Vent** : il change de sens et de force toutes les 9 à 14 s (parfois presque calme). Il dévie le fichier en vol et pousse la neige et la fumée. Une flèche avec la vitesse en km/h s'affiche sous le titre (tournée selon la vue), et une girouette dorée tourne en haut de l'antenne.
 - **Tir à effet** : en relâchant « Lancer », glisser le doigt sur le côté fait partir le fichier en courbe de ce côté (↶ / ↷ s'affichent sur le bouton). Au clavier, on garde une flèche gauche/droite en relâchant l'espace.

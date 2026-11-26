@@ -1354,7 +1354,7 @@ function mysLancer(cb, fic) {
     VMIN = 2.6, // force du lancer : jauge vide…
     VMAX = 9.5, // … et pleine
     REMPLI = 2.4; // secondes pour remplir la jauge
-  let W, H, dpr, f, hy, F, rate, fin, raf, t0, fumees, flocons, etoiles, ville, voisins, eclats;
+  let W, H, dpr, f, hy, hc, F, rate, fin, raf, t0, fumees, flocons, etoiles, ville, voisins, eclats;
   // Célestine (le personnage qu'on dirige) : elle tient le fichier tant qu'elle ne l'a pas lancé
   let C = { x: 0, z: 2.6, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, charge: 0, tir: -9, pTir: null, pose: -9 };
   // obstacles posés sur le toit : le fichier bute contre eux (cylindres : x, z, rayon, hauteur)
@@ -1487,7 +1487,7 @@ function mysLancer(cb, fic) {
     cv.style.height = H + 'px';
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     f = Math.min(W * 0.95, H * 0.55);
-    hy = H * 0.3;
+    hc = hy = H * 0.3; // hc : centre de l'image ; hy : la ligne d'horizon (elle remonte quand la caméra regarde vers le bas)
     voisins = Array.from({ length: Math.ceil((2 * Math.PI * f) / 70) }, (_, i) => ({
       x: i * 70 - 30 + ((i * 23) % 17),
       w: 60 + ((i * 31) % 30),
@@ -1500,7 +1500,7 @@ function mysLancer(cb, fic) {
     }));
   };
   // caméra : elle suit Célestine, 2,6 m derrière elle, dans l'angle choisi au doigt (V = où elle est, Vt = où elle va, en douceur)
-  const V = { x: 0, z: 0, yaw: 0 },
+  const V = { x: 0, z: 0, yaw: 0, h: 0, p: 0 }, // h : la caméra monte (en m) ; p : elle regarde vers le bas (en radians)
     Vt = { x: 0, z: 0, yaw: 0 };
   const cam = (x, z) => {
     const dx = x - V.x,
@@ -1509,15 +1509,23 @@ function mysLancer(cb, fic) {
       si = Math.sin(V.yaw);
     return [dx * co - dz * si, dx * si + dz * co]; // [à droite, devant]
   };
-  const P = (x, y, z) => {
+  // un point vu par la caméra : [à droite, profondeur, en haut], en tenant compte de sa hauteur et de son inclinaison
+  const vue = (x, y, z) => {
     const [xr, zr] = cam(x, z),
-      zz = Math.max(0.05, zr);
-    return [W / 2 + (xr * f) / zz, hy - ((y - CAM) * f) / zz, f / zz, zr]; // projection : [x écran, y écran, échelle, profondeur]
+      yr = y - CAM - V.h,
+      cp = Math.cos(V.p),
+      sp = Math.sin(V.p);
+    return [xr, zr * cp - yr * sp, yr * cp + zr * sp];
+  };
+  const P = (x, y, z) => {
+    const [xr, d, u] = vue(x, y, z),
+      zz = Math.max(0.05, d);
+    return [W / 2 + (xr * f) / zz, hc - (u * f) / zz, f / zz, d]; // projection : [x écran, y écran, échelle, profondeur]
   };
   const prof = (x, z) => cam(x, z)[1];
   // polygone du monde (points [x, y, z]) coupé au ras de la caméra, puis dessiné
   const poly = pts => {
-    const q = pts.map(([x, y, z]) => [...cam(x, z), y]),
+    const q = pts.map(([x, y, z]) => vue(x, y, z)),
       out = [];
     for (let i = 0; i < q.length; i++) {
       const a = q[i],
@@ -1531,9 +1539,9 @@ function mysLancer(cb, fic) {
       }
     }
     c.beginPath();
-    out.forEach(([xr, zr, y], i) => {
+    out.forEach(([xr, zr, u], i) => {
       const px = W / 2 + (xr * f) / zr,
-        py = hy - ((y - CAM) * f) / zr;
+        py = hc - (u * f) / zr;
       i ? c.lineTo(px, py) : c.moveTo(px, py);
     });
     c.closePath();
@@ -2486,7 +2494,7 @@ function mysLancer(cb, fic) {
     if (d < 0.4) return; // derrière la caméra
     // outils 3D autour de l'objet : point (dx, y, dz) → écran, et « ce côté est-il tourné vers nous ? »
     const Q = (dx, yy, dz) => P(ob.x + dx, yy, ob.z + dz),
-      vu = (nx, ny, nz, cx = 0, cy = 0, cz = 0) => nx * (V.x - ob.x - cx) + ny * (CAM - cy) + nz * (V.z - ob.z - cz) > 0,
+      vu = (nx, ny, nz, cx = 0, cy = 0, cz = 0) => nx * (V.x - ob.x - cx) + ny * (CAM + V.h - cy) + nz * (V.z - ob.z - cz) > 0,
       cercle = (cx, yy, cz, r, n = 20) => {
         c.beginPath();
         for (let i = 0; i <= n; i++) {
@@ -3247,6 +3255,18 @@ function mysLancer(cb, fic) {
     const sw = Math.sin(C.ph),
       a = C.amp,
       dz = danse();
+    if (C.chute) {
+      if (C.chute.sol) return { d: [44, 150, 0], de: [30, 140, 0], g: [-44, 150, 0], ge: [-30, 140, 0] }; // étalée dans la neige
+      // elle mouline des bras pour garder l'équilibre (deux cercles en opposition)
+      const w = T() * (C.chute.vy ? 17 : 13),
+        bras = (q, ph) => ({
+          h: [q * 25, 133 + 30 * Math.sin(w + ph), 30 * Math.cos(w + ph)],
+          c: [q * 25, 133 + 15 * Math.sin(w + ph), 15 * Math.cos(w + ph)]
+        }),
+        D = bras(1, 0),
+        Gq = bras(-1, Math.PI);
+      return { d: D.h, de: D.c, g: Gq.h, ge: Gq.c, acc: 0.3 };
+    }
     if (dz) {
       const w = Math.sin(dz.d * 7);
       if (dz.e == 'ange') {
@@ -3279,14 +3299,29 @@ function mysLancer(cb, fic) {
         G0 = [-24, 85, 0],
         D0 = [25, 87, 0];
       switch (em.k) {
-        case 'salut':
-          return { d: [27 + w * 6, 184, 8], de: [31, 154, 4], g: G0 };
+        case 'salut': {
+          // l'avant-bras se balance autour du coude, la main ouverte
+          const th = Math.sin(k * 11) * 0.55;
+          return { d: [31 + Math.sin(th) * 24, 150 + Math.cos(th) * 30, 10], de: [31, 150, 6], g: G0 };
+        }
         case 'bisou':
-          return k < 0.55 ? { d: [5, 150, 15], de: [18, 128, 14], g: G0 } : { d: [16, 168, 46], de: [20, 148, 26], g: G0 };
-        case 'danse':
-          return { d: [12 + w * 8, 118 + w * 22, 26], g: [-12 + w * 8, 118 - w * 22, 26], acc: Math.abs(w) * 5 };
-        case 'boude': // bras croisés
-          return { d: [-9, 118, 15], de: [15, 120, 11], g: [9, 115, 17], ge: [-15, 121, 11] };
+          // la main sur les lèvres, puis elle l'envoie (bras qui s'ouvre vers l'avant)
+          return k < 0.5
+            ? { d: [4, 151, 14], de: [17, 129, 16], g: G0 }
+            : {
+                d: [14 + Math.min(1, (k - 0.5) * 4) * 6, 160, 18 + Math.min(1, (k - 0.5) * 4) * 30],
+                de: [20, 142, 14 + Math.min(1, (k - 0.5) * 4) * 12],
+                g: G0
+              };
+        case 'danse': {
+          // « disco » : un bras pointe en l'air, l'autre en bas, en alternance, les hanches balancent
+          const h = Math.sin(k * 6.5) > 0;
+          return h
+            ? { d: [30, 192, 10], de: [27, 160, 6], g: [-10, 100, 22], ge: [-24, 118, 10], acc: Math.abs(w) * 4 }
+            : { d: [10, 100, 22], de: [24, 118, 10], g: [-30, 192, 10], ge: [-27, 160, 6], acc: Math.abs(w) * 4 };
+        }
+        case 'boude': // bras croisés, elle tape du pied
+          return { d: [-9, 118, 15], de: [15, 120, 11], g: [9, 115, 17], ge: [-15, 121, 11], acc: 0.6 };
         case 'lance': // Valentin lance une boule de neige
           return k < 0.4
             ? { d: [20, 172, -22], de: [27, 150, -8], g: [-22, 128, 22] }
@@ -3321,12 +3356,40 @@ function mysLancer(cb, fic) {
       for (const q of ['d', 'de', 'g', 'ge']) pp[q] = mix3(mix3(SET[q], TIR[q], k), REPOS[q], r);
       return { ...pp, acc: C.y > 0.01 ? 0 : 9 * (1 - k) + Math.max(0, 8 - (T() - C.pose) * 50) };
     }
-    return { d: [25, 87 + sw * 1.5 * a, sw * 10 * a], g: [-24 + Math.abs(sw) * 1.5 * a, 85 - Math.abs(sw) * 2 * a, -sw * 18 * a] };
+    // marche : les bras balancent, coudes un peu pliés ; course : bras pliés qui pompent ; à l'arrêt : elle respire
+    const r = Math.max(0, Math.min(1, ((C.v || 0) - 1.8) / 1.4)),
+      aw = Math.min(1, a),
+      mx = (p, q) => p.map((v, i) => v + (q[i] - v) * r),
+      souffle = Math.sin(T() * 2.2) * 0.6;
+    return {
+      d: mx([24, 86 + 4 * aw * Math.abs(sw), sw * 15 * aw], [19, 116 + 8 * sw, sw * 22 + 8]),
+      de: mx([25.5, 110, sw * 5 * aw - 2], [25, 106, sw * 6 - 12]),
+      g: mx([-24, 86 + 4 * aw * Math.abs(sw), -sw * 15 * aw], [-19, 116 - 8 * sw, -sw * 22 + 8]),
+      ge: mx([-25.5, 110, -sw * 5 * aw - 2], [-25, 106, -sw * 6 - 12]),
+      acc: a < 0.05 ? 0.6 + souffle : 0
+    };
+  };
+  // pose complète (coudes par défaut si besoin) puis lissée d'une image à l'autre : les gestes s'enchaînent sans à-coups
+  const complet = pp => {
+    const coude = (q, H) => [q * 23 + (H[0] - q * 18.5) * 0.4, (133 + H[1]) / 2, H[2] * 0.5 - 4],
+      d = pp.d || [25, 87, 0],
+      g = pp.g || [-24, 85, 0];
+    return { d, g, de: pp.de || coude(1, d), ge: pp.ge || coude(-1, g), acc: pp.acc || 0 };
+  };
+  const posesLisses = () => {
+    const cible = complet(poses()),
+      now = T();
+    if (!C.ps) C.ps = cible;
+    const k = 1 - Math.exp(-Math.min(0.05, now - (C.psT || now)) * 16);
+    C.psT = now;
+    for (const q of ['d', 'de', 'g', 'ge']) C.ps[q] = C.ps[q].map((v, i) => v + (cible[q][i] - v) * k);
+    C.ps.acc += (cible.acc - C.ps.acc) * k;
+    return C.ps;
   };
   const main = () => {
     // le fichier suit sa main droite (même calcul que le dessin)
     // (proj donne un décalage à droite de la caméra et une profondeur vers elle : on les remet dans le monde)
-    const [X, Y, Z] = poses().d,
+    const [X, Y, Z] = posesLisses().d,
       [px, , pd] = proj(X, Y, Z),
       bob = Math.abs(Math.cos(C.ph)) * 0.022 * C.amp,
       co = Math.cos(V.yaw),
@@ -3340,12 +3403,72 @@ function mysLancer(cb, fic) {
   };
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
   const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, yaw: 0 };
+  // la chute du toit : elle vacille au bord en moulinant des bras, bascule, tombe dans la rue (ou la ruelle)
+  // et s'écrase dans la neige ; la caméra monte pour la regarder tomber, puis elle réapparaît au milieu du toit
+  const SOL = -9.6; // le sol de la rue, 9,6 m sous le toit
+  const chute = dt => {
+    const K = C.chute,
+      d = T() - K.t,
+      [nx, nz] = K.n;
+    C.v = 0;
+    C.vy = 0;
+    C.amp += (0 - C.amp) * Math.min(1, dt * 8);
+    if (d < 1.1) {
+      // au bord : elle se tourne vers le vide, se penche, mouline des bras
+      const vise = Math.atan2(nx, nz);
+      C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 10);
+      C.lean = 0.3 + 0.16 * Math.sin(d * 11) + d * 0.2;
+      C.x = K.x0 + nx * 0.05 * Math.sin(d * 11);
+      C.z = K.z0 + nz * 0.05 * Math.sin(d * 11);
+      if (!K.cri && d > 0.12) {
+        K.cri = 1;
+        parle(C, 'Oh oh… 😱', 1.1);
+        bruit('aie', 0.8);
+      }
+    } else if (!K.sol) {
+      // la chute : elle bascule en avant et tombe en tournoyant un peu
+      if (!K.vy) K.vy = 1.6;
+      K.vy -= G * dt;
+      C.y += K.vy * dt;
+      const sort = Math.min(0.8, (d - 1.1) * 1.4);
+      C.x = K.x0 + nx * sort;
+      C.z = K.z0 + nz * sort;
+      C.rot = (C.rot || 0) + dt * 2.6;
+      C.lean = 0.5;
+      bruit('glisse', 1);
+      if (C.y <= SOL) {
+        // badaboum dans la neige de la rue
+        C.y = SOL;
+        K.sol = T();
+        C.rot = Math.PI / 2;
+        C.lean = 0;
+        bruit('glisse', 0);
+        bruit('boum');
+        bruit('neige', 1);
+        const [x, y] = P(C.x, SOL, C.z);
+        for (let j = 0; j < 40; j++)
+          eclats.push({ x, y, vx: (Math.random() - 0.5) * 260, vy: -Math.random() * 220, t: 0.9, c: j % 4 ? '#ffffff' : '#cfe0ff' });
+        parle(C, 'Aïe aïe aïe… 😵‍💫', 1.4);
+      }
+    } else if (T() - K.sol > 1.9) {
+      // elle réapparaît au milieu du toit et la caméra se remet derrière elle
+      Object.assign(C, { x: 0, z: 2.6, y: 0, vy: 0, rot: 0, lean: 0, phi: 0, chute: null, ps: null, idle: 0 });
+      ctl.yaw = 0;
+      Object.assign(V, { x: 0, z: 0, yaw: 0, h: 0, p: 0 });
+      Object.assign(Vt, { x: 0, z: 0, yaw: 0 });
+      C.revient = T();
+      parle(C, 'Plus de peur que de mal ! 😅', 1.8);
+    }
+    if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
+  };
   const marche = dt => {
+    if (C.chute) return chute(dt);
     saut(dt);
     const dz = danse();
     if (dz) {
       // pendant la danse, on ne la dirige plus
       C.v = 0;
+      C.lean = (C.lean || 0) * 0.9;
       C.pen *= 0.9;
       const vers = cible => (C.phi += Math.atan2(Math.sin(cible - C.phi), Math.cos(cible - C.phi)) * Math.min(1, dt * 9)),
         e = dz.e;
@@ -3433,10 +3556,14 @@ function mysLancer(cb, fic) {
     if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 10);
     C.x += vx * dt;
     C.z += vz * dt;
-    C.amp += ((C.v > 0.05 ? Math.min(1.3, C.v / 1.2) : em == 'danse' ? 0.5 : 0) - C.amp) * Math.min(1, dt * 8);
+    C.amp += ((C.v > 0.05 ? Math.min(1.3, C.v / 1.2) : em == 'danse' ? 0.5 : em == 'boude' ? 0.12 : 0) - C.amp) * Math.min(1, dt * 8);
     C.pen += ((C.v > 0.05 ? (vx * Math.cos(V.yaw) - vz * Math.sin(V.yaw)) / 1.5 : 0) - C.pen) * Math.min(1, dt * 6);
+    if (em == 'danse') C.pen = Math.sin(T() * 6.5) * 0.8; // les hanches qui balancent
+    // buste penché : en avant quand elle court, en arrière quand elle glisse
+    const penche = C.glisse ? -0.2 : Math.max(0, Math.min(1, (C.v - 1.8) / 1.4)) * 0.16;
+    C.lean = (C.lean || 0) + (penche - (C.lean || 0)) * Math.min(1, dt * 8);
     const ph0 = C.ph;
-    C.ph += dt * (C.v > 0.05 ? 3 + C.v * 3.2 : em == 'danse' ? 9 : 0);
+    C.ph += dt * (C.v > 0.05 ? 3 + C.v * 3.2 : em == 'danse' ? 9 : em == 'boude' ? 12 : 0);
     if (Math.floor(ph0 / Math.PI) != Math.floor(C.ph / Math.PI) && C.v > 0.05) {
       // un pas : son, et une empreinte de botte dans la neige (pied gauche, pied droit)
       bruit('pas', C.amp);
@@ -3462,8 +3589,20 @@ function mysLancer(cb, fic) {
         surprise(ob.t);
       }
     });
-    C.x = Math.max(-8.4, Math.min(8.4, C.x));
-    C.z = Math.max(0.9, Math.min(RIDGE - 0.3, C.z));
+    C.z = Math.min(RIDGE - 0.3, C.z);
+    // pas de barrière invisible : au bord de la gouttière ou d'un côté du toit, elle perd l'équilibre et tombe
+    if (!fin && C.y <= 0 && (C.z < BORD + 0.12 || Math.abs(C.x) > 8.88)) {
+      const n = C.z < BORD + 0.12 ? [0, -1] : [Math.sign(C.x), 0];
+      if (n[1]) C.z = BORD + 0.12;
+      else C.x = n[0] * 8.88;
+      C.chute = { t: T(), n, vy: 0, x0: C.x, z0: C.z };
+      C.charge = 0;
+      C.glisse = 0;
+      C.emote = null;
+      C.ange = 0;
+      btn.classList.remove('on');
+      btn.style.setProperty('--p', 0);
+    }
     // elle ramasse le fichier en passant dessus
     if (!C.tient && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
       C.tient = 1;
@@ -3484,7 +3623,7 @@ function mysLancer(cb, fic) {
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
   const armer = () => {
-    if (fin || !C.tient || C.charge || C.y > 0 || C.pTir != null) return;
+    if (fin || C.chute || !C.tient || C.charge || C.y > 0 || C.pTir != null) return;
     C.charge = T();
     C.p = 0;
     btn.classList.add('on');
@@ -3577,7 +3716,7 @@ function mysLancer(cb, fic) {
     }
   };
   const celestine = (t, LK = TENUE.celestine) => {
-    if (prof(C.x, C.z) < 0.5) return;
+    if (P(C.x, C.y, C.z)[3] < 0.5) return;
     const [x, yb, s] = P(C.x, C.y, C.z),
       [sx, sy, ss] = P(C.x, C.base || 0, C.z),
       u = s / 100, // 1 unité = 1 cm
@@ -3587,7 +3726,7 @@ function mysLancer(cb, fic) {
       bob = -Math.abs(cw) * 2.2 * a,
       cs = Math.cos(C.phi - V.yaw), // sa direction par rapport à la caméra (comme proj)
       sn = Math.sin(C.phi - V.yaw),
-      po = poses(),
+      po = posesLisses(),
       dz = danse(),
       EC = dz ? dz.ecart : 0, // écart des jambes (danse)
       ACC = po.acc || 0, // flexion des genoux (tir)
@@ -3610,7 +3749,9 @@ function mysLancer(cb, fic) {
     c.save();
     c.translate(x, yb);
     c.scale(u * LK.taille, u * LK.taille);
-    c.rotate(C.pen * 0.05);
+    // penchée en avant quand elle court, en arrière quand elle glisse : tout le corps bascule autour des pieds
+    // (visible surtout de profil), pour que la tête, le buste et les bras restent bien ensemble
+    c.rotate(C.pen * 0.05 + Math.atan(C.lean || 0) * sn + (C.rot || 0));
     c.translate(0, bob);
     if (dz) {
       // décalage du moonwalk, petit saut, balancement du toprock
@@ -4292,7 +4433,7 @@ function mysLancer(cb, fic) {
     c.arc(x, y, 14, 0, 7);
     c.fill();
   };
-  const VOISIN = { x0: 10.6, x1: 17, z0: 0.4, z1: 9.5, h: 0.5 };
+  const VOISIN = { x0: 10.4, x1: 19, z0: 0.6, z1: 8.5, h: 0 }; // même hauteur que notre toit, de l'autre côté d'une ruelle
   const VAL = {
     x: 11.05,
     z: 5.2,
@@ -4317,8 +4458,7 @@ function mysLancer(cb, fic) {
   const valentin = dt => {
     const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
     VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 4);
-    VAL.ph += dt * 2;
-    VAL.amp = 0.06; // il se dandine un peu sur place
+    VAL.amp = 0; // il se tient debout (il respire, c'est tout)
     if (!VAL.coucou) ((VAL.coucou = T() + 4), (VAL.boule = T() + 10));
     const occupe = VAL.emote && T() - VAL.emote.t < VAL.emote.d;
     if (!occupe && !fin && T() > VAL.coucou) {
@@ -4349,7 +4489,8 @@ function mysLancer(cb, fic) {
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       b.z += b.vz * dt;
-      const surNous = Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE;
+      const surNous =
+        (Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE) || (b.x > VOISIN.x0 && b.x < VOISIN.x1 && b.z > VOISIN.z0 && b.z < VOISIN.z1);
       if (b.y > C.y && b.y < C.y + 1.75 && Math.hypot(b.x - C.x, b.z - C.z) < 0.38) {
         // en plein sur Célestine !
         boules.splice(i, 1);
@@ -4382,53 +4523,104 @@ function mysLancer(cb, fic) {
     c.arc(x, y, r, 0, 7);
     c.fill();
   };
-  // le toit voisin : un bâtiment un peu plus haut, avec des fenêtres allumées
-  const toitVoisin = () => {
-    const { x0, x1, z0, z1, h } = VOISIN,
-      bas = -2.2,
-      murs = [
-        [
-          [x0, z0],
-          [x0, z1],
-          [-1, 0]
-        ],
-        [
-          [x1, z0],
-          [x0, z0],
-          [0, -1]
-        ],
-        [
-          [x0, z1],
-          [x1, z1],
-          [0, 1]
-        ]
-      ];
-    murs.forEach(([a, b, [nx, nz]]) => {
-      if (nx * (V.x - a[0]) + nz * (V.z - a[1]) <= 0) return;
+  // une façade d'immeuble qui plonge dans la nuit depuis le bord d'un toit, avec ses fenêtres allumées
+  const facade = (ax, az, bx, bz, vue, h = 0) => {
+    if (!vue) return;
+    const tons = ['#3a4677', '#334070', '#2d3967', '#28335e', '#222c52', '#1c2546', '#161e3b', '#111830'];
+    tons.forEach((ton, k) => {
       if (
         poly([
-          [a[0], bas, a[1]],
-          [b[0], bas, b[1]],
-          [b[0], h, b[1]],
-          [a[0], h, a[1]]
+          [ax, h - k * 1.2, az],
+          [bx, h - k * 1.2, bz],
+          [bx, h - (k + 1) * 1.2 - 0.02, bz],
+          [ax, h - (k + 1) * 1.2 - 0.02, az]
         ])
       ) {
-        const g = c.createLinearGradient(0, P(a[0], h, a[1])[1], 0, P(a[0], bas, a[1])[1]);
-        g.addColorStop(0, nx ? '#3d4c85' : '#34427a');
-        g.addColorStop(1, '#1b2448');
-        c.fillStyle = g;
+        c.fillStyle = ton;
         c.fill();
       }
-      for (let i = 1; i < 4; i++) {
-        const u0 = i / 4 - 0.06,
-          u1 = i / 4 + 0.06,
-          at = (u, y) => [a[0] + (b[0] - a[0]) * u, y, a[1] + (b[1] - a[1]) * u];
-        if (poly([at(u0, -1.5), at(u1, -1.5), at(u1, -0.6), at(u0, -0.6)])) {
-          c.fillStyle = i == 2 ? '#33447a' : '#ffcf73';
+    });
+    const L = Math.hypot(bx - ax, bz - az),
+      n = Math.max(2, Math.round(L / 1.6)),
+      nx = (bz - az) / L,
+      nz = -(bx - ax) / L;
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < 4; j++) {
+        const u = (i + 0.5) / n,
+          mx = ax + (bx - ax) * u - nx * 0.01,
+          mz = az + (bz - az) * u - nz * 0.01,
+          dx = ((bx - ax) / L) * 0.3,
+          dz = ((bz - az) / L) * 0.3,
+          yc = h - 1.1 - j * 1.5,
+          allume = (i * 7 + j * 3) % 5 < 3;
+        if (
+          poly([
+            [mx - dx, yc + 0.4, mz - dz],
+            [mx + dx, yc + 0.4, mz + dz],
+            [mx + dx, yc - 0.4, mz + dz],
+            [mx - dx, yc - 0.4, mz - dz]
+          ])
+        ) {
+          c.fillStyle = allume ? ['#ffcf73', '#ffc062', '#e9b866', '#c79f5c'][j] : '#2a3463';
           c.fill();
         }
       }
+  };
+  // la rue enneigée en bas de l'immeuble (on ne la voit que quand la caméra monte, pendant une chute)
+  const rue = () => {
+    if (
+      poly([
+        [-40, SOL, -40],
+        [40, SOL, -40],
+        [40, SOL, 40],
+        [-40, SOL, 40]
+      ])
+    ) {
+      c.fillStyle = '#a4b0cc';
+      c.fill();
+    }
+    // le trottoir et les traces de pneus dans la neige, le long de la façade
+    [
+      [-40, -2.2, 40, -1.6, '#8492b4'],
+      [-40, -4.6, 40, -4.1, '#8492b4'],
+      [-40, 0.6, 40, -0.6, '#e8eefa']
+    ].forEach(([a, z0, b, z1, col]) => {
+      if (
+        poly([
+          [a, SOL + 0.01, z0],
+          [b, SOL + 0.01, z0],
+          [b, SOL + 0.01, z1],
+          [a, SOL + 0.01, z1]
+        ])
+      ) {
+        c.fillStyle = col;
+        c.fill();
+      }
     });
+  };
+  // notre immeuble : ses façades sous le bord du toit, et le fond sombre de la ruelle
+  const facadesNous = () => {
+    if (
+      poly([
+        [9, -9.6, -6],
+        [VOISIN.x0, -9.6, -6],
+        [VOISIN.x0, -9.6, 16],
+        [9, -9.6, 16]
+      ])
+    ) {
+      c.fillStyle = '#7d89aa'; // la neige au fond de la ruelle, dans l'ombre
+      c.fill();
+    }
+    facade(-9, 0.6, 9, 0.6, V.z < 0.6);
+    facade(9, 0.6, 9, RIDGE, V.x > 9);
+    facade(-9, RIDGE, -9, 0.6, V.x < -9);
+  };
+  // le toit voisin : le même genre de toit que le nôtre (neige, tuiles, faîtage), séparé par une ruelle
+  const toitVoisin = () => {
+    const { x0, x1, z0, z1, h } = VOISIN;
+    facade(x0, z1, x0, z0, V.x < x0); // côté ruelle, face à notre toit
+    facade(x0, z0, x1, z0, V.z < z0); // côté rue
+    // le pan de toit enneigé
     if (
       poly([
         [x0, h, z0],
@@ -4437,18 +4629,98 @@ function mysLancer(cb, fic) {
         [x0, h, z1]
       ])
     ) {
-      c.fillStyle = '#d9e3f3';
+      const g = c.createLinearGradient(0, hy + 20, 0, H);
+      g.addColorStop(0, '#c4d1ea');
+      g.addColorStop(1, '#eef3fc');
+      c.fillStyle = g;
       c.fill();
     }
+    // rangées de tuiles
+    c.strokeStyle = '#9fb0cf';
+    c.lineWidth = 1;
+    c.globalAlpha = 0.5;
+    for (let z = 1; z < z1; z *= 1.16) {
+      c.beginPath();
+      let on = 0;
+      for (let x = x0; x <= x1; x += 0.3) {
+        const [px, py, , d] = P(x, h, z);
+        if (d < 0.3) {
+          on = 0;
+          continue;
+        }
+        on ? c.lineTo(px, py) : c.moveTo(px, py);
+        on = 1;
+      }
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+    // bords enneigés : le long de la ruelle, le faîtage et la gouttière
+    [
+      [x0, z0, x0, z1],
+      [x0, z1, x1, z1],
+      [x0, z0, x1, z0]
+    ].forEach(([ax, az, bx, bz]) => {
+      if (
+        poly([
+          [ax, h, az],
+          [bx, h, bz],
+          [bx, h + 0.07, bz],
+          [ax, h + 0.07, az]
+        ])
+      ) {
+        c.fillStyle = '#f2f6fd';
+        c.fill();
+      }
+    });
+    // un petit conduit de cheminée en briques
+    const cx = 15,
+      cz = 6,
+      e = 0.28,
+      ht = 0.9;
+    [
+      [
+        [cx - e, cz - e],
+        [cx + e, cz - e],
+        [0, -1]
+      ],
+      [
+        [cx - e, cz + e],
+        [cx - e, cz - e],
+        [-1, 0]
+      ],
+      [
+        [cx + e, cz - e],
+        [cx + e, cz + e],
+        [1, 0]
+      ],
+      [
+        [cx + e, cz + e],
+        [cx - e, cz + e],
+        [0, 1]
+      ]
+    ].forEach(([pa, pb, [nx, nz]]) => {
+      if (nx * (V.x - (pa[0] + pb[0]) / 2) + nz * (V.z - (pa[1] + pb[1]) / 2) <= 0) return;
+      if (
+        poly([
+          [pa[0], h, pa[1]],
+          [pb[0], h, pb[1]],
+          [pb[0], h + ht, pb[1]],
+          [pa[0], h + ht, pa[1]]
+        ])
+      ) {
+        c.fillStyle = nx ? '#8e3626' : '#a8432d';
+        c.fill();
+      }
+    });
     if (
       poly([
-        [x0, h, z0],
-        [x0, h, z1],
-        [x0, h + 0.08, z1],
-        [x0, h + 0.08, z0]
+        [cx - e - 0.04, h + ht, cz - e - 0.04],
+        [cx + e + 0.04, h + ht, cz - e - 0.04],
+        [cx + e + 0.04, h + ht, cz + e + 0.04],
+        [cx - e - 0.04, h + ht, cz + e + 0.04]
       ])
     ) {
-      c.fillStyle = '#f2f6fd';
+      c.fillStyle = '#f4f7fd';
       c.fill();
     }
   };
@@ -4486,14 +4758,30 @@ function mysLancer(cb, fic) {
         }
       }
     }
-    // la caméra suit Célestine à 2,6 m, dans l'angle choisi au doigt
-    Vt.yaw = ctl.yaw;
-    Vt.x = C.x - Math.sin(Vt.yaw) * 2.6;
-    Vt.z = C.z - Math.cos(Vt.yaw) * 2.6;
-    const kc = Math.min(1, dt * 6);
-    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * 14);
+    // la caméra suit Célestine ; pendant une chute, elle monte au-dessus du vide et regarde vers le bas
+    const K = C.chute,
+      enChute = K && T() - K.t > 0.8;
+    if (enChute) {
+      // au-dessus du vide, tournée vers l'immeuble : on la voit basculer, longer la façade et s'écraser en bas
+      // (côté ruelle, il n'y a pas la place de reculer : la caméra reste au-dessus de la ruelle et regarde presque à pic)
+      const [nx, nz] = K.n,
+        recul = nx > 0 ? 0.85 : 2.6;
+      Vt.yaw = Math.atan2(-nx, -nz);
+      Vt.x = K.x0 + nx * recul;
+      Vt.z = K.z0 + nz * recul;
+    } else {
+      Vt.yaw = ctl.yaw;
+      Vt.x = C.x - Math.sin(Vt.yaw) * 2.6;
+      Vt.z = C.z - Math.cos(Vt.yaw) * 2.6;
+    }
+    const kc = Math.min(1, dt * (enChute ? 3.2 : 6)),
+      kh = Math.min(1, dt * 3.2);
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (enChute ? 3.2 : 14));
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
+    V.h += ((enChute ? 3.2 : 0) - V.h) * kh;
+    V.p += ((enChute ? (K.n[0] > 0 ? 1.3 : 0.95) : 0) - V.p) * kh;
+    hy = hc - f * Math.tan(V.p);
     marche(dt);
     valentin(dt);
     vent(dt);
@@ -4502,8 +4790,10 @@ function mysLancer(cb, fic) {
     lyon();
     voisinsDessin(t);
     neige(dt, false);
-    toit();
-    toitVoisin();
+    if (V.h > 0.05) rue();
+    // le toit d'en face est plus loin : on le dessine d'abord, notre toit passe devant
+    if (V.x < VOISIN.x0) (toitVoisin(), facadesNous(), toit());
+    else (facadesNous(), toit(), toitVoisin());
     empreintes();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
     const L = OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
