@@ -2830,7 +2830,7 @@ function mysLancer(cb, fic) {
       x: C.x + (co * px - si * pd) / 100,
       y: C.y + bob + Y / 100 + (Y > 150 ? 0.09 : -0.11),
       z: C.z + (-si * px - co * pd) / 100,
-      a: 0.1 * Math.cos(C.phi) + Math.sin(C.ph) * 0.1 * C.amp
+      a: 0.1 * Math.cos(C.phi - V.yaw) + Math.sin(C.ph) * 0.1 * C.amp
     };
   };
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
@@ -2941,8 +2941,8 @@ function mysLancer(cb, fic) {
       sw = Math.sin(C.ph),
       cw = Math.cos(C.ph),
       bob = -Math.abs(cw) * 2.2 * a,
-      cs = Math.cos(C.phi),
-      sn = Math.sin(C.phi),
+      cs = Math.cos(C.phi - V.yaw), // sa direction par rapport à la caméra (comme proj)
+      sn = Math.sin(C.phi - V.yaw),
       po = poses(),
       TRAIT = 'rgba(70,25,45,0.38)';
     // ombre au sol
@@ -3430,7 +3430,7 @@ function mysLancer(cb, fic) {
         c.lineTo(20, -158);
         for (let i = 20; i >= -20; i -= 2) {
           const ang = Math.asin(Math.max(-1, Math.min(1, i / (R + 0.4)))),
-            devant = Math.cos(ang - C.phi + Math.PI) > 0;
+            devant = Math.cos(ang - (C.phi - V.yaw) + Math.PI) > 0;
           c.lineTo(i, -160.6 - (devant ? 1.4 * Math.cos(i / 5 + 1) : 6));
         }
         c.closePath();

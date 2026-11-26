@@ -3,6 +3,11 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : Célestine ne se « dédouble » plus quand on tourne la vue
+- Quand on tournait la vue, la tête (queue-de-cheval) suivait la caméra, alors que le buste, le visage et la frange restaient calés sur le monde. On voyait par exemple le devant de la doudoune avec l'arrière de la tête. Toutes les parties utilisent maintenant sa direction par rapport à la caméra.
+- Version 1795709269
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : commandes de jeu (joystick, vue au doigt, jauge de lancer)
 - Un seul mode, avec des commandes de jeu classiques. Les boutons « Y aller à pied » / « Revenir au lancer », le geste de glisser vers le haut, la marche au toucher (et son calcul de chemin), la marque dans la neige et la main qui montrait le geste sont supprimés.
   - Célestine est toujours là, le fichier à la main, et la caméra la suit 2,6 m derrière elle.
