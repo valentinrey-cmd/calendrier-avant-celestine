@@ -74,12 +74,40 @@ function planSVG() {
 function smsHTML(p) {
   return `<div class="pc-sms"><div class="pc-smsh">${p.grp ? '👥' : '👤'} ${esc(p.who)}</div>${p.m.map(m => (m[0] == 'd' ? `<div class="pc-smsd">${esc(m[1])}</div>` : m[0] == 'ph' ? `<div class="pc-bub th ph">${PH[m[1]]}</div>` : `<div class="pc-bub ${m[0] == 'me' ? 'me' : 'th'}">${p.grp && m[0] != 'me' ? `<b>${esc(m[0])}</b>` : ''}${esc(m[2])}<small>${esc(m[1])}</small></div>`)).join('')}</div>`;
 }
+// agenda de la semaine : jours en colonnes, heures sur le côté (pièce de type « agd »)
+const AGJ = ['Lun. 23', 'Mar. 24', 'Mer. 25', 'Jeu. 26', 'Ven. 27', 'Sam. 28', 'Dim. 29'];
+const agH = h => `${Math.floor(h)} h${h % 1 ? ' ' + String(Math.round((h % 1) * 60)).padStart(2, '0') : ''}`;
+function agdHTML(p) {
+  const H0 = 7,
+    H1 = 24,
+    R = 22; // hauteur d'une heure (px)
+  const heures = Array.from({ length: H1 - H0 }, (_, i) => `<div class="ag-h" style="top:${i * R}px">${H0 + i} h</div>`).join('');
+  const col = d =>
+    `<div class="ag-c">${p.ag
+      .map((e, i) => [e, i])
+      .filter(([e]) => e[0] == d)
+      .map(
+        ([e, i]) =>
+          `<button class="ag-e ag-${e[5]}" style="top:${(e[1] - H0) * R}px;height:${Math.max(13, (e[2] - e[1]) * R - 2)}px" onclick="agTap(${p.d},${i})">${e[5] == 'bg' ? '' : `<b>${esc(e[3])}</b>`}</button>`
+      )
+      .join('')}</div>`;
+  return `<div class="ag"><div class="ag-t"><span></span>${AGJ.map(j => `<span>${j.replace(' ', '<br>')}</span>`).join('')}</div><div class="ag-g" style="height:${(H1 - H0) * R}px"><div class="ag-hs">${heures}</div>${AGJ.map((_, d) => col(d)).join('')}</div><div class="ag-leg"><i class="ag-cours"></i>Cours <i class="ag-amis"></i>Amis <i class="ag-famille"></i>Famille <i class="ag-travail"></i>Travail <i class="ag-perso"></i>Perso</div><p class="ag-info" id="agi">Touche un créneau pour le détail.</p></div>`;
+}
+function agTap(d, i) {
+  const p = PIECES.find(x => x.d == d && x.k == 'agd'),
+    e = p && p.ag[i],
+    o = document.getElementById('agi');
+  if (!e || !o) return;
+  o.innerHTML = `<b>${esc(e[3])}</b><br>${AGJ[e[0]]} · ${agH(e[1])} → ${e[2] >= 24 ? 'minuit' : agH(e[2])}${e[4] ? ' · avec ' + esc(e[4]) : ''}`;
+  o.classList.add('on');
+}
 function pieceBody(p) {
   const k = p.k;
   if (k == 'pv') return `<div class="pc-pv">${p.body.map((l, i) => `<p class="${i == 0 ? 'h' : ''}">${esc(l)}</p>`).join('')}</div>`;
   if (k == 'sms') return smsHTML(p) + (p.note ? `<p class="pc-note">${esc(p.note)}</p>` : '');
   if (k == 'doc')
     return `<div class="pc-doc">${p.rows.map(r => `<div><small>${esc(r[0])}</small><b>${esc(r[1])}</b></div>`).join('')}${p.note ? `<p class="pc-note">${esc(p.note)}</p>` : ''}</div>`;
+  if (k == 'agd') return agdHTML(p);
   if (k == 'tab')
     return `<table class="pc-tab"><tr>${p.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${p.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>${p.note ? `<p class="pc-note">${esc(p.note)}</p>` : ''}`;
   if (k == 'photo')

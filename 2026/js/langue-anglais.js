@@ -3167,5 +3167,21 @@ window.TRADUCTIONS_EN = {
   'Raclette en famille': 'Family raclette',
   'Grasse mat’ et brunch': 'Lie-in and brunch',
   'Balade au bord de la Saône': 'Walk along the Saône',
-  'Retour à l’appart': 'Back at the flat'
+  'Retour à l’appart': 'Back at the flat',
+  'Touche un créneau pour le détail.': 'Tap a slot for details.',
+  'Cours': 'Classes',
+  'Amis': 'Friends',
+  'Famille': 'Family',
+  'Travail': 'Work',
+  'Perso': 'Personal',
+  'Route pour Reyrieux': 'Drive to Reyrieux',
+  'Route pour Lyon': 'Drive to Lyon',
+  'Lun. 23': 'Mon. 23',
+  'Mar. 24': 'Tue. 24',
+  'Mer. 25': 'Wed. 25',
+  'Jeu. 26': 'Thu. 26',
+  'Ven. 27': 'Fri. 27',
+  'Sam. 28': 'Sat. 28',
+  'Dim. 29': 'Sun. 29',
+  'minuit': 'midnight'
 };

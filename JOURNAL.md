@@ -4,6 +4,14 @@
 
 ---
 
+## 26 novembre 2026 (10 h 40) : l'agenda du jour 2 devient un vrai agenda de semaine (version 1795681686)
+
+- L'indice du jour 2 n'est plus un tableau en liste : c'est un **agenda de semaine**, avec les 7 jours en colonnes (lun. 23 → dim. 29) et les heures sur le côté (7 h → minuit).
+- Chaque créneau est un bloc coloré à sa place et à sa durée : bleu cours, rose amis, orange famille, violet travail, vert perso. Le week-end à Reyrieux est en fond hachuré. Toucher un créneau affiche son détail (heures, avec qui).
+- Le contenu reste le même : toute la semaine, avec beaucoup d'infos inutiles. Les créneaux « Route pour Reyrieux » et « Route pour Lyon » sont ajoutés.
+- Nouveau type de pièce `agd` : les données sont dans `p_agenda.ag` (`js/enquete/suspects-pieces.js`), l'affichage dans `agdHTML()` et `agTap()` (`js/enquete/dossier-accusation.js`), les styles `.ag-*` dans `css/08-dossier.css`. L'ancien tableau (`cols`, `rows`) et ses traductions inutilisées sont supprimés.
+- Fichiers : `2026/js/enquete/suspects-pieces.js`, `2026/js/enquete/dossier-accusation.js`, `2026/css/08-dossier.css`, `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (10 h 20) : agenda du jour 2 détaillé, avec des infos inutiles (version 1795681438)
 
 - L'indice du jour 2 (« Agenda de Célestine · Sa semaine ») montre maintenant **toute sa semaine**, du lundi 23 au dimanche 29, en 27 lignes : cours, resto U, courses, lessive, pilates, soirées série et film, poste, sieste, raclette, balade…

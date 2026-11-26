@@ -355,3 +355,114 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* agenda de la semaine (pièce « agd ») */
+.ag {
+  font-family: system-ui, sans-serif;
+  color: #2b1d16;
+}
+.ag-t {
+  display: grid;
+  grid-template-columns: 26px repeat(7, 1fr);
+  gap: 2px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.15;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #d9c9a6;
+}
+.ag-g {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px repeat(7, 1fr);
+  gap: 2px;
+  background: repeating-linear-gradient(#fbf6ea 0 21px, #eadfc6 21px 22px);
+  margin-top: 2px;
+}
+.ag-hs {
+  position: relative;
+}
+.ag-h {
+  position: absolute;
+  left: 0;
+  font-size: 0.55rem;
+  color: #8a6a3a;
+  transform: translateY(-1px);
+}
+.ag-c {
+  position: relative;
+  border-left: 1px solid #eadfc6;
+}
+.ag-e {
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  margin: 0;
+  padding: 1px 2px;
+  min-height: 0;
+  border-radius: 4px;
+  border: 0;
+  border-left: 3px solid #0003;
+  overflow: hidden;
+  text-align: left;
+  font-size: 0.5rem;
+  line-height: 1.1;
+  color: #2b1d16;
+  box-shadow: none;
+  cursor: pointer;
+}
+.ag-e b {
+  font-weight: 700;
+}
+.ag-cours {
+  background: #cfe3f7;
+  border-left-color: #3b7bc4;
+}
+.ag-amis {
+  background: #f9d3e2;
+  border-left-color: #d24b84;
+}
+.ag-famille {
+  background: #fbe0bf;
+  border-left-color: #d98a2b;
+}
+.ag-travail {
+  background: #ded4f5;
+  border-left-color: #7a5ad0;
+}
+.ag-perso {
+  background: #dcebd5;
+  border-left-color: #5a9a4a;
+}
+.ag-bg {
+  background: repeating-linear-gradient(45deg, #fbe0bf55 0 6px, #fbe0bf22 6px 12px);
+  border-left: 0;
+  border-radius: 0;
+}
+.ag-leg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  justify-content: center;
+  font-size: 0.66rem;
+  margin: 8px 0 4px;
+  align-items: center;
+}
+.ag-leg i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-right: -6px;
+}
+.ag-info {
+  font-size: 0.78rem;
+  text-align: center;
+  color: #6f5a44;
+  min-height: 2.4em;
+  margin: 4px 0 0;
+}
+.ag-info.on {
+  color: #2b1d16;
+}
