@@ -1385,7 +1385,8 @@ function mysLancer(cb, fic) {
           c: col[i % col.length]
         });
     }
-    if (k == 'traineau') crash = { x: tp.x, y: TY, vx: -1.6, vy: 1.4, r: 0, fume: [] };
+    if (k == 'traineau')
+      crash = { x: tp.x, y: tp.y, z: tp.z, fx: tp.fx, fz: tp.fz, vx: tp.fx * 1.5, vy: 1.4, vz: tp.fz * 1.5, spin: 0, roll: 0, fume: [] };
   };
   const OBS = [
     { t: 'bonhomme', x: -1.3, z: 3.7, r: 0.3, h: 1.05 },
@@ -2016,116 +2017,358 @@ function mysLancer(cb, fic) {
       }
     });
   };
-  // le traîneau du Père Noël survole le toit toutes les 13 s, lentement, juste devant les maisons (sauf s'il vient de s'écraser)
-  const TY = 1.75, // son altitude
-    TZ = 7.6, // sa profondeur
-    TL = 110; // sa longueur dans le dessin
+  // le traîneau du Père Noël : un vrai modèle en 3D. Il arrive de loin derrière le toit, plonge vers nous en rasant le toit
+  // (on peut le toucher avec un lancer fort au bon moment), puis remonte et repart au loin. Un passage dure 11 s, toutes les 17 s (sauf juste après un crash).
+  const BZ = [
+    [16, 10, 40],
+    [8, -0.6, -4],
+    [-8, -0.6, -4],
+    [-16, 10, 40]
+  ];
   const traineauPos = t => {
     if (age('traineau') < DUREE.traineau) return null;
-    const k = (t % 13) / 10;
+    const k = (t % 17) / 11;
     if (k > 1) return null;
-    return { x: 6.5 - k * 13, y: TY + Math.sin(k * 6) * 0.12 };
+    const u = 1 - k,
+      w = [u * u * u, 3 * u * u * k, 3 * u * k * k, k * k * k],
+      dw = [-3 * u * u, 3 * u * u - 6 * u * k, 6 * u * k - 3 * k * k, 3 * k * k],
+      at = i => w.reduce((s0, wi, j) => s0 + wi * BZ[j][i], 0),
+      dt0 = i => dw.reduce((s0, wi, j) => s0 + wi * BZ[j][i], 0),
+      dx = dt0(0),
+      dz = dt0(2),
+      n = Math.hypot(dx, dz);
+    return { x: at(0), y: at(1), z: at(2), fx: dx / n, fz: dz / n, pente: Math.atan2(dt0(1), n) };
   };
-  const traineauDessin = (x, y, rot, t, sc, ex = 1) => {
-    // ex : il vole vers -x ; vu de face ou de dos il paraît plus court, et retourné vu de l'autre côté
-    c.save();
-    c.translate(x, y);
-    c.scale(sc * ex, sc);
-    c.rotate(rot);
-    for (let r = 0; r < 4; r++) {
-      c.fillStyle = '#7a4e2c';
-      const rx = -20 - r * 22,
-        ry = Math.sin(t * 8 + r) * 2;
-      c.beginPath();
-      c.ellipse(rx, ry, 8, 3.5, 0, 0, 7);
-      c.fill();
-      c.fillRect(rx - 6, ry, 1.6, 6);
-      c.fillRect(rx + 4, ry, 1.6, 6);
-      c.fillRect(rx - 8, ry - 7, 2, 6);
-      c.beginPath();
-      c.ellipse(rx - 10, ry - 7.5, 3.2, 2, -0.2, 0, 7);
-      c.fill();
-      c.fillStyle = '#d9b98a';
-      c.beginPath();
-      c.moveTo(rx - 9, ry - 7);
-      c.lineTo(rx - 13, ry - 11);
-      c.lineTo(rx - 7, ry - 9);
-      c.fill();
-      if (r == 3) {
-        // Rudolph et son nez rouge
-        c.fillStyle = '#ff3b3b';
+  // le modèle : (a vers l'avant, b sur le côté, h en hauteur) en mètres, autour du Père Noël
+  const traineau3D = (o, t, roll = 0, spin = 0) => {
+    const co = Math.cos(spin),
+      si = Math.sin(spin),
+      fx = o.fx * co - o.fz * si,
+      fz = o.fx * si + o.fz * co,
+      rx = fz,
+      rz = -fx,
+      cr = Math.cos(roll),
+      sr = Math.sin(roll),
+      cp = Math.cos(o.pente || 0),
+      sp = Math.sin(o.pente || 0),
+      W = (a, b, h) => {
+        const bb = b * cr - h * sr,
+          hh = b * sr + h * cr,
+          aa = a * cp - hh * sp,
+          h2 = a * sp + hh * cp;
+        return [o.x + fx * aa + rx * bb, o.y + h2, o.z + fz * aa + rz * bb];
+      },
+      Pw = (a, b, h) => P(...W(a, b, h)),
+      D = (a, b, h) => {
+        const [x, , z] = W(a, b, h);
+        return prof(x, z);
+      },
+      parts = [],
+      ligne = (pts, col, lw) => {
+        const q = pts.map(p => Pw(...p));
+        c.strokeStyle = col;
+        c.lineWidth = Math.max(0.8, q[0][2] * lw);
         c.beginPath();
-        c.arc(rx - 13, ry - 7, 1.4, 0, 7);
+        q.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+        c.stroke();
+      },
+      // un « ballon » allongé le long de l'axe avant/arrière (corps des rennes, sac…)
+      ovoide = (a, b, h, L, r, col) => {
+        const A = Pw(a - L / 2, b, h),
+          B = Pw(a + L / 2, b, h),
+          M = Pw(a, b, h),
+          ang = Math.atan2(B[1] - A[1], B[0] - A[0]),
+          rr = r * M[2];
+        c.fillStyle = col;
+        c.beginPath();
+        c.ellipse(M[0], M[1], Math.max(rr, Math.hypot(B[0] - A[0], B[1] - A[1]) / 2 + rr * 0.3), rr, ang, 0, 7);
+        c.fill();
+      },
+      boule = (a, b, h, r, c1, c2) => {
+        const [x, y, s] = Pw(a, b, h),
+          rr = r * s,
+          g = c.createRadialGradient(x - rr * 0.3, y - rr * 0.35, rr * 0.1, x, y, rr);
+        g.addColorStop(0, c1);
+        g.addColorStop(1, c2);
+        c.fillStyle = g;
+        c.beginPath();
+        c.arc(x, y, rr, 0, 7);
+        c.fill();
+      },
+      face = (pts, col) => {
+        poly(pts.map(p => W(...p)));
+        c.fillStyle = col;
+        c.fill();
+      };
+    // --- les rennes (deux paires) et leurs rênes
+    [
+      [1.5, -0.3],
+      [1.5, 0.3],
+      [2.5, -0.3],
+      [2.5, 0.3]
+    ].forEach(([a, b], i) => {
+      const g = Math.sin(t * 9 + i * 1.3),
+        h = 0.55 + Math.sin(t * 9 + i * 1.3 + 1) * 0.04;
+      parts.push([
+        D(a, b, h),
+        () => {
+          // pattes au galop
+          [
+            [0.22, 1],
+            [0.22, -1],
+            [-0.22, 1],
+            [-0.22, -1]
+          ].forEach(([da, sb], j) => {
+            const sw = Math.sin(t * 9 + i * 1.3 + j * 1.6) * 0.18;
+            ligne(
+              [
+                [a + da, b + sb * 0.07, h - 0.1],
+                [a + da + sw, b + sb * 0.07, h - 0.32],
+                [a + da + sw * 1.6, b + sb * 0.07, h - 0.5]
+              ],
+              '#5a3a22',
+              0.028
+            );
+          });
+          ovoide(a, b, h, 0.62, 0.17, '#8a5a34');
+          ovoide(a + 0.05, b, h + 0.06, 0.4, 0.08, '#a3703f');
+          // cou, tête, bois, queue
+          ligne(
+            [
+              [a + 0.28, b, h + 0.05],
+              [a + 0.4, b, h + 0.3]
+            ],
+            '#7a4e2c',
+            0.07
+          );
+          ovoide(a + 0.48, b, h + 0.36, 0.2, 0.075, '#7a4e2c');
+          [-1, 1].forEach(q =>
+            ligne(
+              [
+                [a + 0.42, b + q * 0.04, h + 0.42],
+                [a + 0.36, b + q * 0.12, h + 0.62],
+                [a + 0.3, b + q * 0.18, h + 0.7]
+              ],
+              '#d9b98a',
+              0.018
+            )
+          );
+          if (i == 3) {
+            // Rudolph et son nez rouge qui brille
+            const [nx, ny, ns] = Pw(a + 0.6, b, h + 0.35),
+              gl = c.createRadialGradient(nx, ny, 0, nx, ny, ns * 0.12);
+            gl.addColorStop(0, '#ff5a5aee');
+            gl.addColorStop(1, '#ff5a5a00');
+            c.fillStyle = gl;
+            c.beginPath();
+            c.arc(nx, ny, ns * 0.12, 0, 7);
+            c.fill();
+          }
+          ligne(
+            [
+              [a - 0.3, b, h + 0.08],
+              [a - 0.38, b, h + 0.14]
+            ],
+            '#efe6d8',
+            0.04
+          );
+          // grelot et harnais
+          ligne(
+            [
+              [a + 0.2, b - 0.17, h + 0.05],
+              [a + 0.2, b + 0.17, h + 0.05]
+            ],
+            '#c0233a',
+            0.025
+          );
+        }
+      ]);
+      parts.push([
+        D(a - 0.6, b * 0.5, 0.65) + 0.01,
+        () =>
+          ligne(
+            [
+              [-0.1, b * 0.4, 0.72],
+              [a - 0.3, b, h + 0.12]
+            ],
+            '#e0b84a',
+            0.012
+          )
+      ]);
+    });
+    // --- le traîneau : deux flancs, le fond, la caisse, les patins dorés
+    const flanc = b => [
+      [-0.8, b, 0.08],
+      [0.3, b, 0.08],
+      [0.48, b, 0.25],
+      [0.42, b, 0.5],
+      [0.2, b, 0.42],
+      [-0.55, b, 0.42],
+      [-0.82, b, 0.62]
+    ];
+    [-0.38, 0.38].forEach(b => {
+      parts.push([
+        D(-0.15, b, 0.3),
+        () => {
+          ligne(
+            [
+              [-0.95, b * 0.8, -0.1],
+              [0.45, b * 0.8, -0.1],
+              [0.65, b * 0.8, 0.02],
+              [0.6, b * 0.8, 0.14]
+            ],
+            '#e0b84a',
+            0.022
+          );
+          ligne(
+            [
+              [-0.5, b * 0.8, -0.1],
+              [-0.5, b, 0.08]
+            ],
+            '#e0b84a',
+            0.015
+          );
+          ligne(
+            [
+              [0.15, b * 0.8, -0.1],
+              [0.15, b, 0.08]
+            ],
+            '#e0b84a',
+            0.015
+          );
+          face(flanc(b), '#b3122a');
+          ligne(
+            flanc(b)
+              .slice(2)
+              .concat([flanc(b)[0]])
+              .slice(0, 5),
+            '#e0b84a',
+            0.014
+          );
+        }
+      ]);
+    });
+    parts.push([
+      D(-0.2, 0, 0.3) + 0.02,
+      () => {
+        face(
+          [
+            [-0.8, -0.38, 0.1],
+            [0.3, -0.38, 0.1],
+            [0.3, 0.38, 0.1],
+            [-0.8, 0.38, 0.1]
+          ],
+          '#7a0c1c'
+        );
+        face(
+          [
+            [-0.82, -0.38, 0.08],
+            [-0.82, 0.38, 0.08],
+            [-0.82, 0.38, 0.62],
+            [-0.82, -0.38, 0.62]
+          ],
+          '#9c0f24'
+        );
+        face(
+          [
+            [0.42, -0.38, 0.1],
+            [0.42, 0.38, 0.1],
+            [0.42, 0.38, 0.5],
+            [0.42, -0.38, 0.5]
+          ],
+          '#9c0f24'
+        );
+      }
+    ]);
+    // --- la hotte de cadeaux et le Père Noël
+    parts.push([
+      D(-0.62, 0, 0.55) + 0.03,
+      () => (boule(-0.62, 0.05, 0.6, 0.24, '#b98a5a', '#6e4a2b'), boule(-0.7, -0.12, 0.84, 0.09, '#5fbf7a', '#2f8f5b'))
+    ]);
+    parts.push([
+      D(-0.3, 0, 0.6) + 0.04,
+      () => {
+        boule(-0.3, 0, 0.55, 0.25, '#ff4d5e', '#a3122a');
+        ligne(
+          [
+            [-0.3, -0.25, 0.47],
+            [-0.3, 0.25, 0.47]
+          ],
+          '#1b1b22',
+          0.05
+        );
+        boule(-0.28, 0, 0.92, 0.12, '#f7d0b5', '#d9a585');
+        // barbe (côté visage)
+        const [bx, by, bs] = Pw(-0.18, 0, 0.84);
+        c.fillStyle = '#ffffff';
+        c.beginPath();
+        c.ellipse(bx, by, bs * 0.1, bs * 0.12, 0, 0, 7);
+        c.fill();
+        // bonnet rouge et pompon
+        const B0 = Pw(-0.28, 0, 1.0),
+          B1 = Pw(-0.45, 0, 1.18);
+        c.fillStyle = '#d61f3a';
+        c.beginPath();
+        c.moveTo(B0[0] - B0[2] * 0.12, B0[1]);
+        c.lineTo(B0[0] + B0[2] * 0.12, B0[1]);
+        c.lineTo(B1[0], B1[1]);
+        c.closePath();
+        c.fill();
+        c.fillStyle = '#ffffff';
+        c.fillRect(B0[0] - B0[2] * 0.13, B0[1] - B0[2] * 0.025, B0[2] * 0.26, B0[2] * 0.05);
+        c.beginPath();
+        c.arc(B1[0], B1[1], B1[2] * 0.045, 0, 7);
         c.fill();
       }
-    }
-    c.strokeStyle = '#e0b84a';
-    c.lineWidth = 0.8;
-    c.beginPath();
-    c.moveTo(-16, 0);
-    c.lineTo(6, 2);
-    c.stroke();
-    c.fillStyle = '#7a1424';
-    c.beginPath();
-    c.moveTo(4, 6);
-    c.quadraticCurveTo(6, -4, 22, -2);
-    c.lineTo(24, 6);
-    c.closePath();
-    c.fill();
-    c.fillStyle = '#c0233a';
-    c.beginPath();
-    c.arc(18, -6, 4, 0, 7);
-    c.fill();
-    c.fillStyle = '#ffffff';
-    c.beginPath();
-    c.arc(18, -10, 2, 0, 7);
-    c.fill();
-    c.restore();
-  };
-  // longueur du traîneau en mètres (rennes compris) : 4,6 m, dont 0,8 m de traîneau à droite
-  const traineauEchelle = s => (s * 4.6) / TL;
-  // sens et raccourci du traîneau vu depuis la caméra (1 = de profil vers la gauche, comme dans la vue de départ)
-  const sens = (tx, ty, s) => {
-    const k = (P(tx, ty, TZ)[0] - P(tx - 1, ty, TZ)[0]) / s;
-    return Math.sign(k || 1) * Math.max(0.22, Math.abs(k));
+    ]);
+    parts.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
   };
   const traineau = (t, dt) => {
     const tp = traineauPos(t);
     if (tp) {
-      const [x, y, s, d] = P(tp.x, tp.y, TZ);
-      if (d < 6) return; // trop près de la caméra : il passe au-dessus de nous
-      return traineauDessin(x, y, 0, t, traineauEchelle(s), sens(tp.x, tp.y, s));
+      if (prof(tp.x, tp.z) > 1.2) traineau3D(tp, t);
+      return;
     }
-    if (!crash || prof(crash.x, TZ) < 1) return;
-    // touché : il tournoie et s'écrase sur le toit
+    if (!crash) return;
+    // touché : il tournoie et s'écrase sur le toit dans un nuage de neige
     if (!crash.boum) {
       crash.vy -= G * dt;
       crash.x += crash.vx * dt;
       crash.y += crash.vy * dt;
-      crash.r += dt * 5;
-      if (Math.random() < 0.6) crash.fume.push({ x: crash.x, y: crash.y, r: 0.08, a: 0.6 });
-      if (crash.y <= 0.1) {
-        crash.y = 0.1;
+      crash.z += crash.vz * dt;
+      crash.spin += dt * 6;
+      crash.roll += dt * 3;
+      if (Math.random() < 0.6) crash.fume.push({ x: crash.x, y: crash.y, z: crash.z, r: 0.08, a: 0.6 });
+      if (crash.y <= 0.3) {
+        crash.y = 0.3;
         crash.boum = T();
         bruit('boum');
         for (let i = 0; i < 16; i++)
-          crash.fume.push({ x: crash.x + (Math.random() - 0.5) * 1.6, y: Math.random() * 0.3, r: 0.18 + Math.random() * 0.2, a: 0.8 });
+          crash.fume.push({
+            x: crash.x + (Math.random() - 0.5) * 1.6,
+            y: Math.random() * 0.3,
+            z: crash.z + (Math.random() - 0.5) * 1.6,
+            r: 0.18 + Math.random() * 0.2,
+            a: 0.8
+          });
       }
     }
     crash.fume = crash.fume.filter(f => (f.a -= dt * 0.35) > 0);
     crash.fume.forEach(f => {
       f.r += dt * 0.25;
       f.y += dt * 0.3;
-      const [x, y, s] = P(f.x, f.y, TZ);
+      const [x, y, s, d] = P(f.x, f.y, f.z);
+      if (d < 0.4) return;
       c.fillStyle = `rgba(220,228,245,${f.a})`;
       c.beginPath();
       c.arc(x, y, f.r * s, 0, 7);
       c.fill();
     });
-    const [x, y, s] = P(crash.x, crash.y, TZ);
-    if (!crash.boum) traineauDessin(x, y, crash.r, t, traineauEchelle(s), sens(crash.x, crash.y, s));
+    if (prof(crash.x, crash.z) < 0.8) return;
+    if (!crash.boum) traineau3D({ ...crash, pente: 0 }, t, crash.roll, crash.spin);
     else if (T() - crash.boum < 3.5) {
       // les jambes du Père Noël dépassent de la neige (et gigotent)
+      const [x, y, s] = P(crash.x, 0, crash.z);
       c.globalAlpha = Math.min(1, (3.5 - (T() - crash.boum)) * 2);
       const k = s * 0.0042,
         g = Math.sin(T() * 12) * 2;
@@ -2697,12 +2940,21 @@ function mysLancer(cb, fic) {
     });
     // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
     const tp = traineauPos(T());
-    if (tp && Math.abs(F.z - TZ) < 0.6 && F.y > tp.y - 0.4 && F.y < tp.y + 0.55 && F.x > tp.x - 4 && F.x < tp.x + 0.8) {
-      surprise('traineau', tp);
-      F.vz = -Math.abs(F.vz) * 0.35;
-      F.vy = Math.min(F.vy, 0) * 0.5;
-      F.va += (Math.random() - 0.5) * 10;
-      choc(0.6);
+    if (tp) {
+      // position du fichier dans le repère du traîneau : devant (rennes), sur le côté, en hauteur
+      const ex = F.x - tp.x,
+        ez = F.z - tp.z,
+        av = ex * tp.fx + ez * tp.fz,
+        co = ex * tp.fz - ez * tp.fx,
+        ht = F.y - tp.y;
+      if (av > -1 && av < 3.1 && Math.abs(co) < 0.55 && ht > -0.35 && ht < 1.2) {
+        surprise('traineau', tp);
+        F.vx = -F.vx * 0.35 + tp.fx * 1.5;
+        F.vz = -F.vz * 0.35 + tp.fz * 1.5;
+        F.vy = Math.min(F.vy, 0) * 0.5;
+        F.va += (Math.random() - 0.5) * 10;
+        choc(0.6);
+      }
     }
     if (F.tombe) return;
     // bord du toit côté caméra : il ne revient pas vers nous
@@ -3703,7 +3955,10 @@ function mysLancer(cb, fic) {
     toit();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
     const L = OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
-    L.push([prof(0, TZ), () => traineau(t, dt)]);
+    {
+      const tp = traineauPos(t);
+      L.push([tp ? prof(tp.x, tp.z) : crash ? prof(crash.x, crash.z) : 0, () => traineau(t, dt)]);
+    }
     L.push([prof(0, CZ), () => cheminee(t, F.in && (() => (c.save(), ouverture(), c.clip(), fichier(), c.restore())))]);
     if (!F.in && !C.tient)
       L.push([

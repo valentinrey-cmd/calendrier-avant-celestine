@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : traîneau du Père Noël refait en vraie 3D
+- L'ancien traîneau (un dessin plat aplati selon l'angle) est supprimé. Le nouveau est un vrai modèle 3D, vu correctement sous tous les angles : traîneau rouge à deux flancs et liserés dorés, patins dorés recourbés, hotte de cadeaux, Père Noël (barbe, ceinture, bonnet à pompon), quatre rennes en deux paires (corps, pattes au galop, cou, tête, bois, queue, harnais), Rudolph au nez rouge qui brille, et rênes dorées.
+- Nouvelle trajectoire : il arrive de loin derrière le toit (on le voit petit dans le ciel), plonge vers nous en rasant le toit en suivant la pente, puis remonte et repart au loin. Un passage dure 11 s, toutes les 17 s.
+- Le contact se fait dans le repère du traîneau (des rennes jusqu'à l'arrière du traîneau). Un lancer fort au bon moment le touche. Il tournoie, tombe vraiment là où il était et s'écrase sur le toit.
+- Version 1795711744
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : on ramasse le fichier raté, il retombe du ciel s'il sort du toit
 - Après un lancer raté, le fichier ne revient plus tout seul dans sa main : il reste là où il s'est arrêté, avec une flèche rose qui rebondit au-dessus. Célestine doit marcher dessus pour le ramasser (elle se baisse, petit bruit). Le bouton « Lancer » est grisé tant qu'elle n'a pas de fichier en main.
 - S'il sort du toit (derrière le faîtage ou sur les côtés), il disparaît puis retombe du ciel à un endroit libre du toit (loin de la cheminée, des obstacles et de Célestine).
