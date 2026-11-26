@@ -4,6 +4,15 @@
 
 ---
 
+## 26 novembre 2026 (11 h 45) : lancer du fichier mystère entièrement refait (version 1795687876)
+
+- La première version (lancer de côté, collisions sur deux points, dessin plat) est remplacée.
+- **Nouveau lancer en profondeur, façon « paper toss » :** on glisse le doigt vers le haut et le fichier part au loin vers la cheminée, en 3D, avec une perspective et une ombre sur le toit. Le lancer est en cloche, à angle fixe : la force du geste règle la distance, le côté du geste règle la direction. Un geste à peu près juste est guidé discrètement vers le centre. Trop faible, trop fort ou trop de travers, ça rate pour de vrai.
+- **Vraies collisions,** calculées en 8 petits pas par image : mur de devant (le fichier rebondit et retombe), mur de derrière, côtés, rebord de la cheminée (rebond), toit (rebonds puis glissade). On entre seulement en passant par l'ouverture.
+- **Nouveaux décors :** ciel de nuit avec étoiles qui scintillent, lune et halo, colline de Fourvière avec la basilique, toits de Lyon avec des fenêtres allumées, pan de toit enneigé en perspective avec ses tuiles, cheminée en briques en volume avec la neige sur le rebord et une lueur de feu dans l'ouverture, fumée, neige à deux profondeurs. Le fichier est emballé comme un cadeau (ruban rouge, nœud, étiquette « .AVENT »). Au départ, une petite main montre le geste.
+- Réussite : fumée, étincelles, « Ho ho ho ! 🎅 Bien reçu ! », confettis, puis le fichier s'ouvre. Les aides après 1, 3 et 6 ratés sont conservées, avec le bouton « Le déposer à la main ».
+- Fichiers : `2026/js/musiques-jeux.js` (`mysLancer`), `2026/css/06-boss-playlist.css` (`.mysl*`), `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (11 h 30) : le fichier mystère se lance dans la cheminée (version 1795687162)
 
 - Quand Célestine choisit le fichier mystère, il ne s'ouvre plus tout de suite. Un écran « Livraison spéciale » apparaît : un toit enneigé la nuit, la lune, la neige qui tombe et une cheminée en briques. Elle attrape le fichier (emballé d'un ruban vert) et le lance d'une pichenette dans la cheminée.

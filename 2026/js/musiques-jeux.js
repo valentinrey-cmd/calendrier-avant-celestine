@@ -973,19 +973,30 @@ async function mysMake(input) {
   );
 }
 /* ---------- Fichier mystère : avant de l'ouvrir, on le lance dans la cheminée du Père Noël ---------- */
-// cb est appelé quand le fichier est tombé dans la cheminée
+// Lancer « en profondeur » (façon paper toss) : on glisse le doigt vers le haut, le fichier part vers la cheminée.
+// Monde en mètres : x = gauche/droite, y = hauteur, z = profondeur. cb est appelé quand le fichier est tombé dedans.
 function mysLancer(cb) {
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Lance le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
   document.body.appendChild(o);
   const cv = o.querySelector('canvas'),
-    x = cv.getContext('2d'),
+    c = cv.getContext('2d'),
     tip = o.querySelector('.mysl-tip'),
     pass = o.querySelector('.mysl-pass');
-  let W, H, dpr, cx, ry, rw, F, drag, hist, rate, fin, raf, flocons;
-  const G = 1700,
-    FR = 24; // rayon de collision du fichier
+  // --- monde ---
+  const CAM = 2.9, // hauteur de la caméra
+    CZ = 6, // profondeur de la cheminée
+    CX = 0.62, // demi-largeur de la cheminée
+    CD = 0.42, // demi-profondeur
+    TOP = 1.5, // hauteur du haut de la cheminée
+    OX = 0.47, // demi-ouverture (x)
+    OZ = 0.32, // demi-ouverture (z)
+    G = 9,
+    Z0 = 0.85,
+    Y0 = 2.15,
+    ANG = (52 * Math.PI) / 180; // angle du lancer
+  let W, H, dpr, f, hy, F, drag, hist, rate, fin, raf, t0, idle, fumees, flocons, etoiles, ville, eclats;
   const taille = () => {
     dpr = Math.min(2, devicePixelRatio || 1);
     W = innerWidth;
@@ -994,278 +1005,581 @@ function mysLancer(cb) {
     cv.height = H * dpr;
     cv.style.width = W + 'px';
     cv.style.height = H + 'px';
-    x.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cx = W / 2;
-    ry = Math.max(240, H * 0.47);
-    rw = Math.min(W * 0.17, 74);
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    f = Math.min(W * 0.95, H * 0.55);
+    hy = H * 0.3;
+    ville = Array.from({ length: Math.ceil(W / 14) + 2 }, (_, i) => ({
+      x: i * 14 - 7,
+      h: 10 + ((i * 37) % 23) + (i % 5 == 0 ? 14 : 0),
+      w: (i * 13) % 4
+    }));
   };
-  const depart = () => (F = { x: W * 0.26, y: H * 0.8, vx: 0, vy: 0, r: 0, vr: 0, vol: 0, in: 0, s: 1 });
+  const P = (x, y, z) => [W / 2 + (x * f) / z, hy - ((y - CAM) * f) / z, f / z]; // projection : [x écran, y écran, échelle]
+  const depart = () => (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0 });
   taille();
   depart();
-  rate = 0;
-  fin = 0;
-  flocons = Array.from({ length: 70 }, () => ({
-    x: Math.random() * W,
-    y: Math.random() * H,
-    r: 1 + Math.random() * 2.4,
-    v: 20 + Math.random() * 40
+  rate = fin = 0;
+  idle = 0;
+  fumees = [];
+  eclats = [];
+  etoiles = Array.from({ length: 90 }, () => ({
+    x: Math.random(),
+    y: Math.random() * 0.33,
+    r: Math.random() * 1.3 + 0.3,
+    p: Math.random() * 6
   }));
+  flocons = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random(), d: 0.3 + Math.random() * 0.7, p: Math.random() * 6 }));
   addEventListener('resize', taille);
-  // --- dessin ---
-  const rr = (X, Y, w, h, r) => {
-    x.beginPath();
-    x.moveTo(X + r, Y);
-    x.arcTo(X + w, Y, X + w, Y + h, r);
-    x.arcTo(X + w, Y + h, X, Y + h, r);
-    x.arcTo(X, Y + h, X, Y, r);
-    x.arcTo(X, Y, X + w, Y, r);
-    x.closePath();
+
+  /* ===================== dessin ===================== */
+  const ciel = t => {
+    let g = c.createLinearGradient(0, 0, 0, hy + 40);
+    g.addColorStop(0, '#070d22');
+    g.addColorStop(0.6, '#172a58');
+    g.addColorStop(1, '#3b4f8c');
+    c.fillStyle = g;
+    c.fillRect(0, 0, W, H);
+    etoiles.forEach(s => {
+      c.globalAlpha = 0.45 + 0.4 * Math.sin(t * 2 + s.p);
+      c.fillStyle = '#fff';
+      c.beginPath();
+      c.arc(s.x * W, s.y * H, s.r, 0, 7);
+      c.fill();
+    });
+    c.globalAlpha = 1;
+    const mx = W * 0.8,
+      my = H * 0.13;
+    g = c.createRadialGradient(mx, my, 10, mx, my, 90);
+    g.addColorStop(0, '#fff6d655');
+    g.addColorStop(1, '#fff6d600');
+    c.fillStyle = g;
+    c.fillRect(mx - 90, my - 90, 180, 180);
+    c.fillStyle = '#fbf3d6';
+    c.beginPath();
+    c.arc(mx, my, 22, 0, 7);
+    c.fill();
+    c.fillStyle = '#e9dfbd';
+    [
+      [-6, -4, 5],
+      [7, 5, 4],
+      [-2, 9, 3]
+    ].forEach(([a, b, r]) => {
+      c.beginPath();
+      c.arc(mx + a, my + b, r, 0, 7);
+      c.fill();
+    });
+  };
+  const lyon = () => {
+    // colline de Fourvière et sa basilique, puis les toits de la ville
+    const base = hy + 6;
+    c.fillStyle = '#121d3f';
+    c.beginPath();
+    c.moveTo(0, base);
+    c.quadraticCurveTo(W * 0.12, base - 52, W * 0.3, base - 30);
+    c.lineTo(W * 0.3, base);
+    c.fill();
+    const bx = W * 0.15,
+      by = base - 50;
+    c.fillRect(bx - 18, by - 12, 36, 14);
+    c.fillRect(bx - 18, by - 22, 6, 12);
+    c.fillRect(bx + 12, by - 22, 6, 12);
+    c.fillRect(bx - 4, by - 18, 8, 8);
+    c.fillStyle = '#ffd27a';
+    c.fillRect(bx - 1, by - 8, 2, 3);
+    c.fillStyle = '#18264f';
+    ville.forEach(b => {
+      c.fillRect(b.x, base - b.h, 13, b.h + 4);
+      if (b.w == 1) c.fillRect(b.x + 3, base - b.h - 5, 3, 5);
+    });
+    c.fillStyle = '#ffcf6e';
+    ville.forEach((b, i) => {
+      if (i % 3 == 0) c.fillRect(b.x + 3, base - b.h + 4, 2.5, 2.5);
+      if (i % 4 == 1) c.fillRect(b.x + 8, base - b.h + 9, 2.5, 2.5);
+    });
+  };
+  const toit = () => {
+    // pan de toit enneigé qui part au loin
+    const pts = [P(-9, 0, 0.6), P(9, 0, 0.6), P(9, 0, 8.5), P(-9, 0, 8.5)];
+    let g = c.createLinearGradient(0, pts[2][1], 0, H);
+    g.addColorStop(0, '#c9d6ee');
+    g.addColorStop(1, '#f4f8ff');
+    c.fillStyle = g;
+    c.beginPath();
+    pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y)));
+    c.closePath();
+    c.fill();
+    // rangées de tuiles qui dépassent de la neige
+    c.strokeStyle = '#9fb0cf';
+    for (let z = 1; z < 8.5; z *= 1.16) {
+      const [a, ay] = P(-9, 0, z),
+        [b] = P(9, 0, z),
+        s = f / z;
+      c.lineWidth = Math.max(0.5, s * 0.012);
+      c.globalAlpha = 0.55;
+      c.beginPath();
+      for (let x = Math.max(a, -20); x < Math.min(b, W + 20); x += Math.max(6, s * 0.18)) {
+        c.moveTo(x, ay);
+        c.quadraticCurveTo(x + s * 0.045, ay + s * 0.02, x + s * 0.09, ay);
+      }
+      c.stroke();
+    }
+    c.globalAlpha = 1;
+    // faîtage au loin
+    const [rx1, ry1] = P(-9, 0, 8.5),
+      [rx2] = P(9, 0, 8.5);
+    c.fillStyle = '#e9eff9';
+    c.fillRect(rx1, ry1 - 3, rx2 - rx1, 5);
+  };
+  const quad = (a, b, d, e, col) => {
+    c.fillStyle = col;
+    c.beginPath();
+    c.moveTo(a[0], a[1]);
+    c.lineTo(b[0], b[1]);
+    c.lineTo(d[0], d[1]);
+    c.lineTo(e[0], e[1]);
+    c.closePath();
+    c.fill();
+  };
+  const ouverture = () => {
+    c.beginPath();
+    for (let i = 0; i <= 24; i++) {
+      const t = (i / 24) * Math.PI * 2,
+        [x, y] = P(Math.cos(t) * OX, TOP, CZ + Math.sin(t) * OZ);
+      i ? c.lineTo(x, y) : c.moveTo(x, y);
+    }
+    c.closePath();
+  };
+  const chemineeFond = t => {
+    // côtés et dessus (derrière le fichier quand il est loin)
+    const fl = [P(-CX, 0, CZ - CD), P(CX, 0, CZ - CD), P(CX, TOP, CZ - CD), P(-CX, TOP, CZ - CD)],
+      bl = [P(-CX, 0, CZ + CD), P(CX, 0, CZ + CD), P(CX, TOP, CZ + CD), P(-CX, TOP, CZ + CD)];
+    // ombre au sol
+    c.fillStyle = '#8796b833';
+    const [sx, sy, ss] = P(0.35, 0, CZ + 0.6);
+    c.beginPath();
+    c.ellipse(sx, sy, ss * 0.9, ss * 0.18, 0, 0, 7);
+    c.fill();
+    quad(fl[1], bl[1], bl[2], fl[2], '#7d2f22'); // côté droit
+    quad(fl[0], bl[0], bl[3], fl[3], '#8e3626'); // côté gauche
+    // dessus : couronne de pierre + neige
+    quad(fl[3], fl[2], bl[2], bl[3], '#cfd8e6');
+    ouverture();
+    const [ox, oy, os] = P(0, TOP, CZ),
+      g = c.createRadialGradient(ox, oy + os * 0.05, 2, ox, oy, os * 0.5);
+    g.addColorStop(0, '#ff9a3c');
+    g.addColorStop(0.35, '#5a1a0c');
+    g.addColorStop(1, '#120606');
+    c.fillStyle = g;
+    c.fill();
+    c.strokeStyle = '#6a6f7c';
+    c.lineWidth = Math.max(1, os * 0.03);
+    c.stroke();
+    // petite fumée tranquille
+    if (Math.random() < 0.12) fumees.push({ x: (Math.random() - 0.5) * 0.3, y: TOP + 0.05, z: CZ, r: 0.08, a: 0.35, v: 0.35 });
+  };
+  const briques = (x0, x1, y0, y1, z) => {
+    const a = P(x0, y0, z),
+      b = P(x1, y1, z),
+      s = f / z;
+    let g = c.createLinearGradient(a[0], 0, b[0], 0);
+    g.addColorStop(0, '#b4462f');
+    g.addColorStop(1, '#9a3b28');
+    c.fillStyle = g;
+    c.fillRect(a[0], b[1], b[0] - a[0], a[1] - b[1]);
+    const rh = 0.11 * s,
+      bw = 0.26 * s;
+    c.strokeStyle = '#6e2619';
+    c.lineWidth = Math.max(0.6, s * 0.012);
+    for (let r = 0, yy = a[1]; yy > b[1]; r++, yy -= rh) {
+      c.beginPath();
+      c.moveTo(a[0], yy);
+      c.lineTo(b[0], yy);
+      c.stroke();
+      for (let xx = a[0] + (r % 2) * bw * 0.5; xx < b[0]; xx += bw) {
+        c.beginPath();
+        c.moveTo(xx, yy);
+        c.lineTo(xx, Math.max(b[1], yy - rh));
+        c.stroke();
+      }
+    }
+    // reflets de lune
+    c.fillStyle = '#ffffff10';
+    c.fillRect(a[0], b[1], (b[0] - a[0]) * 0.18, a[1] - b[1]);
+  };
+  const chemineeDevant = () => {
+    briques(-CX, CX, 0, TOP, CZ - CD);
+    // rebord de pierre et neige
+    const a = P(-CX - 0.06, TOP, CZ - CD),
+      b = P(CX + 0.06, TOP, CZ - CD),
+      s = f / (CZ - CD);
+    c.fillStyle = '#d8dee8';
+    c.fillRect(a[0], a[1] - s * 0.02, b[0] - a[0], s * 0.07);
+    c.fillStyle = '#ffffff';
+    c.beginPath();
+    c.moveTo(a[0], a[1]);
+    for (let i = 0; i <= 10; i++) {
+      const xx = a[0] + ((b[0] - a[0]) * i) / 10;
+      c.quadraticCurveTo(xx - s * 0.03, a[1] - s * (0.05 + (i % 3) * 0.015), xx, a[1] - s * 0.01);
+    }
+    c.lineTo(b[0], a[1] + s * 0.03);
+    c.quadraticCurveTo((a[0] + b[0]) / 2, a[1] + s * 0.09, a[0], a[1] + s * 0.03);
+    c.fill();
+    // neige accumulée au pied
+    const p1 = P(-CX - 0.15, 0, CZ - CD - 0.05),
+      p2 = P(CX + 0.15, 0, CZ - CD - 0.05);
+    c.beginPath();
+    c.moveTo(p1[0], p1[1]);
+    c.quadraticCurveTo((p1[0] + p2[0]) / 2, p1[1] - s * 0.16, p2[0], p2[1]);
+    c.fill();
+  };
+  const rr = (x, y, w, h, r) => {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  };
+  const ombre = () => {
+    if (F.in) return;
+    const [x, y, s] = P(F.x, 0, Math.max(0.6, F.z));
+    if (y > H + 20) return;
+    const k = Math.max(0.15, 1 - F.y / 4);
+    c.fillStyle = `rgba(60,75,110,${0.28 * k})`;
+    c.beginPath();
+    c.ellipse(x, y, s * 0.17 * k + 2, s * 0.045 * k + 1, 0, 0, 7);
+    c.fill();
   };
   const fichier = () => {
-    x.save();
-    x.translate(F.x, F.y);
-    x.rotate(F.r);
-    x.scale(F.s, F.s);
-    x.shadowColor = '#0003';
-    x.shadowBlur = 14;
-    x.shadowOffsetY = 6;
-    x.fillStyle = '#fff';
-    x.beginPath();
-    x.moveTo(-26, -34);
-    x.lineTo(12, -34);
-    x.lineTo(26, -20);
-    x.lineTo(26, 34);
-    x.lineTo(-26, 34);
-    x.closePath();
-    x.fill();
-    x.shadowColor = 'transparent';
-    x.fillStyle = '#e9ecef';
-    x.beginPath();
-    x.moveTo(12, -34);
-    x.lineTo(12, -20);
-    x.lineTo(26, -20);
-    x.closePath();
-    x.fill();
-    x.fillStyle = '#dde1e6';
-    [-18, -10, -2].forEach(l => x.fillRect(-16, l, l == -2 ? 22 : 32, 3));
-    x.fillStyle = '#c0233a';
-    rr(-20, 12, 40, 14, 3);
-    x.fill();
-    x.fillStyle = '#fff';
-    x.font = '800 9px system-ui,sans-serif';
-    x.textAlign = 'center';
-    x.fillText('AVENT', 0, 22.5);
-    x.fillStyle = '#2f8f5b';
-    x.fillRect(-3, -34, 6, 68);
-    x.font = '14px system-ui';
-    x.fillText('🎀', 0, -28);
-    x.restore();
+    const [x, y, s] = P(F.x, F.y, F.z),
+      k = s * 0.0042; // le fichier mesure ~ 50 × 64 « unités » à 1 m
+    c.save();
+    c.translate(x, y);
+    c.rotate(F.a);
+    c.scale(k, k);
+    c.shadowColor = '#0005';
+    c.shadowBlur = 16;
+    c.shadowOffsetY = 8;
+    c.fillStyle = '#fdfdfb';
+    c.beginPath();
+    c.moveTo(-25, -32);
+    c.lineTo(11, -32);
+    c.lineTo(25, -18);
+    c.lineTo(25, 32);
+    c.lineTo(-25, 32);
+    c.closePath();
+    c.fill();
+    c.shadowColor = 'transparent';
+    let g = c.createLinearGradient(-25, -32, 25, 32);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(1, '#e8ebf0');
+    c.fillStyle = g;
+    c.fill();
+    c.fillStyle = '#d6dbe3';
+    c.beginPath();
+    c.moveTo(11, -32);
+    c.lineTo(11, -18);
+    c.lineTo(25, -18);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#d3d8e0';
+    [-20, -13, -6].forEach((l, i) => rr(-17, l, i == 2 ? 20 : 30, 3, 1.5) || c.fill());
+    // ruban rouge et nœud
+    c.fillStyle = '#c8243b';
+    c.fillRect(-25, 3, 50, 7);
+    c.fillRect(-4, -32, 8, 64);
+    c.fillStyle = '#e23b52';
+    c.beginPath();
+    c.ellipse(-7, 2, 8, 5, -0.5, 0, 7);
+    c.ellipse(7, 2, 8, 5, 0.5, 0, 7);
+    c.fill();
+    c.fillStyle = '#a81b30';
+    c.beginPath();
+    c.arc(0, 4, 3.5, 0, 7);
+    c.fill();
+    c.fillStyle = '#2f8f5b';
+    rr(-17, 17, 34, 10, 2);
+    c.fill();
+    c.fillStyle = '#fff';
+    c.font = '800 7px system-ui,sans-serif';
+    c.textAlign = 'center';
+    c.fillText('.AVENT', 0, 24.5);
+    c.restore();
   };
-  const cheminee = devant => {
-    const top = ry,
-      w = rw * 1.25;
-    if (!devant) {
-      // toit
-      x.fillStyle = '#5b2a2a';
-      x.beginPath();
-      x.moveTo(-20, H);
-      x.lineTo(-20, top + rw * 2.6);
-      x.lineTo(W / 2, top + rw * 1.4);
-      x.lineTo(W + 20, top + rw * 2.6);
-      x.lineTo(W + 20, H);
-      x.fill();
-      x.fillStyle = '#f4f8ff';
-      x.beginPath();
-      x.moveTo(-20, top + rw * 2.6);
-      x.lineTo(W / 2, top + rw * 1.4);
-      x.lineTo(W + 20, top + rw * 2.6);
-      x.lineTo(W + 20, top + rw * 2.95);
-      x.quadraticCurveTo(W * 0.75, top + rw * 2.2, W / 2, top + rw * 1.75);
-      x.quadraticCurveTo(W * 0.25, top + rw * 2.2, -20, top + rw * 2.95);
-      x.fill();
-      // intérieur de la cheminée
-      x.fillStyle = '#1a0f0f';
-      x.beginPath();
-      x.ellipse(cx, top, w * 0.92, rw * 0.2, 0, 0, Math.PI * 2);
-      x.fill();
+  const particules = dt => {
+    fumees = fumees.filter(p => (p.a -= dt * 0.25) > 0);
+    fumees.forEach(p => {
+      p.y += p.v * dt;
+      p.r += dt * 0.12;
+      p.x += Math.sin(p.y * 3) * dt * 0.05;
+      const [x, y, s] = P(p.x, p.y, p.z);
+      c.fillStyle = `rgba(225,232,245,${p.a})`;
+      c.beginPath();
+      c.arc(x, y, p.r * s, 0, 7);
+      c.fill();
+    });
+    eclats = eclats.filter(e => (e.t -= dt) > 0);
+    eclats.forEach(e => {
+      e.x += e.vx * dt;
+      e.y += e.vy * dt;
+      e.vy += 300 * dt;
+      c.fillStyle = e.c;
+      c.globalAlpha = Math.min(1, e.t * 2);
+      c.fillRect(e.x, e.y, 3, 3);
+    });
+    c.globalAlpha = 1;
+  };
+  const neige = (dt, avant) => {
+    c.fillStyle = '#fff';
+    flocons.forEach(s => {
+      if (avant != s.d > 0.75) return;
+      s.y += dt * (0.03 + s.d * 0.06);
+      s.p += dt;
+      if (s.y > 1.02) ((s.y = -0.02), (s.x = Math.random()));
+      c.globalAlpha = 0.35 + s.d * 0.5;
+      c.beginPath();
+      c.arc(s.x * W + Math.sin(s.p) * 8 * s.d, s.y * H, 0.6 + s.d * 2.2, 0, 7);
+      c.fill();
+    });
+    c.globalAlpha = 1;
+  };
+  const guide = t => {
+    // main qui montre le geste, tant qu'on n'a pas lancé
+    if (F.vol || drag || fin) return;
+    idle += 1;
+    if (idle < 70) return;
+    const [x, y, s] = P(0, Y0, Z0),
+      k = ((t * 0.9) % 1.4) / 1.4,
+      yy = y + s * 0.05 - k * s * 0.55;
+    c.globalAlpha = Math.sin(Math.min(1, k * 1.4) * Math.PI) * 0.9;
+    c.font = `${Math.round(s * 0.13)}px system-ui`;
+    c.textAlign = 'center';
+    c.fillText('👆', x + s * 0.12, yy + s * 0.2);
+    c.globalAlpha = 1;
+  };
+
+  /* ===================== physique ===================== */
+  const pas = h => {
+    const p = { x: F.x, y: F.y, z: F.z };
+    F.vy -= G * h;
+    F.x += F.vx * h;
+    F.y += F.vy * h;
+    F.z += F.vz * h;
+    F.a += F.va * h;
+    if (F.in) {
+      F.x += (0 - F.x) * 0.1;
+      F.z += (CZ - F.z) * 0.1;
       return;
     }
-    // corps en briques (devant le fichier qui tombe dedans)
-    x.fillStyle = '#a8432f';
-    x.fillRect(cx - w * 0.92, top, w * 1.84, rw * 1.9);
-    x.strokeStyle = '#7a2c1f';
-    x.lineWidth = 1.5;
-    for (let r = 0; r < 7; r++) {
-      const yy = top + 6 + r * rw * 0.27;
-      x.beginPath();
-      x.moveTo(cx - w * 0.92, yy);
-      x.lineTo(cx + w * 0.92, yy);
-      x.stroke();
-      for (let c = 0; c < 5; c++) {
-        const xx = cx - w * 0.92 + ((c + (r % 2) * 0.5) * w * 1.84) / 4;
-        x.beginPath();
-        x.moveTo(xx, yy);
-        x.lineTo(xx, yy + rw * 0.27);
-        x.stroke();
+    const dansBoite = (x, z) => Math.abs(x) < CX && Math.abs(z - CZ) < CD;
+    // passage du haut de la cheminée en descendant
+    if (p.y >= TOP && F.y < TOP && F.vy < 0) {
+      const t = (p.y - TOP) / (p.y - F.y),
+        x = p.x + (F.x - p.x) * t,
+        z = p.z + (F.z - p.z) * t;
+      if ((x / OX) ** 2 + ((z - CZ) / OZ) ** 2 <= 1) return entre();
+      if (dansBoite(x, z)) {
+        // rebond sur le rebord
+        F.y = TOP + 0.001;
+        F.vy = Math.abs(F.vy) * 0.38;
+        F.vx = F.vx * 0.5 + Math.sign(x || 1) * 0.7;
+        F.vz = F.vz * 0.4 + Math.sign(z - CZ || -1) * 0.7;
+        F.va += (Math.random() - 0.5) * 8;
+        choc(0.5);
+        return;
       }
     }
-    // rebord et neige
-    x.fillStyle = '#8c3626';
-    x.fillRect(cx - w, top - 4, w * 2, 12);
-    x.fillStyle = '#f4f8ff';
-    x.beginPath();
-    x.ellipse(cx - w * 0.55, top - 5, w * 0.55, 7, 0, Math.PI, Math.PI * 2);
-    x.ellipse(cx + w * 0.45, top - 4, w * 0.6, 6, 0, Math.PI, Math.PI * 2);
-    x.fill();
-  };
-  const fond = dt => {
-    const g = x.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, '#0d1b3d');
-    g.addColorStop(1, '#2a3f78');
-    x.fillStyle = g;
-    x.fillRect(0, 0, W, H);
-    x.fillStyle = '#fff6d8';
-    x.beginPath();
-    x.arc(W * 0.82, H * 0.18, 26, 0, Math.PI * 2);
-    x.fill();
-    x.fillStyle = '#fff';
-    flocons.forEach(f => {
-      f.y += f.v * dt;
-      f.x += Math.sin(f.y / 30) * 0.3;
-      if (f.y > H) ((f.y = -5), (f.x = Math.random() * W));
-      x.globalAlpha = 0.8;
-      x.beginPath();
-      x.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      x.fill();
-    });
-    x.globalAlpha = 1;
-  };
-  // --- physique ---
-  let t0 = performance.now();
-  const anneau = (px, py) => {
-    const dx = F.x - px,
-      dy = F.y - py,
-      d = Math.hypot(dx, dy);
-    if (d < FR + 4 && d > 0) {
-      const nx = dx / d,
-        ny = dy / d,
-        v = F.vx * nx + F.vy * ny;
-      if (v < 0) {
-        F.vx -= 1.6 * v * nx;
-        F.vy -= 1.6 * v * ny;
-        F.vr += v * 0.004;
+    if (F.y < TOP) {
+      // mur de devant
+      if (p.z <= CZ - CD && F.z > CZ - CD && Math.abs(F.x) < CX) {
+        F.z = CZ - CD - 0.001;
+        F.vz = -Math.abs(F.vz) * 0.28;
+        F.vx *= 0.6;
+        F.va += (Math.random() - 0.5) * 10;
+        choc(1);
       }
-      F.x = px + nx * (FR + 4);
-      F.y = py + ny * (FR + 4);
+      // mur de derrière (si on arrive par l'arrière)
+      if (p.z >= CZ + CD && F.z < CZ + CD && Math.abs(F.x) < CX) {
+        F.z = CZ + CD + 0.001;
+        F.vz = Math.abs(F.vz) * 0.28;
+        choc(0.6);
+      }
+      // côtés
+      if (Math.abs(F.z - CZ) < CD && Math.abs(p.x) >= CX && Math.abs(F.x) < CX) {
+        F.x = Math.sign(p.x) * (CX + 0.001);
+        F.vx = -F.vx * 0.3;
+        choc(0.6);
+      }
     }
-  };
-  const boucle = t => {
-    const dt = Math.min(0.033, (t - t0) / 1000);
-    t0 = t;
-    if (F.vol) {
-      const py = F.y;
-      F.vy += G * dt;
-      F.x += F.vx * dt;
-      F.y += F.vy * dt;
-      F.r += F.vr * dt;
-      if (!F.in) {
-        const bord = rw * 1.25 * 0.92;
-        anneau(cx - bord, ry);
-        anneau(cx + bord, ry);
-        if (py < ry && F.y >= ry && F.vy > 0 && Math.abs(F.x - cx) < bord - 6) {
-          F.in = 1;
-          F.vx *= 0.2;
-          marque();
-        }
+    // le toit
+    if (F.y < 0.03) {
+      F.y = 0.03;
+      if (Math.abs(F.vy) > 1.2) {
+        F.vy = Math.abs(F.vy) * 0.22;
+        F.va *= 0.5;
       } else {
-        F.x += (cx - F.x) * 0.12;
-        F.s = Math.max(0.55, F.s - dt * 0.8);
-        if (F.y > ry + rw) F.s = 0;
+        F.vy = 0;
+        F.sol = 1;
       }
-      if (!F.in && (F.y > H + 120 || F.x < -120 || F.x > W + 120)) {
-        rate++;
-        aide();
-        depart();
-      }
+      F.vx *= 0.8;
+      F.vz *= 0.8;
+      F.va *= 0.9;
     }
-    fond(dt);
-    cheminee(0);
-    if (!F.in || F.y < ry + 30) fichier();
-    cheminee(1);
-    if (F.in) fumee(dt);
-    raf = requestAnimationFrame(boucle);
   };
-  let puff = [];
-  const fumee = dt => {
-    if (puff.length < 26) puff.push({ x: cx + (Math.random() - 0.5) * 20, y: ry - 10, r: 6, a: 0.8 });
-    puff.forEach(p => {
-      p.y -= 60 * dt;
-      p.r += 18 * dt;
-      p.a -= 0.5 * dt;
-      x.fillStyle = `rgba(230,236,245,${Math.max(0, p.a)})`;
-      x.beginPath();
-      x.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      x.fill();
-    });
+  const choc = k => {
+    try {
+      SFX('tap');
+    } catch (_) {}
+    const [x, y] = P(F.x, F.y, F.z);
+    for (let i = 0; i < 10 * k; i++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, t: 0.6, c: '#ffffff' });
   };
-  const aide = () => {
-    tip.textContent = rate >= 3 ? 'Lance plus fort, vers le haut, au-dessus de la cheminée ⬆️' : '';
-    if (rate >= 6) pass.classList.add('on');
-  };
-  const marque = () => {
+  const entre = () => {
+    F.in = 1;
+    F.vy = Math.min(F.vy, -1);
+    F.vx *= 0.2;
+    F.vz *= 0.2;
     if (fin) return;
     fin = 1;
     o.querySelector('.mysl-n i').textContent = '1';
+    o.querySelector('.mysl-n').classList.add('ok');
     try {
       SFX('ok');
     } catch (_) {}
-    tip.textContent = 'Ho ho ho ! 🎅';
+    tip.textContent = 'Ho ho ho ! 🎅 Bien reçu !';
+    tip.classList.add('ok');
+    for (let i = 0; i < 26; i++)
+      fumees.push({
+        x: (Math.random() - 0.5) * 0.5,
+        y: TOP + Math.random() * 0.2,
+        z: CZ,
+        r: 0.1 + Math.random() * 0.1,
+        a: 0.9,
+        v: 0.6 + Math.random() * 0.8
+      });
+    const [x, y] = P(0, TOP, CZ);
+    for (let i = 0; i < 40; i++)
+      eclats.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 320,
+        vy: -80 - Math.random() * 260,
+        t: 1.2,
+        c: ['#ffd76a', '#ff6b8a', '#8be0a8', '#fff'][i % 4]
+      });
     setTimeout(() => {
       try {
         confetti();
       } catch (_) {}
-    }, 300);
-    setTimeout(fermer, 1500);
+    }, 400);
+    setTimeout(fermer, 2000);
+  };
+  const aide = () => {
+    rate++;
+    tip.textContent = rate >= 3 ? 'Un geste franc vers le haut, droit sur la cheminée ⬆️' : rate == 1 ? 'Presque ! Réessaie 😉' : '';
+    if (rate >= 6) pass.classList.add('on');
   };
   const fermer = () => {
     cancelAnimationFrame(raf);
     removeEventListener('resize', taille);
-    o.remove();
-    cb();
+    o.classList.add('out');
+    setTimeout(() => {
+      o.remove();
+      cb();
+    }, 450);
   };
   pass.onclick = () => {
-    F.vol = 0;
-    marque();
+    if (fin) return;
+    F = { x: 0, y: TOP + 0.4, z: CZ, vx: 0, vy: -1, vz: 0, a: 0, va: 0, vol: 1, in: 0, sol: 0, t: 0 };
   };
-  // --- toucher : attraper le fichier et le lancer ---
+
+  /* ===================== boucle ===================== */
+  t0 = performance.now();
+  const boucle = now => {
+    const dt = Math.min(0.033, (now - t0) / 1000),
+      t = now / 1000;
+    t0 = now;
+    if (F.vol) {
+      for (let i = 0; i < 8; i++) pas(dt / 8);
+      F.t += dt;
+      if (!F.in && (F.sol ? F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.3 : F.z > 11 || F.z < 0.3 || Math.abs(F.x) > 5)) {
+        F.vol = 0;
+        setTimeout(() => {
+          if (!fin) {
+            aide();
+            depart();
+          }
+        }, 500);
+      }
+    } else if (!drag && !fin) F.y = Y0 + Math.sin(t * 2.2) * 0.015;
+    ciel(t);
+    lyon();
+    neige(dt, false);
+    toit();
+    const loin = F.z > CZ + CD && !F.in;
+    if (loin) (ombre(), fichier());
+    chemineeFond(t);
+    if (F.in) {
+      c.save();
+      ouverture();
+      c.clip();
+      fichier();
+      c.restore();
+    }
+    chemineeDevant();
+    if (!loin && !F.in) (ombre(), fichier());
+    particules(dt);
+    neige(dt, true);
+    guide(t);
+    raf = requestAnimationFrame(boucle);
+  };
+
+  /* ===================== toucher ===================== */
   cv.addEventListener('pointerdown', e => {
-    if (F.vol || fin || Math.hypot(e.clientX - F.x, e.clientY - F.y) > 70) return;
+    if (F.vol || fin || e.clientY < H * 0.45) return;
     drag = 1;
+    idle = 0;
     hist = [[e.clientX, e.clientY, performance.now()]];
     cv.setPointerCapture(e.pointerId);
   });
   cv.addEventListener('pointermove', e => {
     if (!drag) return;
-    F.x = e.clientX;
-    F.y = e.clientY;
     hist.push([e.clientX, e.clientY, performance.now()]);
-    if (hist.length > 6) hist.shift();
+    if (hist.length > 12) hist.shift();
+    const a = hist[0];
+    F.x = ((e.clientX - a[0]) / f) * Z0 * 0.4;
+    F.y = Y0 - ((e.clientY - a[1]) / f) * Z0 * 0.4;
   });
-  cv.addEventListener('pointerup', () => {
+  const lacher = () => {
     if (!drag) return;
     drag = 0;
-    const a = hist[0],
+    const now = performance.now(),
+      r = hist.filter(h => now - h[2] < 140),
+      a = r[0] || hist[0],
       b = hist[hist.length - 1],
-      dt = Math.max(16, b[2] - a[2]) / 1000;
-    let vx = (b[0] - a[0]) / dt,
-      vy = (b[1] - a[1]) / dt;
-    const v = Math.hypot(vx, vy),
-      m = Math.min(1, 2600 / (v || 1));
-    vx *= m;
-    vy *= m;
-    if (v < 200) return depart();
-    Object.assign(F, { vx, vy, vol: 1, vr: vx / 260 });
-  });
+      dt = Math.max(0.03, (b[2] - a[2]) / 1000),
+      vsy = (a[1] - b[1]) / dt, // vitesse vers le haut (px/s)
+      vsx = (b[0] - a[0]) / dt;
+    if (vsy < 250) {
+      depart();
+      return;
+    }
+    // lancer en cloche à angle fixe : la force du geste règle la distance
+    const D = CZ - Z0,
+      vopt = Math.sqrt((G * D * D) / (2 * Math.cos(ANG) ** 2 * (Y0 + D * Math.tan(ANG) - TOP))),
+      tt = D / (vopt * Math.cos(ANG));
+    let v = vopt * (vsy / (H * 1.7)),
+      vx = (vsx / W) * 2.4;
+    // aide discrète : un geste à peu près juste est guidé vers le centre
+    if (Math.abs(v - vopt) < vopt * 0.4) v = vopt + (v - vopt) * 0.12;
+    if (Math.abs(vx * tt) < 1.2) vx *= 0.1;
+    const vy = v * Math.sin(ANG),
+      vz = v * Math.cos(ANG);
+    Object.assign(F, { vx, vy, vz, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
+    tip.textContent = '';
+  };
+  cv.addEventListener('pointerup', lacher);
+  cv.addEventListener('pointercancel', lacher);
   raf = requestAnimationFrame(boucle);
 }
 // le fichier choisi : d'abord le lancer dans la cheminée, puis on l'ouvre

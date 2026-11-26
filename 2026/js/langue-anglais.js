@@ -3226,9 +3226,10 @@ window.TRADUCTIONS_EN = {
   'Vendredi 7 h 51 · souvenir Snapchat de Célestine.': "Friday 7:51 am · Célestine's Snapchat memory.",
   'Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.': '×8 enlargement of the tray, in the background of the 7:51 selfie.',
   'Livraison spéciale': 'Special delivery',
-  'Lance le fichier dans la cheminée.': 'Throw the file down the chimney.',
   'Livré': 'Delivered',
   'Le déposer à la main': 'Drop it in by hand',
-  'Lance plus fort, vers le haut, au-dessus de la cheminée ⬆️': 'Throw harder, upwards, above the chimney ⬆️',
-  'Ho ho ho ! 🎅': 'Ho ho ho! 🎅'
+  'Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.': 'Swipe up to throw the file down the chimney.',
+  'Presque ! Réessaie 😉': 'Almost! Try again 😉',
+  'Un geste franc vers le haut, droit sur la cheminée ⬆️': 'A firm swipe up, straight at the chimney ⬆️',
+  'Ho ho ho ! 🎅 Bien reçu !': 'Ho ho ho! 🎅 Got it!'
 };
