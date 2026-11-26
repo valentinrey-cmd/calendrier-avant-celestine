@@ -2,6 +2,7 @@ const CONTENU = {
   prenom: 'mon amour', // ✏️ son prénom ou un surnom (affiché en haut)
   ...(VERSION_TEST && { syncRoom: 't' }), // version de test : suivi en direct dans le salon « t »
   modeTest: VERSION_TEST, // version de test (/test/) : les 24 jours sont ouverts + bouton 🧪
+  mysLien: 'https://www.swisstransfer.com/dl/01a21812-c930-74dd-bbb2-76e266e8477c', // lien pour télécharger le fichier mystère (SwissTransfer, expire au bout de 15 jours)
   codeSecret: '2412', // code du mode test caché (toucher 7 fois la photo en haut à gauche)
   finale: "Je t'aime ❤",
   album: {

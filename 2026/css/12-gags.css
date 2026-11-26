@@ -862,6 +862,12 @@
   margin-top: 6px;
   animation: smBob 1.6s ease-in-out infinite;
 }
+.sm-mysdl {
+  display: inline-block;
+  font-size: 0.95rem !important;
+  padding: 10px 16px !important;
+  text-decoration: none;
+}
 
 /* fausse mise à jour (au lancement d'une partie en cours, js/gags.js) */
 .maj {

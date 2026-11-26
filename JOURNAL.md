@@ -3,6 +3,12 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Lien pour télécharger le fichier mystère, le toit ne se traverse plus
+- Dans la fenêtre « Avant de commencer… » de l'écran de démarrage, un bouton « 📥 Télécharger le fichier mystère » ouvre le lien SwissTransfer de Valentin (dans le navigateur, aussi depuis l'appli Android). Les explications disent de télécharger d'abord, puis d'ouvrir le fichier. Le lien est dans `CONTENU.mysLien` (`js/contenu.js`). Attention : un lien SwissTransfer expire au bout de 15 jours.
+- Lancer du fichier dans la cheminée : le sol couvre maintenant toute la largeur du toit dessiné (avant, il s'arrêtait à 4,2 m du centre et le fichier traversait la neige sur les côtés). Partout sur le toit, le fichier atterrit et glisse. S'il passe le faîtage, il tombe de l'autre côté et disparaît derrière la ligne du toit, au lieu de passer à travers la neige.
+- Version 1795701078
+- Fichiers : `2026/js/contenu.js`, `2026/js/menu-demarrer.js`, `2026/css/12-gags.css`, `2026/js/langue-anglais.js`, `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Remise à zéro de la progression sur tous les appareils
 - Au prochain lancement, chaque appareil (téléphone, tablette, PC, appli Android, vraie version et version de test) efface une seule fois toute la progression : les 3 sauvegardes, la signature des CGU (à refaire), la photo, les musiques importées et les secrets trouvés. Ensuite, plus rien n'est effacé.
 - Pour refaire une remise à zéro plus tard, il suffit de changer la date `REMISE_A_ZERO` dans `js/config.js` (noté dans CLAUDE.md).

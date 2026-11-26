@@ -720,7 +720,7 @@ function smOpen(force, at) {
         log('fichier mystère demandé');
         panel(
           '🎁 Fichier mystère',
-          `<div class="sm-c" style="font-size:64px;line-height:1">🎁🔒</div><p class="sm-c big">Avant de commencer…</p><p class="sm-c">Valentin t’a préparé un <b>fichier mystère</b>. Il faut l’ouvrir pour pouvoir lancer le jeu.</p><p class="sm-small center">Il te l’a envoyé (par message ou par mail) : enregistre-le, puis touche le bouton ci-dessous et choisis-le.</p><p class="center"><label class="sm-tg on sm-mys sm-mysbig">🎁 Ouvrir le fichier mystère<input type="file" class="fpick mysop"></label></p>`,
+          `<div class="sm-c" style="font-size:64px;line-height:1">🎁🔒</div><p class="sm-c big">Avant de commencer…</p><p class="sm-c">Valentin t’a préparé un <b>fichier mystère</b>. Il faut l’ouvrir pour pouvoir lancer le jeu.</p><p class="sm-small center"><b>1.</b> Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).<br><b>2.</b> Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.</p><p class="center"><a class="sm-tg sm-mysdl" href="${CONTENU.mysLien}" target="_blank" rel="noopener">📥 Télécharger le fichier mystère</a></p><p class="center"><label class="sm-tg on sm-mys sm-mysbig">🎁 Ouvrir le fichier mystère<input type="file" class="fpick mysop"></label></p>`,
           [
             ['← Retour', () => scr('menu'), 'alt'],
             ['😢 Je ne l’ai pas', () => toastM('📩 Demande-le à Valentin : sans lui, l’enquête ne peut pas commencer !'), 'alt']

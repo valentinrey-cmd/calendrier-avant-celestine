@@ -2408,8 +2408,8 @@ function mysLancer(cb, fic) {
       F.z = BORD;
       F.vz = Math.abs(F.vz) * 0.25;
     }
-    // il passe le faîtage ou le bord : il tombe de l'autre côté
-    if (F.z > RIDGE || Math.abs(F.x) > 4.2) {
+    // il passe le faîtage (ou sort tout à fait sur le côté) : il tombe de l'autre côté, caché derrière le faîtage
+    if (F.z > RIDGE || Math.abs(F.x) > 9) {
       if (F.y < 0.05 && !F.tombe) {
         F.tombe = 1;
         bruit('tombe');
@@ -2544,7 +2544,21 @@ function mysLancer(cb, fic) {
     const L = OBS.map(ob => [ob.z, () => obstacle(ob, t)]);
     L.push([TZ, () => traineau(t, dt)]);
     L.push([CZ, () => (chemineeFond(t), F.in && (c.save(), ouverture(), c.clip(), fichier(), c.restore()), chemineeDevant())]);
-    if (!F.in) L.push([F.z - (F.z > CZ - CD && F.z < CZ + CD && Math.abs(F.x) < CX ? 1 : 0) * 0, () => (ombre(), fichier())]);
+    if (!F.in)
+      L.push([
+        F.z,
+        () => {
+          if (F.z <= RIDGE) return (ombre(), fichier());
+          // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
+          const [, ry] = P(0, 0, RIDGE);
+          c.save();
+          c.beginPath();
+          c.rect(0, 0, W, ry);
+          c.clip();
+          fichier();
+          c.restore();
+        }
+      ]);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);

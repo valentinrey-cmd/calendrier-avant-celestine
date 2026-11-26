@@ -2936,8 +2936,6 @@ window.TRADUCTIONS_EN = {
   '😢 Je ne l’ai pas': '😢 I don’t have it',
   '📩 Demande-le à Valentin : sans lui, l’enquête ne peut pas commencer !':
     '📩 Ask Valentin for it: without it, the investigation can’t start!',
-  'Il te l’a envoyé (par message ou par mail) : enregistre-le, puis touche le bouton ci-dessous et choisis-le.':
-    'He sent it to you (by message or email): save it, then tap the button below and pick it.',
   'IDÉE ORIGINALE': 'ORIGINAL IDEA',
   'Notre histoire, écrite par Valentin': 'Our story, written by Valentin',
   'SCÉNARIO DE L’ENQUÊTE': 'INVESTIGATION SCRIPT',
@@ -3238,5 +3236,8 @@ window.TRADUCTIONS_EN = {
   'Plus de télé chez le voisin ! 📺': 'No more TV for the neighbour! 📺',
   'Tu as fait tomber le Père Noël ! 🎅💥': 'You knocked Santa down! 🎅💥',
   '🥚 Nouveau secret !': '🥚 New secret!',
-  'Miaou !': 'Meow!'
+  'Miaou !': 'Meow!',
+  'Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).': 'Download it with the first button (it’s quite big: wait until the download is complete).',
+  'Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.': 'Come back here, tap the second button and pick it from your downloads.',
+  '📥 Télécharger le fichier mystère': '📥 Download the mystery file'
 };
