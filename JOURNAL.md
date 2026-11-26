@@ -3,6 +3,19 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : objets en vrai volume, la caméra garde l'angle à pied
+- Les objets du toit ne se tournent plus vers la caméra :
+  - le bonhomme de neige a un devant et un dos (yeux, nez en carotte, boutons et pan d'écharpe seulement du côté visage ; chapeau haut-de-forme en vrai cylindre ; bras orientés) ;
+  - les cadeaux sont de vraies boîtes (dessus et côtés visibles, rubans sur chaque face, nœuds) ;
+  - la guirlande dorée et les ampoules du sapin sont posées autour du cône (celles de derrière sont cachées) ;
+  - les barres de l'antenne ont un vrai sens (vues de biais quand on tourne) ;
+  - le traîneau paraît plus court vu de face, et il est retourné vu de l'autre côté. Il est caché quand il passe trop près de la caméra.
+  Les surprises (bonhomme qui s'écroule, chat dans le cadeau, étoile du sapin, antenne tordue) fonctionnent toujours.
+- À pied, la caméra ne revient plus à la vue de départ : elle garde l'angle actuel (par exemple depuis derrière la cheminée) et suit Célestine à 2,6 m.
+- Ajout de l'autre pan du toit derrière le faîtage, pour ne plus voir de vide quand la caméra est tout en haut. Rangées de tuiles plus fines.
+- Version 1795708385
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : on lance depuis l'endroit où Célestine a marché
 - Le saut et le bouton « Sauter » sont supprimés (code, styles, bruit, traductions). À pied, on ne fait que marcher.
 - « 🎯 Revenir au lancer » place la caméra un peu derrière Célestine, à l'endroit où elle s'est arrêtée, et dans la direction où elle regarde. On lance droit devant soi : si elle ne regarde pas la cheminée, on ne peut pas la mettre dedans. On peut aussi aller derrière la cheminée et lancer de là, ou lancer dans n'importe quelle autre direction.

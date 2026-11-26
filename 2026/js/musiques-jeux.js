@@ -1572,6 +1572,19 @@ function mysLancer(cb, fic) {
     // le bas des maisons voisines (on le voit quand on regarde le long du toit)
     c.fillStyle = '#1a2850';
     c.fillRect(0, hy + 30, W, H);
+    // l'autre pan du toit, qui redescend derrière le faîtage (on le voit quand la caméra est tout en haut)
+    if (
+      V.z > RIDGE - 3 &&
+      poly([
+        [-9, 0, RIDGE],
+        [9, 0, RIDGE],
+        [9, -5, RIDGE + 9],
+        [-9, -5, RIDGE + 9]
+      ])
+    ) {
+      c.fillStyle = '#b9c7e2';
+      c.fill();
+    }
     // pan de toit enneigé
     if (
       poly([
@@ -1589,7 +1602,8 @@ function mysLancer(cb, fic) {
     }
     // rangées de tuiles qui dépassent de la neige
     c.strokeStyle = '#9fb0cf';
-    c.globalAlpha = 0.55;
+    c.lineWidth = 1;
+    c.globalAlpha = 0.5;
     for (let z = 1; z < RIDGE; z *= 1.16) {
       c.beginPath();
       let on = 0;
@@ -1599,7 +1613,6 @@ function mysLancer(cb, fic) {
           on = 0;
           continue;
         }
-        c.lineWidth = Math.max(0.5, sc * 0.012);
         on ? c.lineTo(px, py) : c.moveTo(px, py);
         on = 1;
       }
@@ -2040,10 +2053,11 @@ function mysLancer(cb, fic) {
     if (k > 1) return null;
     return { x: 6.5 - k * 13, y: TY + Math.sin(k * 6) * 0.12 };
   };
-  const traineauDessin = (x, y, rot, t, sc) => {
+  const traineauDessin = (x, y, rot, t, sc, ex = 1) => {
+    // ex : il vole vers -x ; vu de face ou de dos il paraît plus court, et retourné vu de l'autre côté
     c.save();
     c.translate(x, y);
-    c.scale(sc, sc);
+    c.scale(sc * ex, sc);
     c.rotate(rot);
     for (let r = 0; r < 4; r++) {
       c.fillStyle = '#7a4e2c';
@@ -2097,12 +2111,17 @@ function mysLancer(cb, fic) {
   };
   // longueur du traîneau en mètres (rennes compris) : 4,6 m, dont 0,8 m de traîneau à droite
   const traineauEchelle = s => (s * 4.6) / TL;
+  // sens et raccourci du traîneau vu depuis la caméra (1 = de profil vers la gauche, comme dans la vue de départ)
+  const sens = (tx, ty, s) => {
+    const k = (P(tx, ty, TZ)[0] - P(tx - 1, ty, TZ)[0]) / s;
+    return Math.sign(k || 1) * Math.max(0.22, Math.abs(k));
+  };
   const traineau = (t, dt) => {
     const tp = traineauPos(t);
     if (tp) {
       const [x, y, s, d] = P(tp.x, tp.y, TZ);
-      if (d < 4) return; // trop près de la caméra : il passe au-dessus de nous
-      return traineauDessin(x - s * 0.15, y, 0, t, traineauEchelle(s));
+      if (d < 6) return; // trop près de la caméra : il passe au-dessus de nous
+      return traineauDessin(x, y, 0, t, traineauEchelle(s), sens(tp.x, tp.y, s));
     }
     if (!crash || prof(crash.x, TZ) < 1) return;
     // touché : il tournoie et s'écrase sur le toit
@@ -2131,7 +2150,7 @@ function mysLancer(cb, fic) {
       c.fill();
     });
     const [x, y, s] = P(crash.x, crash.y, TZ);
-    if (!crash.boum) traineauDessin(x, y, crash.r, t, traineauEchelle(s));
+    if (!crash.boum) traineauDessin(x, y, crash.r, t, traineauEchelle(s), sens(crash.x, crash.y, s));
     else if (T() - crash.boum < 3.5) {
       // les jambes du Père Noël dépassent de la neige (et gigotent)
       c.globalAlpha = Math.min(1, (3.5 - (T() - crash.boum)) * 2);
@@ -2180,131 +2199,248 @@ function mysLancer(cb, fic) {
   const obstacle = (ob, t) => {
     const [x, y, s, d] = P(ob.x, 0, ob.z);
     if (d < 0.4) return; // derrière la caméra
+    // outils 3D autour de l'objet : point (dx, y, dz) → écran, et « ce côté est-il tourné vers nous ? »
+    const Q = (dx, yy, dz) => P(ob.x + dx, yy, ob.z + dz),
+      vu = (nx, ny, nz, cx = 0, cy = 0, cz = 0) => nx * (V.x - ob.x - cx) + ny * (CAM - cy) + nz * (V.z - ob.z - cz) > 0,
+      cercle = (cx, yy, cz, r, n = 20) => {
+        c.beginPath();
+        for (let i = 0; i <= n; i++) {
+          const a = (i / n) * Math.PI * 2,
+            [px, py] = Q(cx + Math.cos(a) * r, yy, cz + Math.sin(a) * r);
+          i ? c.lineTo(px, py) : c.moveTo(px, py);
+        }
+        c.closePath();
+      };
     // ombre
     c.fillStyle = '#7d8db033';
-    c.beginPath();
-    c.ellipse(x + s * 0.12, y, s * ob.r * 1.3, s * ob.r * 0.3, 0, 0, 7);
+    cercle(0.1, 0, 0.1, ob.r * 1.25);
     c.fill();
     if (ob.t == 'bonhomme') {
-      // il s'écroule : les boules roulent dans la neige, le chapeau s'envole, puis il se reconstruit
+      // trois boules de neige ; son visage regarde vers le bas du toit (vers la vue de départ).
+      // Il s'écroule : les boules roulent, le chapeau tombe, puis il se reconstruit.
       const p = chambou('bonhomme'),
         L = (a, b) => a + (b - a) * p,
-        pos = (i, ax, ay, bx, by) => [x + L(ax, bx) * s, y + L(ay, by) * s],
-        boule = ([bx, by], r, ec) => {
-          const g = c.createRadialGradient(bx - r * 0.35, by - r * 0.35, r * 0.1, bx, by, r);
+        B = [
+          [L(0, -0.02), L(0.28, 0.22), 0.3],
+          [L(0, 0.42), L(0.7, 0.21), 0.21],
+          [L(0, -0.58), L(0.98, 0.14), 0.14]
+        ],
+        rot = -p * 2.4, // la tête qui roule
+        tourne = ([a, b, cc]) => [a * Math.cos(rot) - b * Math.sin(rot), a * Math.sin(rot) + b * Math.cos(rot), cc],
+        boule = ([bx, by, r], ec = 0) => {
+          const [px, py, sc] = Q(bx, by, 0),
+            rr = r * sc,
+            g = c.createRadialGradient(px - rr * 0.35, py - rr * 0.4, rr * 0.1, px, py, rr);
           g.addColorStop(0, '#ffffff');
-          g.addColorStop(1, '#c6d3ea');
+          g.addColorStop(1, '#c3d0e8');
           c.fillStyle = g;
           c.beginPath();
-          c.ellipse(bx, by, r * (1 + ec), r * (1 - ec), 0, 0, 7);
+          c.ellipse(px, py, rr * (1 + ec), rr * (1 - ec), 0, 0, 7);
           c.fill();
         },
-        b0 = pos(0, 0, -0.28, -0.02, -0.2),
-        b1 = pos(1, 0, -0.7, 0.42, -0.21),
-        b2 = pos(2, 0, -0.98, -0.58, -0.14),
-        ch = pos(3, 0, -1.14, 0.8, -0.05),
-        dot = (px, py) => {
+        // un détail posé sur une boule (direction depuis son centre), dessiné seulement s'il est de notre côté
+        sur = ([bx, by, r], [nx, ny, nz], dessin) => {
+          if (!vu(nx, ny, nz, bx + nx * r, by + ny * r, nz * r)) return;
+          const [px, py, sc] = Q(bx + nx * r, by + ny * r, nz * r);
+          dessin(px, py, sc);
+        },
+        point = (px, py, sc) => {
+          c.fillStyle = '#1b1b22';
           c.beginPath();
-          c.arc(px, py, s * 0.018, 0, 7);
+          c.arc(px, py, Math.max(0.8, sc * 0.018), 0, 7);
           c.fill();
+        },
+        bras = (q, derriere) => {
+          const a0 = [L(q * 0.18, q * 0.95), L(0.72, 0.03), 0],
+            a1 = [L(q * 0.42, q * 1.22), L(0.88, 0.06), 0],
+            dd = prof(ob.x + a1[0], ob.z) - prof(ob.x, ob.z);
+          if (derriere != dd > 0) return;
+          const [ax, ay, sc] = Q(...a0),
+            [bx, by] = Q(...a1);
+          c.strokeStyle = '#6b4a2b';
+          c.lineWidth = Math.max(1, sc * 0.016);
+          c.beginPath();
+          c.moveTo(ax, ay);
+          c.lineTo(bx, by);
+          c.lineTo(bx + (q * sc * 0.04 * (bx > ax ? 1 : -1)) / 2, by - sc * 0.05);
+          c.stroke();
         };
-      // les bras (des bâtons), qui finissent par terre
-      c.strokeStyle = '#6b4a2b';
-      c.lineWidth = Math.max(1, s * 0.015);
-      c.beginPath();
-      c.moveTo(x + L(-0.18, -0.95) * s, y + L(-0.72, -0.03) * s);
-      c.lineTo(x + L(-0.42, -1.22) * s, y + L(-0.88, -0.06) * s);
-      c.moveTo(x + L(0.18, 1.0) * s, y + L(-0.72, -0.02) * s);
-      c.lineTo(x + L(0.4, 1.27) * s, y + L(-0.84, -0.08) * s);
-      c.stroke();
-      boule(b0, s * 0.3, p * 0.18);
-      boule(b1, s * 0.21, 0);
-      c.fillStyle = '#1b1b22';
-      dot(b1[0], b1[1] - s * 0.05);
-      dot(b1[0], b1[1] + s * 0.04);
-      dot(b0[0], b0[1] - s * 0.14);
-      // l'écharpe reste sur le corps
-      c.fillStyle = '#c0233a';
-      c.fillRect(b1[0] - s * 0.15, b1[1] - s * 0.16, s * 0.3, s * 0.06);
-      c.fillRect(b1[0] + s * 0.05, b1[1] - s * 0.16, s * 0.06, s * 0.2);
-      // la tête roule (elle tourne sur elle-même)
+      bras(-1, true);
+      bras(1, true);
+      boule(B[0], p * 0.16);
+      sur(B[0], [0, 0.45, -0.89], point);
+      boule(B[1]);
+      sur(B[1], [0, 0.25, -0.97], point);
+      sur(B[1], [0, -0.2, -0.98], point);
+      // écharpe : un anneau autour du cou et un pan qui pend
+      if (p < 0.5) {
+        const [, , sc] = Q(0, 0.86, 0);
+        c.strokeStyle = '#c0233a';
+        c.lineWidth = Math.max(1.5, sc * 0.055);
+        cercle(B[1][0], B[1][1] + 0.16, 0, 0.155, 18);
+        c.stroke();
+        const [tx, ty] = Q(B[1][0] + 0.09, B[1][1] + 0.14, -0.12),
+          [ux, uy] = Q(B[1][0] + 0.12, B[1][1] - 0.04, -0.17);
+        if (vu(0.5, 0, -0.85)) {
+          c.lineWidth = Math.max(1.5, sc * 0.05);
+          c.beginPath();
+          c.moveTo(tx, ty);
+          c.lineTo(ux, uy);
+          c.stroke();
+        }
+      }
+      boule(B[2]);
+      const yeux = [
+        [-0.38, 0.25, -0.89],
+        [0.38, 0.25, -0.89]
+      ].map(tourne);
+      yeux.forEach(n => sur(B[2], n, point));
+      // nez en carotte, qui pointe vers l'avant
+      const nb = tourne([0, 0, -1]),
+        nt = tourne([0, -0.12, -1.9]);
+      if (vu(nb[0] + 0.0001, nb[1], nb[2] + 0.35)) {
+        const [bx0, by0, sc] = Q(B[2][0] + nb[0] * B[2][2], B[2][1] + nb[1] * B[2][2], nb[2] * B[2][2]),
+          [tx0, ty0] = Q(B[2][0] + nt[0] * B[2][2], B[2][1] + nt[1] * B[2][2], nt[2] * B[2][2]);
+        c.fillStyle = '#f28c28';
+        c.beginPath();
+        c.moveTo(bx0, by0 - sc * 0.02);
+        c.lineTo(tx0, ty0);
+        c.lineTo(bx0, by0 + sc * 0.02);
+        c.closePath();
+        c.fill();
+      }
+      // chapeau haut-de-forme (un vrai cylindre)
+      const hx = L(0, 0.8),
+        hy0 = L(1.1, 0.04),
+        [hpx, hpy, hs] = Q(hx, hy0, 0),
+        [, hpt] = Q(hx, hy0 + 0.16, 0);
       c.save();
-      c.translate(b2[0], b2[1]);
-      c.rotate(-p * 2.4);
-      boule([0, 0], s * 0.14, 0);
-      c.fillStyle = '#1b1b22';
-      dot(-s * 0.05, -s * 0.03);
-      dot(s * 0.05, -s * 0.03);
-      c.fillStyle = '#f28c28';
-      c.beginPath();
-      c.moveTo(0, s * 0.01);
-      c.lineTo(s * 0.13, s * 0.03);
-      c.lineTo(0, s * 0.04);
-      c.fill();
-      c.restore();
-      // le chapeau
-      c.save();
-      c.translate(ch[0], ch[1]);
+      c.translate(hpx, hpy);
       c.rotate(p * 1.9);
+      c.translate(-hpx, -hpy);
       c.fillStyle = '#1b1b22';
-      c.fillRect(-s * 0.13, 0, s * 0.26, s * 0.04);
-      c.fillRect(-s * 0.08, -s * 0.14, s * 0.16, s * 0.15);
+      cercle(hx, hy0, 0, 0.14, 18);
+      c.fill();
+      c.fillRect(hpx - hs * 0.085, hpt, hs * 0.17, hpy - hpt);
+      cercle(hx, hy0 + 0.16, 0, 0.085, 14);
+      c.fillStyle = '#2e2e38';
+      c.fill();
+      c.fillStyle = '#c0233a';
+      c.fillRect(hpx - hs * 0.085, hpy - hs * 0.045, hs * 0.17, hs * 0.03);
       c.restore();
+      bras(-1, false);
+      bras(1, false);
     } else if (ob.t == 'cadeaux') {
-      const boite = (dx, w, hh, col, rub, ox = x, oy = y) => {
-        const bx = ox + dx * s,
-          bw = w * s,
-          bh = hh * s;
+      // de vraies boîtes : on voit le dessus et les côtés tournés vers nous, rubans et nœuds compris
+      const boite = (cx, cz, w, dd, h, an, col, rub, y0 = 0, couv = 0) => {
+        const co = Math.cos(an),
+          si = Math.sin(an),
+          pt = (u, v, yy) => [cx + u * co - v * si, yy, cz + u * si + v * co],
+          coins = [
+            [-w / 2, -dd / 2],
+            [w / 2, -dd / 2],
+            [w / 2, dd / 2],
+            [-w / 2, dd / 2]
+          ];
+        // côtés visibles, avec leur ruban vertical et horizontal
+        for (let i = 0; i < 4; i++) {
+          const a = coins[i],
+            b = coins[(i + 1) % 4],
+            mu = (a[0] + b[0]) / 2,
+            mv = (a[1] + b[1]) / 2,
+            nl = Math.hypot(mu, mv),
+            nx = (mu * co - mv * si) / nl,
+            nz = (mu * si + mv * co) / nl;
+          if (!vu(nx, 0, nz, cx + nx * 0.1, y0 + h / 2, cz + nz * 0.1)) continue;
+          const lum = 0.78 + 0.22 * (-nx * 0.5 - nz * 0.86);
+          poly(
+            [pt(a[0], a[1], y0), pt(b[0], b[1], y0), pt(b[0], b[1], y0 + h), pt(a[0], a[1], y0 + h)].map(([px, py, pz]) => [
+              ob.x + px,
+              py,
+              ob.z + pz
+            ])
+          );
+          c.fillStyle = col;
+          c.fill();
+          c.fillStyle = `rgba(0,0,0,${(1 - lum) * 0.9})`;
+          c.fill();
+          const at = (k, yy) => pt(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, yy),
+            bande = (k0, k1, ya, yb) =>
+              poly([at(k0, ya), at(k1, ya), at(k1, yb), at(k0, yb)].map(([px, py, pz]) => [ob.x + px, py, ob.z + pz]));
+          c.fillStyle = rub;
+          bande(0.44, 0.56, y0, y0 + h);
+          c.fill();
+          bande(0, 1, y0 + h * 0.5, y0 + h * 0.6);
+          c.fill();
+        }
+        // dessus (un peu de neige) et croix du ruban
+        const haut = coins.map(([u, v]) => pt(u, v, y0 + h)).map(([px, py, pz]) => [ob.x + px, py, ob.z + pz]);
+        poly(haut);
         c.fillStyle = col;
-        c.fillRect(bx - bw / 2, oy - bh, bw, bh);
-        c.fillStyle = '#00000022';
-        c.fillRect(bx + bw * 0.2, oy - bh, bw * 0.3, bh);
+        c.fill();
+        c.fillStyle = '#ffffff66';
+        c.fill();
         c.fillStyle = rub;
-        c.fillRect(bx - bw * 0.06, oy - bh, bw * 0.12, bh);
-        c.fillRect(bx - bw / 2, oy - bh * 0.55, bw, bh * 0.1);
-        c.fillStyle = '#ffffff';
-        c.fillRect(bx - bw / 2, oy - bh - s * 0.02, bw, s * 0.035);
+        [
+          [
+            [-0.06 * w, -dd / 2],
+            [0.06 * w, -dd / 2],
+            [0.06 * w, dd / 2],
+            [-0.06 * w, dd / 2]
+          ],
+          [
+            [-w / 2, -0.06 * dd],
+            [w / 2, -0.06 * dd],
+            [w / 2, 0.06 * dd],
+            [-w / 2, 0.06 * dd]
+          ]
+        ].forEach(bd => {
+          poly(bd.map(([u, v]) => pt(u, v, y0 + h + 0.002)).map(([px, py, pz]) => [ob.x + px, py, ob.z + pz]));
+          c.fill();
+        });
+        // nœud
+        if (!couv) {
+          const [nx0, ny0, sc] = Q(cx, y0 + h, cz);
+          c.fillStyle = rub;
+          [-1, 1].forEach(q => {
+            c.beginPath();
+            c.ellipse(nx0 + q * sc * 0.035, ny0 - sc * 0.025, sc * 0.04, sc * 0.025, q * 0.5, 0, 7);
+            c.fill();
+          });
+        }
       };
       // surprise : la petite boîte valdingue et un chat sort du gros cadeau rouge, monté sur ressort
       const p = chambou('cadeaux', 0.35, 0.8),
-        a = age('cadeaux');
-      boite(-0.17, 0.34, 0.32, '#2f8f5b', '#ffd166');
-      boite(0.18, 0.3, 0.42, '#c0233a', '#ffffff');
+        a = age('cadeaux'),
+        L3 = [
+          [prof(ob.x - 0.17, ob.z + 0.05), () => boite(-0.17, 0.05, 0.34, 0.3, 0.32, 0.2, '#2f8f5b', '#ffd166')],
+          [prof(ob.x + 0.18, ob.z - 0.02), () => boite(0.18, -0.02, 0.3, 0.28, 0.42, -0.15, '#c0233a', '#ffffff', 0, p > 0)],
+          [
+            prof(ob.x + 0.55 * p, ob.z - 0.2),
+            () => boite(0.55 * p, -0.2, 0.24, 0.22, 0.22, 0.5 + p * 1.57, '#3a5ab8', '#ff8fb8', 0.3 * Math.sin(p * Math.PI))
+          ]
+        ];
+      L3.sort((u, v) => v[0] - u[0]).forEach(e => e[1]());
       if (p > 0) {
-        const hh = s * 0.42 * p * (a < 4.5 ? 1 - Math.exp(-5 * a) * Math.cos(16 * a) : 1),
-          bx = x + 0.18 * s,
-          by = y - 0.42 * s;
+        const [bx, by, sc] = Q(0.18, 0.42, -0.02),
+          hh = sc * 0.42 * p * (a < 4.5 ? 1 - Math.exp(-5 * a) * Math.cos(16 * a) : 1);
         c.strokeStyle = '#9aa3b5';
-        c.lineWidth = Math.max(1, s * 0.012);
+        c.lineWidth = Math.max(1, sc * 0.012);
         c.beginPath();
         c.moveTo(bx, by);
-        for (let i = 1; i <= 8; i++) c.lineTo(bx + (i % 2 ? -1 : 1) * s * 0.05, by - (hh * i) / 8);
+        for (let i = 1; i <= 8; i++) c.lineTo(bx + (i % 2 ? -1 : 1) * sc * 0.05, by - (hh * i) / 8);
         c.stroke();
-        c.font = `${Math.round(s * 0.3)}px system-ui`;
+        c.font = `${Math.round(sc * 0.3)}px system-ui`;
         c.textAlign = 'center';
         c.textBaseline = 'middle';
-        c.fillText('🐱', bx, by - hh - s * 0.1);
+        c.fillText('🐱', bx, by - hh - sc * 0.1);
         c.textBaseline = 'alphabetic';
         if (a > 0.3 && a < 2.4) {
           c.fillStyle = '#ffffff';
-          c.font = `800 ${Math.round(Math.max(10, s * 0.11))}px system-ui`;
-          c.fillText('Miaou !', bx + s * 0.38, by - hh - s * 0.28);
+          c.font = `800 ${Math.round(Math.max(10, sc * 0.11))}px system-ui`;
+          c.fillText('Miaou !', bx + sc * 0.38, by - hh - sc * 0.28);
         }
-        // le couvercle ouvert
-        c.save();
-        c.translate(bx - s * 0.15, by);
-        c.rotate(-1.2 * p);
-        c.fillStyle = '#c0233a';
-        c.fillRect(0, -s * 0.05, s * 0.3, s * 0.05);
-        c.fillStyle = '#ffffff';
-        c.fillRect(s * 0.12, -s * 0.05, s * 0.06, s * 0.05);
-        c.restore();
       }
-      c.save();
-      c.translate(x + 0.55 * p * s, y - 0.3 * s * Math.sin(p * Math.PI));
-      c.rotate(p * 1.57);
-      boite(0.0, 0.24, 0.22, '#3a5ab8', '#ff8fb8', 0, 0);
-      c.restore();
     } else if (ob.t == 'sapin') {
       // surprise : il tremble, perd ses aiguilles (voir les éclats) et son étoile tombe, puis elle remonte
       const as = age('sapin'),
@@ -2314,25 +2450,57 @@ function mysLancer(cb, fic) {
       c.translate(x, y);
       c.rotate(sw);
       c.translate(-x, -y);
+      c.fillStyle = '#5b3a22';
+      c.fillRect(x - s * 0.06, y - s * 0.2, s * 0.12, s * 0.2);
+      // étages de branches (un cône : pareil de tous les côtés)
       for (let k = 0; k < 4; k++) {
         const w = (0.5 - k * 0.1) * s,
-          yy = y - s * (0.2 + k * 0.33);
-        c.fillStyle = k % 2 ? '#1f6b45' : '#22784d';
+          yy = y - s * (0.2 + k * 0.33),
+          g = c.createLinearGradient(x - w, 0, x + w, 0);
+        g.addColorStop(0, '#2c8a59');
+        g.addColorStop(1, '#17573a');
+        c.fillStyle = g;
         c.beginPath();
         c.moveTo(x - w, yy);
         c.lineTo(x, yy - s * 0.55);
         c.lineTo(x + w, yy);
-        c.closePath();
+        c.quadraticCurveTo(x, yy + s * 0.07, x - w, yy);
         c.fill();
         c.fillStyle = '#eef4ff';
-        c.fillRect(x - w * 0.9, yy - s * 0.015, w * 1.8, s * 0.03);
+        c.beginPath();
+        c.moveTo(x - w * 0.9, yy - s * 0.01);
+        c.quadraticCurveTo(x, yy + s * 0.05, x + w * 0.9, yy - s * 0.01);
+        c.quadraticCurveTo(x, yy + s * 0.02, x - w * 0.9, yy - s * 0.01);
+        c.fill();
       }
-      c.fillStyle = '#5b3a22';
-      c.fillRect(x - s * 0.06, y - s * 0.2, s * 0.12, s * 0.2);
-      for (let k = 0; k < 14; k++) {
-        const yy = y - s * (0.25 + (k % 7) * 0.2),
-          xx = x + Math.sin(k * 2.3) * s * (0.4 - (k % 7) * 0.05);
-        ampoule(xx, yy, Math.max(1.2, s * 0.025), COUL[k % 5], Math.sin(t * 3 + k) > -0.3);
+      // guirlande et ampoules posées sur le cône : celles de derrière sont cachées, elles tournent avec la vue
+      const surCone = (an, hh) => {
+        const r = Math.max(0.03, 0.46 * (1 - (hh - 0.2) / 1.5)) * 0.95;
+        return [Math.sin(an) * r, hh, Math.cos(an) * r, vu(Math.sin(an), 0.3, Math.cos(an), 0, hh, 0)];
+      };
+      c.strokeStyle = '#e9c45a';
+      c.lineWidth = Math.max(0.8, s * 0.012);
+      for (let g = 0; g < 2; g++) {
+        c.beginPath();
+        let on = 0;
+        for (let i = 0; i <= 60; i++) {
+          const hh = 0.3 + g * 0.08 + (i / 60) * 1.15,
+            [dx, yy, dz, v] = surCone(i * 0.42 + g * 3, hh);
+          if (!v) {
+            on = 0;
+            continue;
+          }
+          const [px, py] = Q(dx, yy, dz);
+          on ? c.lineTo(px, py) : c.moveTo(px, py);
+          on = 1;
+        }
+        c.stroke();
+      }
+      for (let k = 0; k < 22; k++) {
+        const [dx, yy, dz, v] = surCone(k * 2.39996, 0.28 + (k % 8) * 0.17);
+        if (!v) continue;
+        const [px, py] = Q(dx, yy, dz);
+        ampoule(px, py, Math.max(1.2, s * 0.025), COUL[k % 5], Math.sin(t * 3 + k) > -0.3);
       }
       c.restore();
       c.fillStyle = '#ffd76a';
@@ -2344,37 +2512,51 @@ function mysLancer(cb, fic) {
       c.fillText('★', 0, s * 0.07);
       c.restore();
     } else {
-      // l'antenne : touchée, elle se tord et fait des étincelles (et la télé du voisin grésille)
+      // l'antenne : le mât et ses barres (alignées dans le sens du toit, donc vues de biais quand on tourne).
+      // Touchée, elle se tord et fait des étincelles (et la télé du voisin grésille).
       const pa = chambou('antenne', 0.25, 1),
-        piv = y - s * ob.h * 0.45;
+        piv = ob.h * 0.45,
+        ang = pa * 0.75,
+        plie = (dx, yy) =>
+          yy <= piv ? [dx, yy] : [dx * Math.cos(ang) + (yy - piv) * Math.sin(ang), piv - dx * Math.sin(ang) + (yy - piv) * Math.cos(ang)],
+        A = (dx, yy) => {
+          const [u, v] = plie(dx, yy);
+          return Q(u, v, 0);
+        };
       c.strokeStyle = '#3c4660';
       c.lineWidth = Math.max(1.2, s * 0.03);
       c.beginPath();
-      c.moveTo(x, y);
-      c.lineTo(x, piv);
+      const m0 = A(0, 0),
+        m1 = A(0, piv),
+        m2 = A(0, ob.h);
+      c.moveTo(m0[0], m0[1]);
+      c.lineTo(m1[0], m1[1]);
+      c.lineTo(m2[0], m2[1]);
       c.stroke();
-      c.save();
-      c.translate(x, piv);
-      c.rotate(pa * 0.75);
-      c.translate(-x, -piv);
-      c.beginPath();
-      c.moveTo(x, piv);
-      c.lineTo(x, y - s * ob.h);
       for (let k = 0; k < 4; k++) {
-        const yy = y - s * (ob.h - 0.1 - k * 0.22),
-          w = s * (0.45 - k * 0.08);
-        c.moveTo(x - w, yy);
-        c.lineTo(x + w, yy);
+        const yy = ob.h - 0.1 - k * 0.22,
+          w = 0.45 - k * 0.08,
+          a0 = A(-w, yy),
+          a1 = A(w, yy),
+          n0 = A(-w, yy + 0.035),
+          n1 = A(w, yy + 0.035);
+        c.strokeStyle = '#3c4660';
+        c.lineWidth = Math.max(1, s * 0.022);
+        c.beginPath();
+        c.moveTo(a0[0], a0[1]);
+        c.lineTo(a1[0], a1[1]);
+        c.stroke();
+        c.strokeStyle = '#ffffff';
+        c.lineWidth = Math.max(1, s * 0.02);
+        c.beginPath();
+        c.moveTo(n0[0], n0[1]);
+        c.lineTo(n1[0], n1[1]);
+        c.stroke();
       }
-      c.stroke();
-      c.fillStyle = '#ffffff';
-      for (let k = 0; k < 4; k++)
-        c.fillRect(x - s * (0.45 - k * 0.08), y - s * (ob.h - 0.1 - k * 0.22) - s * 0.03, s * (0.9 - k * 0.16), s * 0.03);
       c.fillStyle = pa > 0 && Math.sin(t * 30) > 0 ? '#ffe066' : '#ff5a5f';
       c.beginPath();
-      c.arc(x, y - s * ob.h, s * 0.04, 0, 7);
+      c.arc(m2[0], m2[1], s * 0.04, 0, 7);
       c.fill();
-      c.restore();
     }
   };
   const branche = (x, y, sens, sc, t) => {
@@ -2775,14 +2957,13 @@ function mysLancer(cb, fic) {
     }
     return lisse;
   };
-  // « Y aller à pied » : la caméra recule pour voir tout le toit et Célestine marche où on touche ;
+  // « Y aller à pied » : la caméra garde l'angle de vue actuel, recule un peu et suit Célestine, qui marche où on touche ;
   // « Revenir au lancer » : la caméra se place derrière elle, et on lance dans la direction où elle regarde
   let pied = 0;
   const aPied = on => {
     if (fin || (F.vol && !F.fin)) return;
     if (on) {
-      pied = 1;
-      Object.assign(Vt, { x: 0, z: 0, yaw: 0 });
+      pied = 1; // la caméra garde l'angle actuel et suit Célestine (voir la boucle)
       if (!C) {
         C = { x: 0, z: 1.5, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, way: [{ x: 0, z: 2.6 }] };
         cible = { x: 0, z: 2.6 };
@@ -3459,7 +3640,11 @@ function mysLancer(cb, fic) {
       F.y = Y0 - (1 - F.ent) ** 2 * 0.6 + Math.sin(t * 2.2) * 0.015;
       F.al = F.ent;
     }
-    // la caméra rejoint en douceur sa place (vue d'ensemble, ou derrière Célestine)
+    // à pied, la caméra suit Célestine à 2,6 m sans changer d'angle ; elle rejoint toujours sa place en douceur
+    if (pied && C) {
+      Vt.x = C.x - Math.sin(Vt.yaw) * 2.6;
+      Vt.z = C.z - Math.cos(Vt.yaw) * 2.6;
+    }
     const kc = Math.min(1, dt * 3.5);
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
@@ -3479,7 +3664,7 @@ function mysLancer(cb, fic) {
       L.push([
         prof(F.x, F.z),
         () => {
-          if (F.z <= RIDGE) return (ombre(), fichier());
+          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier());
           // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
           c.save();
           poly([
