@@ -1755,25 +1755,6 @@ p.vc-b {
   font-size: 1.15rem;
   pointer-events: auto;
 }
-.mysl-pas {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: #2f8f5bcc;
-  border: 1px solid #ffffff44;
-  font: 800 0.78rem system-ui, sans-serif;
-  color: #fff;
-  vertical-align: middle;
-  opacity: 0;
-  transition: opacity 0.25s;
-}
-.mysl-pas.on {
-  opacity: 1;
-}
-.mysl-pas.pop {
-  animation: myslOk 0.35s ease;
-}
 .mysl-rec {
   position: absolute;
   left: 50%;

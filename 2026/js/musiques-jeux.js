@@ -1352,7 +1352,7 @@ function mysLancer(cb, fic) {
   let fc = fic; // le fichier en main (celui qu'on ouvrira s'il entre dans la cheminée)
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button><span class="mysl-pas"></span></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
   try {
     if (S.mysTrophee) o.querySelector('.mysl-n').classList.add('trophee');
   } catch (_) {}
@@ -1425,6 +1425,7 @@ function mysLancer(cb, fic) {
       S.mysTrophee = 1;
       save();
       slog('🏆', 'Fichier mystère : les 10 secrets sont trouvés !');
+      ACH('toit10'); // le succès « Reine des toits »
     } catch (_) {}
     o.querySelector('.mysl-n').classList.add('trophee');
     const d = document.createElement('div');
@@ -3238,8 +3239,10 @@ function mysLancer(cb, fic) {
         choc(0.6);
       }
     }
-    // Valentin, sur le toit d'à côté : un fichier qui arrive à hauteur de ses mains, il l'attrape au vol (une passe !)
-    // et le renvoie tout de suite ; en pleine tête ou dans les jambes, il tombe sur les fesses
+    // le tir canon de Valentin touche Célestine : elle tombe à la renverse
+    if (F.deVal && !F.sol && !C.ko && !C.chute && F.y > C.y + 0.15 && F.y < C.y + 1.85 && Math.hypot(F.x - C.x, F.z - C.z) < 0.42) return renverse();
+    // Valentin, sur le toit d'à côté : un fichier qui arrive à hauteur de ses mains, il l'attrape au vol et le renvoie
+    // aussitôt, en tir canon sur Célestine (voir valRelance) ; en pleine tête ou dans les jambes, il tombe sur les fesses
     const dv = Math.hypot(F.x - VAL.x, F.z - VAL.z),
       dispo = !VAL.tient && !VAL.renvoi && !(VAL.emote && VAL.emote.k == 'aie' && T() - VAL.emote.t < VAL.emote.d);
     if (!F.sol && !F.deVal && !fin && dispo && dv < 0.65 && F.y > VAL.base + 0.45 && F.y < VAL.base + 1.5) {
@@ -3247,9 +3250,8 @@ function mysLancer(cb, fic) {
       VAL.renvoi = { e: 'vise', t: T() - 0.25 };
       F.vol = 0;
       F.vx = F.vy = F.vz = 0;
-      passe();
       bruit('ramasse');
-      parle(VAL, ['Attrapé ! 😎', 'Je l’ai ! 🙌', 'Belle passe ! 👌'][Math.floor(Math.random() * 3)], 1.3);
+      parle(VAL, ['Attrapé ! 😎', 'Je l’ai ! 😏', 'Merci ! 😈'][Math.floor(Math.random() * 3)], 1.3);
       return;
     }
     if (!F.sol && !F.deVal && F.y > VAL.base + 0.1 && F.y < VAL.base + 1.9 && Math.hypot(F.x - VAL.x, F.z - VAL.z) < 0.36) {
@@ -3273,7 +3275,6 @@ function mysLancer(cb, fic) {
     if (!chezVal && (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9)) {
       if (F.y < 0.05 && !F.tombe) {
         F.tombe = 1;
-        casse();
         bruit('tombe');
       }
       return;
@@ -3295,8 +3296,7 @@ function mysLancer(cb, fic) {
     const sy = (chezVal ? VOISIN.h : 0) + 0.03;
     if (F.y <= sy) {
       F.y = sy;
-      // il touche la neige : fin de la série de passes, et longueur du lancer de Célestine
-      if (passes) casse();
+      // il touche la neige : longueur du lancer de Célestine
       if (F.moi && !F.touche) ((F.touche = 1), record('dist', Math.hypot(F.x - F.x0, F.z - F.z0)));
       if (F.vy < -1.4) {
         bruit('neige', Math.min(1, -F.vy / 7));
@@ -3321,6 +3321,107 @@ function mysLancer(cb, fic) {
     const [x, y] = P(F.x, F.y, F.z);
     for (let i = 0; i < 10 * k; i++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, t: 0.6, c: '#ffffff' });
   };
+  // Célestine prend le tir canon de Valentin en pleine poitrine : elle tombe à la renverse, reste sonnée un moment
+  // (des étoiles tournent au-dessus de sa tête), puis se relève et s'époussette. La caméra se met de côté pour bien voir.
+  // Le fichier rebondit sur elle et retombe à ses pieds.
+  const KO = 2.9;
+  const renverse = () => {
+    const sp = Math.hypot(F.vx, F.vz) || 1,
+      nx = F.vx / sp,
+      nz = F.vz / sp;
+    C.ko = { t: T(), n: [nx, nz], cote: (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1 };
+    Object.assign(C, { charge: 0, pTir: null, glisse: 0, emote: null, ange: 0, idle: 0, phi: Math.atan2(-nx, -nz) });
+    btn.classList.remove('on');
+    btn.style.setProperty('--p', 0);
+    Object.assign(F, { deVal: 0, ko: 1, vx: -nx * 0.8, vz: -nz * 0.8, vy: 2.6, va: 14 });
+    bruit('aie');
+    bruit('brique', 0.8);
+    choc(2.5);
+    parle(C, 'Ouf ! 😵', 0.9);
+    parle(VAL, ['Hahaha ! 😂', 'Strike ! 🎳', 'Oups… désolé ! 😇'][Math.floor(Math.random() * 3)], 2.2);
+    tip.textContent = '';
+  };
+  const ko = dt => {
+    const K = C.ko,
+      d = T() - K.t,
+      [nx, nz] = K.n;
+    C.v = 0;
+    C.amp = 0;
+    C.lean = 0;
+    C.pen *= 0.9;
+    C.idle = 0;
+    // elle recule en tombant (elle glisse sur la neige), sans quitter le toit ni traverser un obstacle
+    if (d < 0.75) {
+      const sp = 2.6 * Math.max(0, 1 - d / 0.75) * dt,
+        x = C.x + nx * sp,
+        z = C.z + nz * sp;
+      if (
+        Math.abs(x) < 8.4 &&
+        z > BORD + 0.4 &&
+        z < RIDGE - 0.4 &&
+        !(Math.abs(x) < CX + 0.35 && Math.abs(z - CZ) < CD + 0.35) &&
+        !OBS.some(ob => Math.hypot(x - ob.x, z - ob.z) < rayon(ob, 0.3) + 0.35)
+      )
+        ((C.x = x), (C.z = z));
+    }
+    if (d > 0.55 && !K.boum) {
+      // badaboum dans la neige
+      K.boum = 1;
+      bruit('boum');
+      bruit('neige', 1);
+      const [x, y] = P(C.x + nx * 0.4, 0.2, C.z + nz * 0.4);
+      for (let j = 0; j < 30; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 240, vy: -Math.random() * 200, t: 0.9, c: j % 3 ? '#ffffff' : '#cfe0ff' });
+      parle(C, ['Aïe… 😵‍💫', 'Ouille ! 🤕', 'J’ai vu des étoiles… ✨'][Math.floor(Math.random() * 3)], 1.4);
+    }
+    if (d > 2.45 && !K.dit) {
+      K.dit = 1;
+      parle(C, ['Tu vas voir ! 😤', 'Même pas mal ! 😝', 'Revanche ! 💪'][Math.floor(Math.random() * 3)], 1.6);
+    }
+    if (d > KO) C.ko = 0;
+  };
+  // les étoiles qui tournent au-dessus de sa tête pendant qu'elle est sonnée
+  // le tir canon de Valentin laisse des traits de vitesse derrière le fichier
+  const trainee = () => {
+    if (!F.deVal || F.sol) return;
+    const [x, y, , d] = P(F.x, F.y, F.z);
+    if (d < 0.3) return;
+    c.lineCap = 'round';
+    for (let i = -1; i <= 1; i++) {
+      const [x2, y2] = P(F.x - F.vx * 0.06, F.y - F.vy * 0.06 + i * 0.07, F.z - F.vz * 0.06);
+      const g = c.createLinearGradient(x, y, x2, y2);
+      g.addColorStop(0, '#ffffffcc');
+      g.addColorStop(1, '#ffffff00');
+      c.strokeStyle = g;
+      c.lineWidth = i ? 2 : 3.5;
+      c.beginPath();
+      c.moveTo(x, y + i * 4);
+      c.lineTo(x2, y2);
+      c.stroke();
+    }
+  };
+  const etoilesKO = t => {
+    const K = C.ko,
+      d = T() - K.t;
+    if (d < 0.6 || d > 2) return;
+    const [nx, nz] = K.n,
+      [x0, y0, sc, dd] = P(C.x, C.y + 0.2, C.z),
+      [x1] = P(C.x + nx, C.y + 1, C.z + nz),
+      [x2] = P(C.x, C.y + 1, C.z),
+      s = x1 >= x2 ? 1 : -1,
+      hx = x0 + s * 0.78 * sc, // sa tête, à l'écran (elle est tombée dans le sens du tir)
+      hy = y0 - 0.08 * sc,
+      al = Math.min(1, (d - 0.6) / 0.2, (2 - d) / 0.2);
+    if (dd < 0.3) return;
+    c.globalAlpha = al;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.font = `${Math.max(12, sc * 0.13)}px system-ui,sans-serif`;
+    for (let i = 0; i < 4; i++) {
+      const a = t * 4 + (i * Math.PI) / 2;
+      c.fillText(i % 2 ? '💫' : '⭐', hx + Math.cos(a) * sc * 0.2, hy - sc * 0.12 + Math.sin(a) * sc * 0.06);
+    }
+    c.globalAlpha = 1;
+  };
   const entre = () => {
     if (!vis.ok) return recrache(); // ce n'est pas le fichier mystère : la cheminée n'en veut pas
     if (!F.in) bruit('entre');
@@ -3331,12 +3432,8 @@ function mysLancer(cb, fic) {
     if (fin) return;
     fin = 1;
     // les records sont annoncés après le replay (voir fete)
-    const passesFin = passes,
-      distFin = F.moi ? Math.hypot(F.x - F.x0, F.z - F.z0) : 0;
-    passes = 0;
-    majPasses();
+    const distFin = F.moi ? Math.hypot(F.x - F.x0, F.z - F.z0) : 0;
     fete.recs = () => {
-      if (passesFin) record('passes', passesFin);
       if (distFin) (record('dist', distFin), record('reussi', distFin));
       if (lancers) record('lancers', lancers);
     };
@@ -3383,7 +3480,6 @@ function mysLancer(cb, fic) {
   // un mauvais fichier (pas le fichier mystère) : le feu s'étouffe et le recrache, noirci et fumant, vers Célestine
   const recrache = () => {
     vis.noir = 1;
-    casse();
     const dx = C.x,
       dz = C.z - CZ,
       n = Math.hypot(dx, dz) || 1,
@@ -3473,6 +3569,27 @@ function mysLancer(cb, fic) {
   // → baby freeze (pose figée penchée) → saut périlleux pour se relever → bras en l'air avec des cœurs
   const DANSE = 8;
   const danse = () => {
+    if (C.ko) {
+      // à la renverse (voir renverse) : elle bascule dans le sens du tir, rebondit, reste étalée, puis se relève
+      const d = T() - C.ko.t,
+        [nx, nz] = C.ko.n,
+        L = (a, b, k) => a + (b - a) * k * k * (3 - 2 * k),
+        [x1] = P(C.x + nx, C.y + 1, C.z + nz),
+        [x0] = P(C.x, C.y + 1, C.z),
+        s = x1 >= x0 ? 1 : -1; // de quel côté de l'écran elle part
+      if (d < 0.12) return { e: 'ko', d, rot: s * 0.3 * (d / 0.12), ecart: 0, mx: 0 };
+      if (d < 0.55) {
+        const k = (d - 0.12) / 0.43;
+        return { e: 'ko', d, rot: s * (0.3 + (Math.PI / 2 - 0.3) * k * k), ecart: 12 * k, mx: 0, saut: Math.sin(k * Math.PI) * 24 };
+      }
+      if (d < 0.75) return { e: 'ko', d, rot: (s * Math.PI) / 2, ecart: 14, mx: 0, saut: Math.sin(((d - 0.55) / 0.2) * Math.PI) * 7 }; // petit rebond
+      if (d < 1.95) return { e: 'ko', d, rot: (s * Math.PI) / 2, ecart: 14 + 3 * Math.sin(d * 3), mx: 0 };
+      if (d < 2.45) {
+        const k = (d - 1.95) / 0.5;
+        return { e: 'releve', d, rot: s * L(Math.PI / 2, 0, k), ecart: 14 * (1 - k), mx: 0, saut: Math.sin(k * Math.PI) * 10 };
+      }
+      return { e: 'secoue', d, rot: Math.sin(d * 22) * 0.06 * (KO - d), ecart: 0, mx: 0 };
+    }
     if (C.ange) {
       // l'ange dans la neige : elle se laisse tomber sur le dos, bat des bras et des jambes, puis se relève
       const d = T() - C.ange,
@@ -3633,6 +3750,12 @@ function mysLancer(cb, fic) {
     if (dz) {
       const w = Math.sin(dz.d * 7);
       switch (dz.e) {
+        case 'ko': // bras projetés vers l'avant au choc, puis en croix dans la neige
+          return dz.d < 0.55 ? pose2(bA(1, 1.2, 1.2, 0.25), bA(-1, 1.2, 1.2, 0.25)) : pose2(bA(1, 0.1, 1.5 + 0.1 * w, 0.1), bA(-1, 0.1, 1.5 - 0.1 * w, 0.1));
+        case 'releve': // elle pousse sur ses mains pour se relever
+          return pose2(bA(1, -0.4, 0.5, 0.6), bA(-1, -0.4, 0.5, 0.6));
+        case 'secoue': // elle s'époussette
+          return pose2(bA(1, 0.6 + 0.3 * w, 0.3, 1.2), bA(-1, 0.6 - 0.3 * w, 0.3, 1.2));
         case 'ange': {
           // allongée dans la neige : les bras balaient de la hanche jusqu'au-dessus de la tête
           const k = ((dz.bat || 0) + 1) / 2;
@@ -3858,6 +3981,7 @@ function mysLancer(cb, fic) {
   };
   const marche = dt => {
     if (C.chute) return chute(dt);
+    if (C.ko) return ko(dt);
     saut(dt);
     const dz = danse();
     if (dz) {
@@ -3997,16 +4121,6 @@ function mysLancer(cb, fic) {
       C.ange = 0;
       btn.classList.remove('on');
       btn.style.setProperty('--p', 0);
-    }
-    // le fichier renvoyé par Valentin arrive sur elle : elle l'attrape au vol
-    if (!C.tient && !C.chute && F.vol && F.deVal && !F.sol && F.y > C.y + 0.3 && F.y < C.y + 2 && Math.hypot(F.x - C.x, F.z - C.z) < 0.6) {
-      C.tient = 1;
-      F.deVal = 0;
-      passe();
-      geste(C, 'touche', 0.4);
-      parle(C, ['Attrapé ! 🙌', 'Merci ! 😘', 'Je l’ai ! 😄'][Math.floor(Math.random() * 3)], 1.4);
-      bruit('ramasse');
-      tip.textContent = '';
     }
     // elle ramasse le fichier en passant dessus
     if (!C.tient && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
@@ -4908,7 +5022,7 @@ function mysLancer(cb, fic) {
     if (!R && !occupe && !fin && F.vol && F.sol && !F.in && !F.tombe && surVoisin(F.x, F.z)) {
       VAL.renvoi = { e: 'cherche', t: T() };
       parle(VAL, ['Oh ! Pour moi ? 😏', 'Raté ! Je te le renvoie 😆', 'Attends, je l’ai ! 🏃'][Math.floor(Math.random() * 3)], 1.6);
-      tip.textContent = 'Valentin va te le renvoyer… attrape-le ! 🙌';
+      tip.textContent = '😈 Valentin prépare un tir canon… esquive !';
       return true;
     }
     if (!R) return false;
@@ -4935,22 +5049,22 @@ function mysLancer(cb, fic) {
       const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
       VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 6);
       // il attend que Célestine soit bien sur ses pieds, sur le toit
-      if (T() - R.t > 0.6 && !C.chute && !C.danse && !C.ange && C.y <= 0.01) {
+      if (T() - R.t > 0.6 && !C.chute && !C.danse && !C.ange && !C.ko && C.y <= 0.01) {
         geste(VAL, 'lance', 0.9);
-        parle(VAL, ['Attrape ! 😘', 'Tiens ! 🎁', 'Hop ! 💨'][Math.floor(Math.random() * 3)], 1.4);
+        parle(VAL, ['Attention ! 😈', 'Tir canon ! 💥', 'Prends ça ! 😆'][Math.floor(Math.random() * 3)], 1.4);
         Object.assign(R, { e: 'lance', t: T() });
       }
     } else if (R.e == 'lance' && T() - R.t > 0.4) {
-      // il le lâche en fin de geste : en cloche, droit sur Célestine (à hauteur de ses mains)
+      // il le lâche en fin de geste : un tir canon presque à plat (17 m/s), droit sur la poitrine de Célestine
       VAL.tient = 0;
       VAL.renvoi = null;
       const x0 = F.x,
         y0 = F.y,
         z0 = F.z,
         tx = C.x,
-        ty = C.y + 1.05,
+        ty = C.y + 1.1,
         tz = C.z,
-        TT = 0.7 + Math.hypot(tx - x0, tz - z0) * 0.06;
+        TT = Math.max(0.25, Math.hypot(tx - x0, tz - z0) / 17);
       F = {
         deVal: 1,
         x: x0,
@@ -4960,7 +5074,7 @@ function mysLancer(cb, fic) {
         vy: (ty - y0 + 0.5 * G * TT * TT) / TT,
         vz: (tz - z0) / TT,
         a: F.a || 0,
-        va: (Math.random() - 0.5) * 4,
+        va: (Math.random() < 0.5 ? -1 : 1) * 26, // il tourne sur lui-même à toute vitesse
         vol: 1,
         in: 0,
         sol: 0,
@@ -4970,7 +5084,7 @@ function mysLancer(cb, fic) {
         ent: 1,
         tombe: 0
       };
-      bruit('lance', 0.5);
+      bruit('lance', 1);
       return false;
     }
     return true;
@@ -5046,7 +5160,7 @@ function mysLancer(cb, fic) {
       }
     }
   };
-  /* ===================== boîte aux lettres, passes, records, chat de la cheminée, pigeons, replay ===================== */
+  /* ===================== boîte aux lettres, records, chat de la cheminée, pigeons, replay ===================== */
   // --- la boîte aux lettres : tout près, un bouton ouvre le sélecteur de fichiers du téléphone (photos, fichiers, appareil photo…)
   const BOITE = OBS.find(ob => ob.t == 'boite'),
     BOITE_PRES = 1.15,
@@ -5055,7 +5169,6 @@ function mysLancer(cb, fic) {
     if (!g || fin || C.chute) return;
     fc = g;
     apparence(g);
-    casse();
     // Valentin lâche l'ancien fichier s'il l'avait (il retourne à sa place)
     if (VAL.tient || VAL.renvoi) ((VAL.tient = 0), (VAL.renvoi = { e: 'retour', t: T() }));
     nouveau();
@@ -5071,33 +5184,12 @@ function mysLancer(cb, fic) {
   const boiteMaj = () =>
     boiteEl.classList.toggle('on', !fin && !RP && !C.chute && Math.hypot(C.x - BOITE.x, C.z - BOITE.z) < BOITE_PRES);
 
-  // --- les passes avec Valentin : chaque fichier attrapé au vol compte, la série s'arrête quand il touche la neige
-  let passes = 0,
-    lancers = 0;
-  const pasEl = o.querySelector('.mysl-pas');
-  const majPasses = () => {
-    pasEl.textContent = passes ? `🤝 ${passes} passe${passes > 1 ? 's' : ''}` : '';
-    pasEl.classList.toggle('on', passes > 0);
-  };
-  const passe = () => {
-    passes++;
-    majPasses();
-    pasEl.classList.remove('pop');
-    void pasEl.offsetWidth;
-    pasEl.classList.add('pop');
-  };
-  const casse = () => {
-    if (passes) record('passes', passes);
-    passes = 0;
-    majPasses();
-  };
-
-  // --- les records (gardés dans S.mysRec) : moins de lancers pour livrer, plus long lancer, plus de passes
+  let lancers = 0; // nombre de lancers de Célestine (pour le record « livré en le moins de lancers »)
+  // --- les records (gardés dans S.mysRec) : moins de lancers pour livrer, plus long lancer, plus long lancer réussi
   const REC = {
     lancers: { t: 'Livré en le moins de lancers', u: n => `${n} lancer${n > 1 ? 's' : ''}`, mieux: (a, b) => a < b },
     dist: { t: 'Plus long lancer', u: n => `${n.toFixed(1).replace('.', ',')} m`, mieux: (a, b) => a > b + 0.05 },
     reussi: { t: 'Plus long lancer réussi', u: n => `${n.toFixed(1).replace('.', ',')} m`, mieux: (a, b) => a > b + 0.05 },
-    passes: { t: 'Plus de passes avec Valentin', u: n => `${n} passe${n > 1 ? 's' : ''}`, mieux: (a, b) => a > b }
   };
   const recs = () => {
     try {
@@ -6539,8 +6631,8 @@ function mysLancer(cb, fic) {
           F.pose = 1;
           // sur le toit de Valentin, c'est lui qui va le chercher ; renvoyé par lui et pas attrapé : pas un raté
           if (surVoisin(F.x, F.z)) F.deVal = 0;
-          else if (F.deVal) ((F.deVal = 0), (tip.textContent = 'Raté la réception ! Va le ramasser 😉'));
-          else if (!F.noirT) aide(); // recraché par la cheminée : le message du Père Noël reste affiché
+          else if (F.deVal) ((F.deVal = 0), (tip.textContent = 'Esquivé ! 😎 Va ramasser le fichier'));
+          else if (!F.noirT && !F.ko) aide(); // recraché par la cheminée ou renvoyé par Valentin : ce n’est pas un raté
         }
         if (F.tombe) {
           F.al -= dt * 3;
@@ -6552,8 +6644,18 @@ function mysLancer(cb, fic) {
     const K = C.chute,
       dc = K ? T() - K.t : 0;
     let cible = { yaw: ctl.yaw, h: 0, p: 0, kx: 6, kh: 6 };
-    const rp = replay(dt); // le replay du tir gagnant prend la main sur la caméra
-    if (K && dc < 1.15) {
+    const rp = replay(dt), // le replay du tir gagnant prend la main sur la caméra
+      KOc = C.ko && T() - C.ko.t < KO - 0.3;
+    if (KOc) {
+      // à la renverse : la caméra se met de côté pour bien la voir tomber, puis se relever
+      const [nx, nz] = C.ko.n,
+        q = C.ko.cote,
+        mx = C.x + nx * 0.45,
+        mz = C.z + nz * 0.45,
+        cx = mx - nz * q * 3,
+        cz = mz + nx * q * 3;
+      cible = { x: cx, z: cz, yaw: Math.atan2(mx - cx, mz - cz), h: -1.2, p: 0.14, kx: 5, kh: 5 };
+    } else if (K && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
         q = (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1,
@@ -6578,7 +6680,7 @@ function mysLancer(cb, fic) {
     Vt.z = cible.z != null ? cible.z : C.z - Math.cos(Vt.yaw) * 2.6;
     const kc = Math.min(1, dt * cible.kx),
       kh = Math.min(1, dt * cible.kh);
-    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K ? 4 : 14));
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K || KOc ? 4 : 14));
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
     V.h += (cible.h - V.h) * kh;
@@ -6623,7 +6725,7 @@ function mysLancer(cb, fic) {
       L.push([
         prof(F.x, F.z),
         () => {
-          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier(), F.pose && !VAL.renvoi && fleche(t));
+          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), trainee(), fichier(), F.pose && !VAL.renvoi && fleche(t));
           // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
           c.save();
           poly([
@@ -6638,6 +6740,7 @@ function mysLancer(cb, fic) {
         }
       ]);
     L.push([prof(C.x, C.z), () => celestine(t)]);
+    if (C.ko) L.push([prof(C.x, C.z) - 0.02, () => etoilesKO(t)]);
     if (!sous) {
       L.push([prof(VAL.x, VAL.z), () => dessineValentin(t)]);
       boules.forEach(b => L.push([prof(b.x, b.z), () => dessinBoule(b)]));

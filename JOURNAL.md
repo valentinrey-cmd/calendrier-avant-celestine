@@ -3,6 +3,19 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fichier mystère : tir canon de Valentin, Célestine tombe à la renverse, succès « Reine des toits »
+- **Nouveau succès** « 🏠 Reine des toits » (difficile, catégorie Secrets) : trouver les 10 secrets du toit dans la scène du fichier mystère. Il se débloque au moment où le 10e secret est trouvé (ou au prochain contrôle des succès si le trophée était déjà gagné). Fichier : `succes.js`.
+- **Plus de passes** : le compteur « 🤝 passes », son record et Célestine qui attrape le fichier au vol sont supprimés (code, style, traduction). L'ancien record des passes reste dans la sauvegarde mais n'est plus affiché.
+- **Tir canon de Valentin** :
+  - Quand le fichier arrive chez lui (attrapé au vol ou ramassé sur son toit), Valentin ne fait plus de passe. Il le renvoie presque à plat, à 17 m/s, droit sur la poitrine de Célestine, en le faisant tourner à toute vitesse, avec des traits de vitesse derrière.
+  - Il prévient : « Attention ! 😈 », « Tir canon ! 💥 » ou « Prends ça ! 😆 ». Le message en haut dit « 😈 Valentin prépare un tir canon… esquive ! ». Si elle s'est écartée : « Esquivé ! 😎 Va ramasser le fichier ».
+- **Célestine tombe à la renverse** si elle est touchée :
+  - « Ouf ! 😵 » et Valentin rigole (« Hahaha ! 😂 », « Strike ! 🎳 »…). Elle bascule en arrière en reculant sur la neige, rebondit (bruit, gerbe de neige), puis reste étalée bras en croix avec des étoiles ⭐💫 qui tournent au-dessus de sa tête (« Aïe… 😵‍💫 »).
+  - Elle se relève en poussant sur ses mains, s'époussette et lance « Tu vas voir ! 😤 » (ou « Même pas mal ! 😝 », « Revanche ! 💪 »).
+  - Pendant ces 2,9 s, la caméra se met de côté pour bien la voir tomber, et on ne la dirige plus. Le fichier rebondit sur elle et retombe à ses pieds, et ça ne compte pas comme un raté.
+- Version : 1795735686
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/succes.js`, `2026/js/langue-anglais.js`, `2026/css/06-boss-playlist.css`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-26 · Fichier mystère : on monte sur le toit les mains vides, pigeons et replay refaits, record du plus long lancer réussi
 - **Ouvrir le fichier mystère** (menu de démarrage, Paramètres, Trésors) n'ouvre plus le sélecteur de fichiers : on arrive directement sur le toit, les mains vides. Un message dit « 📮 Va prendre le fichier dans la boîte aux lettres ! » et une flèche rose rebondit au-dessus de la boîte jusqu'à ce qu'un fichier soit pris. Le texte de l'écran « Avant de commencer… » l'explique aussi. L'ancien `mysOpen()` et les champs de fichier cachés sont supprimés.
 - **Pigeons refaits** :
