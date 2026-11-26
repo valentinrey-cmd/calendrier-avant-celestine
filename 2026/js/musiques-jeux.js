@@ -1322,7 +1322,7 @@ function mysLancer(cb, fic) {
       S.mysSec = S.mysSec || {};
       neuf = !S.mysSec[k];
       S.mysSec[k] = 1;
-      n = Object.keys(S.mysSec).length;
+      n = Object.keys(S.mysSec).filter(q => SECRETS[q]).length; // seuls les secrets qui existent encore comptent
       if (neuf) {
         save();
         slog('🥚', `Fichier mystère : surprise « ${k} » trouvée (${n}/5)`);
@@ -1885,13 +1885,13 @@ function mysLancer(cb, fic) {
       }
     });
   };
-  // le traîneau du Père Noël survole le toit toutes les 11 s, juste devant les maisons (sauf s'il vient de s'écraser)
-  const TY = 1.9, // son altitude
+  // le traîneau du Père Noël survole le toit toutes les 13 s, lentement, juste devant les maisons (sauf s'il vient de s'écraser)
+  const TY = 1.75, // son altitude
     TZ = 7.6, // sa profondeur
     TL = 110; // sa longueur dans le dessin
   const traineauPos = t => {
     if (age('traineau') < DUREE.traineau) return null;
-    const k = (t % 11) / 8;
+    const k = (t % 13) / 10;
     if (k > 1) return null;
     return { x: 6.5 - k * 13, y: TY + Math.sin(k * 6) * 0.12 };
   };
@@ -1900,8 +1900,8 @@ function mysLancer(cb, fic) {
     c.translate(x, y);
     c.scale(sc, sc);
     c.rotate(rot);
-    c.fillStyle = '#0a1230';
     for (let r = 0; r < 4; r++) {
+      c.fillStyle = '#7a4e2c';
       const rx = -20 - r * 22,
         ry = Math.sin(t * 8 + r) * 2;
       c.beginPath();
@@ -1911,12 +1911,23 @@ function mysLancer(cb, fic) {
       c.fillRect(rx + 4, ry, 1.6, 6);
       c.fillRect(rx - 8, ry - 7, 2, 6);
       c.beginPath();
+      c.ellipse(rx - 10, ry - 7.5, 3.2, 2, -0.2, 0, 7);
+      c.fill();
+      c.fillStyle = '#d9b98a';
+      c.beginPath();
       c.moveTo(rx - 9, ry - 7);
       c.lineTo(rx - 13, ry - 11);
       c.lineTo(rx - 7, ry - 9);
       c.fill();
+      if (r == 3) {
+        // Rudolph et son nez rouge
+        c.fillStyle = '#ff3b3b';
+        c.beginPath();
+        c.arc(rx - 13, ry - 7, 1.4, 0, 7);
+        c.fill();
+      }
     }
-    c.strokeStyle = '#0a1230';
+    c.strokeStyle = '#e0b84a';
     c.lineWidth = 0.8;
     c.beginPath();
     c.moveTo(-16, 0);
@@ -1939,8 +1950,8 @@ function mysLancer(cb, fic) {
     c.fill();
     c.restore();
   };
-  // longueur du traîneau en mètres (rennes compris) : 4 m, dont 0,7 m de traîneau à droite
-  const traineauEchelle = s => (s * 4) / TL;
+  // longueur du traîneau en mètres (rennes compris) : 4,6 m, dont 0,8 m de traîneau à droite
+  const traineauEchelle = s => (s * 4.6) / TL;
   const traineau = (t, dt) => {
     const tp = traineauPos(t);
     if (tp) {
@@ -2384,7 +2395,7 @@ function mysLancer(cb, fic) {
     });
     // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
     const tp = traineauPos(T());
-    if (tp && Math.abs(F.z - TZ) < 0.45 && F.y > tp.y - 0.35 && F.y < tp.y + 0.4 && F.x > tp.x - 3.5 && F.x < tp.x + 0.7) {
+    if (tp && Math.abs(F.z - TZ) < 0.6 && F.y > tp.y - 0.4 && F.y < tp.y + 0.55 && F.x > tp.x - 4 && F.x < tp.x + 0.8) {
       surprise('traineau', tp);
       F.vz = -Math.abs(F.vz) * 0.35;
       F.vy = Math.min(F.vy, 0) * 0.5;
