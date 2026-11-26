@@ -3,6 +3,11 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · CLAUDE.md : repères de la scène « Lancer » du fichier mystère
+- Ajout d'une ligne dans le tableau « Où mettre le code » qui indique où se trouve chaque partie de la scène (caméra, personnage, bras, poses, chute, ville, Valentin, secrets…). Rien ne change pour Célestine.
+- Version : 1795719354
+- Fichiers : `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-26 · Fichier mystère : vrais bras articulés, poses refaites, chute en vraie 3D dans la rue
 - **Bras articulés** : chaque bras a maintenant une épaule fixe, un bras et un avant-bras de longueur fixe. Le coude est calculé automatiquement (comme dans les jeux vidéo), et la main et le coude sont repoussés hors du buste et de la tête. Les bras ne traversent plus le corps. Le haut du bras, l'avant-bras et la main sont dessinés chacun à sa profondeur : un bras derrière le dos est caché par le corps, un bras devant passe par-dessus.
 - **Poses refaites avec ce squelette** : marche (balancier opposé aux jambes), course (coude plié, grand balancier de l'épaule, plus de « T-rex »), respiration à l'arrêt, tir façon basket (fichier au-dessus du front, bras qui se tend), ramassage, glissade bras écartés, emotes (salut de l'avant-bras, bisou, disco, bras croisés), danse de victoire (toprock, moonwalk, bras en croix au sol, mains au sol tête en bas, freeze main sur la hanche, salto bras repliés, bras en V), ange dans la neige, et les gestes de Valentin.
