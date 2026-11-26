@@ -3225,9 +3225,7 @@ window.TRADUCTIONS_EN = {
   'Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.': '×8 enlargement of the tray, in the background of the 7:51 selfie.',
   'Livraison spéciale': 'Special delivery',
   'Livré': 'Delivered',
-  'Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.': 'Swipe up to throw the file down the chimney.',
   'Presque ! Réessaie 😉': 'Almost! Try again 😉',
-  'Un geste franc vers le haut, droit sur la cheminée ⬆️': 'A firm swipe up, straight at the chimney ⬆️',
   'Ho ho ho ! 🎅 Bien reçu !': 'Ho ho ho! 🎅 Got it!',
   'Le bonhomme de neige s’écroule ! ⛄': 'The snowman falls apart! ⛄',
   'Le sapin perd ses aiguilles ! 🎄': 'The tree is losing its needles! 🎄',
@@ -3239,7 +3237,6 @@ window.TRADUCTIONS_EN = {
   'Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).': 'Download it with the first button (it’s quite big: wait until the download is complete).',
   'Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.': 'Come back here, tap the second button and pick it from your downloads.',
   '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
-  '🚶 Y aller à pied': '🚶 Go on foot',
-  '🎯 Revenir au lancer': '🎯 Back to throwing',
-  'Touche le toit pour la faire marcher. Reviens au lancer : tu lanceras d’où elle est, dans la direction où elle regarde.': 'Tap the roof to make her walk. Go back to throwing: you’ll throw from where she stands, in the direction she’s facing.'
+  'Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !': 'Joystick to walk, slide your finger to turn the view. Hold “Throw” and let go at the right moment!',
+  'Tourne la vue pile vers la cheminée et relâche au bon moment 🎯': 'Turn the view right toward the chimney and let go at the right moment 🎯'
 };

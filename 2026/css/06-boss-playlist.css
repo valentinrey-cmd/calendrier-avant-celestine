@@ -1557,20 +1557,78 @@ p.vc-b {
     opacity: 0;
   }
 }
-.mysl-pass {
+.mysl-joy {
+  position: absolute;
+  left: 22px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff10 0 55%, #ffffff26 56% 100%);
+  border: 2px solid #ffffff66;
+  box-shadow:
+    0 6px 20px #0005,
+    inset 0 0 18px #0003;
+  touch-action: none;
+  backdrop-filter: blur(2px);
+}
+.mysl-joy i {
   position: absolute;
   left: 50%;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-  transform: translateX(-50%);
-  display: none;
-  width: auto;
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  background: #0b1430b3;
-  color: #fff;
-  border: 1px solid #ffffff55;
-  box-shadow: 0 4px 14px #0005;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #d9e2f2);
+  box-shadow: 0 4px 12px #0006;
+  transition: transform 0.12s;
 }
-.mysl-pass.on {
-  display: block;
+.mysl-joy.on i {
+  transition: none;
+}
+.mysl-lance {
+  --p: 0;
+  position: absolute;
+  right: 22px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 62px);
+  width: 104px;
+  height: 104px;
+  padding: 0;
+  border-radius: 50%;
+  border: 0;
+  background: conic-gradient(from 200deg, #7ee08a 0turn, #ffd76a calc(var(--p) * 0.55turn), #ff6b6b calc(var(--p) * 0.9turn), #ffffff22 0);
+  box-shadow: 0 6px 20px #0006;
+  color: #fff;
+  font: 800 1rem system-ui, sans-serif;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mysl-lance b {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff9cbc, #d6467a);
+  border: 2px solid #ffffffaa;
+}
+.mysl-lance i {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M12 3l7 8h-4v9H9v-9H5z'/%3E%3C/svg%3E");
+}
+.mysl-lance span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 54px;
+  text-align: center;
+}
+.mysl-lance.on b {
+  transform: scale(0.94);
 }

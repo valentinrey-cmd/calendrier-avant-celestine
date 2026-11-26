@@ -3,6 +3,18 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : commandes de jeu (joystick, vue au doigt, jauge de lancer)
+- Un seul mode, avec des commandes de jeu classiques. Les boutons « Y aller à pied » / « Revenir au lancer », le geste de glisser vers le haut, la marche au toucher (et son calcul de chemin), la marque dans la neige et la main qui montrait le geste sont supprimés.
+  - Célestine est toujours là, le fichier à la main, et la caméra la suit 2,6 m derrière elle.
+  - Joystick en bas à gauche pour la faire marcher : vers le haut = droit devant, par rapport à la vue.
+  - Glisser le doigt (ou la souris) ailleurs sur l'écran fait tourner la vue autour d'elle.
+  - Bouton rond « Lancer » en bas à droite : on le maintient, elle arme le bras au-dessus de l'épaule en se tournant dans le sens de la vue, et la jauge de force (anneau vert → jaune → rouge) monte puis redescend. On relâche pour lancer droit devant.
+  - Sur ordinateur : flèches ou ZQSD / WASD pour marcher, souris pour la vue, barre d'espace maintenue pour lancer.
+- Réglages : jauge remplie en 2,4 s, force de 3,6 à 8 m/s, lancer à 48°. Depuis le départ, la bonne force tient sur environ 0,3 s de la jauge.
+- Après un lancer raté, un nouveau fichier revient dans sa main.
+- Version 1795708892
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : objets en vrai volume, la caméra garde l'angle à pied
 - Les objets du toit ne se tournent plus vers la caméra :
   - le bonhomme de neige a un devant et un dos (yeux, nez en carotte, boutons et pan d'écharpe seulement du côté visage ; chapeau haut-de-forme en vrai cylindre ; bras orientés) ;

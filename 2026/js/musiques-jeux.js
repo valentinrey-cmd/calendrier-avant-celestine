@@ -1264,7 +1264,7 @@ function mysLancer(cb, fic) {
   }
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass on">🚶 Y aller à pied</button>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><button class="mysl-lance"><b><i></i></b><span>Lancer</span></button>`;
   document.body.appendChild(o);
   // les bruitages et la musique (sauf si le son est coupé dans les paramètres)
   let son = null;
@@ -1289,7 +1289,8 @@ function mysLancer(cb, fic) {
   const cv = o.querySelector('canvas'),
     c = cv.getContext('2d'),
     tip = o.querySelector('.mysl-tip'),
-    pass = o.querySelector('.mysl-pass');
+    joy = o.querySelector('.mysl-joy'),
+    btn = o.querySelector('.mysl-lance');
   // --- monde ---
   const CAM = 2.9, // hauteur de la caméra
     CZ = 6, // profondeur de la cheminée
@@ -1299,10 +1300,13 @@ function mysLancer(cb, fic) {
     OX = 0.47, // demi-ouverture (x)
     OZ = 0.32, // demi-ouverture (z)
     G = 9,
-    Z0 = 0.85,
-    Y0 = 2.15,
-    ANG = (52 * Math.PI) / 180; // angle du lancer
-  let W, H, dpr, f, hy, F, drag, hist, rate, fin, raf, t0, idle, fumees, flocons, etoiles, ville, voisins, eclats;
+    ANG = (48 * Math.PI) / 180, // angle du lancer
+    VMIN = 3.6, // force du lancer : jauge vide…
+    VMAX = 8, // … et pleine
+    REMPLI = 2.4; // secondes pour remplir la jauge
+  let W, H, dpr, f, hy, F, rate, fin, raf, t0, fumees, flocons, etoiles, ville, voisins, eclats;
+  // Célestine (le personnage qu'on dirige) : elle tient le fichier tant qu'elle ne l'a pas lancé
+  let C = { x: 0, z: 2.6, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, charge: 0, lanceT: -9 };
   // obstacles posés sur le toit : le fichier bute contre eux (cylindres : x, z, rayon, hauteur)
   // les surprises cachées quand on rate : chaque élément touché fait quelque chose de drôle, puis se remet en place
   const OE = {},
@@ -1407,8 +1411,7 @@ function mysLancer(cb, fic) {
       w: (i * 13) % 4
     }));
   };
-  // caméra : par défaut au bord du toit, face à la cheminée ; en lançant depuis l'endroit où Célestine a marché,
-  // elle se place derrière elle et regarde dans la même direction (V = où elle est, Vt = où elle va, en douceur)
+  // caméra : elle suit Célestine, 2,6 m derrière elle, dans l'angle choisi au doigt (V = où elle est, Vt = où elle va, en douceur)
   const V = { x: 0, z: 0, yaw: 0 },
     Vt = { x: 0, z: 0, yaw: 0 };
   const cam = (x, z) => {
@@ -1418,8 +1421,6 @@ function mysLancer(cb, fic) {
       si = Math.sin(V.yaw);
     return [dx * co - dz * si, dx * si + dz * co]; // [à droite, devant]
   };
-  // point « devant la caméra » (lx à droite, lz devant) → monde
-  const loc = (lx, lz) => [V.x + Math.cos(V.yaw) * lx + Math.sin(V.yaw) * lz, V.z - Math.sin(V.yaw) * lx + Math.cos(V.yaw) * lz];
   const P = (x, y, z) => {
     const [xr, zr] = cam(x, z),
       zz = Math.max(0.05, zr);
@@ -1457,34 +1458,15 @@ function mysLancer(cb, fic) {
     if (x > PW - marge) x -= PW;
     return x < W + marge ? x : null;
   };
-  // nouveau fichier : il remonte en douceur depuis le bas de l'écran
-  const depart = () => (
+  // nouveau fichier : il apparaît dans la main de Célestine
+  const nouveau = () => (
     bruit('glisse', 0),
-    (F = {
-      lx: 0,
-      x: 0,
-      y: Y0,
-      z: Z0,
-      vx: 0,
-      vy: 0,
-      vz: 0,
-      a: -0.08,
-      va: 0,
-      vol: 0,
-      in: 0,
-      sol: 0,
-      t: 0,
-      arret: 0,
-      al: 1,
-      ent: 1,
-      tombe: 0
-    }),
-    ([F.x, F.z] = loc(0, Z0))
+    (F = { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, a: 0, va: 0, vol: 0, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 }),
+    (C.tient = 1)
   );
   taille();
-  depart();
+  nouveau();
   rate = fin = 0;
-  idle = 0;
   fumees = [];
   eclats = [];
   etoiles = Array.from({ length: 560 }, () => ({
@@ -1972,20 +1954,6 @@ function mysLancer(cb, fic) {
       c.arc(s.x * W + Math.sin(s.p) * 8 * s.d, s.y * H, 0.6 + s.d * 2.2, 0, 7);
       c.fill();
     });
-    c.globalAlpha = 1;
-  };
-  const guide = t => {
-    // main qui montre le geste, tant qu'on n'a pas lancé
-    if (F.vol || drag || fin || pied) return;
-    idle += 1;
-    if (idle < 70) return;
-    const [x, y, s] = P(...(([a, b]) => [a, Y0, b])(loc(0, Z0))),
-      k = ((t * 0.9) % 1.4) / 1.4,
-      yy = y + s * 0.05 - k * s * 0.55;
-    c.globalAlpha = Math.sin(Math.min(1, k * 1.4) * Math.PI) * 0.9;
-    c.font = `${Math.round(s * 0.13)}px system-ui`;
-    c.textAlign = 'center';
-    c.fillText('👆', x + s * 0.12, yy + s * 0.2);
     c.globalAlpha = 1;
   };
 
@@ -2807,13 +2775,8 @@ function mysLancer(cb, fic) {
   };
   const aide = () => {
     rate++;
-    tip.textContent = C
-      ? 'Mets-toi bien en face de la cheminée, puis saute ! 🦘'
-      : rate >= 3
-        ? 'Un geste franc vers le haut, droit sur la cheminée ⬆️'
-        : rate == 1
-          ? 'Presque ! Réessaie 😉'
-          : '';
+    tip.textContent =
+      rate >= 3 ? 'Tourne la vue pile vers la cheminée et relâche au bon moment 🎯' : rate == 1 ? 'Presque ! Réessaie 😉' : '';
   };
   const fermer = () => {
     cancelAnimationFrame(raf);
@@ -2825,26 +2788,17 @@ function mysLancer(cb, fic) {
         } catch (_) {}
       }, 600);
     removeEventListener('resize', taille);
+    removeEventListener('keydown', bas);
+    removeEventListener('keyup', haut);
     o.classList.add('out');
     setTimeout(() => {
       o.remove();
       cb();
     }, 450);
   };
-  /* ===================== Célestine à pied ===================== */
-  // Bouton « Y aller à pied » : une petite Célestine (vue de dos) apparaît avec le fichier à la main.
-  // On touche le toit pour qu'elle y marche ; en revenant au lancer, on lance d'où elle est, dans la direction où elle regarde.
-  let C = null,
-    cible = null;
-  const consigne = o.querySelector('.mysl-h small'),
-    CONSIGNE = consigne.textContent;
-  const sol = (sx, sy) => {
-    // point du toit (y = 0) sous le doigt
-    if (sy <= hy + 4) return null;
-    const zr = (CAM * f) / (sy - hy),
-      [x, z] = loc(((sx - W / 2) * zr) / f, zr);
-    return { x, z };
-  };
+  /* ===================== Célestine (commandes de jeu) ===================== */
+  // Joystick (ou flèches / ZQSD) pour la faire marcher, glisser le doigt (ou la souris) pour tourner la vue autour d'elle,
+  // bouton « Lancer » (ou barre d'espace) maintenu : la jauge de force monte et descend, on relâche pour lancer droit devant.
   // Célestine est un petit personnage « en volume » : chaque partie a sa place autour d'elle (en cm, X = sa droite,
   // Y = hauteur, Z = devant elle). C.phi = le sens où elle regarde : 0 = de dos (elle s'éloigne), π/2 = vers la droite,
   // π = vers nous. Elle pivote vraiment : toutes les positions entre de dos, de profil et de face existent.
@@ -2855,7 +2809,13 @@ function mysLancer(cb, fic) {
   };
   const poses = () => {
     const sw = Math.sin(C.ph),
-      a = C.amp;
+      a = C.amp,
+      lt = T() - C.lanceT;
+    if (C.charge) return { d: [17, 172, -16], g: [-22, 130, 24] }; // bras armé derrière la tête, l'autre bras vise
+    if (lt < 0.35) {
+      const k = lt / 0.35; // le bras part vers l'avant
+      return { d: [15, 160 - k * 50, -16 + k * 46], g: [-22, 130 - k * 30, 24 - k * 20] };
+    }
     return { d: [25, 87 + sw * 1.5 * a, sw * 10 * a], g: [-24 + Math.abs(sw) * 1.5 * a, 85 - Math.abs(sw) * 2 * a, -sw * 18 * a] };
   };
   const main = () => {
@@ -2868,157 +2828,38 @@ function mysLancer(cb, fic) {
       si = Math.sin(V.yaw);
     return {
       x: C.x + (co * px - si * pd) / 100,
-      y: C.y + bob + Y / 100 - 0.11,
+      y: C.y + bob + Y / 100 + (Y > 150 ? 0.09 : -0.11),
       z: C.z + (-si * px - co * pd) / 100,
       a: 0.1 * Math.cos(C.phi) + Math.sin(C.ph) * 0.1 * C.amp
     };
   };
-  /* --- chemin : elle contourne la cheminée et les obstacles (grille de 20 cm, recherche A*) --- */
-  const GR = 0.2,
-    GX0 = -6,
-    GZ0 = 1.4,
-    NX = 61,
-    NZ = Math.floor((RIDGE - 0.4 - GZ0) / GR) + 1;
-  const libre = (x, z) =>
-    !(Math.abs(x) < CX + 0.3 && Math.abs(z - CZ) < CD + 0.3) && OBS.every(ob => Math.hypot(x - ob.x, z - ob.z) > rayon(ob, 0.5) + 0.3);
-  const voit = (a, b) => {
-    const d = Math.hypot(b.x - a.x, b.z - a.z),
-      n = Math.ceil(d / 0.08);
-    for (let i = 1; i <= n; i++) if (!libre(a.x + ((b.x - a.x) * i) / n, a.z + ((b.z - a.z) * i) / n)) return false;
-    return true;
-  };
-  const chemin = (a, b) => {
-    const cell = p => [
-        Math.max(0, Math.min(NX - 1, Math.round((p.x - GX0) / GR))),
-        Math.max(0, Math.min(NZ - 1, Math.round((p.z - GZ0) / GR)))
-      ],
-      pt = (i, j) => ({ x: GX0 + i * GR, z: GZ0 + j * GR });
-    // point d'arrivée dans un obstacle : on prend l'endroit libre le plus proche
-    if (!libre(b.x, b.z)) {
-      let best = null,
-        bd = 1e9;
-      for (let j = 0; j < NZ; j++)
-        for (let i = 0; i < NX; i++) {
-          const p = pt(i, j),
-            d = Math.hypot(p.x - b.x, p.z - b.z);
-          if (d < bd && libre(p.x, p.z)) ((bd = d), (best = p));
-        }
-      b = best || b;
-    }
-    if (voit(a, b)) return [b];
-    const [si, sj] = cell(a),
-      [gi, gj] = cell(b),
-      N = NX * NZ,
-      g = new Float32Array(N).fill(1e9),
-      de = new Int32Array(N).fill(-1),
-      fait = new Uint8Array(N),
-      ouv = [si + sj * NX];
-    g[si + sj * NX] = 0;
-    const h = k => Math.hypot((k % NX) - gi, Math.floor(k / NX) - gj);
-    while (ouv.length) {
-      let bi = 0;
-      for (let k = 1; k < ouv.length; k++) if (g[ouv[k]] + h(ouv[k]) < g[ouv[bi]] + h(ouv[bi])) bi = k;
-      const k = ouv.splice(bi, 1)[0];
-      if (k == gi + gj * NX) break;
-      fait[k] = 1;
-      const i = k % NX,
-        j = Math.floor(k / NX);
-      for (let di = -1; di <= 1; di++)
-        for (let dj = -1; dj <= 1; dj++) {
-          const ni = i + di,
-            nj = j + dj;
-          if ((!di && !dj) || ni < 0 || nj < 0 || ni >= NX || nj >= NZ) continue;
-          const n = ni + nj * NX,
-            p = pt(ni, nj);
-          if (fait[n] || !libre(p.x, p.z)) continue;
-          const ng = g[k] + Math.hypot(di, dj);
-          if (ng < g[n]) {
-            g[n] = ng;
-            de[n] = k;
-            if (!ouv.includes(n)) ouv.push(n);
-          }
-        }
-    }
-    let k = gi + gj * NX;
-    if (de[k] < 0) return [b];
-    const pts = [];
-    for (; k >= 0 && k != si + sj * NX; k = de[k]) pts.unshift(pt(k % NX, Math.floor(k / NX)));
-    pts[pts.length - 1] = b;
-    // on lisse : à chaque fois, on va directement au point le plus loin qu'on voit
-    const lisse = [];
-    let cur = a,
-      i = 0;
-    while (i < pts.length) {
-      let j = pts.length - 1;
-      while (j > i && !voit(cur, pts[j])) j--;
-      lisse.push(pts[j]);
-      cur = pts[j];
-      i = j + 1;
-    }
-    return lisse;
-  };
-  // « Y aller à pied » : la caméra garde l'angle de vue actuel, recule un peu et suit Célestine, qui marche où on touche ;
-  // « Revenir au lancer » : la caméra se place derrière elle, et on lance dans la direction où elle regarde
-  let pied = 0;
-  const aPied = on => {
-    if (fin || (F.vol && !F.fin)) return;
-    if (on) {
-      pied = 1; // la caméra garde l'angle actuel et suit Célestine (voir la boucle)
-      if (!C) {
-        C = { x: 0, z: 1.5, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, phi: 0, way: [{ x: 0, z: 2.6 }] };
-        cible = { x: 0, z: 2.6 };
-      }
-      C.tient = 1;
-      F.vol = 0;
-      consigne.textContent =
-        'Touche le toit pour la faire marcher. Reviens au lancer : tu lanceras d’où elle est, dans la direction où elle regarde.';
-      tip.textContent = '';
-      pass.textContent = '🎯 Revenir au lancer';
-    } else {
-      pied = 0;
-      C.way = [];
-      cible = null;
-      Object.assign(Vt, { x: C.x - Math.sin(C.phi) * 1.2, z: C.z - Math.cos(C.phi) * 1.2, yaw: C.phi }); // la caméra se met un peu derrière elle
-      depart();
-      F.ent = 0;
-      tip.textContent = '';
-      consigne.textContent = CONSIGNE;
-      pass.textContent = '🚶 Y aller à pied';
-    }
-  };
-  pass.onclick = () => aPied(!pied);
+  // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
+  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, yaw: 0 };
   const marche = dt => {
-    if (!C || !pied) return;
-    // marche vers le point touché, étape par étape (le chemin contourne les obstacles)
+    // vitesse voulue, par rapport à la vue : vers le haut du joystick = droit devant
+    const ix = Math.max(-1, Math.min(1, ctl.jx + ctl.kx)),
+      iy = Math.max(-1, Math.min(1, ctl.jy + ctl.ky)),
+      m = Math.min(1, Math.hypot(ix, iy)),
+      co = Math.cos(ctl.yaw),
+      si = Math.sin(ctl.yaw);
     let vx = 0,
       vz = 0;
-    if (C.way.length) {
-      const w = C.way[0],
-        fin2 = C.way[C.way.length - 1],
-        dx = w.x - C.x,
-        dz = w.z - C.z,
-        d = Math.hypot(dx, dz),
-        reste = Math.hypot(fin2.x - C.x, fin2.z - C.z);
-      if (d > (C.way.length > 1 ? 0.12 : 0.04)) {
-        C.v = Math.min(1.5, C.v + dt * 4, reste * 3 + 0.15);
-        vx = (dx / d) * C.v;
-        vz = (dz / d) * C.v;
-      } else if (C.way.shift() && !C.way.length) cible = null;
-    }
-    // elle pivote vers là où elle va
-    const vise = vx || vz ? Math.atan2(vx, vz) : null;
-    if (vise != null) {
-      let dphi = vise - C.phi;
-      dphi = Math.atan2(Math.sin(dphi), Math.cos(dphi));
-      C.phi += dphi * Math.min(1, dt * 9);
-    }
-    if (!vx && !vz) C.v = Math.max(0, C.v - dt * 6);
-    const x0 = C.x,
-      z0 = C.z;
+    if (m > 0.12 && !C.charge) {
+      const sp = 1.7 * m;
+      C.v = Math.min(sp, C.v + dt * 5);
+      const dx = co * ix + si * -iy,
+        dz = -si * ix + co * -iy,
+        n = Math.hypot(dx, dz);
+      vx = (dx / n) * C.v;
+      vz = (dz / n) * C.v;
+    } else C.v = Math.max(0, C.v - dt * 7);
+    // elle pivote vers là où elle va ; en armant le lancer, elle se tourne dans le sens de la vue
+    const vise = C.charge ? ctl.yaw : vx || vz ? Math.atan2(vx, vz) : null;
+    if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 10);
     C.x += vx * dt;
     C.z += vz * dt;
     C.amp += ((C.v > 0.05 ? Math.min(1, C.v / 1.2) : 0) - C.amp) * Math.min(1, dt * 8);
-    C.pen += ((C.v > 0.05 ? vx / 1.5 : 0) - C.pen) * Math.min(1, dt * 6);
+    C.pen += ((C.v > 0.05 ? (vx * Math.cos(V.yaw) - vz * Math.sin(V.yaw)) / 1.5 : 0) - C.pen) * Math.min(1, dt * 6);
     const ph0 = C.ph;
     C.ph += dt * (C.v > 0.05 ? 3 + C.v * 3.2 : 0);
     if (Math.floor(ph0 / Math.PI) != Math.floor(C.ph / Math.PI)) bruit('pas', C.amp);
@@ -3033,39 +2874,63 @@ function mysLancer(cb, fic) {
     }
     OBS.forEach(ob => {
       const d = Math.hypot(C.x - ob.x, C.z - ob.z),
-        m = rayon(ob, 0.5) + 0.22;
-      if (d < m && d > 0) {
-        C.x = ob.x + ((C.x - ob.x) / d) * m;
-        C.z = ob.z + ((C.z - ob.z) / d) * m;
+        mm = rayon(ob, 0.5) + 0.22;
+      if (d < mm && d > 0) {
+        C.x = ob.x + ((C.x - ob.x) / d) * mm;
+        C.z = ob.z + ((C.z - ob.z) / d) * mm;
         surprise(ob.t);
-        cible = null;
-        C.way = [];
       }
     });
-    C.x = Math.max(-6, Math.min(6, C.x));
-    C.z = Math.max(1.4, Math.min(RIDGE - 0.4, C.z));
-    // bloquée contre quelque chose : elle s'arrête au lieu de piétiner
-    const bouge = Math.hypot(C.x - x0, C.z - z0),
-      voulu = Math.hypot(vx, vz) * dt;
-    C.bloque = voulu > 0 && bouge < voulu * 0.3 ? (C.bloque || 0) + dt : 0;
-    if (C.bloque > 0.2) ((cible = null), (C.way = []));
+    C.x = Math.max(-8.4, Math.min(8.4, C.x));
+    C.z = Math.max(0.9, Math.min(RIDGE - 0.3, C.z));
+    // la jauge de force monte et redescend tant qu'on maintient « Lancer »
+    if (C.charge) {
+      const k = (T() - C.charge) / REMPLI;
+      C.p = 1 - Math.abs((k % 2) - 1);
+      btn.style.setProperty('--p', C.p.toFixed(3));
+    }
     // le fichier suit sa main
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
-  // la petite croix dans la neige là où elle va
-  const marque = t => {
-    if (!cible || !C || prof(cible.x, cible.z) < 0.5) return;
-    const [x, y, s] = P(cible.x, 0, cible.z),
-      k = 1 + Math.sin(t * 6) * 0.08;
-    c.strokeStyle = '#ffffffcc';
-    c.lineWidth = Math.max(1.5, s * 0.012);
-    c.beginPath();
-    c.ellipse(x, y, s * 0.18 * k, s * 0.05 * k, 0, 0, 7);
-    c.stroke();
-    c.strokeStyle = '#ff8fb8';
-    c.beginPath();
-    c.ellipse(x, y, s * 0.09 * k, s * 0.025 * k, 0, 0, 7);
-    c.stroke();
+  const armer = () => {
+    if (fin || !C.tient || C.charge) return;
+    C.charge = T();
+    C.p = 0;
+    btn.classList.add('on');
+  };
+  const lancer = () => {
+    if (!C.charge) return;
+    const p = C.p || 0,
+      m = main(); // la main armée, au-dessus de l'épaule (avant de relâcher la pose)
+    C.charge = 0;
+    btn.classList.remove('on');
+    btn.style.setProperty('--p', 0);
+    if (!C.tient) return;
+    // elle lance droit devant elle (dans le sens de la vue), en cloche ; la jauge règle la force
+    const v = VMIN + (VMAX - VMIN) * p,
+      dir = C.phi;
+    C.lanceT = T();
+    C.tient = 0;
+    F = {
+      x: m.x,
+      y: m.y,
+      z: m.z,
+      vx: Math.sin(dir) * v * Math.cos(ANG),
+      vy: v * Math.sin(ANG),
+      vz: Math.cos(dir) * v * Math.cos(ANG),
+      a: m.a,
+      va: (Math.random() - 0.5) * 3,
+      vol: 1,
+      in: 0,
+      sol: 0,
+      t: 0,
+      arret: 0,
+      al: 1,
+      ent: 1,
+      tombe: 0
+    };
+    bruit('lance', 0.4 + p * 0.6);
+    tip.textContent = '';
   };
   const celestine = t => {
     if (prof(C.x, C.z) < 0.5) return;
@@ -3629,26 +3494,19 @@ function mysLancer(cb, fic) {
           F.fin = 1;
           if (!fin) {
             aide();
-            depart();
-            F.ent = 0;
+            nouveau(); // un nouveau fichier revient dans sa main
           }
         }
       }
-    } else if (!drag && !fin && !pied) {
-      [F.x, F.z] = loc(F.lx, Z0); // le fichier reste devant la caméra (même quand elle se déplace)
-      F.ent = Math.min(1, F.ent + dt * 2.5);
-      F.y = Y0 - (1 - F.ent) ** 2 * 0.6 + Math.sin(t * 2.2) * 0.015;
-      F.al = F.ent;
     }
-    // à pied, la caméra suit Célestine à 2,6 m sans changer d'angle ; elle rejoint toujours sa place en douceur
-    if (pied && C) {
-      Vt.x = C.x - Math.sin(Vt.yaw) * 2.6;
-      Vt.z = C.z - Math.cos(Vt.yaw) * 2.6;
-    }
-    const kc = Math.min(1, dt * 3.5);
+    // la caméra suit Célestine à 2,6 m, dans l'angle choisi au doigt
+    Vt.yaw = ctl.yaw;
+    Vt.x = C.x - Math.sin(Vt.yaw) * 2.6;
+    Vt.z = C.z - Math.cos(Vt.yaw) * 2.6;
+    const kc = Math.min(1, dt * 6);
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * 14);
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
-    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * kc;
     marche(dt);
     ciel(t);
     lyon();
@@ -3659,8 +3517,7 @@ function mysLancer(cb, fic) {
     const L = OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
     L.push([prof(0, TZ), () => traineau(t, dt)]);
     L.push([prof(0, CZ), () => cheminee(t, F.in && (() => (c.save(), ouverture(), c.clip(), fichier(), c.restore())))]);
-    if (pied) L.push([99, () => marque(t)]);
-    if (!F.in && !(pied && C.tient))
+    if (!F.in && !C.tient)
       L.push([
         prof(F.x, F.z),
         () => {
@@ -3678,81 +3535,91 @@ function mysLancer(cb, fic) {
           c.restore();
         }
       ]);
-    if (pied) L.push([prof(C.x, C.z), () => celestine(t)]);
+    L.push([prof(C.x, C.z), () => celestine(t)]);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
     devant(t);
-    guide(t);
     raf = requestAnimationFrame(boucle);
   };
 
-  /* ===================== toucher ===================== */
+  /* ===================== commandes ===================== */
+  // glisser le doigt (ou la souris) sur la scène : la vue tourne autour de Célestine
+  let regard = null;
   cv.addEventListener('pointerdown', e => {
-    if (pied) {
-      // à pied : elle marche jusqu'au point touché (toucher la cheminée l'y emmène, juste devant)
-      if (fin) return;
-      const [cx1, cy1] = P(-CX, TOP, CZ - CD),
-        [cx2, cy2] = P(CX, 0, CZ - CD);
-      let p =
-        e.clientX > cx1 && e.clientX < cx2 && e.clientY > cy1 && e.clientY < cy2
-          ? { x: Math.max(-0.3, Math.min(0.3, C.x)), z: CZ - CD - 0.5 }
-          : sol(e.clientX, e.clientY);
-      if (!p) return;
-      p.x = Math.max(-6, Math.min(6, p.x));
-      p.z = Math.max(1.4, Math.min(RIDGE - 0.4, p.z));
-      C.way = chemin(C, p);
-      cible = C.way[C.way.length - 1];
-      return;
-    }
-    if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45 || Math.hypot(V.x - Vt.x, V.z - Vt.z) > 0.05) return;
-    drag = 1;
-    idle = 0;
-    hist = [[e.clientX, e.clientY, performance.now()]];
+    if (regard) return;
+    regard = { id: e.pointerId, x: e.clientX };
     cv.setPointerCapture(e.pointerId);
   });
   cv.addEventListener('pointermove', e => {
-    if (!drag) return;
-    hist.push([e.clientX, e.clientY, performance.now()]);
-    if (hist.length > 12) hist.shift();
-    const a = hist[0];
-    F.lx = ((e.clientX - a[0]) / f) * Z0 * 0.4;
-    [F.x, F.z] = loc(F.lx, Z0);
-    F.y = Y0 - ((e.clientY - a[1]) / f) * Z0 * 0.4;
+    if (!regard || e.pointerId != regard.id) return;
+    ctl.yaw += (e.clientX - regard.x) * 0.0075;
+    regard.x = e.clientX;
   });
-  const lacher = () => {
-    if (!drag) return;
-    drag = 0;
-    const now = performance.now(),
-      r = hist.filter(h => now - h[2] < 140),
-      a = r[0] || hist[0],
-      b = hist[hist.length - 1],
-      dt = Math.max(0.03, (b[2] - a[2]) / 1000),
-      vsy = (a[1] - b[1]) / dt, // vitesse vers le haut (px/s)
-      vsx = (b[0] - a[0]) / dt;
-    if (vsy < 250) {
-      depart();
+  const finRegard = e => regard && e.pointerId == regard.id && (regard = null);
+  cv.addEventListener('pointerup', finRegard);
+  cv.addEventListener('pointercancel', finRegard);
+  // joystick
+  const bouton = joy.querySelector('i');
+  let joyId = null;
+  const joyBouge = e => {
+    const r = joy.getBoundingClientRect(),
+      R0 = r.width / 2,
+      dx = e.clientX - (r.left + R0),
+      dy = e.clientY - (r.top + R0),
+      d = Math.hypot(dx, dy),
+      k = d > R0 * 0.75 ? (R0 * 0.75) / d : 1;
+    ctl.jx = (dx * k) / (R0 * 0.75);
+    ctl.jy = (dy * k) / (R0 * 0.75);
+    bouton.style.transform = `translate(${dx * k}px, ${dy * k}px)`;
+  };
+  joy.addEventListener('pointerdown', e => {
+    joyId = e.pointerId;
+    joy.setPointerCapture(e.pointerId);
+    joy.classList.add('on');
+    joyBouge(e);
+  });
+  joy.addEventListener('pointermove', e => e.pointerId == joyId && joyBouge(e));
+  const joyFin = e => {
+    if (e.pointerId != joyId) return;
+    joyId = null;
+    ctl.jx = ctl.jy = 0;
+    bouton.style.transform = '';
+    joy.classList.remove('on');
+  };
+  joy.addEventListener('pointerup', joyFin);
+  joy.addEventListener('pointercancel', joyFin);
+  // bouton « Lancer » : on maintient, puis on relâche
+  btn.addEventListener('pointerdown', e => {
+    btn.setPointerCapture(e.pointerId);
+    armer();
+  });
+  btn.addEventListener('pointerup', lancer);
+  btn.addEventListener('pointercancel', lancer);
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+  // clavier (sur ordinateur) : flèches ou ZQSD / WASD pour marcher, espace pour lancer
+  const touches = {};
+  const clavier = () => {
+    const k = n => (touches[n] ? 1 : 0);
+    ctl.kx = k('ArrowRight') + k('d') - k('ArrowLeft') - k('q') - k('a');
+    ctl.ky = k('ArrowDown') + k('s') - k('ArrowUp') - k('z') - k('w');
+  };
+  const bas = e => {
+    if (e.key == ' ') {
+      e.preventDefault();
+      if (!e.repeat) armer();
       return;
     }
-    // lancer en cloche à angle fixe : la force du geste règle la distance
-    const D = Math.max(1, Math.hypot(F.x, F.z - CZ)), // distance jusqu'à la cheminée
-      vopt = Math.sqrt((G * D * D) / (2 * Math.cos(ANG) ** 2 * (Y0 + D * Math.tan(ANG) - TOP))),
-      tt = D / (vopt * Math.cos(ANG));
-    let v = vopt * 0.978 * Math.pow(vsy / (H * 1.7), (0.5 * (CZ - Z0)) / D), // plus on est près, plus il faut être précis : même difficulté partout // il faut doser la force : un peu trop faible tape la cheminée, un peu trop fort passe derrière
-      vx = (vsx / W) * 1.5;
-    // pas d'aide : seul le petit tremblement naturel du doigt sur le côté est ignoré
-    if (Math.abs(vx * tt) < 0.12) vx = 0;
-    // vitesse vue depuis la caméra → dans le monde (on lance droit devant soi)
-    const vy = v * Math.sin(ANG),
-      vl = v * Math.cos(ANG),
-      co = Math.cos(V.yaw),
-      si = Math.sin(V.yaw);
-    Object.assign(F, { vx: co * vx + si * vl, vy, vz: -si * vx + co * vl, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
-    bruit('lance', Math.min(1, v / vopt));
-    tip.textContent = '';
+    touches[e.key.length == 1 ? e.key.toLowerCase() : e.key] = 1;
+    clavier();
   };
-  cv.addEventListener('pointerup', lacher);
-  cv.addEventListener('pointercancel', lacher);
+  const haut = e => {
+    if (e.key == ' ') return lancer();
+    touches[e.key.length == 1 ? e.key.toLowerCase() : e.key] = 0;
+    clavier();
+  };
+  addEventListener('keydown', bas);
+  addEventListener('keyup', haut);
   raf = requestAnimationFrame(boucle);
 }
 
