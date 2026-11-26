@@ -3231,5 +3231,13 @@ window.TRADUCTIONS_EN = {
   'Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.': 'Swipe up to throw the file down the chimney.',
   'Presque ! Réessaie 😉': 'Almost! Try again 😉',
   'Un geste franc vers le haut, droit sur la cheminée ⬆️': 'A firm swipe up, straight at the chimney ⬆️',
-  'Ho ho ho ! 🎅 Bien reçu !': 'Ho ho ho! 🎅 Got it!'
+  'Ho ho ho ! 🎅 Bien reçu !': 'Ho ho ho! 🎅 Got it!',
+  'Le bonhomme de neige s’écroule ! ⛄': 'The snowman falls apart! ⛄',
+  'Le sapin perd ses aiguilles ! 🎄': 'The tree is losing its needles! 🎄',
+  'Il y avait un chat dans le cadeau ! 🐱': 'There was a cat in the present! 🐱',
+  'Plus de télé chez le voisin ! 📺': 'No more TV for the neighbour! 📺',
+  'Tu as fait tomber le Père Noël ! 🎅💥': 'You knocked Santa down! 🎅💥',
+  'La lune t’a fait un clin d’œil 😉': 'The moon winked at you 😉',
+  '🥚 Nouveau secret !': '🥚 New secret!',
+  'Miaou !': 'Meow!'
 };

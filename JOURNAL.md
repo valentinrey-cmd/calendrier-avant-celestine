@@ -3,6 +3,19 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : 6 surprises cachées quand on rate
+- Quand on rate le lancer, toucher certains éléments déclenche une surprise drôle, avec son bruit, puis tout se remet en place :
+  - le bonhomme de neige s'écroule (les boules roulent, la tête tourne, le chapeau s'envole) puis se reconstruit ;
+  - le sapin tremble, perd ses aiguilles et son étoile tombe, puis elle remonte ;
+  - la petite boîte de la pile de cadeaux valdingue et un chat monté sur ressort sort du gros cadeau rouge (« Miaou ! ») ;
+  - l'antenne se tord avec des étincelles et la télé du voisin grésille ;
+  - en lançant très haut quand le traîneau passe (toutes les 10 s), le Père Noël tombe en tournoyant derrière les toits, et seules ses jambes dépassent de la neige ;
+  - en lançant très haut à droite, la lune fait un clin d'œil.
+- Un petit message s'affiche en haut (« 🥚 Nouveau secret ! », avec un compteur sur 6). Les secrets trouvés sont gardés dans `S.mysSec` et envoyés au suivi.
+- Le bonhomme, les cadeaux, le sapin et l'antenne ont été un peu rapprochés du centre pour que les surprises soient faciles à découvrir.
+- Version 1795692165
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : bruitages et petite musique
 - Le lancer du fichier dans la cheminée a maintenant du son, entièrement synthétisé : le feu qui crépite et le vent en fond, un « ffuit » au lancer, un bruit feutré quand le fichier tombe dans la neige, un frottement quand il glisse, un « toc » sur les briques, un bruit différent pour chaque obstacle (bonhomme, cadeaux, sapin avec grelots, antenne qui tinte), un sifflement quand il tombe du toit, et quand il entre dans la cheminée, une dégringolade, le feu qui s'emballe et des clochettes.
 - Une petite musique de fond en boîte à musique (« Douce nuit », avec des grelots) joue pendant le lancer. La musique d'ambiance du site s'arrête pendant le lancer puis reprend après.

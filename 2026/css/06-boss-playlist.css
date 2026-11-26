@@ -1506,6 +1506,46 @@ p.vc-b {
   text-shadow: 0 2px 8px #000a;
   pointer-events: none;
 }
+.mysl-sec {
+  position: absolute;
+  left: 50%;
+  top: 104px;
+  transform: translate(-50%, -12px) scale(0.9);
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 86%;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: #0b1430d9;
+  border: 1px solid #ffe9a855;
+  box-shadow: 0 6px 22px #0007;
+  color: #fff;
+  font: 700 0.95rem system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.mysl-sec.on {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+.mysl-sec i {
+  font-style: normal;
+  font-size: 0.75rem;
+  color: #ffd76a;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mysl-sec u {
+  text-decoration: none;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
 .mysl-tip.ok {
   font-size: 1.35rem;
   color: #ffe9a8;

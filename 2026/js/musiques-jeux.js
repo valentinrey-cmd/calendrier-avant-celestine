@@ -1144,6 +1144,57 @@ function mysSons(A, musique = true) {
       feu.g.gain.setTargetAtTime(0.07, t + 1.4, 0.4);
       [1047, 1319, 1568, 2093, 2637].forEach((f, i) => cloche(t + 0.45 + i * 0.09, f, 0.05));
     },
+    // les surprises
+    eboule: () => {
+      const t = now();
+      souffle(t, 0.8, 0.22, 'lowpass', 800, 140, 0.8, 0.02);
+      [0.05, 0.22, 0.4].forEach((d, i) => ton(t + d, 150 - i * 25, 0.16, 0.16, 'sine', 60));
+    },
+    aiguilles: () => {
+      const t = now();
+      souffle(t, 0.9, 0.09, 'highpass', 2800, 0, 0.7, 0.05);
+      for (let i = 0; i < 7; i++) ton(t + 0.05 + i * 0.07, [2637, 3136, 3520, 2794][i % 4], 0.35, 0.025);
+    },
+    miaou: () => {
+      const t = now() + 0.15,
+        o = A.createOscillator(),
+        f = A.createBiquadFilter(),
+        g = A.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(520, t);
+      o.frequency.linearRampToValueAtTime(880, t + 0.18);
+      o.frequency.linearRampToValueAtTime(600, t + 0.55);
+      f.type = 'bandpass';
+      f.frequency.value = 1300;
+      f.Q.value = 2;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.09, t + 0.06);
+      g.gain.setValueAtTime(0.09, t + 0.35);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      o.connect(f).connect(g).connect(M);
+      o.start(t);
+      o.stop(t + 0.65);
+      ton(now(), 300, 0.25, 0.08, 'sine', 900); // le « boing » du ressort
+    },
+    gresille: () => {
+      const t = now();
+      souffle(t, 1.3, 0.05, 'highpass', 3000, 0, 0.7, 0.01);
+      ton(t, 120, 1.1, 0.025, 'square');
+      ton(t, 1400, 0.08, 0.05, 'square', 400);
+    },
+    crash: () => {
+      const t = now();
+      ton(t, 1300, 1.4, 0.04, 'sine', 220);
+      for (let i = 0; i < 6; i++) souffle(t + i * 0.18, 0.08, 0.025, 'highpass', 6500, 0, 1, 0.003);
+      souffle(t + 1.45, 0.9, 0.3, 'lowpass', 900, 90, 0.7, 0.01);
+      ton(t + 1.45, 110, 0.4, 0.25, 'sine', 45);
+      for (let i = 0; i < 9; i++) ton(t + 1.5 + Math.random() * 0.5, 2000 + Math.random() * 2500, 0.25, 0.025);
+    },
+    clin: () => {
+      const t = now();
+      cloche(t, 1568, 0.06);
+      cloche(t + 0.13, 2093, 0.06);
+    },
     fin: () => {
       clearInterval(iv);
       try {
@@ -1205,7 +1256,7 @@ function mysLancer(cb, fic) {
   }
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass">Le déposer à la main</button>`;
   document.body.appendChild(o);
   // les bruitages et la musique (sauf si le son est coupé dans les paramètres)
   let son = null;
@@ -1245,11 +1296,70 @@ function mysLancer(cb, fic) {
     ANG = (52 * Math.PI) / 180; // angle du lancer
   let W, H, dpr, f, hy, F, drag, hist, rate, fin, raf, t0, idle, fumees, flocons, etoiles, ville, voisins, eclats;
   // obstacles posés sur le toit : le fichier bute contre eux (cylindres : x, z, rayon, hauteur)
+  // les surprises cachées quand on rate : chaque élément touché fait quelque chose de drôle, puis se remet en place
+  const OE = {},
+    T = () => performance.now() / 1000,
+    age = k => (OE[k] == null ? 99 : T() - OE[k]),
+    DUREE = { bonhomme: 7, cadeaux: 6, sapin: 4.5, antenne: 7.5, traineau: 16, lune: 3 },
+    SECRETS = {
+      bonhomme: 'Le bonhomme de neige s’écroule ! ⛄',
+      sapin: 'Le sapin perd ses aiguilles ! 🎄',
+      cadeaux: 'Il y avait un chat dans le cadeau ! 🐱',
+      antenne: 'Plus de télé chez le voisin ! 📺',
+      traineau: 'Tu as fait tomber le Père Noël ! 🎅💥',
+      lune: 'La lune t’a fait un clin d’œil 😉'
+    },
+    secEl = o.querySelector('.mysl-sec');
+  let crash = null;
+  const surprise = (k, px, py) => {
+    if (age(k) < DUREE[k]) return;
+    OE[k] = T();
+    bruit({ bonhomme: 'eboule', sapin: 'aiguilles', cadeaux: 'miaou', antenne: 'gresille', traineau: 'crash', lune: 'clin' }[k]);
+    let neuf = 0,
+      n = 0;
+    try {
+      S.mysSec = S.mysSec || {};
+      neuf = !S.mysSec[k];
+      S.mysSec[k] = 1;
+      n = Object.keys(S.mysSec).length;
+      if (neuf) {
+        save();
+        slog('🥚', `Fichier mystère : surprise « ${k} » trouvée (${n}/6)`);
+      }
+    } catch (_) {}
+    secEl.innerHTML = (neuf ? '<i>🥚 Nouveau secret !</i>' : '') + `<b>${SECRETS[k]}</b>` + (n ? `<u>${n}/6</u>` : '');
+    secEl.classList.remove('on');
+    void secEl.offsetWidth;
+    secEl.classList.add('on');
+    clearTimeout(surprise.to);
+    surprise.to = setTimeout(() => secEl.classList.remove('on'), 3200);
+    // des éclats à l'endroit touché
+    const ob = OBS.find(q => q.t == k);
+    if (ob) {
+      const [x, y, sc] = P(ob.x, ob.h * 0.6, ob.z),
+        col = {
+          bonhomme: ['#ffffff', '#e6eefb'],
+          sapin: ['#1f6b45', '#2b7a4f', '#3c9a62', '#ffffff'],
+          cadeaux: ['#ffd166', '#ff8fb8', '#ffffff'],
+          antenne: ['#ffe066', '#fff3b0', '#ffffff']
+        }[k];
+      for (let i = 0; i < 46; i++)
+        eclats.push({
+          x: x + (Math.random() - 0.5) * sc * ob.r * 2,
+          y: y + (Math.random() - 0.5) * sc * ob.h * 0.8,
+          vx: (Math.random() - 0.5) * 220,
+          vy: -40 - Math.random() * 200,
+          t: 0.8 + Math.random() * 0.8,
+          c: col[i % col.length]
+        });
+    }
+    if (k == 'traineau') crash = { x: px, y: py, vx: -40 - Math.random() * 30, vy: -60, r: 0, fume: [] };
+  };
   const OBS = [
-    { t: 'bonhomme', x: -1.55, z: 3.7, r: 0.3, h: 1.05 },
-    { t: 'cadeaux', x: 1.55, z: 3.1, r: 0.34, h: 0.55 },
-    { t: 'sapin', x: 2.25, z: 7.2, r: 0.45, h: 1.7 },
-    { t: 'antenne', x: -2.3, z: 7.6, r: 0.1, h: 1.9 }
+    { t: 'bonhomme', x: -1.3, z: 3.7, r: 0.3, h: 1.05 },
+    { t: 'cadeaux', x: 1.2, z: 3.1, r: 0.34, h: 0.55 },
+    { t: 'sapin', x: 2.0, z: 7.2, r: 0.45, h: 1.7 },
+    { t: 'antenne', x: -1.8, z: 7.4, r: 0.14, h: 1.9 }
   ];
   const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
     BORD = 0.75; // bord du toit côté caméra (la gouttière)
@@ -1333,6 +1443,33 @@ function mysLancer(cb, fic) {
       c.arc(mx + a, my + b, r, 0, 7);
       c.fill();
     });
+    const al = age('lune');
+    if (al < DUREE.lune) {
+      // un visage apparaît et fait un clin d'œil
+      c.globalAlpha = Math.min(1, al * 4, (DUREE.lune - al) * 3);
+      c.strokeStyle = c.fillStyle = '#5a4a2a';
+      c.lineWidth = 2;
+      c.beginPath();
+      c.arc(mx - 7, my - 4, 2.4, 0, 7);
+      c.fill();
+      c.beginPath();
+      if (Math.sin(al * 5) > -0.2) c.arc(mx + 7, my - 3, 3.5, Math.PI * 1.1, Math.PI * 1.9);
+      else c.arc(mx + 7, my - 4, 2.4, 0, 7);
+      c.stroke();
+      c.beginPath();
+      c.arc(mx, my + 3, 8, 0.25, Math.PI - 0.25);
+      c.stroke();
+      c.fillStyle = '#ffb3a7';
+      c.beginPath();
+      c.arc(mx - 13, my + 3, 3, 0, 7);
+      c.arc(mx + 13, my + 3, 3, 0, 7);
+      c.fill();
+      c.fillStyle = '#fff6c8';
+      c.font = '14px system-ui';
+      c.textAlign = 'center';
+      c.fillText('✨', mx + 30, my - 18 - al * 6);
+      c.globalAlpha = 1;
+    }
   };
   const lyon = () => {
     // colline de Fourvière et sa basilique, puis les toits de la ville
@@ -1746,8 +1883,9 @@ function mysLancer(cb, fic) {
       c.lineTo(v.x + v.w + 4, base - v.h);
       c.stroke();
       for (let k = 0; k < 3; k++) {
-        const on = (i * 7 + k * 3) % 5 != 0;
-        c.fillStyle = on ? '#ffcf73' : '#33447a';
+        const on = (i * 7 + k * 3) % 5 != 0,
+          tele = i == 1 && k == 1 && age('antenne') < DUREE.antenne;
+        c.fillStyle = tele ? ['#e8f0ff', '#8fb0ff', '#ffffff', '#4a5f9a'][Math.floor(Math.random() * 4)] : on ? '#ffcf73' : '#33447a';
         c.fillRect(v.x + 8 + k * (v.w / 3.2), base - v.h + 8, 7, 9);
       }
       if (i % 3 == 1) {
@@ -1758,14 +1896,17 @@ function mysLancer(cb, fic) {
       }
     });
   };
-  const traineau = t => {
-    // le traîneau du Père Noël passe devant la lune toutes les 14 s
-    const k = (t % 14) / 6;
-    if (k > 1) return;
-    const x = W * 1.1 - k * W * 1.25,
-      y = H * 0.14 + Math.sin(k * 6) * 8;
+  const traineauPos = t => {
+    // le traîneau du Père Noël passe devant la lune toutes les 10 s (sauf s'il vient de s'écraser)
+    if (age('traineau') < DUREE.traineau) return null;
+    const k = (t % 10) / 6;
+    if (k > 1) return null;
+    return { x: W * 1.1 - k * W * 1.25, y: H * 0.14 + Math.sin(k * 6) * 8 };
+  };
+  const traineauDessin = (x, y, rot, t) => {
     c.save();
     c.translate(x, y);
+    c.rotate(rot);
     c.fillStyle = '#0a1230';
     for (let r = 0; r < 4; r++) {
       const rx = -20 - r * 22,
@@ -1803,6 +1944,45 @@ function mysLancer(cb, fic) {
     c.fill();
     c.restore();
   };
+  const traineau = (t, dt) => {
+    const tp = traineauPos(t);
+    if (tp) return traineauDessin(tp.x, tp.y, 0, t);
+    if (!crash) return;
+    // il tournoie, laisse une traînée de fumée, puis s'écrase derrière les toits
+    const sol = hy + 26;
+    if (crash.y < sol) {
+      crash.vy += 120 * dt;
+      crash.x += crash.vx * dt;
+      crash.y += crash.vy * dt;
+      crash.r += dt * 4;
+      if (Math.random() < 0.6) crash.fume.push({ x: crash.x, y: crash.y, r: 4, a: 0.6 });
+      if (crash.y >= sol) {
+        for (let i = 0; i < 16; i++)
+          crash.fume.push({ x: crash.x + (Math.random() - 0.5) * 60, y: sol - Math.random() * 20, r: 8 + Math.random() * 10, a: 0.8 });
+        crash.boum = T();
+      }
+    }
+    crash.fume = crash.fume.filter(f => (f.a -= dt * 0.35) > 0);
+    crash.fume.forEach(f => {
+      f.r += dt * 10;
+      f.y -= dt * 12;
+      c.fillStyle = `rgba(190,200,225,${f.a})`;
+      c.beginPath();
+      c.arc(f.x, f.y, f.r, 0, 7);
+      c.fill();
+    });
+    if (crash.y < sol) traineauDessin(crash.x, crash.y, crash.r, t);
+    else if (T() - crash.boum < 2.2) {
+      // les jambes du Père Noël dépassent de la neige
+      c.globalAlpha = Math.min(1, (2.2 - (T() - crash.boum)) * 2);
+      c.fillStyle = '#0a1230';
+      c.fillRect(crash.x - 6, sol - 18, 4, 16);
+      c.fillRect(crash.x + 2, sol - 16, 4, 14);
+      c.fillRect(crash.x - 9, sol - 20, 7, 3);
+      c.fillRect(crash.x + 2, sol - 18, 7, 3);
+      c.globalAlpha = 1;
+    }
+  };
   const guirlandeFaite = t => {
     // guirlande d'ampoules le long du faîtage
     for (let x = -8.6; x <= 8.6; x += 0.45) {
@@ -1812,6 +1992,21 @@ function mysLancer(cb, fic) {
       ampoule(px, py - s * 0.02, Math.max(1.3, s * 0.03), COUL[(i + 50) % 5], Math.sin(t * 2.5 + i) > -0.4);
     }
   };
+  // avancement d'une surprise : 0 = normal, 1 = chamboulé (vite), puis retour en place à la fin
+  const chambou = (k, monte = 0.45, retour = 1.3) => {
+    const a = age(k),
+      d = DUREE[k];
+    if (a >= d) return 0;
+    if (a < monte) {
+      const u = a / monte;
+      return 1 - (1 - u) * (1 - u);
+    }
+    if (a > d - retour) {
+      const u = (a - (d - retour)) / retour;
+      return 1 - u * u * (3 - 2 * u);
+    }
+    return 1;
+  };
   const obstacle = (ob, t) => {
     const [x, y, s] = P(ob.x, 0, ob.z);
     // ombre
@@ -1820,68 +2015,134 @@ function mysLancer(cb, fic) {
     c.ellipse(x + s * 0.12, y, s * ob.r * 1.3, s * ob.r * 0.3, 0, 0, 7);
     c.fill();
     if (ob.t == 'bonhomme') {
-      const boule = (yy, r) => {
-        const g = c.createRadialGradient(x - r * 0.35, yy - r * 0.35, r * 0.1, x, yy, r);
-        g.addColorStop(0, '#ffffff');
-        g.addColorStop(1, '#c6d3ea');
-        c.fillStyle = g;
-        c.beginPath();
-        c.arc(x, yy, r, 0, 7);
-        c.fill();
-      };
-      boule(y - s * 0.28, s * 0.3);
-      boule(y - s * 0.7, s * 0.21);
-      boule(y - s * 0.98, s * 0.14);
-      c.fillStyle = '#c0233a';
-      c.fillRect(x - s * 0.15, y - s * 0.86, s * 0.3, s * 0.06);
-      c.fillRect(x + s * 0.05, y - s * 0.86, s * 0.06, s * 0.2);
-      c.fillStyle = '#1b1b22';
-      c.fillRect(x - s * 0.13, y - s * 1.14, s * 0.26, s * 0.04);
-      c.fillRect(x - s * 0.08, y - s * 1.28, s * 0.16, s * 0.15);
-      [
-        [-0.05, -1.01],
-        [0.05, -1.01],
-        [0, -0.75],
-        [0, -0.66],
-        [0, -0.42]
-      ].forEach(([a, b]) => {
-        c.beginPath();
-        c.arc(x + a * s, y + b * s, s * 0.018, 0, 7);
-        c.fill();
-      });
-      c.fillStyle = '#f28c28';
-      c.beginPath();
-      c.moveTo(x, y - s * 0.97);
-      c.lineTo(x + s * 0.13, y - s * 0.95);
-      c.lineTo(x, y - s * 0.94);
-      c.fill();
+      // il s'écroule : les boules roulent dans la neige, le chapeau s'envole, puis il se reconstruit
+      const p = chambou('bonhomme'),
+        L = (a, b) => a + (b - a) * p,
+        pos = (i, ax, ay, bx, by) => [x + L(ax, bx) * s, y + L(ay, by) * s],
+        boule = ([bx, by], r, ec) => {
+          const g = c.createRadialGradient(bx - r * 0.35, by - r * 0.35, r * 0.1, bx, by, r);
+          g.addColorStop(0, '#ffffff');
+          g.addColorStop(1, '#c6d3ea');
+          c.fillStyle = g;
+          c.beginPath();
+          c.ellipse(bx, by, r * (1 + ec), r * (1 - ec), 0, 0, 7);
+          c.fill();
+        },
+        b0 = pos(0, 0, -0.28, -0.02, -0.2),
+        b1 = pos(1, 0, -0.7, 0.42, -0.21),
+        b2 = pos(2, 0, -0.98, -0.58, -0.14),
+        ch = pos(3, 0, -1.14, 0.8, -0.05),
+        dot = (px, py) => {
+          c.beginPath();
+          c.arc(px, py, s * 0.018, 0, 7);
+          c.fill();
+        };
+      // les bras (des bâtons), qui finissent par terre
       c.strokeStyle = '#6b4a2b';
       c.lineWidth = Math.max(1, s * 0.015);
       c.beginPath();
-      c.moveTo(x - s * 0.18, y - s * 0.72);
-      c.lineTo(x - s * 0.42, y - s * 0.88);
-      c.moveTo(x + s * 0.18, y - s * 0.72);
-      c.lineTo(x + s * 0.4, y - s * 0.84);
+      c.moveTo(x + L(-0.18, -0.95) * s, y + L(-0.72, -0.03) * s);
+      c.lineTo(x + L(-0.42, -1.22) * s, y + L(-0.88, -0.06) * s);
+      c.moveTo(x + L(0.18, 1.0) * s, y + L(-0.72, -0.02) * s);
+      c.lineTo(x + L(0.4, 1.27) * s, y + L(-0.84, -0.08) * s);
       c.stroke();
+      boule(b0, s * 0.3, p * 0.18);
+      boule(b1, s * 0.21, 0);
+      c.fillStyle = '#1b1b22';
+      dot(b1[0], b1[1] - s * 0.05);
+      dot(b1[0], b1[1] + s * 0.04);
+      dot(b0[0], b0[1] - s * 0.14);
+      // l'écharpe reste sur le corps
+      c.fillStyle = '#c0233a';
+      c.fillRect(b1[0] - s * 0.15, b1[1] - s * 0.16, s * 0.3, s * 0.06);
+      c.fillRect(b1[0] + s * 0.05, b1[1] - s * 0.16, s * 0.06, s * 0.2);
+      // la tête roule (elle tourne sur elle-même)
+      c.save();
+      c.translate(b2[0], b2[1]);
+      c.rotate(-p * 2.4);
+      boule([0, 0], s * 0.14, 0);
+      c.fillStyle = '#1b1b22';
+      dot(-s * 0.05, -s * 0.03);
+      dot(s * 0.05, -s * 0.03);
+      c.fillStyle = '#f28c28';
+      c.beginPath();
+      c.moveTo(0, s * 0.01);
+      c.lineTo(s * 0.13, s * 0.03);
+      c.lineTo(0, s * 0.04);
+      c.fill();
+      c.restore();
+      // le chapeau
+      c.save();
+      c.translate(ch[0], ch[1]);
+      c.rotate(p * 1.9);
+      c.fillStyle = '#1b1b22';
+      c.fillRect(-s * 0.13, 0, s * 0.26, s * 0.04);
+      c.fillRect(-s * 0.08, -s * 0.14, s * 0.16, s * 0.15);
+      c.restore();
     } else if (ob.t == 'cadeaux') {
-      const boite = (dx, w, hh, col, rub) => {
-        const bx = x + dx * s,
+      const boite = (dx, w, hh, col, rub, ox = x, oy = y) => {
+        const bx = ox + dx * s,
           bw = w * s,
           bh = hh * s;
         c.fillStyle = col;
-        c.fillRect(bx - bw / 2, y - bh, bw, bh);
+        c.fillRect(bx - bw / 2, oy - bh, bw, bh);
         c.fillStyle = '#00000022';
-        c.fillRect(bx + bw * 0.2, y - bh, bw * 0.3, bh);
+        c.fillRect(bx + bw * 0.2, oy - bh, bw * 0.3, bh);
         c.fillStyle = rub;
-        c.fillRect(bx - bw * 0.06, y - bh, bw * 0.12, bh);
-        c.fillRect(bx - bw / 2, y - bh * 0.55, bw, bh * 0.1);
+        c.fillRect(bx - bw * 0.06, oy - bh, bw * 0.12, bh);
+        c.fillRect(bx - bw / 2, oy - bh * 0.55, bw, bh * 0.1);
         c.fillStyle = '#ffffff';
-        c.fillRect(bx - bw / 2, y - bh - s * 0.02, bw, s * 0.035);
+        c.fillRect(bx - bw / 2, oy - bh - s * 0.02, bw, s * 0.035);
       };
+      // surprise : la petite boîte valdingue et un chat sort du gros cadeau rouge, monté sur ressort
+      const p = chambou('cadeaux', 0.35, 0.8),
+        a = age('cadeaux');
       boite(-0.17, 0.34, 0.32, '#2f8f5b', '#ffd166');
       boite(0.18, 0.3, 0.42, '#c0233a', '#ffffff');
-      boite(0.0, 0.24, 0.22, '#3a5ab8', '#ff8fb8');
+      if (p > 0) {
+        const hh = s * 0.42 * p * (a < 4.5 ? 1 - Math.exp(-5 * a) * Math.cos(16 * a) : 1),
+          bx = x + 0.18 * s,
+          by = y - 0.42 * s;
+        c.strokeStyle = '#9aa3b5';
+        c.lineWidth = Math.max(1, s * 0.012);
+        c.beginPath();
+        c.moveTo(bx, by);
+        for (let i = 1; i <= 8; i++) c.lineTo(bx + (i % 2 ? -1 : 1) * s * 0.05, by - (hh * i) / 8);
+        c.stroke();
+        c.font = `${Math.round(s * 0.3)}px system-ui`;
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText('🐱', bx, by - hh - s * 0.1);
+        c.textBaseline = 'alphabetic';
+        if (a > 0.3 && a < 2.4) {
+          c.fillStyle = '#ffffff';
+          c.font = `800 ${Math.round(Math.max(10, s * 0.11))}px system-ui`;
+          c.fillText('Miaou !', bx + s * 0.38, by - hh - s * 0.28);
+        }
+        // le couvercle ouvert
+        c.save();
+        c.translate(bx - s * 0.15, by);
+        c.rotate(-1.2 * p);
+        c.fillStyle = '#c0233a';
+        c.fillRect(0, -s * 0.05, s * 0.3, s * 0.05);
+        c.fillStyle = '#ffffff';
+        c.fillRect(s * 0.12, -s * 0.05, s * 0.06, s * 0.05);
+        c.restore();
+      }
+      c.save();
+      c.translate(x + 0.55 * p * s, y - 0.3 * s * Math.sin(p * Math.PI));
+      c.rotate(p * 1.57);
+      boite(0.0, 0.24, 0.22, '#3a5ab8', '#ff8fb8', 0, 0);
+      c.restore();
     } else if (ob.t == 'sapin') {
+      // surprise : il tremble, perd ses aiguilles (voir les éclats) et son étoile tombe, puis elle remonte
+      const as = age('sapin'),
+        sw = as < DUREE.sapin ? 0.28 * Math.exp(-2.2 * as) * Math.sin(as * 15) : 0,
+        pe = chambou('sapin', 0.6, 0.7);
+      c.save();
+      c.translate(x, y);
+      c.rotate(sw);
+      c.translate(-x, -y);
       for (let k = 0; k < 4; k++) {
         const w = (0.5 - k * 0.1) * s,
           yy = y - s * (0.2 + k * 0.33);
@@ -1902,15 +2163,31 @@ function mysLancer(cb, fic) {
           xx = x + Math.sin(k * 2.3) * s * (0.4 - (k % 7) * 0.05);
         ampoule(xx, yy, Math.max(1.2, s * 0.025), COUL[k % 5], Math.sin(t * 3 + k) > -0.3);
       }
+      c.restore();
       c.fillStyle = '#ffd76a';
       c.font = `${Math.round(s * 0.22)}px system-ui`;
       c.textAlign = 'center';
-      c.fillText('★', x, y - s * 1.6);
+      c.save();
+      c.translate(x + pe * s * 0.62, y - s * 1.6 + pe * s * (1.6 - 0.05) - Math.sin(pe * Math.PI) * s * 0.3);
+      c.rotate(pe * 2.8);
+      c.fillText('★', 0, s * 0.07);
+      c.restore();
     } else {
+      // l'antenne : touchée, elle se tord et fait des étincelles (et la télé du voisin grésille)
+      const pa = chambou('antenne', 0.25, 1),
+        piv = y - s * ob.h * 0.45;
       c.strokeStyle = '#3c4660';
       c.lineWidth = Math.max(1.2, s * 0.03);
       c.beginPath();
       c.moveTo(x, y);
+      c.lineTo(x, piv);
+      c.stroke();
+      c.save();
+      c.translate(x, piv);
+      c.rotate(pa * 0.75);
+      c.translate(-x, -piv);
+      c.beginPath();
+      c.moveTo(x, piv);
       c.lineTo(x, y - s * ob.h);
       for (let k = 0; k < 4; k++) {
         const yy = y - s * (ob.h - 0.1 - k * 0.22),
@@ -1922,10 +2199,11 @@ function mysLancer(cb, fic) {
       c.fillStyle = '#ffffff';
       for (let k = 0; k < 4; k++)
         c.fillRect(x - s * (0.45 - k * 0.08), y - s * (ob.h - 0.1 - k * 0.22) - s * 0.03, s * (0.9 - k * 0.16), s * 0.03);
-      c.fillStyle = '#ff5a5f';
+      c.fillStyle = pa > 0 && Math.sin(t * 30) > 0 ? '#ffe066' : '#ff5a5f';
       c.beginPath();
       c.arc(x, y - s * ob.h, s * 0.04, 0, 7);
       c.fill();
+      c.restore();
     }
   };
   const branche = (x, y, sens, sc, t) => {
@@ -2089,6 +2367,10 @@ function mysLancer(cb, fic) {
         F.vy = Math.abs(F.vy) * 0.25;
       }
     });
+    // les surprises : il suffit de passer tout près d'un élément
+    OBS.forEach(ob => {
+      if (Math.hypot(F.x - ob.x, F.z - ob.z) < ob.r + 0.45 && F.y < ob.h + 0.45) surprise(ob.t);
+    });
     if (F.tombe) return;
     // bord du toit côté caméra : il ne revient pas vers nous
     if (F.z < BORD && F.y < 0.5) {
@@ -2203,6 +2485,13 @@ function mysLancer(cb, fic) {
       for (let i = 0; i < 8; i++) pas(dt / 8);
       F.t += dt;
       bruit('glisse', F.sol && !F.in && !F.tombe ? Math.hypot(F.vx, F.vz) : 0);
+      if (!F.in && !F.sol && F.al > 0) {
+        // le traîneau et la lune, tout en haut du ciel
+        const [px, py] = P(F.x, F.y, F.z),
+          tp = traineauPos(t);
+        if (tp && px > tp.x - 98 && px < tp.x + 30 && Math.abs(py - tp.y) < 26) surprise('traineau', tp.x, tp.y);
+        if (Math.hypot(px - W * 0.8, py - H * 0.13) < 46) surprise('lune');
+      }
       if (!F.in) {
         const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
         F.arret = arrete || F.tombe || F.z > 14 ? F.arret + dt : 0;
@@ -2223,7 +2512,7 @@ function mysLancer(cb, fic) {
       F.al = F.ent;
     }
     ciel(t);
-    traineau(t);
+    traineau(t, dt);
     lyon();
     voisinsDessin(t);
     neige(dt, false);
