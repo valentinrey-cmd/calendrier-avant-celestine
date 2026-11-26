@@ -3,6 +3,12 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : vraie physique quand on rate, décors en plus
+- Quand le fichier rate la cheminée, il atterrit, glisse sur la neige avec du frottement, bute contre les obstacles (bonhomme de neige, pile de cadeaux, sapin, antenne) et s'arrête, sans saccade ni téléportation. S'il passe le faîtage ou le bord du toit, il tombe. Ensuite il s'efface doucement et un nouveau fichier glisse à sa place.
+- Décors ajoutés : au fond, des toits voisins enneigés avec des fenêtres allumées, une guirlande sur le faîtage et le traîneau du Père Noël qui passe devant la lune ; au premier plan, une guirlande lumineuse qui clignote et des branches de sapin avec des boules.
+- Version 1795690044
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 
 ## 26 novembre 2026 (11 h 45) : lancer du fichier mystère entièrement refait (version 1795687876)
 

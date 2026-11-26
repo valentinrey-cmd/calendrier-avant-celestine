@@ -996,7 +996,16 @@ function mysLancer(cb) {
     Z0 = 0.85,
     Y0 = 2.15,
     ANG = (52 * Math.PI) / 180; // angle du lancer
-  let W, H, dpr, f, hy, F, drag, hist, rate, fin, raf, t0, idle, fumees, flocons, etoiles, ville, eclats;
+  let W, H, dpr, f, hy, F, drag, hist, rate, fin, raf, t0, idle, fumees, flocons, etoiles, ville, voisins, eclats;
+  // obstacles posés sur le toit : le fichier bute contre eux (cylindres : x, z, rayon, hauteur)
+  const OBS = [
+    { t: 'bonhomme', x: -1.55, z: 3.7, r: 0.3, h: 1.05 },
+    { t: 'cadeaux', x: 1.55, z: 3.1, r: 0.34, h: 0.55 },
+    { t: 'sapin', x: 2.25, z: 7.2, r: 0.45, h: 1.7 },
+    { t: 'antenne', x: -2.3, z: 7.6, r: 0.1, h: 1.9 }
+  ];
+  const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
+    BORD = 0.75; // bord du toit côté caméra (la gouttière)
   const taille = () => {
     dpr = Math.min(2, devicePixelRatio || 1);
     W = innerWidth;
@@ -1008,6 +1017,11 @@ function mysLancer(cb) {
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     f = Math.min(W * 0.95, H * 0.55);
     hy = H * 0.3;
+    voisins = Array.from({ length: Math.ceil(W / 70) + 2 }, (_, i) => ({
+      x: i * 70 - 30 + ((i * 23) % 17),
+      w: 60 + ((i * 31) % 30),
+      h: 16 + ((i * 17) % 14)
+    }));
     ville = Array.from({ length: Math.ceil(W / 14) + 2 }, (_, i) => ({
       x: i * 14 - 7,
       h: 10 + ((i * 37) % 23) + (i % 5 == 0 ? 14 : 0),
@@ -1015,7 +1029,9 @@ function mysLancer(cb) {
     }));
   };
   const P = (x, y, z) => [W / 2 + (x * f) / z, hy - ((y - CAM) * f) / z, f / z]; // projection : [x écran, y écran, échelle]
-  const depart = () => (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0 });
+  // nouveau fichier : il remonte en douceur depuis le bas de l'écran
+  const depart = () =>
+    (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 });
   taille();
   depart();
   rate = fin = 0;
@@ -1129,6 +1145,7 @@ function mysLancer(cb) {
       [rx2] = P(9, 0, 8.5);
     c.fillStyle = '#e9eff9';
     c.fillRect(rx1, ry1 - 3, rx2 - rx1, 5);
+    guirlandeFaite(performance.now() / 1000);
   };
   const quad = (a, b, d, e, col) => {
     c.fillStyle = col;
@@ -1245,7 +1262,8 @@ function mysLancer(cb) {
     if (F.in) return;
     const [x, y, s] = P(F.x, 0, Math.max(0.6, F.z));
     if (y > H + 20) return;
-    const k = Math.max(0.15, 1 - F.y / 4);
+    if (F.tombe || F.al <= 0) return;
+    const k = Math.max(0.15, 1 - F.y / 4) * Math.min(1, F.al);
     c.fillStyle = `rgba(60,75,110,${0.28 * k})`;
     c.beginPath();
     c.ellipse(x, y, s * 0.17 * k + 2, s * 0.045 * k + 1, 0, 0, 7);
@@ -1254,7 +1272,9 @@ function mysLancer(cb) {
   const fichier = () => {
     const [x, y, s] = P(F.x, F.y, F.z),
       k = s * 0.0042; // le fichier mesure ~ 50 × 64 « unités » à 1 m
+    if (F.al <= 0) return;
     c.save();
+    c.globalAlpha = Math.max(0, Math.min(1, F.al));
     c.translate(x, y);
     c.rotate(F.a);
     c.scale(k, k);
@@ -1359,6 +1379,303 @@ function mysLancer(cb) {
     c.globalAlpha = 1;
   };
 
+  /* ---------- décors ajoutés : toits voisins, traîneau, guirlandes, obstacles, premier plan ---------- */
+  const COUL = ['#ff5a5f', '#ffd166', '#06d6a0', '#4cc9f0', '#f78cff'];
+  const ampoule = (x, y, r, col, on) => {
+    if (on) {
+      const g = c.createRadialGradient(x, y, 0, x, y, r * 4);
+      g.addColorStop(0, col + 'aa');
+      g.addColorStop(1, col + '00');
+      c.fillStyle = g;
+      c.fillRect(x - r * 4, y - r * 4, r * 8, r * 8);
+    }
+    c.fillStyle = on ? col : '#55607a';
+    c.beginPath();
+    c.ellipse(x, y + r * 0.3, r * 0.7, r, 0, 0, 7);
+    c.fill();
+    c.fillStyle = '#2a2f3a';
+    c.fillRect(x - r * 0.4, y - r * 0.9, r * 0.8, r * 0.5);
+  };
+  const voisinsDessin = t => {
+    // une rangée de toits voisins enneigés, avec leurs fenêtres allumées
+    const base = hy + 30;
+    voisins.forEach((v, i) => {
+      c.fillStyle = '#1d2c5a';
+      c.fillRect(v.x, base - v.h, v.w, v.h + 40);
+      c.beginPath();
+      c.moveTo(v.x - 4, base - v.h);
+      c.lineTo(v.x + v.w / 2, base - v.h - 16);
+      c.lineTo(v.x + v.w + 4, base - v.h);
+      c.closePath();
+      c.fillStyle = '#263a70';
+      c.fill();
+      c.strokeStyle = '#dfe8f8';
+      c.lineWidth = 2.5;
+      c.beginPath();
+      c.moveTo(v.x - 4, base - v.h);
+      c.lineTo(v.x + v.w / 2, base - v.h - 16);
+      c.lineTo(v.x + v.w + 4, base - v.h);
+      c.stroke();
+      for (let k = 0; k < 3; k++) {
+        const on = (i * 7 + k * 3) % 5 != 0;
+        c.fillStyle = on ? '#ffcf73' : '#33447a';
+        c.fillRect(v.x + 8 + k * (v.w / 3.2), base - v.h + 8, 7, 9);
+      }
+      if (i % 3 == 1) {
+        c.fillStyle = '#1d2c5a';
+        c.fillRect(v.x + v.w * 0.7, base - v.h - 18, 7, 12);
+        c.fillStyle = '#dfe8f8';
+        c.fillRect(v.x + v.w * 0.7 - 1, base - v.h - 19, 9, 2.5);
+      }
+    });
+  };
+  const traineau = t => {
+    // le traîneau du Père Noël passe devant la lune toutes les 14 s
+    const k = (t % 14) / 6;
+    if (k > 1) return;
+    const x = W * 1.1 - k * W * 1.25,
+      y = H * 0.14 + Math.sin(k * 6) * 8;
+    c.save();
+    c.translate(x, y);
+    c.fillStyle = '#0a1230';
+    for (let r = 0; r < 4; r++) {
+      const rx = -20 - r * 22,
+        ry = Math.sin(t * 8 + r) * 2;
+      c.beginPath();
+      c.ellipse(rx, ry, 8, 3.5, 0, 0, 7);
+      c.fill();
+      c.fillRect(rx - 6, ry, 1.6, 6);
+      c.fillRect(rx + 4, ry, 1.6, 6);
+      c.fillRect(rx - 8, ry - 7, 2, 6);
+      c.beginPath();
+      c.moveTo(rx - 9, ry - 7);
+      c.lineTo(rx - 13, ry - 11);
+      c.lineTo(rx - 7, ry - 9);
+      c.fill();
+    }
+    c.strokeStyle = '#0a1230';
+    c.lineWidth = 0.8;
+    c.beginPath();
+    c.moveTo(-16, 0);
+    c.lineTo(6, 2);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(4, 6);
+    c.quadraticCurveTo(6, -4, 22, -2);
+    c.lineTo(24, 6);
+    c.closePath();
+    c.fill();
+    c.beginPath();
+    c.arc(18, -6, 4, 0, 7);
+    c.fill();
+    c.fillStyle = '#c0233a';
+    c.beginPath();
+    c.arc(18, -6, 2, 0, 7);
+    c.fill();
+    c.restore();
+  };
+  const guirlandeFaite = t => {
+    // guirlande d'ampoules le long du faîtage
+    for (let x = -8.6; x <= 8.6; x += 0.45) {
+      const [px, py, s] = P(x, 0.02 + Math.abs(Math.sin(x * 3.5)) * 0.05, RIDGE);
+      if (px < -10 || px > W + 10) continue;
+      const i = Math.round(x / 0.45);
+      ampoule(px, py - s * 0.02, Math.max(1.3, s * 0.03), COUL[(i + 50) % 5], Math.sin(t * 2.5 + i) > -0.4);
+    }
+  };
+  const obstacle = (ob, t) => {
+    const [x, y, s] = P(ob.x, 0, ob.z);
+    // ombre
+    c.fillStyle = '#7d8db033';
+    c.beginPath();
+    c.ellipse(x + s * 0.12, y, s * ob.r * 1.3, s * ob.r * 0.3, 0, 0, 7);
+    c.fill();
+    if (ob.t == 'bonhomme') {
+      const boule = (yy, r) => {
+        const g = c.createRadialGradient(x - r * 0.35, yy - r * 0.35, r * 0.1, x, yy, r);
+        g.addColorStop(0, '#ffffff');
+        g.addColorStop(1, '#c6d3ea');
+        c.fillStyle = g;
+        c.beginPath();
+        c.arc(x, yy, r, 0, 7);
+        c.fill();
+      };
+      boule(y - s * 0.28, s * 0.3);
+      boule(y - s * 0.7, s * 0.21);
+      boule(y - s * 0.98, s * 0.14);
+      c.fillStyle = '#c0233a';
+      c.fillRect(x - s * 0.15, y - s * 0.86, s * 0.3, s * 0.06);
+      c.fillRect(x + s * 0.05, y - s * 0.86, s * 0.06, s * 0.2);
+      c.fillStyle = '#1b1b22';
+      c.fillRect(x - s * 0.13, y - s * 1.14, s * 0.26, s * 0.04);
+      c.fillRect(x - s * 0.08, y - s * 1.28, s * 0.16, s * 0.15);
+      [
+        [-0.05, -1.01],
+        [0.05, -1.01],
+        [0, -0.75],
+        [0, -0.66],
+        [0, -0.42]
+      ].forEach(([a, b]) => {
+        c.beginPath();
+        c.arc(x + a * s, y + b * s, s * 0.018, 0, 7);
+        c.fill();
+      });
+      c.fillStyle = '#f28c28';
+      c.beginPath();
+      c.moveTo(x, y - s * 0.97);
+      c.lineTo(x + s * 0.13, y - s * 0.95);
+      c.lineTo(x, y - s * 0.94);
+      c.fill();
+      c.strokeStyle = '#6b4a2b';
+      c.lineWidth = Math.max(1, s * 0.015);
+      c.beginPath();
+      c.moveTo(x - s * 0.18, y - s * 0.72);
+      c.lineTo(x - s * 0.42, y - s * 0.88);
+      c.moveTo(x + s * 0.18, y - s * 0.72);
+      c.lineTo(x + s * 0.4, y - s * 0.84);
+      c.stroke();
+    } else if (ob.t == 'cadeaux') {
+      const boite = (dx, w, hh, col, rub) => {
+        const bx = x + dx * s,
+          bw = w * s,
+          bh = hh * s;
+        c.fillStyle = col;
+        c.fillRect(bx - bw / 2, y - bh, bw, bh);
+        c.fillStyle = '#00000022';
+        c.fillRect(bx + bw * 0.2, y - bh, bw * 0.3, bh);
+        c.fillStyle = rub;
+        c.fillRect(bx - bw * 0.06, y - bh, bw * 0.12, bh);
+        c.fillRect(bx - bw / 2, y - bh * 0.55, bw, bh * 0.1);
+        c.fillStyle = '#ffffff';
+        c.fillRect(bx - bw / 2, y - bh - s * 0.02, bw, s * 0.035);
+      };
+      boite(-0.17, 0.34, 0.32, '#2f8f5b', '#ffd166');
+      boite(0.18, 0.3, 0.42, '#c0233a', '#ffffff');
+      boite(0.0, 0.24, 0.22, '#3a5ab8', '#ff8fb8');
+    } else if (ob.t == 'sapin') {
+      for (let k = 0; k < 4; k++) {
+        const w = (0.5 - k * 0.1) * s,
+          yy = y - s * (0.2 + k * 0.33);
+        c.fillStyle = k % 2 ? '#1f6b45' : '#22784d';
+        c.beginPath();
+        c.moveTo(x - w, yy);
+        c.lineTo(x, yy - s * 0.55);
+        c.lineTo(x + w, yy);
+        c.closePath();
+        c.fill();
+        c.fillStyle = '#eef4ff';
+        c.fillRect(x - w * 0.9, yy - s * 0.015, w * 1.8, s * 0.03);
+      }
+      c.fillStyle = '#5b3a22';
+      c.fillRect(x - s * 0.06, y - s * 0.2, s * 0.12, s * 0.2);
+      for (let k = 0; k < 14; k++) {
+        const yy = y - s * (0.25 + (k % 7) * 0.2),
+          xx = x + Math.sin(k * 2.3) * s * (0.4 - (k % 7) * 0.05);
+        ampoule(xx, yy, Math.max(1.2, s * 0.025), COUL[k % 5], Math.sin(t * 3 + k) > -0.3);
+      }
+      c.fillStyle = '#ffd76a';
+      c.font = `${Math.round(s * 0.22)}px system-ui`;
+      c.textAlign = 'center';
+      c.fillText('★', x, y - s * 1.6);
+    } else {
+      c.strokeStyle = '#3c4660';
+      c.lineWidth = Math.max(1.2, s * 0.03);
+      c.beginPath();
+      c.moveTo(x, y);
+      c.lineTo(x, y - s * ob.h);
+      for (let k = 0; k < 4; k++) {
+        const yy = y - s * (ob.h - 0.1 - k * 0.22),
+          w = s * (0.45 - k * 0.08);
+        c.moveTo(x - w, yy);
+        c.lineTo(x + w, yy);
+      }
+      c.stroke();
+      c.fillStyle = '#ffffff';
+      for (let k = 0; k < 4; k++)
+        c.fillRect(x - s * (0.45 - k * 0.08), y - s * (ob.h - 0.1 - k * 0.22) - s * 0.03, s * (0.9 - k * 0.16), s * 0.03);
+      c.fillStyle = '#ff5a5f';
+      c.beginPath();
+      c.arc(x, y - s * ob.h, s * 0.04, 0, 7);
+      c.fill();
+    }
+  };
+  const branche = (x, y, sens, sc, t) => {
+    // branche de sapin au premier plan, avec une boule
+    c.save();
+    c.translate(x, y);
+    c.scale(sens * sc, sc);
+    c.strokeStyle = '#4a3020';
+    c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(-10, 0);
+    c.quadraticCurveTo(60, -20, 150, -6);
+    c.stroke();
+    for (let k = 0; k < 34; k++) {
+      const u = k / 34,
+        bx = -10 + u * 160,
+        by = -20 * Math.sin(u * 2.6) - 4;
+      [-1, 1].forEach(sg => {
+        c.strokeStyle = sg > 0 ? '#1d5a3a' : '#2b7a4f';
+        c.lineWidth = 3;
+        c.beginPath();
+        c.moveTo(bx, by);
+        c.lineTo(bx + 16, by + sg * 22);
+        c.stroke();
+      });
+    }
+    c.fillStyle = '#ffffffcc';
+    for (let k = 0; k < 9; k++) {
+      c.beginPath();
+      c.ellipse(10 + k * 16, -18 * Math.sin((k / 9) * 2.6) - 12, 9, 4, -0.2, 0, 7);
+      c.fill();
+    }
+    const bx = 95,
+      by = 34 + Math.sin(t * 1.6) * 2;
+    c.strokeStyle = '#c9a24a';
+    c.lineWidth = 1.2;
+    c.beginPath();
+    c.moveTo(bx, -8);
+    c.lineTo(bx, by - 14);
+    c.stroke();
+    const g = c.createRadialGradient(bx - 5, by - 5, 2, bx, by, 15);
+    g.addColorStop(0, '#ff8c9a');
+    g.addColorStop(1, '#a3122a');
+    c.fillStyle = g;
+    c.beginPath();
+    c.arc(bx, by, 14, 0, 7);
+    c.fill();
+    c.fillStyle = '#d9b44a';
+    c.fillRect(bx - 4, by - 17, 8, 5);
+    c.fillStyle = '#ffffffaa';
+    c.beginPath();
+    c.ellipse(bx - 5, by - 5, 4, 2.5, -0.6, 0, 7);
+    c.fill();
+    c.restore();
+  };
+  const devant = t => {
+    // grosse guirlande au bord du toit, floue de près, et branches de sapin dans les coins
+    const y0 = H * 0.955;
+    c.strokeStyle = '#1b2436';
+    c.lineWidth = 2;
+    c.beginPath();
+    for (let i = 0; i <= 3; i++) {
+      const xa = (i - 0.5) * (W / 2.6),
+        xb = (i + 0.5) * (W / 2.6);
+      c.moveTo(xa, y0);
+      c.quadraticCurveTo((xa + xb) / 2, y0 + 26, xb, y0);
+    }
+    c.stroke();
+    for (let i = 0; i < 12; i++) {
+      const u = (i + 0.5) / 12,
+        xx = u * W,
+        seg = (xx + W / 5.2) % (W / 2.6),
+        yy = y0 + 4 + 26 * 4 * (seg / (W / 2.6)) * (1 - seg / (W / 2.6)) * 0.5;
+      ampoule(xx, yy, 6, COUL[i % 5], Math.sin(t * 2 + i * 1.3) > -0.5);
+    }
+    branche(-14, H * 0.93, 1, Math.min(1, W / 420), t);
+    branche(W + 14, H * 0.9, -1, Math.min(0.85, W / 480), t + 1);
+  };
+
   /* ===================== physique ===================== */
   const pas = h => {
     const p = { x: F.x, y: F.y, z: F.z };
@@ -1412,19 +1729,61 @@ function mysLancer(cb) {
         choc(0.6);
       }
     }
-    // le toit
-    if (F.y < 0.03) {
+    // obstacles du toit
+    OBS.forEach(ob => {
+      const dx = F.x - ob.x,
+        dz = F.z - ob.z,
+        d = Math.hypot(dx, dz),
+        m = ob.r + 0.12;
+      if (F.y < ob.h && d < m && d > 0) {
+        const nx = dx / d,
+          nz = dz / d,
+          v = F.vx * nx + F.vz * nz;
+        F.x = ob.x + nx * m;
+        F.z = ob.z + nz * m;
+        if (v < 0) {
+          F.vx -= 1.35 * v * nx;
+          F.vz -= 1.35 * v * nz;
+          F.va = -F.va * 0.5 + v * 2;
+          if (v < -0.8) choc(0.5);
+        }
+      }
+      // atterrir sur le dessus d'un obstacle bas (les cadeaux)
+      if (ob.t == 'cadeaux' && p.y >= ob.h && F.y < ob.h && d < ob.r) {
+        F.y = ob.h;
+        F.vy = Math.abs(F.vy) * 0.25;
+      }
+    });
+    if (F.tombe) return;
+    // bord du toit côté caméra : il ne revient pas vers nous
+    if (F.z < BORD && F.y < 0.5) {
+      F.z = BORD;
+      F.vz = Math.abs(F.vz) * 0.25;
+    }
+    // il passe le faîtage ou le bord : il tombe de l'autre côté
+    if (F.z > RIDGE || Math.abs(F.x) > 4.2) {
+      if (F.y < 0.05) F.tombe = 1;
+      return;
+    }
+    // le toit : rebonds, puis glissade sur la neige avec frottement
+    if (F.y <= 0.03) {
       F.y = 0.03;
-      if (Math.abs(F.vy) > 1.2) {
-        F.vy = Math.abs(F.vy) * 0.22;
-        F.va *= 0.5;
+      if (F.vy < -1.4) {
+        F.vy = -F.vy * 0.24;
+        F.vx *= 0.75;
+        F.vz *= 0.75;
+        F.va *= 0.6;
+        if (F.vy > 0.6) choc(0.35);
       } else {
         F.vy = 0;
         F.sol = 1;
+        const sp = Math.hypot(F.vx, F.vz),
+          dec = 3.2 * h; // frottement de la neige
+        if (sp <= dec) ((F.vx = 0), (F.vz = 0));
+        else ((F.vx *= 1 - dec / sp), (F.vz *= 1 - dec / sp));
+        F.va *= 1 - 6 * h;
+        F.a += (Math.round(F.a / Math.PI) * Math.PI - F.a) * 4 * h; // il se pose à plat
       }
-      F.vx *= 0.8;
-      F.vz *= 0.8;
-      F.va *= 0.9;
     }
   };
   const choc = k => {
@@ -1502,41 +1861,46 @@ function mysLancer(cb) {
     if (F.vol) {
       for (let i = 0; i < 8; i++) pas(dt / 8);
       F.t += dt;
-      if (!F.in && (F.sol ? F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.3 : F.z > 11 || F.z < 0.3 || Math.abs(F.x) > 5)) {
-        F.vol = 0;
-        setTimeout(() => {
+      if (!F.in) {
+        const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
+        F.arret = arrete || F.tombe || F.z > 14 ? F.arret + dt : 0;
+        // il s'efface doucement, puis un nouveau fichier arrive
+        if (F.arret > (F.tombe ? 0.05 : 0.7)) F.al -= dt * (F.tombe ? 3 : 2.2);
+        if (F.al <= 0 && !F.fin) {
+          F.fin = 1;
           if (!fin) {
             aide();
             depart();
+            F.ent = 0;
           }
-        }, 500);
+        }
       }
-    } else if (!drag && !fin) F.y = Y0 + Math.sin(t * 2.2) * 0.015;
+    } else if (!drag && !fin) {
+      F.ent = Math.min(1, F.ent + dt * 2.5);
+      F.y = Y0 - (1 - F.ent) ** 2 * 0.6 + Math.sin(t * 2.2) * 0.015;
+      F.al = F.ent;
+    }
     ciel(t);
+    traineau(t);
     lyon();
+    voisinsDessin(t);
     neige(dt, false);
     toit();
-    const loin = F.z > CZ + CD && !F.in;
-    if (loin) (ombre(), fichier());
-    chemineeFond(t);
-    if (F.in) {
-      c.save();
-      ouverture();
-      c.clip();
-      fichier();
-      c.restore();
-    }
-    chemineeDevant();
-    if (!loin && !F.in) (ombre(), fichier());
+    // tout ce qui est sur le toit, dessiné du plus loin au plus proche
+    const L = OBS.map(ob => [ob.z, () => obstacle(ob, t)]);
+    L.push([CZ, () => (chemineeFond(t), F.in && (c.save(), ouverture(), c.clip(), fichier(), c.restore()), chemineeDevant())]);
+    if (!F.in) L.push([F.z - (F.z > CZ - CD && F.z < CZ + CD && Math.abs(F.x) < CX ? 1 : 0) * 0, () => (ombre(), fichier())]);
+    L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
+    devant(t);
     guide(t);
     raf = requestAnimationFrame(boucle);
   };
 
   /* ===================== toucher ===================== */
   cv.addEventListener('pointerdown', e => {
-    if (F.vol || fin || e.clientY < H * 0.45) return;
+    if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45) return;
     drag = 1;
     idle = 0;
     hist = [[e.clientX, e.clientY, performance.now()]];
@@ -1582,6 +1946,7 @@ function mysLancer(cb) {
   cv.addEventListener('pointercancel', lacher);
   raf = requestAnimationFrame(boucle);
 }
+
 // le fichier choisi : d'abord le lancer dans la cheminée, puis on l'ouvre
 function mysOpen(input) {
   const f = input.files[0];
