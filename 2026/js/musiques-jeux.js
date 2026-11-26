@@ -1,43 +1,43 @@
 /* ---------- Musiques YouTube des mini-jeux (une chanson par jour) ---------- */
 const SONGS = {
-  '1': { 't': 'Babydoll', 'a': 'Dominic Fike' },
-  '2': { 't': 'Loser', 'a': 'Tame Impala' },
-  '3': { 't': 'Stolen Dance', 'a': 'Milky Chance' },
-  '4': { 't': 'The Fate of Ophelia', 'a': 'Taylor Swift' },
-  '5': { 't': 'Lush Life', 'a': 'Zara Larsson' },
-  '6': { 't': 'DtMF', 'a': 'Bad Bunny' },
-  '7': { 't': "Gigi l'amoroso", 'a': 'Dalida' },
-  '8': { 't': 'Le passé', 'a': 'TAL' },
-  '9': { 't': "Dine N'Dash", 'a': 'The Strokes' },
-  '10': { 't': 'Zoo (Zootopie 2)', 'a': 'Shakira' },
-  '11': { 't': 'Dracula (ft. JENNIE)', 'a': 'Tame Impala' },
-  '12': { 't': 'White Keys', 'a': 'Dominic Fike' },
-  '13': { 't': 'Out of My League', 'a': 'Fitz and The Tantrums' },
-  '14': { 't': 'Last Nite', 'a': 'The Strokes' },
-  '15': { 't': 'Opalite', 'a': 'Taylor Swift' },
-  '16': { 't': 'I Just Might', 'a': 'Bruno Mars' },
-  '17': { 't': 'Self Aware', 'a': 'Temper City' },
-  '18': { 't': 'Nothing Breaks Like a Heart', 'a': 'Mark Ronson ft. Miley Cyrus' },
-  '19': { 't': 'I Feel It Coming', 'a': 'The Weeknd ft. Daft Punk' },
-  '20': { 't': 'Diana', 'a': 'GIMS' },
-  '21': { 't': 'Black Madonna', 'a': 'Cage The Elephant' },
-  '22': { 't': "À l'international", 'a': 'TAL' },
-  '23': { 't': 'Dance, Dance', 'a': 'Fall Out Boy' },
-  '24': { 't': "I Was Made for Lovin' You", 'a': 'KISS' },
-  'b11': { 't': 'Audition · Edgar', 'a': 'Musique au choix' },
-  'b4': { 't': 'Audition · Noémie', 'a': 'Musique au choix' },
-  'b8': { 't': 'Audition · Emma', 'a': 'Musique au choix' },
-  'b15': { 't': 'Audition · Nora', 'a': 'Musique au choix' },
-  'b19': { 't': 'Audition · Sandrine', 'a': 'Musique au choix' },
-  'b22': { 't': 'Audition · Valentin', 'a': 'Musique au choix' },
-  'b24': { 't': 'Combat final', 'a': 'Musique au choix' },
-  'b25': { 't': 'Générique de fin', 'a': 'Musique au choix' },
-  'b26': { 't': 'Album photo', 'a': 'Musique au choix' },
-  'b27': { 't': 'Combat final · partie 2', 'a': 'Musique au choix' },
-  'b28': { 't': 'Combat final · partie 3', 'a': 'Musique au choix' },
-  'b29': { 't': 'Combat final · partie 4', 'a': 'Musique au choix' },
-  'b30': { 't': 'Combat final · dialogues', 'a': 'Musique au choix' },
-  'b31': { 't': 'Combat final · scène de fin', 'a': 'Musique au choix' }
+  1: { t: 'Babydoll', a: 'Dominic Fike' },
+  2: { t: 'Loser', a: 'Tame Impala' },
+  3: { t: 'Stolen Dance', a: 'Milky Chance' },
+  4: { t: 'The Fate of Ophelia', a: 'Taylor Swift' },
+  5: { t: 'Lush Life', a: 'Zara Larsson' },
+  6: { t: 'DtMF', a: 'Bad Bunny' },
+  7: { t: "Gigi l'amoroso", a: 'Dalida' },
+  8: { t: 'Le passé', a: 'TAL' },
+  9: { t: "Dine N'Dash", a: 'The Strokes' },
+  10: { t: 'Zoo (Zootopie 2)', a: 'Shakira' },
+  11: { t: 'Dracula (ft. JENNIE)', a: 'Tame Impala' },
+  12: { t: 'White Keys', a: 'Dominic Fike' },
+  13: { t: 'Out of My League', a: 'Fitz and The Tantrums' },
+  14: { t: 'Last Nite', a: 'The Strokes' },
+  15: { t: 'Opalite', a: 'Taylor Swift' },
+  16: { t: 'I Just Might', a: 'Bruno Mars' },
+  17: { t: 'Self Aware', a: 'Temper City' },
+  18: { t: 'Nothing Breaks Like a Heart', a: 'Mark Ronson ft. Miley Cyrus' },
+  19: { t: 'I Feel It Coming', a: 'The Weeknd ft. Daft Punk' },
+  20: { t: 'Diana', a: 'GIMS' },
+  21: { t: 'Black Madonna', a: 'Cage The Elephant' },
+  22: { t: "À l'international", a: 'TAL' },
+  23: { t: 'Dance, Dance', a: 'Fall Out Boy' },
+  24: { t: "I Was Made for Lovin' You", a: 'KISS' },
+  b11: { t: 'Audition · Edgar', a: 'Musique au choix' },
+  b4: { t: 'Audition · Noémie', a: 'Musique au choix' },
+  b8: { t: 'Audition · Emma', a: 'Musique au choix' },
+  b15: { t: 'Audition · Nora', a: 'Musique au choix' },
+  b19: { t: 'Audition · Sandrine', a: 'Musique au choix' },
+  b22: { t: 'Audition · Valentin', a: 'Musique au choix' },
+  b24: { t: 'Combat final', a: 'Musique au choix' },
+  b25: { t: 'Générique de fin', a: 'Musique au choix' },
+  b26: { t: 'Album photo', a: 'Musique au choix' },
+  b27: { t: 'Combat final · partie 2', a: 'Musique au choix' },
+  b28: { t: 'Combat final · partie 3', a: 'Musique au choix' },
+  b29: { t: 'Combat final · partie 4', a: 'Musique au choix' },
+  b30: { t: 'Combat final · dialogues', a: 'Musique au choix' },
+  b31: { t: 'Combat final · scène de fin', a: 'Musique au choix' }
 };
 /* Les fichiers audio sont importés par Valentin (mode admin) et gardés uniquement sur cet appareil (IndexedDB) */
 const MDB = (() => {
@@ -972,10 +972,310 @@ async function mysMake(input) {
     miss.length ? `<br><small class="muted">Pas reconnus : ${miss.map(esc).join(', ')}</small>` : ''
   );
 }
-async function mysOpen(input) {
+/* ---------- Fichier mystère : avant de l'ouvrir, on le lance dans la cheminée du Père Noël ---------- */
+// cb est appelé quand le fichier est tombé dans la cheminée
+function mysLancer(cb) {
+  const o = document.createElement('div');
+  o.className = 'mysl';
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Lance le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
+  document.body.appendChild(o);
+  const cv = o.querySelector('canvas'),
+    x = cv.getContext('2d'),
+    tip = o.querySelector('.mysl-tip'),
+    pass = o.querySelector('.mysl-pass');
+  let W, H, dpr, cx, ry, rw, F, drag, hist, rate, fin, raf, flocons;
+  const G = 1700,
+    FR = 24; // rayon de collision du fichier
+  const taille = () => {
+    dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth;
+    H = innerHeight;
+    cv.width = W * dpr;
+    cv.height = H * dpr;
+    cv.style.width = W + 'px';
+    cv.style.height = H + 'px';
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cx = W / 2;
+    ry = Math.max(240, H * 0.47);
+    rw = Math.min(W * 0.17, 74);
+  };
+  const depart = () => (F = { x: W * 0.26, y: H * 0.8, vx: 0, vy: 0, r: 0, vr: 0, vol: 0, in: 0, s: 1 });
+  taille();
+  depart();
+  rate = 0;
+  fin = 0;
+  flocons = Array.from({ length: 70 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: 1 + Math.random() * 2.4,
+    v: 20 + Math.random() * 40
+  }));
+  addEventListener('resize', taille);
+  // --- dessin ---
+  const rr = (X, Y, w, h, r) => {
+    x.beginPath();
+    x.moveTo(X + r, Y);
+    x.arcTo(X + w, Y, X + w, Y + h, r);
+    x.arcTo(X + w, Y + h, X, Y + h, r);
+    x.arcTo(X, Y + h, X, Y, r);
+    x.arcTo(X, Y, X + w, Y, r);
+    x.closePath();
+  };
+  const fichier = () => {
+    x.save();
+    x.translate(F.x, F.y);
+    x.rotate(F.r);
+    x.scale(F.s, F.s);
+    x.shadowColor = '#0003';
+    x.shadowBlur = 14;
+    x.shadowOffsetY = 6;
+    x.fillStyle = '#fff';
+    x.beginPath();
+    x.moveTo(-26, -34);
+    x.lineTo(12, -34);
+    x.lineTo(26, -20);
+    x.lineTo(26, 34);
+    x.lineTo(-26, 34);
+    x.closePath();
+    x.fill();
+    x.shadowColor = 'transparent';
+    x.fillStyle = '#e9ecef';
+    x.beginPath();
+    x.moveTo(12, -34);
+    x.lineTo(12, -20);
+    x.lineTo(26, -20);
+    x.closePath();
+    x.fill();
+    x.fillStyle = '#dde1e6';
+    [-18, -10, -2].forEach(l => x.fillRect(-16, l, l == -2 ? 22 : 32, 3));
+    x.fillStyle = '#c0233a';
+    rr(-20, 12, 40, 14, 3);
+    x.fill();
+    x.fillStyle = '#fff';
+    x.font = '800 9px system-ui,sans-serif';
+    x.textAlign = 'center';
+    x.fillText('AVENT', 0, 22.5);
+    x.fillStyle = '#2f8f5b';
+    x.fillRect(-3, -34, 6, 68);
+    x.font = '14px system-ui';
+    x.fillText('🎀', 0, -28);
+    x.restore();
+  };
+  const cheminee = devant => {
+    const top = ry,
+      w = rw * 1.25;
+    if (!devant) {
+      // toit
+      x.fillStyle = '#5b2a2a';
+      x.beginPath();
+      x.moveTo(-20, H);
+      x.lineTo(-20, top + rw * 2.6);
+      x.lineTo(W / 2, top + rw * 1.4);
+      x.lineTo(W + 20, top + rw * 2.6);
+      x.lineTo(W + 20, H);
+      x.fill();
+      x.fillStyle = '#f4f8ff';
+      x.beginPath();
+      x.moveTo(-20, top + rw * 2.6);
+      x.lineTo(W / 2, top + rw * 1.4);
+      x.lineTo(W + 20, top + rw * 2.6);
+      x.lineTo(W + 20, top + rw * 2.95);
+      x.quadraticCurveTo(W * 0.75, top + rw * 2.2, W / 2, top + rw * 1.75);
+      x.quadraticCurveTo(W * 0.25, top + rw * 2.2, -20, top + rw * 2.95);
+      x.fill();
+      // intérieur de la cheminée
+      x.fillStyle = '#1a0f0f';
+      x.beginPath();
+      x.ellipse(cx, top, w * 0.92, rw * 0.2, 0, 0, Math.PI * 2);
+      x.fill();
+      return;
+    }
+    // corps en briques (devant le fichier qui tombe dedans)
+    x.fillStyle = '#a8432f';
+    x.fillRect(cx - w * 0.92, top, w * 1.84, rw * 1.9);
+    x.strokeStyle = '#7a2c1f';
+    x.lineWidth = 1.5;
+    for (let r = 0; r < 7; r++) {
+      const yy = top + 6 + r * rw * 0.27;
+      x.beginPath();
+      x.moveTo(cx - w * 0.92, yy);
+      x.lineTo(cx + w * 0.92, yy);
+      x.stroke();
+      for (let c = 0; c < 5; c++) {
+        const xx = cx - w * 0.92 + ((c + (r % 2) * 0.5) * w * 1.84) / 4;
+        x.beginPath();
+        x.moveTo(xx, yy);
+        x.lineTo(xx, yy + rw * 0.27);
+        x.stroke();
+      }
+    }
+    // rebord et neige
+    x.fillStyle = '#8c3626';
+    x.fillRect(cx - w, top - 4, w * 2, 12);
+    x.fillStyle = '#f4f8ff';
+    x.beginPath();
+    x.ellipse(cx - w * 0.55, top - 5, w * 0.55, 7, 0, Math.PI, Math.PI * 2);
+    x.ellipse(cx + w * 0.45, top - 4, w * 0.6, 6, 0, Math.PI, Math.PI * 2);
+    x.fill();
+  };
+  const fond = dt => {
+    const g = x.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0d1b3d');
+    g.addColorStop(1, '#2a3f78');
+    x.fillStyle = g;
+    x.fillRect(0, 0, W, H);
+    x.fillStyle = '#fff6d8';
+    x.beginPath();
+    x.arc(W * 0.82, H * 0.18, 26, 0, Math.PI * 2);
+    x.fill();
+    x.fillStyle = '#fff';
+    flocons.forEach(f => {
+      f.y += f.v * dt;
+      f.x += Math.sin(f.y / 30) * 0.3;
+      if (f.y > H) ((f.y = -5), (f.x = Math.random() * W));
+      x.globalAlpha = 0.8;
+      x.beginPath();
+      x.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      x.fill();
+    });
+    x.globalAlpha = 1;
+  };
+  // --- physique ---
+  let t0 = performance.now();
+  const anneau = (px, py) => {
+    const dx = F.x - px,
+      dy = F.y - py,
+      d = Math.hypot(dx, dy);
+    if (d < FR + 4 && d > 0) {
+      const nx = dx / d,
+        ny = dy / d,
+        v = F.vx * nx + F.vy * ny;
+      if (v < 0) {
+        F.vx -= 1.6 * v * nx;
+        F.vy -= 1.6 * v * ny;
+        F.vr += v * 0.004;
+      }
+      F.x = px + nx * (FR + 4);
+      F.y = py + ny * (FR + 4);
+    }
+  };
+  const boucle = t => {
+    const dt = Math.min(0.033, (t - t0) / 1000);
+    t0 = t;
+    if (F.vol) {
+      const py = F.y;
+      F.vy += G * dt;
+      F.x += F.vx * dt;
+      F.y += F.vy * dt;
+      F.r += F.vr * dt;
+      if (!F.in) {
+        const bord = rw * 1.25 * 0.92;
+        anneau(cx - bord, ry);
+        anneau(cx + bord, ry);
+        if (py < ry && F.y >= ry && F.vy > 0 && Math.abs(F.x - cx) < bord - 6) {
+          F.in = 1;
+          F.vx *= 0.2;
+          marque();
+        }
+      } else {
+        F.x += (cx - F.x) * 0.12;
+        F.s = Math.max(0.55, F.s - dt * 0.8);
+        if (F.y > ry + rw) F.s = 0;
+      }
+      if (!F.in && (F.y > H + 120 || F.x < -120 || F.x > W + 120)) {
+        rate++;
+        aide();
+        depart();
+      }
+    }
+    fond(dt);
+    cheminee(0);
+    if (!F.in || F.y < ry + 30) fichier();
+    cheminee(1);
+    if (F.in) fumee(dt);
+    raf = requestAnimationFrame(boucle);
+  };
+  let puff = [];
+  const fumee = dt => {
+    if (puff.length < 26) puff.push({ x: cx + (Math.random() - 0.5) * 20, y: ry - 10, r: 6, a: 0.8 });
+    puff.forEach(p => {
+      p.y -= 60 * dt;
+      p.r += 18 * dt;
+      p.a -= 0.5 * dt;
+      x.fillStyle = `rgba(230,236,245,${Math.max(0, p.a)})`;
+      x.beginPath();
+      x.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      x.fill();
+    });
+  };
+  const aide = () => {
+    tip.textContent = rate >= 3 ? 'Lance plus fort, vers le haut, au-dessus de la cheminée ⬆️' : '';
+    if (rate >= 6) pass.classList.add('on');
+  };
+  const marque = () => {
+    if (fin) return;
+    fin = 1;
+    o.querySelector('.mysl-n i').textContent = '1';
+    try {
+      SFX('ok');
+    } catch (_) {}
+    tip.textContent = 'Ho ho ho ! 🎅';
+    setTimeout(() => {
+      try {
+        confetti();
+      } catch (_) {}
+    }, 300);
+    setTimeout(fermer, 1500);
+  };
+  const fermer = () => {
+    cancelAnimationFrame(raf);
+    removeEventListener('resize', taille);
+    o.remove();
+    cb();
+  };
+  pass.onclick = () => {
+    F.vol = 0;
+    marque();
+  };
+  // --- toucher : attraper le fichier et le lancer ---
+  cv.addEventListener('pointerdown', e => {
+    if (F.vol || fin || Math.hypot(e.clientX - F.x, e.clientY - F.y) > 70) return;
+    drag = 1;
+    hist = [[e.clientX, e.clientY, performance.now()]];
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    F.x = e.clientX;
+    F.y = e.clientY;
+    hist.push([e.clientX, e.clientY, performance.now()]);
+    if (hist.length > 6) hist.shift();
+  });
+  cv.addEventListener('pointerup', () => {
+    if (!drag) return;
+    drag = 0;
+    const a = hist[0],
+      b = hist[hist.length - 1],
+      dt = Math.max(16, b[2] - a[2]) / 1000;
+    let vx = (b[0] - a[0]) / dt,
+      vy = (b[1] - a[1]) / dt;
+    const v = Math.hypot(vx, vy),
+      m = Math.min(1, 2600 / (v || 1));
+    vx *= m;
+    vy *= m;
+    if (v < 200) return depart();
+    Object.assign(F, { vx, vy, vol: 1, vr: vx / 260 });
+  });
+  raf = requestAnimationFrame(boucle);
+}
+// le fichier choisi : d'abord le lancer dans la cheminée, puis on l'ouvre
+function mysOpen(input) {
   const f = input.files[0];
   input.value = '';
   if (!f) return;
+  mysLancer(() => mysLire(f));
+}
+async function mysLire(f) {
   try {
     const magic = new TextDecoder().decode(await f.slice(0, 19).arrayBuffer());
     if (!magic.startsWith('AVENTMUS1')) throw 0;

@@ -4,6 +4,15 @@
 
 ---
 
+## 26 novembre 2026 (11 h 30) : le fichier mystère se lance dans la cheminée (version 1795687162)
+
+- Quand Célestine choisit le fichier mystère, il ne s'ouvre plus tout de suite. Un écran « Livraison spéciale » apparaît : un toit enneigé la nuit, la lune, la neige qui tombe et une cheminée en briques. Elle attrape le fichier (emballé d'un ruban vert) et le lance d'une pichenette dans la cheminée.
+- S'il tombe dedans : fumée, « Ho ho ho ! 🎅 », confettis, le compteur « Livré » passe à 1, puis le fichier s'ouvre comme avant.
+- S'il rate, le fichier revient. Après 3 ratés, une aide s'affiche (« Lance plus fort, vers le haut… »). Après 6, un bouton « Le déposer à la main » apparaît.
+- Une version « panier de basket » a aussi été faite pour comparer. Valentin a choisi la cheminée, donc la version basket n'est pas gardée.
+- Code : `mysLancer()` dans `js/musiques-jeux.js`. `mysOpen()` lance le jeu, puis `mysLire()` ouvre le fichier (c'est l'ancien contenu de `mysOpen`). Styles `.mysl*` dans `css/06-boss-playlist.css`. Traductions anglaises ajoutées.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (11 h 15) : une enquête où il faut réfléchir (version 1795682360)
 
 Le scénario ne change pas. C'est la façon de découvrir les choses qui change : Célestine doit déduire elle-même.

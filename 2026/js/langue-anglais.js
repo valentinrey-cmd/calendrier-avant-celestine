@@ -3224,5 +3224,11 @@ window.TRADUCTIONS_EN = {
   'Jeudi 21 h 40 · au resto · photo de Noémie.': "Thursday 9:40 pm · at the restaurant · Noémie's photo.",
   'Vendredi 8 h 50 · TP, salle 214 · Snapchat d’Erika.': "Friday 8:50 am · lab, room 214 · Erika's Snapchat.",
   'Vendredi 7 h 51 · souvenir Snapchat de Célestine.': "Friday 7:51 am · Célestine's Snapchat memory.",
-  'Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.': '×8 enlargement of the tray, in the background of the 7:51 selfie.'
+  'Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.': '×8 enlargement of the tray, in the background of the 7:51 selfie.',
+  'Livraison spéciale': 'Special delivery',
+  'Lance le fichier dans la cheminée.': 'Throw the file down the chimney.',
+  'Livré': 'Delivered',
+  'Le déposer à la main': 'Drop it in by hand',
+  'Lance plus fort, vers le haut, au-dessus de la cheminée ⬆️': 'Throw harder, upwards, above the chimney ⬆️',
+  'Ho ho ho ! 🎅': 'Ho ho ho! 🎅'
 };

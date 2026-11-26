@@ -1423,3 +1423,71 @@ p.vc-b {
     width: 99%;
   }
 }
+
+/* fichier mystère : le lancer dans la cheminée du Père Noël (js/musiques-jeux.js, mysLancer) */
+.mysl {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mysl canvas {
+  display: block;
+}
+.mysl-h {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 22px);
+  left: 22px;
+  right: 22px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  pointer-events: none;
+}
+.mysl-h b {
+  display: block;
+  font-size: 1.6rem;
+  color: #fff;
+}
+.mysl-h small {
+  font-size: 0.9rem;
+  color: #c8d4f0;
+}
+.mysl-n {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  font-size: 0.78rem;
+  color: #dfe7fb;
+  background: #ffffff22;
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+.mysl-n i {
+  font-style: normal;
+  font-weight: 800;
+  color: #ffd76a;
+}
+.mysl-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+  text-align: center;
+  font: 600 0.95rem system-ui, sans-serif;
+  color: #fff;
+  pointer-events: none;
+}
+.mysl-pass {
+  position: absolute;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  transform: translateX(-50%);
+  display: none;
+  width: auto;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+.mysl-pass.on {
+  display: block;
+}
