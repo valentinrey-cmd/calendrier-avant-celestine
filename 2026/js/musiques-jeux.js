@@ -1203,6 +1203,21 @@ function mysSons(A, musique = true) {
       ton(t, 110, 0.4, 0.25, 'sine', 45);
       for (let i = 0; i < 9; i++) ton(t + 0.05 + Math.random() * 0.5, 2000 + Math.random() * 2500, 0.25, 0.025);
     },
+    // la danse de la victoire : un petit rythme de breakdance (la boîte à musique se tait)
+    beat: () => {
+      musique = false;
+      const t = now() + 0.05,
+        q = 60 / 104 / 4; // une double-croche à 104 battements par minute
+      for (let i = 0; i < 64; i++) {
+        const tt = t + i * q,
+          j = i % 16;
+        if (j == 0 || j == 10 || j == 7) ton(tt, 150, 0.16, 0.32, 'sine', 42);
+        if (j == 4 || j == 12) (souffle(tt, 0.14, 0.18, 'bandpass', 1900, 0, 0.8, 0.002), ton(tt, 210, 0.08, 0.08, 'triangle', 140));
+        if (j % 2 == 0) souffle(tt, 0.035, j % 4 == 2 ? 0.05 : 0.03, 'highpass', 8000, 0, 1, 0.002);
+        if (j == 14 && i > 32) souffle(tt, 0.06, 0.12, 'bandpass', 2300, 0, 1, 0.002);
+      }
+      [523, 659, 784, 1047].forEach((f, i) => ton(t + 64 * q + i * 0.08, f, 0.5, 0.05, 'triangle'));
+    },
     fin: () => {
       clearInterval(iv);
       try {
@@ -2771,7 +2786,10 @@ function mysLancer(cb, fic) {
         confetti();
       } catch (_) {}
     }, 400);
-    setTimeout(fermer, 2000);
+    // Célestine fête ça : une petite chorégraphie de breakdance (voir danse), puis on ouvre le fichier
+    C.danse = T() + 0.5;
+    setTimeout(() => bruit('beat'), 500);
+    setTimeout(fermer, 5600);
   };
   const aide = () => {
     rate++;
@@ -2807,10 +2825,32 @@ function mysLancer(cb, fic) {
       sn = Math.sin(C.phi - V.yaw);
     return [X * cs + Z * sn, -Y, X * sn - Z * cs]; // [x écran, y écran, profondeur vers nous]
   };
+  // la chorégraphie (en secondes depuis le début) : pas de danse debout, descente au sol, tourne sur la tête
+  // jambes écartées, pose figée, puis elle se relève d'un saut et lève les bras
+  const danse = () => {
+    if (!C.danse) return null;
+    const d = T() - C.danse,
+      lisse = k => k * k * (3 - 2 * k);
+    if (d < 0) return null;
+    if (d < 1.1) return { e: 'debout', d, rot: 0, ecart: 0 };
+    if (d < 1.45) return { e: 'descend', d, rot: Math.PI * lisse((d - 1.1) / 0.35), ecart: 10 * ((d - 1.1) / 0.35) };
+    if (d < 3.3) return { e: 'tourne', d, rot: Math.PI, ecart: 24 };
+    if (d < 3.7) return { e: 'pose', d, rot: Math.PI, ecart: 14 };
+    if (d < 4.05) return { e: 'remonte', d, rot: Math.PI + Math.PI * lisse((d - 3.7) / 0.35), ecart: 14 * (1 - (d - 3.7) / 0.35) };
+    return { e: 'bravo', d, rot: 0, ecart: 0 };
+  };
   const poses = () => {
     const sw = Math.sin(C.ph),
       a = C.amp,
-      lt = T() - C.lanceT;
+      lt = T() - C.lanceT,
+      dz = danse();
+    if (dz) {
+      const w = Math.sin(dz.d * 7);
+      if (dz.e == 'debout') return { d: [14 + w * 4, 124 + w * 18, 26], g: [-14 + w * 4, 124 - w * 18, 26] }; // poings qui alternent
+      if (dz.e == 'tourne' || dz.e == 'descend') return { d: [26, 166, 4], g: [-26, 166, 4] }; // mains au sol, près de la tête
+      if (dz.e == 'pose') return { d: [24, 166, 4], g: [-34, 96, 8] }; // une main au sol, l'autre bras tendu
+      return { d: [19, 196 + w * 4, 4], g: [-19, 196 - w * 4, 4] }; // bras en l'air
+    }
     if (C.charge) return { d: [17, 172, -16], g: [-22, 130, 24] }; // bras armé derrière la tête, l'autre bras vise
     if (lt < 0.35) {
       const k = lt / 0.35; // le bras part vers l'avant
@@ -2836,6 +2876,18 @@ function mysLancer(cb, fic) {
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
   const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, yaw: 0 };
   const marche = dt => {
+    const dz = danse();
+    if (dz) {
+      // pendant la danse, on ne la dirige plus
+      C.v = 0;
+      C.pen *= 0.9;
+      const face = V.yaw + Math.PI;
+      if (dz.e == 'tourne') C.phi += dt * 12 * Math.min(1, (dz.d - 1.45) * 3);
+      else if (dz.e != 'pose') C.phi += Math.atan2(Math.sin(face - C.phi), Math.cos(face - C.phi)) * Math.min(1, dt * 8);
+      C.amp = dz.e == 'debout' ? 0.8 : dz.e == 'bravo' ? 0.3 : 0;
+      C.ph += dt * (dz.e == 'debout' ? 9 : 6);
+      return;
+    }
     // vitesse voulue, par rapport à la vue : vers le haut du joystick = droit devant
     const ix = Math.max(-1, Math.min(1, ctl.jx + ctl.kx)),
       iy = Math.max(-1, Math.min(1, ctl.jy + ctl.ky)),
@@ -2944,6 +2996,8 @@ function mysLancer(cb, fic) {
       cs = Math.cos(C.phi - V.yaw), // sa direction par rapport à la caméra (comme proj)
       sn = Math.sin(C.phi - V.yaw),
       po = poses(),
+      dz = danse(),
+      EC = dz ? dz.ecart : 0, // écart des jambes (danse)
       TRAIT = 'rgba(70,25,45,0.38)';
     // ombre au sol
     c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y)})`;
@@ -2955,6 +3009,14 @@ function mysLancer(cb, fic) {
     c.scale(u, u);
     c.rotate(C.pen * 0.05);
     c.translate(0, bob);
+    if (dz && dz.rot) {
+      // tête en bas : on la fait pivoter autour des hanches, la tête posée sur la neige
+      const k = dz.rot <= Math.PI ? dz.rot / Math.PI : (2 * Math.PI - dz.rot) / Math.PI;
+      c.translate(0, -8 * k - (dz.e == 'remonte' ? Math.sin(k * Math.PI) * 30 : 0));
+      c.translate(0, -81);
+      c.rotate(dz.rot);
+      c.translate(0, 81);
+    }
     c.lineJoin = c.lineCap = 'round';
     const ombre = d => Math.max(0, Math.min(1, 0.5 - d / 40)); // plus c'est loin de nous, plus c'est dans l'ombre
     const mix = (c1, c2, k) => {
@@ -2980,10 +3042,11 @@ function mysLancer(cb, fic) {
         zf = -cote * sw * 16 * a, // le pied avance et recule
         plie = Math.max(0, -cote * cw) * 7 * a,
         X = cote * 8.5,
+        Xe = cote * (8.5 + EC),
         H = proj(X, 80, 0),
-        K = proj(X, 43 + lev * 0.4, zf * 0.5 + plie),
-        A = proj(X, 9 + lev, zf),
-        T2 = proj(X, 3 + lev, zf + 12),
+        K = proj((X + Xe) / 2, 43 + lev * 0.4, zf * 0.5 + plie),
+        A = proj(Xe, 9 + lev, zf),
+        T2 = proj(Xe, 3 + lev, zf + 12),
         d = (H[2] + A[2]) / 2,
         k = ombre(d);
       return {
