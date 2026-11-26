@@ -3238,5 +3238,7 @@ window.TRADUCTIONS_EN = {
   'Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.': 'Come back here, tap the second button and pick it from your downloads.',
   '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
   'Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !': 'Joystick to walk, slide your finger to turn the view. Hold “Throw” and let go at the right moment!',
-  'Tourne la vue pile vers la cheminée et relâche au bon moment 🎯': 'Turn the view right toward the chimney and let go at the right moment 🎯'
+  'Va le ramasser, puis vise pile la cheminée 🎯': 'Go pick it up, then aim right at the chimney 🎯',
+  'Raté ! Va ramasser le fichier 😉': 'Missed! Go pick up the file 😉',
+  'Il est tombé du toit… le revoilà ! ⬇️': 'It fell off the roof… here it comes again! ⬇️'
 };

@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : on ramasse le fichier raté, il retombe du ciel s'il sort du toit
+- Après un lancer raté, le fichier ne revient plus tout seul dans sa main : il reste là où il s'est arrêté, avec une flèche rose qui rebondit au-dessus. Célestine doit marcher dessus pour le ramasser (elle se baisse, petit bruit). Le bouton « Lancer » est grisé tant qu'elle n'a pas de fichier en main.
+- S'il sort du toit (derrière le faîtage ou sur les côtés), il disparaît puis retombe du ciel à un endroit libre du toit (loin de la cheminée, des obstacles et de Célestine).
+- Bords du toit : la surface grisâtre (l'autre pan du toit) et le fond sombre sous les maisons sont supprimés. Au bord, on ne voit plus que le ciel.
+- Version 1795711313
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : vraie chorégraphie de breakdance et tir façon basket
 - Danse de la victoire refaite (8 s) : toprock (pas croisés, bras qui balancent, buste qui se balance), moonwalk (de profil, elle « marche » mais glisse en arrière), descente au sol, windmill (elle tourne sur le dos, jambes en V, bras écartés), headspin qui accélère, baby freeze (pose figée penchée, une main au sol), saut périlleux pour se relever, puis bras en l'air avec des cœurs qui s'envolent. Un projecteur éclaire la piste, le rythme dure toute la danse, et le fichier s'ouvre juste après.
 - Tir façon basket : en maintenant « Lancer », elle fléchit les genoux et tient le fichier à deux mains au-dessus du front, coudes pliés. En relâchant, elle saute, tend le bras vers le haut et l'avant (coup de poignet) et lâche le fichier en haut du saut. L'autre main se retire, et elle amortit en retombant. Les coudes sont maintenant placés en 3D.

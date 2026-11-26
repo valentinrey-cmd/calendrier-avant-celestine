@@ -1144,6 +1144,12 @@ function mysSons(A, musique = true) {
       feu.g.gain.setTargetAtTime(0.07, t + 1.4, 0.4);
       [1047, 1319, 1568, 2093, 2637].forEach((f, i) => cloche(t + 0.45 + i * 0.09, f, 0.05));
     },
+    // elle ramasse le fichier
+    ramasse: () => {
+      const t = now();
+      souffle(t, 0.12, 0.08, 'bandpass', 2400, 1200, 1.2, 0.005);
+      ton(t + 0.05, 880, 0.18, 0.05, 'triangle', 1320);
+    },
     // Célestine à pied : ses pas dans la neige
     pas: k => {
       const t = now();
@@ -1566,22 +1572,6 @@ function mysLancer(cb, fic) {
     });
   };
   const toit = () => {
-    // le bas des maisons voisines (on le voit quand on regarde le long du toit)
-    c.fillStyle = '#1a2850';
-    c.fillRect(0, hy + 30, W, H);
-    // l'autre pan du toit, qui redescend derrière le faîtage (on le voit quand la caméra est tout en haut)
-    if (
-      V.z > RIDGE - 3 &&
-      poly([
-        [-9, 0, RIDGE],
-        [9, 0, RIDGE],
-        [9, -5, RIDGE + 9],
-        [-9, -5, RIDGE + 9]
-      ])
-    ) {
-      c.fillStyle = '#b9c7e2';
-      c.fill();
-    }
     // pan de toit enneigé
     if (
       poly([
@@ -2791,10 +2781,39 @@ function mysLancer(cb, fic) {
     setTimeout(() => bruit('beat'), 500);
     setTimeout(fermer, (DANSE + 0.9) * 1000);
   };
+  // le fichier sorti du toit retombe du ciel, à un endroit libre du toit
+  // flèche rose qui rebondit au-dessus du fichier à ramasser
+  const fleche = t => {
+    const [x, y, s, d] = P(F.x, F.y + 0.5 + Math.abs(Math.sin(t * 4)) * 0.12, F.z);
+    if (d < 0.4) return;
+    const k = Math.max(8, s * 0.09);
+    c.fillStyle = '#ff6fa3';
+    c.strokeStyle = '#ffffff';
+    c.lineWidth = Math.max(1.5, k * 0.18);
+    c.beginPath();
+    c.moveTo(x - k, y - k * 0.9);
+    c.lineTo(x + k, y - k * 0.9);
+    c.lineTo(x, y + k * 0.5);
+    c.closePath();
+    c.fill();
+    c.stroke();
+  };
+  const retombe = () => {
+    let x = 0,
+      z = 3;
+    for (let i = 0; i < 40; i++) {
+      x = (Math.random() - 0.5) * 9;
+      z = 1.6 + Math.random() * 6.2;
+      const libre =
+        !(Math.abs(x) < CX + 0.5 && Math.abs(z - CZ) < CD + 0.5) && OBS.every(ob => Math.hypot(x - ob.x, z - ob.z) > ob.r + 0.6);
+      if (libre && Math.hypot(x - C.x, z - C.z) > 1.2) break;
+    }
+    F = { x, y: 7, z, vx: 0, vy: -1, vz: 0, a: Math.random() * 6, va: 4, vol: 1, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 };
+    tip.textContent = 'Il est tombé du toit… le revoilà ! ⬇️';
+  };
   const aide = () => {
     rate++;
-    tip.textContent =
-      rate >= 3 ? 'Tourne la vue pile vers la cheminée et relâche au bon moment 🎯' : rate == 1 ? 'Presque ! Réessaie 😉' : '';
+    tip.textContent = rate >= 3 ? 'Va le ramasser, puis vise pile la cheminée 🎯' : 'Raté ! Va ramasser le fichier 😉';
   };
   const fermer = () => {
     cancelAnimationFrame(raf);
@@ -2883,6 +2902,12 @@ function mysLancer(cb, fic) {
       lt = T() - C.tir,
       mix3 = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
     if (C.charge) return { ...SET, acc: 9 };
+    const rm = T() - (C.ramasse || -9);
+    if (rm < 0.4) {
+      // elle se baisse pour ramasser le fichier
+      const k = Math.sin((rm / 0.4) * Math.PI);
+      return { d: [22, 87 - k * 40, k * 22], g: [-24, 85 - k * 10, 0], acc: k * 26 };
+    }
     if (lt < 0.75) {
       // … puis elle saute, tend le bras vers le haut et l'avant (coup de poignet), l'autre main se retire
       const k = Math.min(1, lt / 0.22),
@@ -2978,6 +3003,16 @@ function mysLancer(cb, fic) {
     });
     C.x = Math.max(-8.4, Math.min(8.4, C.x));
     C.z = Math.max(0.9, Math.min(RIDGE - 0.3, C.z));
+    // elle ramasse le fichier en passant dessus
+    if (!C.tient && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
+      C.tient = 1;
+      C.ramasse = T();
+      F.vol = 0;
+      F.pose = 0;
+      bruit('ramasse');
+      tip.textContent = '';
+    }
+    btn.classList.toggle('vide', !C.tient); // pas de fichier en main : bouton grisé
     // la jauge de force monte et redescend tant qu'on maintient « Lancer »
     if (C.charge) {
       const k = (T() - C.charge) / REMPLI;
@@ -3638,17 +3673,17 @@ function mysLancer(cb, fic) {
       for (let i = 0; i < 8; i++) pas(dt / 8);
       F.t += dt;
       bruit('glisse', F.sol && !F.in && !F.tombe ? Math.hypot(F.vx, F.vz) : 0);
-      if (!F.in) {
-        const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
-        F.arret = arrete || F.tombe || prof(F.x, F.z) > 14 ? F.arret + dt : 0;
-        // il s'efface doucement, puis un nouveau fichier arrive
-        if (F.arret > (F.tombe ? 0.05 : 0.7)) F.al -= dt * (F.tombe ? 3 : 2.2);
-        if (F.al <= 0 && !F.fin) {
-          F.fin = 1;
-          if (!fin) {
-            aide();
-            nouveau(); // un nouveau fichier revient dans sa main
-          }
+      if (!F.in && !fin) {
+        // raté : il reste là où il s'est arrêté (il faut aller le ramasser) ;
+        // tombé du toit : il disparaît puis retombe du ciel sur le toit
+        const repos = F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.03 && Math.abs(F.vy) < 0.05 && !F.tombe;
+        if (repos && !F.pose) {
+          F.pose = 1;
+          aide();
+        }
+        if (F.tombe) {
+          F.al -= dt * 3;
+          if (F.al <= 0) retombe();
         }
       }
     }
@@ -3674,7 +3709,7 @@ function mysLancer(cb, fic) {
       L.push([
         prof(F.x, F.z),
         () => {
-          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier());
+          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier(), F.pose && fleche(t));
           // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
           c.save();
           poly([

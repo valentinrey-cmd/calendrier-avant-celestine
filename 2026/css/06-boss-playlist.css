@@ -1629,6 +1629,10 @@ p.vc-b {
   top: 54px;
   text-align: center;
 }
+.mysl-lance.vide {
+  opacity: 0.45;
+  filter: grayscale(0.6);
+}
 .mysl-lance.on b {
   transform: scale(0.94);
 }
