@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : bruitages et petite musique
+- Le lancer du fichier dans la cheminée a maintenant du son, entièrement synthétisé : le feu qui crépite et le vent en fond, un « ffuit » au lancer, un bruit feutré quand le fichier tombe dans la neige, un frottement quand il glisse, un « toc » sur les briques, un bruit différent pour chaque obstacle (bonhomme, cadeaux, sapin avec grelots, antenne qui tinte), un sifflement quand il tombe du toit, et quand il entre dans la cheminée, une dégringolade, le feu qui s'emballe et des clochettes.
+- Une petite musique de fond en boîte à musique (« Douce nuit », avec des grelots) joue pendant le lancer. La musique d'ambiance du site s'arrête pendant le lancer puis reprend après.
+- Le son respecte les paramètres : rien si les sons sont coupés, pas de musique si la musique est coupée ou si une chanson du lecteur joue.
+- Version 1795691359
+- Fichiers : `2026/js/musiques-jeux.js` (nouvelle fonction `mysSons`), `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : le fichier lancé ressemble au vrai fichier, lancer plus dur
 - Le fichier qu'on lance prend l'apparence du fichier choisi : une photo s'affiche en vrai tirage, une vidéo montre une image de la vidéo, et un PDF, une musique, un document Word ou Excel, une archive ou un autre fichier prennent une icône et une couleur selon leur type, avec leur extension. Le fichier .avent garde son paquet cadeau.
 - Le lancer est plus dur : l'aide qui ramenait le tir vers la cheminée est supprimée. Il faut doser la force (environ ±6 %) : un peu trop faible, le fichier tape contre la cheminée et retombe ; un peu trop fort, il passe derrière. Il faut aussi viser plus droit.

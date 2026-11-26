@@ -972,6 +972,192 @@ async function mysMake(input) {
     miss.length ? `<br><small class="muted">Pas reconnus : ${miss.map(esc).join(', ')}</small>` : ''
   );
 }
+/* ---------- Fichier mystère : les bruitages et la petite musique du lancer ----------
+   Tout est synthétisé. A est un AudioContext (ou un OfflineAudioContext pour fabriquer un extrait). */
+function mysSons(A, musique = true) {
+  const M = A.createGain();
+  M.gain.value = 0.0001;
+  M.connect(A.destination);
+  M.gain.exponentialRampToValueAtTime(1.4, A.currentTime + 1.2);
+  const now = () => A.currentTime;
+  const bruit = (() => {
+    const b = A.createBuffer(1, A.sampleRate * 2, A.sampleRate),
+      d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return b;
+  })();
+  // un souffle de bruit filtré (type : lowpass, bandpass, highpass), avec un balayage de fréquence possible
+  const souffle = (t, d, v, type, f1, f2, q = 1, att = 0.01) => {
+    const s = A.createBufferSource(),
+      f = A.createBiquadFilter(),
+      g = A.createGain();
+    s.buffer = bruit;
+    s.loop = true;
+    f.type = type;
+    f.Q.value = q;
+    f.frequency.setValueAtTime(f1, t);
+    if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + att);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f).connect(g).connect(M);
+    s.start(t, Math.random());
+    s.stop(t + d + 0.05);
+  };
+  const ton = (t, fq, d, v, type = 'sine', f2) => {
+    const o = A.createOscillator(),
+      g = A.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(fq, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g).connect(M);
+    o.start(t);
+    o.stop(t + d + 0.05);
+  };
+  // fond continu : le grondement du feu dans la cheminée et le vent sur les toits
+  const continu = (type, fq, v) => {
+    const s = A.createBufferSource(),
+      f = A.createBiquadFilter(),
+      g = A.createGain();
+    s.buffer = bruit;
+    s.loop = true;
+    f.type = type;
+    f.frequency.value = fq;
+    g.gain.value = v;
+    s.connect(f).connect(g).connect(M);
+    s.start();
+    return { s, f, g };
+  };
+  const feu = continu('lowpass', 380, 0.07),
+    vent = continu('bandpass', 520, 0.018),
+    glis = continu('bandpass', 1500, 0);
+  vent.f.Q.value = 0.7;
+  glis.f.Q.value = 0.6;
+  glis.g.gain.value = 0;
+  // la boîte à musique : « Douce nuit » (Franz Gruber, 1818), lente et douce, avec des grelots
+  const DN =
+      'G4:1.5 A4:.5 G4:1 E4:3 G4:1.5 A4:.5 G4:1 E4:3 D5:2 D5:1 B4:3 C5:2 C5:1 G4:3 A4:2 A4:1 C5:1.5 B4:.5 A4:1 G4:1.5 A4:.5 G4:1 E4:3 A4:2 A4:1 C5:1.5 B4:.5 A4:1 G4:1.5 A4:.5 G4:1 E4:3 D5:2 D5:1 F5:1.5 D5:.5 B4:1 C5:3 E5:3 C5:1.5 G4:.5 E4:1 G4:1.5 F4:.5 D4:1 C4:6 R:3'
+        .split(' ')
+        .map(x => x.split(':')),
+    BAS = {
+      0: 'C3',
+      6: 'C3',
+      12: 'G2',
+      18: 'C3',
+      24: 'F2',
+      30: 'C3',
+      36: 'F2',
+      42: 'C3',
+      48: 'G2',
+      54: 'C3',
+      60: 'C3',
+      66: 'C3',
+      72: 'G2',
+      78: 'C3'
+    },
+    hz = n => {
+      const i = 'C C# D D# E F F# G G# A A# B'.split(' ').indexOf(n.slice(0, -1));
+      return 440 * 2 ** ((i - 9) / 12 + (+n.slice(-1) - 4));
+    },
+    BT = 0.34;
+  const cloche = (t, fq, v) => {
+    ton(t, fq, 1.6, v);
+    ton(t, fq * 2, 0.7, v * 0.35);
+    ton(t, fq * 3.01, 0.35, v * 0.12);
+  };
+  let mi = 0,
+    mt = now() + 0.8,
+    mb = 0,
+    ct = now();
+  const prevoir = h => {
+    // musique
+    while (musique && mt < now() + h) {
+      const [n, d] = DN[mi];
+      if (BAS[mb] != null) ton(mt, hz(BAS[mb]), BT * 5, 0.05, 'triangle');
+      if (n != 'R') cloche(mt, hz(n), 0.06);
+      if (mb % 3 == 0) souffle(mt, 0.09, 0.012, 'highpass', 7000);
+      mt += +d * BT;
+      mb += +d;
+      if (++mi >= DN.length) ((mi = 0), (mb = 0));
+    }
+    // crépitements du feu : petits craquements au hasard
+    while (ct < now() + h) {
+      ct += 0.03 + Math.random() * 0.16;
+      const v = Math.random() < 0.15 ? 0.09 : 0.03 * Math.random() + 0.008;
+      souffle(ct, 0.012 + Math.random() * 0.03, v, 'bandpass', 1500 + Math.random() * 3500, 0, 1.4, 0.002);
+    }
+  };
+  const iv = A instanceof (window.OfflineAudioContext || Object) ? 0 : setInterval(() => prevoir(0.6), 200);
+  prevoir(0.6);
+  return {
+    prevoir,
+    // le geste : un « ffuit » qui monte avec la force
+    lance: k => {
+      const t = now();
+      souffle(t, 0.4, 0.09 * k, 'bandpass', 500, 1800, 1.2, 0.05);
+    },
+    // la neige : un « crouch » feutré
+    neige: k => {
+      const t = now();
+      souffle(t, 0.16, 0.14 * k, 'lowpass', 1100, 300, 0.8);
+      for (let i = 0; i < 4; i++) souffle(t + i * 0.025, 0.03, 0.05 * k, 'bandpass', 2200 + Math.random() * 1500, 0, 2, 0.002);
+    },
+    // les briques de la cheminée : un « toc » sourd
+    brique: k => {
+      const t = now();
+      ton(t, 160, 0.14, 0.22 * k, 'sine', 70);
+      souffle(t, 0.07, 0.12 * k, 'bandpass', 700, 0, 1.5, 0.002);
+    },
+    // les obstacles : chacun son bruit
+    obstacle: (ty, k) => {
+      const t = now();
+      if (ty == 'antenne') {
+        ton(t, 1760, 0.6, 0.06 * k, 'triangle');
+        ton(t, 2637, 0.4, 0.035 * k, 'triangle');
+      } else if (ty == 'cadeaux') {
+        ton(t, 210, 0.1, 0.16 * k, 'sine', 120);
+        souffle(t, 0.12, 0.08 * k, 'bandpass', 1800, 900, 1);
+      } else if (ty == 'sapin') {
+        souffle(t, 0.35, 0.07 * k, 'highpass', 2500, 0, 0.7, 0.03);
+        [2637, 3136, 3520].forEach((f, i) => ton(t + 0.05 + i * 0.06, f, 0.3, 0.02 * k));
+      } else souffle(t, 0.2, 0.15 * k, 'lowpass', 900, 250, 0.8);
+    },
+    // la glissade : un frottement continu qui suit la vitesse
+    glisse: v => {
+      glis.g.gain.setTargetAtTime(Math.min(0.06, v * 0.025), now(), 0.05);
+    },
+    // il tombe du toit : un petit sifflement qui descend, puis un « plouf » lointain
+    tombe: () => {
+      const t = now();
+      ton(t, 900, 0.7, 0.03, 'sine', 280);
+      souffle(t + 0.75, 0.25, 0.05, 'lowpass', 600, 200, 0.8);
+    },
+    // dans la cheminée : il dégringole, le feu s'emballe, et une petite cascade de clochettes
+    entre: () => {
+      const t = now();
+      souffle(t, 0.5, 0.12, 'lowpass', 1600, 200, 0.9, 0.02);
+      souffle(t + 0.35, 1.2, 0.2, 'lowpass', 300, 1400, 0.7, 0.15);
+      feu.g.gain.setTargetAtTime(0.16, t + 0.35, 0.1);
+      feu.g.gain.setTargetAtTime(0.07, t + 1.4, 0.4);
+      [1047, 1319, 1568, 2093, 2637].forEach((f, i) => cloche(t + 0.45 + i * 0.09, f, 0.05));
+    },
+    fin: () => {
+      clearInterval(iv);
+      try {
+        M.gain.setTargetAtTime(0.0001, now(), 0.15);
+      } catch (_) {}
+      setTimeout(() => {
+        try {
+          A.close();
+        } catch (_) {}
+      }, 700);
+    }
+  };
+}
+
 /* ---------- Fichier mystère : avant de l'ouvrir, on le lance dans la cheminée du Père Noël ---------- */
 // Lancer « en profondeur » (façon paper toss) : on glisse le doigt vers le haut, le fichier part vers la cheminée.
 // Monde en mètres : x = gauche/droite, y = hauteur, z = profondeur. cb est appelé quand le fichier est tombé dedans.
@@ -1021,6 +1207,26 @@ function mysLancer(cb, fic) {
   o.className = 'mysl';
   o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><button class="mysl-pass">Le déposer à la main</button>`;
   document.body.appendChild(o);
+  // les bruitages et la musique (sauf si le son est coupé dans les paramètres)
+  let son = null;
+  const musAvant = typeof MUS != 'undefined' && MUS.cur;
+  if (typeof S == 'undefined' || S.sound !== false) {
+    try {
+      if (musAvant) MUS.stop();
+      let yt = 0;
+      try {
+        yt = YTM.on();
+      } catch (_) {}
+      son = mysSons(new (window.AudioContext || window.webkitAudioContext)(), !yt && (typeof S == 'undefined' || S.music !== false));
+    } catch (_) {
+      son = null;
+    }
+  }
+  const bruit = (n, ...a) => {
+    try {
+      son && son[n](...a);
+    } catch (_) {}
+  };
   const cv = o.querySelector('canvas'),
     c = cv.getContext('2d'),
     tip = o.querySelector('.mysl-tip'),
@@ -1071,8 +1277,10 @@ function mysLancer(cb, fic) {
   };
   const P = (x, y, z) => [W / 2 + (x * f) / z, hy - ((y - CAM) * f) / z, f / z]; // projection : [x écran, y écran, échelle]
   // nouveau fichier : il remonte en douceur depuis le bas de l'écran
-  const depart = () =>
-    (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 });
+  const depart = () => (
+    bruit('glisse', 0),
+    (F = { x: 0, y: Y0, z: Z0, vx: 0, vy: 0, vz: 0, a: -0.08, va: 0, vol: 0, in: 0, sol: 0, t: 0, arret: 0, al: 1, ent: 1, tombe: 0 })
+  );
   taille();
   depart();
   rate = fin = 0;
@@ -1825,6 +2033,7 @@ function mysLancer(cb, fic) {
         F.vz = F.vz * 0.4 + Math.sign(z - CZ || -1) * 0.7;
         F.va += (Math.random() - 0.5) * 8;
         choc(0.5);
+        bruit('brique', 0.8);
         return;
       }
     }
@@ -1836,18 +2045,21 @@ function mysLancer(cb, fic) {
         F.vx *= 0.6;
         F.va += (Math.random() - 0.5) * 10;
         choc(1);
+        bruit('brique', Math.min(1, 0.4 + Math.abs(F.vz)));
       }
       // mur de derrière (si on arrive par l'arrière)
       if (p.z >= CZ + CD && F.z < CZ + CD && Math.abs(F.x) < CX) {
         F.z = CZ + CD + 0.001;
         F.vz = Math.abs(F.vz) * 0.28;
         choc(0.6);
+        bruit('brique', 0.6);
       }
       // côtés
       if (Math.abs(F.z - CZ) < CD && Math.abs(p.x) >= CX && Math.abs(F.x) < CX) {
         F.x = Math.sign(p.x) * (CX + 0.001);
         F.vx = -F.vx * 0.3;
         choc(0.6);
+        bruit('brique', 0.6);
       }
     }
     // obstacles du toit
@@ -1867,11 +2079,13 @@ function mysLancer(cb, fic) {
           F.vz -= 1.35 * v * nz;
           F.va = -F.va * 0.5 + v * 2;
           if (v < -0.8) choc(0.5);
+          if (v < -0.3) bruit('obstacle', ob.t, Math.min(1, -v / 3));
         }
       }
       // atterrir sur le dessus d'un obstacle bas (les cadeaux)
       if (ob.t == 'cadeaux' && p.y >= ob.h && F.y < ob.h && d < ob.r) {
         F.y = ob.h;
+        if (F.vy < -1) bruit('obstacle', 'cadeaux', Math.min(1, -F.vy / 6));
         F.vy = Math.abs(F.vy) * 0.25;
       }
     });
@@ -1883,13 +2097,17 @@ function mysLancer(cb, fic) {
     }
     // il passe le faîtage ou le bord : il tombe de l'autre côté
     if (F.z > RIDGE || Math.abs(F.x) > 4.2) {
-      if (F.y < 0.05) F.tombe = 1;
+      if (F.y < 0.05 && !F.tombe) {
+        F.tombe = 1;
+        bruit('tombe');
+      }
       return;
     }
     // le toit : rebonds, puis glissade sur la neige avec frottement
     if (F.y <= 0.03) {
       F.y = 0.03;
       if (F.vy < -1.4) {
+        bruit('neige', Math.min(1, -F.vy / 7));
         F.vy = -F.vy * 0.24;
         F.vx *= 0.75;
         F.vz *= 0.75;
@@ -1908,13 +2126,11 @@ function mysLancer(cb, fic) {
     }
   };
   const choc = k => {
-    try {
-      SFX('tap');
-    } catch (_) {}
     const [x, y] = P(F.x, F.y, F.z);
     for (let i = 0; i < 10 * k; i++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, t: 0.6, c: '#ffffff' });
   };
   const entre = () => {
+    if (!F.in) bruit('entre');
     F.in = 1;
     F.vy = Math.min(F.vy, -1);
     F.vx *= 0.2;
@@ -1923,9 +2139,6 @@ function mysLancer(cb, fic) {
     fin = 1;
     o.querySelector('.mysl-n i').textContent = '1';
     o.querySelector('.mysl-n').classList.add('ok');
-    try {
-      SFX('ok');
-    } catch (_) {}
     tip.textContent = 'Ho ho ho ! 🎅 Bien reçu !';
     tip.classList.add('ok');
     for (let i = 0; i < 26; i++)
@@ -1961,6 +2174,13 @@ function mysLancer(cb, fic) {
   };
   const fermer = () => {
     cancelAnimationFrame(raf);
+    bruit('fin');
+    if (musAvant)
+      setTimeout(() => {
+        try {
+          bgm();
+        } catch (_) {}
+      }, 600);
     removeEventListener('resize', taille);
     o.classList.add('out');
     setTimeout(() => {
@@ -1982,6 +2202,7 @@ function mysLancer(cb, fic) {
     if (F.vol) {
       for (let i = 0; i < 8; i++) pas(dt / 8);
       F.t += dt;
+      bruit('glisse', F.sol && !F.in && !F.tombe ? Math.hypot(F.vx, F.vz) : 0);
       if (!F.in) {
         const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
         F.arret = arrete || F.tombe || F.z > 14 ? F.arret + dt : 0;
@@ -2060,6 +2281,7 @@ function mysLancer(cb, fic) {
     const vy = v * Math.sin(ANG),
       vz = v * Math.cos(ANG);
     Object.assign(F, { vx, vy, vz, va: vx * 2.5 + (Math.random() - 0.5) * 3, vol: 1, t: 0 });
+    bruit('lance', Math.min(1, v / vopt));
     tip.textContent = '';
   };
   cv.addEventListener('pointerup', lacher);
