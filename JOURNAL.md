@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : le toit de Valentin est solide, il renvoie le fichier
+- **Toit de Valentin solide** : un fichier lancé sur son toit y atterrit, rebondit et glisse sur la neige comme sur le nôtre (avant, il passait à travers et retombait du ciel). Son petit conduit de cheminée bloque aussi le fichier. S'il glisse jusqu'au bord (ruelle, faîtage, côté), il tombe comme avant.
+- **Valentin renvoie le fichier** : dès que le fichier touche son toit, il dit « Oh ! Pour moi ? 😏 » (ou une autre réplique), court le chercher (en contournant sa cheminée), se baisse pour le ramasser, revient au bord de son toit, se tourne vers Célestine et le lui relance en cloche (« Attrape ! 😘 »). Le message en haut dit « Valentin va te le renvoyer… attrape-le ! 🙌 ».
+- **Célestine l'attrape au vol** s'il arrive sur elle (« Attrapé ! 🙌 »). Si elle s'est déplacée, il tombe sur notre toit et elle va le ramasser (« Raté la réception ! Va le ramasser 😉 »). Valentin attend qu'elle soit debout (pas pendant une chute ou un ange dans la neige). Le renvoi de Valentin n'est pas poussé par le vent, ne le fait pas tomber sur les fesses et ne peut pas entrer dans la cheminée à la place de Célestine. Un fichier sur son toit ne compte pas comme un raté. Traductions anglaises des deux nouveaux messages ajoutées.
+- Version : 1795719914
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-26 · CLAUDE.md : repères de la scène « Lancer » du fichier mystère
 - Ajout d'une ligne dans le tableau « Où mettre le code » qui indique où se trouve chaque partie de la scène (caméra, personnage, bras, poses, chute, ville, Valentin, secrets…). Rien ne change pour Célestine.
 - Version : 1795719354

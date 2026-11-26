@@ -2953,8 +2953,8 @@ function mysLancer(cb, fic) {
     F.y += F.vy * h;
     F.z += F.vz * h;
     F.a += F.va * h;
-    if (!F.in && !F.sol && F.y > 0.05) {
-      // le vent pousse le fichier, et l'effet le fait tourner en courbe
+    if (!F.in && !F.sol && !F.deVal && F.y > 0.05) {
+      // le vent pousse le fichier, et l'effet le fait tourner en courbe (pas quand c'est Valentin qui le renvoie)
       F.vx += VENT.x * h;
       F.vz += VENT.z * h;
       if (F.spin) {
@@ -2974,7 +2974,7 @@ function mysLancer(cb, fic) {
       const t = (p.y - TOP) / (p.y - F.y),
         x = p.x + (F.x - p.x) * t,
         z = p.z + (F.z - p.z) * t;
-      if ((x / OX) ** 2 + ((z - CZ) / OZ) ** 2 <= 1) return entre();
+      if (!F.deVal && (x / OX) ** 2 + ((z - CZ) / OZ) ** 2 <= 1) return entre(); // Valentin ne le met pas dedans à sa place
       if (dansBoite(x, z)) {
         // rebond sur le rebord
         F.y = TOP + 0.001;
@@ -3060,7 +3060,7 @@ function mysLancer(cb, fic) {
       }
     }
     // Valentin, sur le toit d'à côté : touché par le fichier, il tombe sur les fesses
-    if (F.y > VAL.base && F.y < VAL.base + 1.9 && Math.hypot(F.x - VAL.x, F.z - VAL.z) < 0.36) {
+    if (!F.sol && !F.deVal && F.y > VAL.base + 0.1 && F.y < VAL.base + 1.9 && Math.hypot(F.x - VAL.x, F.z - VAL.z) < 0.36) {
       surprise('valentin');
       geste(VAL, 'aie', 2.2);
       parle(VAL, 'Aïe ! 😵', 2);
@@ -3075,17 +3075,33 @@ function mysLancer(cb, fic) {
     }
     if (F.tombe) return;
     // bord du toit côté caméra : il ne revient pas vers nous
-    // il passe le faîtage (ou sort tout à fait sur le côté) : il tombe de l'autre côté, caché derrière le faîtage
-    if (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9) {
+    // il passe le faîtage (ou sort tout à fait sur le côté) : il tombe de l'autre côté, caché derrière le faîtage.
+    // Le toit de Valentin, lui, est solide : le fichier y atterrit et y glisse comme sur le nôtre
+    const chezVal = surVoisin(F.x, F.z);
+    if (!chezVal && (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9)) {
       if (F.y < 0.05 && !F.tombe) {
         F.tombe = 1;
         bruit('tombe');
       }
       return;
     }
+    if (chezVal) {
+      // le petit conduit de cheminée de Valentin : le fichier rebondit dessus
+      const { cx, cz, ce, h: hv } = VOISIN,
+        ch = hv + VOISIN.ch,
+        ex = F.x - cx,
+        ez = F.z - cz;
+      if (F.y < ch && Math.abs(ex) < ce + 0.08 && Math.abs(ez) < ce + 0.08) {
+        if (p.y >= ch) ((F.y = ch), (F.vy = Math.abs(F.vy) * 0.3));
+        else if (Math.abs(ex) > Math.abs(ez)) ((F.x = cx + Math.sign(ex) * (ce + 0.081)), (F.vx = -F.vx * 0.3));
+        else ((F.z = cz + Math.sign(ez) * (ce + 0.081)), (F.vz = -F.vz * 0.3));
+        if (Math.abs(F.vx) + Math.abs(F.vz) > 0.5) (bruit('brique', 0.5), choc(0.4));
+      }
+    }
     // le toit : rebonds, puis glissade sur la neige avec frottement
-    if (F.y <= 0.03) {
-      F.y = 0.03;
+    const sy = (chezVal ? VOISIN.h : 0) + 0.03;
+    if (F.y <= sy) {
+      F.y = sy;
       if (F.vy < -1.4) {
         bruit('neige', Math.min(1, -F.vy / 7));
         F.vy = -F.vy * 0.24;
@@ -3742,6 +3758,15 @@ function mysLancer(cb, fic) {
       C.ange = 0;
       btn.classList.remove('on');
       btn.style.setProperty('--p', 0);
+    }
+    // le fichier renvoyé par Valentin arrive sur elle : elle l'attrape au vol
+    if (!C.tient && !C.chute && F.vol && F.deVal && !F.sol && F.y > C.y + 0.3 && F.y < C.y + 2 && Math.hypot(F.x - C.x, F.z - C.z) < 0.6) {
+      C.tient = 1;
+      F.deVal = 0;
+      geste(C, 'touche', 0.4);
+      parle(C, ['Attrapé ! 🙌', 'Merci ! 😘', 'Je l’ai ! 😄'][Math.floor(Math.random() * 3)], 1.4);
+      bruit('ramasse');
+      tip.textContent = '';
     }
     // elle ramasse le fichier en passant dessus
     if (!C.tient && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
@@ -4586,7 +4611,9 @@ function mysLancer(cb, fic) {
     c.arc(x, y, 14, 0, 7);
     c.fill();
   };
-  const VOISIN = { x0: 10.4, x1: 19, z0: 0.6, z1: 8.5, h: 0 }; // même hauteur que notre toit, de l'autre côté d'une ruelle
+  // même hauteur que notre toit, de l'autre côté d'une ruelle ; (cx, cz) : son petit conduit de cheminée (demi-largeur ce, hauteur ch)
+  const VOISIN = { x0: 10.4, x1: 19, z0: 0.6, z1: 8.5, h: 0, cx: 15, cz: 6, ce: 0.28, ch: 0.9 };
+  const surVoisin = (x, z) => x > VOISIN.x0 && x < VOISIN.x1 && z > VOISIN.z0 && z < VOISIN.z1;
   const VAL = {
     x: 11.05,
     z: 5.2,
@@ -4608,12 +4635,120 @@ function mysLancer(cb, fic) {
   const boules = [];
   const parle = (Q, txt, d = 1.8) => (Q.bulle = { txt, t: T(), d });
   const geste = (Q, k, d) => (Q.emote = { k, t: T(), d });
+  // Valentin et le fichier tombé sur son toit : il court le chercher, revient au bord de son toit et le relance à Célestine
+  const VAL0 = { x: 11.05, z: 5.2 }; // sa place, au bord de son toit, face à notre toit
+  const valCourt = (dt, x, z, vmax) => {
+    // il court vers (x, z) en contournant son petit conduit de cheminée ; renvoie vrai quand il y est
+    const dx = x - VAL.x,
+      dz = z - VAL.z,
+      d = Math.hypot(dx, dz);
+    if (d < 0.08) return ((VAL.v = Math.max(0, VAL.v - dt * 8)), true);
+    VAL.v = Math.min(vmax, VAL.v + dt * 6, d * 3 + 0.4);
+    VAL.x += (dx / d) * VAL.v * dt;
+    VAL.z += (dz / d) * VAL.v * dt;
+    const ox = VAL.x - VOISIN.cx,
+      oz = VAL.z - VOISIN.cz,
+      od = Math.hypot(ox, oz),
+      m = VOISIN.ce + 0.42;
+    if (od < m && od > 0) ((VAL.x = VOISIN.cx + (ox / od) * m), (VAL.z = VOISIN.cz + (oz / od) * m));
+    VAL.x = Math.max(VOISIN.x0 + 0.35, Math.min(VOISIN.x1 - 0.35, VAL.x));
+    VAL.z = Math.max(VOISIN.z0 + 0.35, Math.min(VOISIN.z1 - 0.35, VAL.z));
+    const vise = Math.atan2(dx, dz);
+    VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 10);
+    return false;
+  };
+  const valRelance = (dt, occupe) => {
+    const R = VAL.renvoi;
+    // le fichier vient de s'arrêter (ou glisse encore) sur son toit : il part le chercher
+    if (!R && !occupe && !fin && F.vol && F.sol && !F.in && !F.tombe && surVoisin(F.x, F.z)) {
+      VAL.renvoi = { e: 'cherche', t: T() };
+      parle(VAL, ['Oh ! Pour moi ? 😏', 'Raté ! Je te le renvoie 😆', 'Attends, je l’ai ! 🏃'][Math.floor(Math.random() * 3)], 1.6);
+      tip.textContent = 'Valentin va te le renvoyer… attrape-le ! 🙌';
+      return true;
+    }
+    if (!R) return false;
+    if (fin) return ((VAL.renvoi = null), false);
+    if (R.e == 'cherche') {
+      // le fichier n'est plus sur son toit (il a glissé dans la ruelle…) : il laisse tomber et retourne à sa place
+      if (!F.vol || F.tombe || !surVoisin(F.x, F.z)) return (Object.assign(R, { e: 'retour', t: T() }), true);
+      // il le rattrape même s'il glisse encore
+      if (valCourt(dt, F.x, F.z, 3.4) || Math.hypot(F.x - VAL.x, F.z - VAL.z) < 0.4) {
+        VAL.tient = 1;
+        VAL.ramasse = T(); // il se baisse pour le ramasser
+        F.vol = 0;
+        F.pose = 0;
+        bruit('ramasse');
+        Object.assign(R, { e: 'retour', t: T() });
+      }
+    } else if (R.e == 'retour') {
+      if (T() - R.t > 0.35 && valCourt(dt, VAL0.x, VAL0.z, 3)) {
+        if (!VAL.tient) return ((VAL.renvoi = null), false);
+        Object.assign(R, { e: 'vise', t: T() });
+      }
+    } else if (R.e == 'vise') {
+      VAL.v = 0;
+      const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
+      VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 6);
+      // il attend que Célestine soit bien sur ses pieds, sur le toit
+      if (T() - R.t > 0.6 && !C.chute && !C.danse && !C.ange && C.y <= 0.01) {
+        geste(VAL, 'lance', 0.9);
+        parle(VAL, ['Attrape ! 😘', 'Tiens ! 🎁', 'Hop ! 💨'][Math.floor(Math.random() * 3)], 1.4);
+        Object.assign(R, { e: 'lance', t: T() });
+      }
+    } else if (R.e == 'lance' && T() - R.t > 0.4) {
+      // il le lâche en fin de geste : en cloche, droit sur Célestine (à hauteur de ses mains)
+      VAL.tient = 0;
+      VAL.renvoi = null;
+      const x0 = F.x,
+        y0 = F.y,
+        z0 = F.z,
+        tx = C.x,
+        ty = C.y + 1.05,
+        tz = C.z,
+        TT = 0.7 + Math.hypot(tx - x0, tz - z0) * 0.06;
+      F = {
+        deVal: 1,
+        x: x0,
+        y: y0,
+        z: z0,
+        vx: (tx - x0) / TT,
+        vy: (ty - y0 + 0.5 * G * TT * TT) / TT,
+        vz: (tz - z0) / TT,
+        a: F.a || 0,
+        va: (Math.random() - 0.5) * 4,
+        vol: 1,
+        in: 0,
+        sol: 0,
+        t: 0,
+        arret: 0,
+        al: 1,
+        ent: 1,
+        tombe: 0
+      };
+      bruit('lance', 0.5);
+      return false;
+    }
+    return true;
+  };
   const valentin = dt => {
+    const occupe = VAL.emote && T() - VAL.emote.t < VAL.emote.d;
+    VAL.amp += ((VAL.v > 0.05 ? Math.min(1.3, VAL.v / 1.2) : 0) - VAL.amp) * Math.min(1, dt * 8);
+    VAL.ph += dt * (VAL.v > 0.05 ? 3 + VAL.v * 3.2 : 0);
+    // le fichier suit sa main tant qu'il le tient
+    if (VAL.tient) {
+      const moi = C;
+      C = VAL;
+      try {
+        Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
+      } finally {
+        C = moi;
+      }
+    }
+    if (valRelance(dt, occupe)) return valBoules(dt);
+    VAL.v = 0;
     const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
     VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 4);
-    VAL.amp = 0; // il se tient debout (il respire, c'est tout)
     if (!VAL.coucou) ((VAL.coucou = T() + 4), (VAL.boule = T() + 10));
-    const occupe = VAL.emote && T() - VAL.emote.t < VAL.emote.d;
     if (!occupe && !fin && T() > VAL.coucou) {
       geste(VAL, 'salut', 1.6);
       parle(VAL, ['Coucou ! 👋', 'Hé Célestine !', 'Tu y arrives ? 😏', 'Allez, vise ! 🎯'][Math.floor(Math.random() * 4)]);
@@ -4635,15 +4770,17 @@ function mysLancer(cb, fic) {
       boules.push({ x: x0, y: y0, z: z0, vx: (tx - x0) / TT, vy: (1 - y0 + 0.5 * G * TT * TT) / TT, vz: (tz - z0) / TT });
       bruit('lance', 0.3);
     }
-    // les boules de neige
+    valBoules(dt);
+  };
+  // les boules de neige
+  const valBoules = dt => {
     for (let i = boules.length - 1; i >= 0; i--) {
       const b = boules[i];
       b.vy -= G * dt;
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       b.z += b.vz * dt;
-      const surNous =
-        (Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE) || (b.x > VOISIN.x0 && b.x < VOISIN.x1 && b.z > VOISIN.z0 && b.z < VOISIN.z1);
+      const surNous = (Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE) || surVoisin(b.x, b.z);
       if (b.y > C.y && b.y < C.y + 1.75 && Math.hypot(b.x - C.x, b.z - C.z) < 0.38) {
         // en plein sur Célestine !
         boules.splice(i, 1);
@@ -5060,10 +5197,7 @@ function mysLancer(cb, fic) {
       }
     });
     // un petit conduit de cheminée en briques
-    const cx = 15,
-      cz = 6,
-      e = 0.28,
-      ht = 0.9;
+    const { cx, cz, ce: e, ch: ht } = VOISIN;
     [
       [
         [cx - e, cz - e],
@@ -5137,7 +5271,10 @@ function mysLancer(cb, fic) {
         const repos = F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.03 && Math.abs(F.vy) < 0.05 && !F.tombe;
         if (repos && !F.pose) {
           F.pose = 1;
-          aide();
+          // sur le toit de Valentin, c'est lui qui va le chercher ; renvoyé par lui et pas attrapé : pas un raté
+          if (surVoisin(F.x, F.z)) F.deVal = 0;
+          else if (F.deVal) ((F.deVal = 0), (tip.textContent = 'Raté la réception ! Va le ramasser 😉'));
+          else aide();
         }
         if (F.tombe) {
           F.al -= dt * 3;
@@ -5207,11 +5344,11 @@ function mysLancer(cb, fic) {
       L.push([tp ? prof(tp.x, tp.z) : crash ? prof(crash.x, crash.z) : 0, () => traineau(t, dt)]);
       L.push([prof(0, CZ), () => cheminee(t, F.in && (() => (c.save(), ouverture(), c.clip(), fichier(), c.restore())))]);
     }
-    if (!F.in && !C.tient && !sous)
+    if (!F.in && !C.tient && !VAL.tient && !sous)
       L.push([
         prof(F.x, F.z),
         () => {
-          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier(), F.pose && fleche(t));
+          if (F.z <= RIDGE || V.z > RIDGE) return (ombre(), fichier(), F.pose && !VAL.renvoi && fleche(t));
           // derrière le faîtage : on ne voit que ce qui dépasse au-dessus de la ligne du toit
           c.save();
           poly([

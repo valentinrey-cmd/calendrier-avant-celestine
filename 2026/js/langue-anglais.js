@@ -3240,6 +3240,8 @@ window.TRADUCTIONS_EN = {
   'Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !': 'Joystick to walk, slide your finger to turn the view. Hold “Throw” and let go at the right moment!',
   'Va le ramasser, puis vise pile la cheminée 🎯': 'Go pick it up, then aim right at the chimney 🎯',
   'Raté ! Va ramasser le fichier 😉': 'Missed! Go pick up the file 😉',
+  'Valentin va te le renvoyer… attrape-le ! 🙌': 'Valentin will throw it back to you… catch it! 🙌',
+  'Raté la réception ! Va le ramasser 😉': 'Missed the catch! Go pick it up 😉',
   'Il est tombé du toit… le revoilà ! ⬇️': 'It fell off the roof… here it comes again! ⬇️',
   'En plein sur Valentin ! 😵': 'Right on Valentin! 😵',
   'Valentin t’a eue avec sa boule de neige ! ☃️': 'Valentin got you with his snowball! ☃️',
