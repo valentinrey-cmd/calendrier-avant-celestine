@@ -1144,6 +1144,17 @@ function mysSons(A, musique = true) {
       feu.g.gain.setTargetAtTime(0.07, t + 1.4, 0.4);
       [1047, 1319, 1568, 2093, 2637].forEach((f, i) => cloche(t + 0.45 + i * 0.09, f, 0.05));
     },
+    // Célestine à pied : ses pas dans la neige, et son saut
+    pas: k => {
+      const t = now();
+      souffle(t, 0.09, 0.06 * (0.4 + k), 'lowpass', 1500, 450, 0.8, 0.005);
+      souffle(t + 0.02, 0.03, 0.02, 'bandpass', 2600 + Math.random() * 900, 0, 2, 0.002);
+    },
+    hop: () => {
+      const t = now();
+      ton(t, 320, 0.18, 0.06, 'sine', 640);
+      souffle(t, 0.2, 0.05, 'bandpass', 600, 1600, 1, 0.02);
+    },
     // les surprises
     eboule: () => {
       const t = now();
@@ -1258,7 +1269,7 @@ function mysLancer(cb, fic) {
   }
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass">Le déposer à la main</button>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.</small><span class="mysl-n">Livré <i>0</i></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><button class="mysl-pass on">🚶 Y aller à pied</button><button class="mysl-saut">Sauter</button>`;
   document.body.appendChild(o);
   // les bruitages et la musique (sauf si le son est coupé dans les paramètres)
   let son = null;
@@ -1821,7 +1832,7 @@ function mysLancer(cb, fic) {
   };
   const guide = t => {
     // main qui montre le geste, tant qu'on n'a pas lancé
-    if (F.vol || drag || fin) return;
+    if (F.vol || drag || fin || C) return;
     idle += 1;
     if (idle < 70) return;
     const [x, y, s] = P(0, Y0, Z0),
@@ -2450,6 +2461,7 @@ function mysLancer(cb, fic) {
     F.vz *= 0.2;
     if (fin) return;
     fin = 1;
+    if (C) C.joie = T();
     o.querySelector('.mysl-n i').textContent = '1';
     o.querySelector('.mysl-n').classList.add('ok');
     tip.textContent = 'Ho ho ho ! 🎅 Bien reçu !';
@@ -2482,8 +2494,13 @@ function mysLancer(cb, fic) {
   };
   const aide = () => {
     rate++;
-    tip.textContent = rate >= 3 ? 'Un geste franc vers le haut, droit sur la cheminée ⬆️' : rate == 1 ? 'Presque ! Réessaie 😉' : '';
-    if (rate >= 6) pass.classList.add('on');
+    tip.textContent = C
+      ? 'Mets-toi bien en face de la cheminée, puis saute ! 🦘'
+      : rate >= 3
+        ? 'Un geste franc vers le haut, droit sur la cheminée ⬆️'
+        : rate == 1
+          ? 'Presque ! Réessaie 😉'
+          : '';
   };
   const fermer = () => {
     cancelAnimationFrame(raf);
@@ -2501,9 +2518,453 @@ function mysLancer(cb, fic) {
       cb();
     }, 450);
   };
-  pass.onclick = () => {
-    if (fin) return;
-    F = { x: 0, y: TOP + 0.4, z: CZ, vx: 0, vy: -1, vz: 0, a: 0, va: 0, vol: 1, in: 0, sol: 0, t: 0 };
+  /* ===================== Célestine à pied ===================== */
+  // Bouton « Y aller à pied » : une petite Célestine (vue de dos) apparaît avec le fichier à la main.
+  // On touche le toit pour qu'elle y marche, puis « Sauter » devant la cheminée pour y glisser le fichier.
+  let C = null,
+    cible = null;
+  const saut = o.querySelector('.mysl-saut'),
+    consigne = o.querySelector('.mysl-h small'),
+    CONSIGNE = consigne.textContent;
+  const sol = (sx, sy) => {
+    // point du toit (y = 0) sous le doigt
+    if (sy <= hy + 4) return null;
+    const z = (CAM * f) / (sy - hy);
+    return { x: ((sx - W / 2) * z) / f, z };
+  };
+  // bien placée pour sauter : juste devant (ou derrière) la cheminée
+  const presDe = () => C && Math.abs(Math.abs(C.z - CZ) - CD - 0.5) < 0.42 && Math.abs(C.x) < CX + 0.25;
+  const enFace = () => presDe() && Math.abs(C.x) < OX - 0.12;
+  const main = () => {
+    // position du fichier dans sa main droite (à droite de l'écran, puisqu'on la voit de dos), en suivant le dessin
+    const sw = Math.sin(C.ph),
+      bob = Math.abs(Math.cos(C.ph)) * 0.022 * C.amp;
+    if (C.saute && C.tient) return { x: C.x + 0.12, y: C.y + 2.08, z: C.z - 0.01, a: 0.08 };
+    return { x: C.x + 0.27 + C.pen * 0.02, y: C.y + 0.77 + sw * 0.04 * C.amp + bob, z: C.z - 0.01, a: 0.1 + sw * 0.1 * C.amp };
+  };
+  const aPied = on => {
+    if (fin || (F.vol && !F.fin)) return;
+    if (on) {
+      C = { x: 0, z: 1.5, y: 0, vy: 0, ph: 0, v: 0, amp: 0, pen: 0, tient: 1, saute: 0, lache: 0, joie: 0, pasS: 0 };
+      cible = { x: 0, z: 2.6, t: -9 };
+      F.vol = 0;
+      consigne.textContent = 'Touche le toit pour la faire marcher, puis saute devant la cheminée.';
+      tip.textContent = '';
+      pass.textContent = '🎯 Revenir au lancer';
+      saut.classList.add('on');
+    } else {
+      C = cible = null;
+      depart();
+      F.ent = 0;
+      tip.textContent = '';
+      consigne.textContent = CONSIGNE;
+      pass.textContent = '🚶 Y aller à pied';
+      saut.classList.remove('on', 'pret');
+    }
+  };
+  pass.onclick = () => aPied(!C);
+  saut.onclick = () => {
+    if (!C || C.y > 0.01 || C.vy || fin) return;
+    const pret = presDe() && C.tient;
+    C.vy = pret ? 3.3 : 2.4;
+    C.saute = 1;
+    C.lache = pret;
+    cible = null;
+    bruit('hop');
+  };
+  const lacherMain = () => {
+    // en haut du saut, elle laisse tomber le fichier vers le centre de la cheminée, juste devant elle
+    const m = main(),
+      d = m.y - TOP,
+      tt = (0.6 + Math.sqrt(0.36 + 4 * 4.5 * d)) / 9;
+    F = {
+      x: m.x,
+      y: m.y,
+      z: m.z,
+      vx: (C.x - m.x) / tt,
+      vy: 0.6,
+      vz: (CZ - m.z) / tt,
+      a: m.a,
+      va: 2,
+      vol: 1,
+      in: 0,
+      sol: 0,
+      t: 0,
+      arret: 0,
+      al: 1,
+      ent: 1,
+      tombe: 0
+    };
+    C.tient = 0;
+    bruit('lance', 0.4);
+  };
+  const marche = dt => {
+    if (!C) return;
+    // saut
+    if (C.saute) {
+      C.vy -= G * dt;
+      C.y += C.vy * dt;
+      if (C.lache && C.tient && C.vy <= 0) lacherMain();
+      if (C.y <= 0) {
+        C.y = 0;
+        C.vy = 0;
+        C.saute = 0;
+        bruit('neige', 0.5);
+        const [x, y] = P(C.x, 0, C.z);
+        for (let i = 0; i < 12; i++)
+          eclats.push({
+            x: x + (Math.random() - 0.5) * 30,
+            y,
+            vx: (Math.random() - 0.5) * 120,
+            vy: -Math.random() * 90,
+            t: 0.5,
+            c: '#ffffff'
+          });
+      }
+    }
+    // marche vers le point touché
+    let vx = 0,
+      vz = 0;
+    if (cible && !C.saute) {
+      const dx = cible.x - C.x,
+        dz = cible.z - C.z,
+        d = Math.hypot(dx, dz);
+      if (d > 0.04) {
+        C.v = Math.min(1.5, C.v + dt * 4, d * 3);
+        vx = (dx / d) * C.v;
+        vz = (dz / d) * C.v;
+      } else cible = null;
+    }
+    if (!vx && !vz) C.v = Math.max(0, C.v - dt * 6);
+    const x0 = C.x,
+      z0 = C.z;
+    C.x += vx * dt;
+    C.z += vz * dt;
+    C.amp += ((C.v > 0.05 ? Math.min(1, C.v / 1.2) : 0) - C.amp) * Math.min(1, dt * 8);
+    C.pen += ((C.v > 0.05 ? vx / 1.5 : 0) - C.pen) * Math.min(1, dt * 6);
+    const ph0 = C.ph;
+    C.ph += dt * (C.v > 0.05 ? 3 + C.v * 3.2 : 0);
+    if (Math.floor(ph0 / Math.PI) != Math.floor(C.ph / Math.PI)) bruit('pas', C.amp);
+    // la cheminée et les obstacles l'arrêtent (et elle déclenche les surprises en les touchant)
+    const ex = CX + 0.24,
+      ez = CD + 0.22;
+    if (Math.abs(C.x) < ex && Math.abs(C.z - CZ) < ez) {
+      const px = ex - Math.abs(C.x),
+        pz = ez - Math.abs(C.z - CZ);
+      if (px < pz) C.x = Math.sign(C.x || 1) * ex;
+      else C.z = CZ + Math.sign(C.z - CZ || -1) * ez;
+    }
+    OBS.forEach(ob => {
+      const d = Math.hypot(C.x - ob.x, C.z - ob.z),
+        m = rayon(ob, 0.5) + 0.22;
+      if (d < m && d > 0) {
+        C.x = ob.x + ((C.x - ob.x) / d) * m;
+        C.z = ob.z + ((C.z - ob.z) / d) * m;
+        surprise(ob.t);
+        cible = null;
+      }
+    });
+    C.x = Math.max(-6, Math.min(6, C.x));
+    C.z = Math.max(1.4, Math.min(RIDGE - 0.4, C.z));
+    // bloquée contre quelque chose : elle s'arrête au lieu de piétiner
+    const bouge = Math.hypot(C.x - x0, C.z - z0),
+      voulu = Math.hypot(vx, vz) * dt;
+    C.bloque = voulu > 0 && bouge < voulu * 0.3 ? (C.bloque || 0) + dt : 0;
+    if (C.bloque > 0.2) cible = null;
+    // le fichier suit sa main
+    if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
+    saut.classList.toggle('pret', enFace() && C.tient);
+  };
+  // la petite croix dans la neige là où elle va
+  const marque = t => {
+    if (!cible || !C) return;
+    const [x, y, s] = P(cible.x, 0, cible.z),
+      k = 1 + Math.sin(t * 6) * 0.08;
+    c.strokeStyle = '#ffffffcc';
+    c.lineWidth = Math.max(1.5, s * 0.012);
+    c.beginPath();
+    c.ellipse(x, y, s * 0.18 * k, s * 0.05 * k, 0, 0, 7);
+    c.stroke();
+    c.strokeStyle = '#ff8fb8';
+    c.beginPath();
+    c.ellipse(x, y, s * 0.09 * k, s * 0.025 * k, 0, 0, 7);
+    c.stroke();
+  };
+  const celestine = t => {
+    const [x, yb, s] = P(C.x, C.y, C.z),
+      [sx, sy, ss] = P(C.x, 0, C.z),
+      u = s / 100, // 1 unité = 1 cm
+      a = C.amp,
+      sw = Math.sin(C.ph),
+      bob = -Math.abs(Math.cos(C.ph)) * 2.2 * a,
+      air = C.saute ? 1 : 0,
+      joie = C.joie && T() - C.joie < 2.5;
+    // ombre au sol
+    c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y)})`;
+    c.beginPath();
+    c.ellipse(sx, sy, ss * 0.26, ss * 0.07, 0, 0, 7);
+    c.fill();
+    c.save();
+    c.translate(x, yb);
+    c.scale(u, u);
+    c.rotate(C.pen * 0.07);
+    c.translate(0, bob);
+    c.lineJoin = c.lineCap = 'round';
+    const forme = (pts, col) => {
+      c.fillStyle = col;
+      c.beginPath();
+      pts.forEach(([px, py], i) => (i ? c.lineTo(px, py) : c.moveTo(px, py)));
+      c.closePath();
+      c.fill();
+    };
+    // --- jambes (jean) et bottes fourrées
+    const jambe = (cx, lev) => {
+      const ky = -8 - lev; // cheville
+      const gj = c.createLinearGradient(cx - 7.5, 0, cx + 7.5, 0);
+      gj.addColorStop(0, '#2a375c');
+      gj.addColorStop(0.5, '#41558a');
+      gj.addColorStop(1, '#2a375c');
+      c.fillStyle = gj;
+      c.beginPath();
+      c.moveTo(cx - 7.5, -80);
+      c.lineTo(cx + 7.5, -80);
+      c.lineTo(cx + 5.5, ky);
+      c.lineTo(cx - 5.5, ky);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = '#5b6fa3';
+      c.lineWidth = 0.9;
+      c.beginPath();
+      c.moveTo(cx + 2.5, -76);
+      c.lineTo(cx + 2, ky);
+      c.stroke();
+      // plis derrière le genou
+      c.strokeStyle = '#25304f';
+      c.lineWidth = 0.8;
+      [-44, -41].forEach(yk => {
+        c.beginPath();
+        c.moveTo(cx - 4.5, yk - lev * 0.4);
+        c.quadraticCurveTo(cx, yk + 1.5 - lev * 0.4, cx + 4.5, yk - lev * 0.4);
+        c.stroke();
+      });
+      // botte
+      c.fillStyle = lev > 3 ? '#4a2f1c' : '#6e4a2e';
+      c.beginPath();
+      c.roundRect(cx - 6.5, ky - 4, 13, 13 + Math.min(lev, 6) * 0.2, [3, 3, 4, 4]);
+      c.fill();
+      if (lev > 3) {
+        // on voit la semelle quand le pied se lève
+        c.fillStyle = '#2a1a10';
+        c.fillRect(cx - 6, ky + 6.5, 12, 2.5);
+      }
+      c.fillStyle = '#f1e7d8';
+      c.beginPath();
+      c.roundRect(cx - 7.5, ky - 6, 15, 5, 2.5);
+      c.fill();
+    };
+    const levG = air ? 7 : Math.max(0, sw) * 9 * a,
+      levD = air ? 5 : Math.max(0, -sw) * 9 * a;
+    jambe(-8.5, levG);
+    jambe(8.5, levD);
+    // --- bras (manches de la doudoune) : derrière le manteau pour la gauche qui balance
+    const bras = (sxx, hx, hyy, avant) => {
+      c.strokeStyle = '#d8577d';
+      c.lineWidth = 9;
+      c.beginPath();
+      c.moveTo(sxx, -132);
+      c.quadraticCurveTo((sxx + hx) / 2 + Math.sign(sxx) * 4, (-132 + hyy) / 2, hx, hyy);
+      c.stroke();
+      c.strokeStyle = '#ee7b9d';
+      c.lineWidth = 4;
+      c.beginPath();
+      c.moveTo(sxx + Math.sign(sxx) * 1.5, -130);
+      c.quadraticCurveTo((sxx + hx) / 2 + Math.sign(sxx) * 4, (-130 + hyy) / 2, hx, hyy - 2);
+      c.stroke();
+      if (avant !== false) moufle(hx, hyy);
+    };
+    const moufle = (hx, hyy) => {
+      c.fillStyle = '#c0233a';
+      c.beginPath();
+      c.ellipse(hx, hyy - 1, 5.5, 2.5, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#f4ead8';
+      c.beginPath();
+      c.ellipse(hx, hyy + 4, 5, 6.2, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#e2d2bb';
+      c.beginPath();
+      c.ellipse(hx + Math.sign(hx || 1) * 3.5, hyy + 2, 2, 3, 0.4, 0, 7);
+      c.fill();
+    };
+    const gH = joie ? [-20, -196 + Math.sin(T() * 12) * 4] : air ? [-31, -122] : [-25 - Math.abs(sw) * 1.5 * a, -84 + sw * 7 * a],
+      dH = joie ? [20, -196 - Math.sin(T() * 12) * 4] : C.saute && C.tient ? [12, -198] : air ? [31, -122] : [27, -88 - sw * 4 * a];
+    // --- manteau (doudoune rose matelassée, capuche fourrée posée dans le dos)
+    c.save();
+    const g = c.createLinearGradient(-24, 0, 24, 0);
+    g.addColorStop(0, '#d65b80');
+    g.addColorStop(0.45, '#f07fa1');
+    g.addColorStop(1, '#c94f74');
+    forme(
+      [
+        [-18, -140],
+        [18, -140],
+        [21, -120],
+        [24, -76],
+        [12, -72],
+        [0, -73],
+        [-12, -72],
+        [-24, -76],
+        [-21, -120]
+      ],
+      g
+    );
+    c.strokeStyle = '#b8466a';
+    c.lineWidth = 1.1;
+    [-124, -110, -96, -84].forEach(yq => {
+      const w = 19 + (yq + 140) * 0.09;
+      c.beginPath();
+      c.moveTo(-w, yq);
+      c.quadraticCurveTo(0, yq + 3, w, yq);
+      c.stroke();
+    });
+    c.beginPath();
+    c.moveTo(0, -128);
+    c.lineTo(0, -73);
+    c.stroke();
+    // capuche
+    forme(
+      [
+        [-14, -142],
+        [14, -142],
+        [11, -126],
+        [0, -121],
+        [-11, -126]
+      ],
+      '#cf5a7e'
+    );
+    c.fillStyle = '#f6efe6';
+    c.beginPath();
+    c.moveTo(-15, -142);
+    c.quadraticCurveTo(0, -136, 15, -142);
+    c.quadraticCurveTo(12, -125, 0, -120);
+    c.quadraticCurveTo(-12, -125, -15, -142);
+    c.lineTo(-12.5, -140);
+    c.quadraticCurveTo(-9, -127, 0, -123.5);
+    c.quadraticCurveTo(9, -127, 12.5, -140);
+    c.closePath();
+    c.fill();
+    c.restore();
+    // bras gauche (il balance), bras droit (il tient le fichier)
+    bras(-18, gH[0], gH[1]);
+    if (C.tient || joie) {
+      bras(18, dH[0], dH[1], false);
+      if (C.tient) {
+        // le fichier, tenu à la main : il se dessine à sa place dans le monde (repère de l'écran)
+        c.save();
+        c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        fichier();
+        c.restore();
+      }
+      moufle(dH[0], dH[1]);
+    } else bras(18, dH[0], dH[1]);
+    // --- écharpe crème à rayures, un pan qui pend dans le dos
+    c.fillStyle = '#f4ead8';
+    c.beginPath();
+    c.roundRect(-11, -147, 22, 8, 4);
+    c.fill();
+    const pan = sw * 2.5 * a + C.pen * 3;
+    c.beginPath();
+    c.moveTo(-6, -142);
+    c.lineTo(2, -142);
+    c.quadraticCurveTo(2 + pan * 0.5, -128, 1 + pan, -116);
+    c.lineTo(-6 + pan, -116);
+    c.quadraticCurveTo(-6 + pan * 0.5, -128, -6, -142);
+    c.fill();
+    c.fillStyle = '#c0233a';
+    [-136, -128, -121].forEach(yq => {
+      const k = (yq + 142) / 26;
+      c.fillRect(-6 + pan * k, yq, 7.5, 2);
+    });
+    c.strokeStyle = '#e8dcc6';
+    c.lineWidth = 0.8;
+    for (let i = 0; i < 4; i++) {
+      c.beginPath();
+      c.moveTo(-5 + pan + i * 2, -116);
+      c.lineTo(-5 + pan + i * 2 + pan * 0.1, -112.5);
+      c.stroke();
+    }
+    // --- tête vue de dos : oreilles, branches des lunettes, cheveux châtains et queue-de-cheval
+    c.save();
+    c.translate(C.pen * 1.2, 0);
+    c.fillStyle = '#e7b393';
+    [-1, 1].forEach(sg => {
+      c.beginPath();
+      c.ellipse(sg * 10.8, -152, 2.4, 3.6, sg * 0.2, 0, 7);
+      c.fill();
+    });
+    c.strokeStyle = '#7a4a2a';
+    c.lineWidth = 1.2;
+    [-1, 1].forEach(sg => {
+      c.beginPath();
+      c.moveTo(sg * 10.2, -155.5);
+      c.quadraticCurveTo(sg * 12.4, -155, sg * 13.4, -158);
+      c.stroke();
+    });
+    const gh = c.createRadialGradient(-3, -162, 2, 0, -154, 14);
+    gh.addColorStop(0, '#6a4329');
+    gh.addColorStop(1, '#2e1c12');
+    c.fillStyle = gh;
+    c.beginPath();
+    c.ellipse(0, -155, 11, 12.5, 0, 0, 7);
+    c.fill();
+    // mèches tirées vers l'élastique
+    c.strokeStyle = '#80573a';
+    c.lineWidth = 0.7;
+    for (let i = -4; i <= 4; i++) {
+      c.beginPath();
+      c.moveTo(i * 2.4, -166.5 + Math.abs(i) * 0.6);
+      c.quadraticCurveTo(i * 2.2, -158, i * 0.4, -152);
+      c.stroke();
+    }
+    c.strokeStyle = '#1f130c';
+    c.lineWidth = 0.6;
+    for (let i = -3; i <= 3; i += 2) {
+      c.beginPath();
+      c.moveTo(i * 3, -164);
+      c.quadraticCurveTo(i * 2.6, -157, i * 0.5, -152.5);
+      c.stroke();
+    }
+    // queue-de-cheval qui se balance
+    const q = sw * 3 * a + C.pen * 4 + (air ? -2 : 0),
+      qy = air ? (C.vy > 0 ? 3 : -4) : 0;
+    const gq = c.createLinearGradient(0, -152, 0, -128);
+    gq.addColorStop(0, '#4a2e1d');
+    gq.addColorStop(1, '#2a190f');
+    c.fillStyle = gq;
+    c.beginPath();
+    c.moveTo(-3.2, -151);
+    c.quadraticCurveTo(-5 + q * 0.4, -140, -2.5 + q, -129 + qy);
+    c.quadraticCurveTo(0.5 + q * 1.1, -126 + qy, 2 + q, -130 + qy);
+    c.quadraticCurveTo(4.5 + q * 0.4, -141, 3.2, -151);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = '#6a4329';
+    c.lineWidth = 0.6;
+    c.beginPath();
+    c.moveTo(0, -150);
+    c.quadraticCurveTo(q * 0.5, -140, q * 0.9, -130 + qy);
+    c.stroke();
+    // chouchou rose
+    c.fillStyle = '#ff8fb8';
+    c.beginPath();
+    c.ellipse(0, -151.5, 4.2, 2.4, 0, 0, 7);
+    c.fill();
+    c.fillStyle = '#ffc2d8';
+    c.beginPath();
+    c.ellipse(-1, -152.3, 1.8, 0.9, 0, 0, 7);
+    c.fill();
+    c.restore();
+    c.restore();
   };
 
   /* ===================== boucle ===================== */
@@ -2527,14 +2988,16 @@ function mysLancer(cb, fic) {
             aide();
             depart();
             F.ent = 0;
+            if (C) C.tient = 1; // à pied : un nouveau fichier revient dans sa main
           }
         }
       }
-    } else if (!drag && !fin) {
+    } else if (!drag && !fin && !C) {
       F.ent = Math.min(1, F.ent + dt * 2.5);
       F.y = Y0 - (1 - F.ent) ** 2 * 0.6 + Math.sin(t * 2.2) * 0.015;
       F.al = F.ent;
     }
+    marche(dt);
     ciel(t);
     lyon();
     voisinsDessin(t);
@@ -2544,7 +3007,8 @@ function mysLancer(cb, fic) {
     const L = OBS.map(ob => [ob.z, () => obstacle(ob, t)]);
     L.push([TZ, () => traineau(t, dt)]);
     L.push([CZ, () => (chemineeFond(t), F.in && (c.save(), ouverture(), c.clip(), fichier(), c.restore()), chemineeDevant())]);
-    if (!F.in)
+    if (C) L.push([99, () => marque(t)]);
+    if (!F.in && !(C && C.tient))
       L.push([
         F.z,
         () => {
@@ -2559,6 +3023,7 @@ function mysLancer(cb, fic) {
           c.restore();
         }
       ]);
+    if (C) L.push([C.z, () => celestine(t)]);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
@@ -2569,6 +3034,21 @@ function mysLancer(cb, fic) {
 
   /* ===================== toucher ===================== */
   cv.addEventListener('pointerdown', e => {
+    if (C) {
+      // à pied : elle marche jusqu'au point touché (toucher la cheminée l'y emmène, juste devant)
+      if (C.saute || fin) return;
+      const [cx1, cy1] = P(-CX, TOP, CZ - CD),
+        [cx2, cy2] = P(CX, 0, CZ - CD);
+      let p =
+        e.clientX > cx1 && e.clientX < cx2 && e.clientY > cy1 && e.clientY < cy2
+          ? { x: Math.max(-0.3, Math.min(0.3, C.x)), z: CZ - CD - 0.5 }
+          : sol(e.clientX, e.clientY);
+      if (!p) return;
+      p.x = Math.max(-6, Math.min(6, p.x));
+      p.z = Math.max(1.4, Math.min(RIDGE - 0.4, p.z));
+      cible = { ...p, t: T() };
+      return;
+    }
     if (F.vol || fin || F.ent < 1 || e.clientY < H * 0.45) return;
     drag = 1;
     idle = 0;

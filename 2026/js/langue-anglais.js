@@ -3225,7 +3225,6 @@ window.TRADUCTIONS_EN = {
   'Agrandissement ×8 du vide-poche, au fond du selfie de 7 h 51.': '×8 enlargement of the tray, in the background of the 7:51 selfie.',
   'Livraison spéciale': 'Special delivery',
   'Livré': 'Delivered',
-  'Le déposer à la main': 'Drop it in by hand',
   'Glisse le doigt vers le haut pour lancer le fichier dans la cheminée.': 'Swipe up to throw the file down the chimney.',
   'Presque ! Réessaie 😉': 'Almost! Try again 😉',
   'Un geste franc vers le haut, droit sur la cheminée ⬆️': 'A firm swipe up, straight at the chimney ⬆️',
@@ -3239,5 +3238,10 @@ window.TRADUCTIONS_EN = {
   'Miaou !': 'Meow!',
   'Télécharge-le avec le premier bouton (il est un peu lourd : attends bien la fin du téléchargement).': 'Download it with the first button (it’s quite big: wait until the download is complete).',
   'Reviens ici, touche le second bouton et choisis-le dans tes téléchargements.': 'Come back here, tap the second button and pick it from your downloads.',
-  '📥 Télécharger le fichier mystère': '📥 Download the mystery file'
+  '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
+  '🚶 Y aller à pied': '🚶 Go on foot',
+  '🎯 Revenir au lancer': '🎯 Back to throwing',
+  'Sauter': 'Jump',
+  'Touche le toit pour la faire marcher, puis saute devant la cheminée.': 'Tap the roof to make her walk, then jump in front of the chimney.',
+  'Mets-toi bien en face de la cheminée, puis saute ! 🦘': 'Stand right in front of the chimney, then jump! 🦘'
 };

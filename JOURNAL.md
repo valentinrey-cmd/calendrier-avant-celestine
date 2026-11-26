@@ -3,6 +3,15 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : Célestine y va à pied
+- Le bouton « Le déposer à la main » (qui n'apparaissait qu'après 6 ratés et déposait directement le fichier) est remplacé par « 🚶 Y aller à pied », toujours visible.
+- À pied, une petite Célestine dessinée apparaît, vue de dos : cheveux châtains en queue-de-cheval avec un chouchou rose, branches des lunettes, doudoune rose matelassée avec capuche fourrée, écharpe crème à rayures, jean, bottes fourrées, moufles. Elle tient le fichier choisi à la main (la photo, le document…).
+- On touche le toit pour la faire marcher jusque-là (une petite marque apparaît dans la neige). Elle marche avec les bras, la queue-de-cheval, l'écharpe et le fichier qui se balancent, et on entend ses pas. Toucher la cheminée l'emmène juste devant. Elle s'arrête contre la cheminée et les obstacles, et les touche (le bonhomme s'écroule, etc.).
+- Le bouton rond « Sauter » brille quand elle est bien en face de la cheminée. En haut du saut, elle lâche le fichier : bien en face, il tombe dedans et elle lève les bras ; mal placée, il tape le bord ou passe à côté, puis un nouveau fichier revient dans sa main. Loin de la cheminée, elle fait juste un petit saut.
+- « 🎯 Revenir au lancer » permet de retrouver le lancer au doigt.
+- Version 1795702772
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Lien pour télécharger le fichier mystère, le toit ne se traverse plus
 - Dans la fenêtre « Avant de commencer… » de l'écran de démarrage, un bouton « 📥 Télécharger le fichier mystère » ouvre le lien SwissTransfer de Valentin (dans le navigateur, aussi depuis l'appli Android). Les explications disent de télécharger d'abord, puis d'ouvrir le fichier. Le lien est dans `CONTENU.mysLien` (`js/contenu.js`). Attention : un lien SwissTransfer expire au bout de 15 jours.
 - Lancer du fichier dans la cheminée : le sol couvre maintenant toute la largeur du toit dessiné (avant, il s'arrêtait à 4,2 m du centre et le fichier traversait la neige sur les côtés). Partout sur le toit, le fichier atterrit et glisse. S'il passe le faîtage, il tombe de l'autre côté et disparaît derrière la ligne du toit, au lieu de passer à travers la neige.
