@@ -3237,7 +3237,6 @@ window.TRADUCTIONS_EN = {
   'Il y avait un chat dans le cadeau ! 🐱': 'There was a cat in the present! 🐱',
   'Plus de télé chez le voisin ! 📺': 'No more TV for the neighbour! 📺',
   'Tu as fait tomber le Père Noël ! 🎅💥': 'You knocked Santa down! 🎅💥',
-  'La lune t’a fait un clin d’œil 😉': 'The moon winked at you 😉',
   '🥚 Nouveau secret !': '🥚 New secret!',
   'Miaou !': 'Meow!'
 };

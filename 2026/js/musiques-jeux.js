@@ -1182,18 +1182,20 @@ function mysSons(A, musique = true) {
       ton(t, 120, 1.1, 0.025, 'square');
       ton(t, 1400, 0.08, 0.05, 'square', 400);
     },
+    // le traîneau touché : un choc, les grelots qui s'affolent, un sifflement qui descend
     crash: () => {
       const t = now();
-      ton(t, 1300, 1.4, 0.04, 'sine', 220);
-      for (let i = 0; i < 6; i++) souffle(t + i * 0.18, 0.08, 0.025, 'highpass', 6500, 0, 1, 0.003);
-      souffle(t + 1.45, 0.9, 0.3, 'lowpass', 900, 90, 0.7, 0.01);
-      ton(t + 1.45, 110, 0.4, 0.25, 'sine', 45);
-      for (let i = 0; i < 9; i++) ton(t + 1.5 + Math.random() * 0.5, 2000 + Math.random() * 2500, 0.25, 0.025);
+      ton(t, 180, 0.18, 0.2, 'sine', 70);
+      souffle(t, 0.1, 0.12, 'bandpass', 900, 0, 1.5, 0.002);
+      for (let i = 0; i < 10; i++) souffle(t + i * 0.07, 0.07, 0.03, 'highpass', 6500, 0, 1, 0.003);
+      ton(t + 0.1, 1300, 0.8, 0.04, 'sine', 260);
     },
-    clin: () => {
+    // … et il s'écrase dans la neige du toit
+    boum: () => {
       const t = now();
-      cloche(t, 1568, 0.06);
-      cloche(t + 0.13, 2093, 0.06);
+      souffle(t, 0.9, 0.3, 'lowpass', 900, 90, 0.7, 0.01);
+      ton(t, 110, 0.4, 0.25, 'sine', 45);
+      for (let i = 0; i < 9; i++) ton(t + 0.05 + Math.random() * 0.5, 2000 + Math.random() * 2500, 0.25, 0.025);
     },
     fin: () => {
       clearInterval(iv);
@@ -1300,21 +1302,20 @@ function mysLancer(cb, fic) {
   const OE = {},
     T = () => performance.now() / 1000,
     age = k => (OE[k] == null ? 99 : T() - OE[k]),
-    DUREE = { bonhomme: 7, cadeaux: 6, sapin: 4.5, antenne: 7.5, traineau: 16, lune: 3 },
+    DUREE = { bonhomme: 7, cadeaux: 6, sapin: 4.5, antenne: 7.5, traineau: 16 },
     SECRETS = {
       bonhomme: 'Le bonhomme de neige s’écroule ! ⛄',
       sapin: 'Le sapin perd ses aiguilles ! 🎄',
       cadeaux: 'Il y avait un chat dans le cadeau ! 🐱',
       antenne: 'Plus de télé chez le voisin ! 📺',
-      traineau: 'Tu as fait tomber le Père Noël ! 🎅💥',
-      lune: 'La lune t’a fait un clin d’œil 😉'
+      traineau: 'Tu as fait tomber le Père Noël ! 🎅💥'
     },
     secEl = o.querySelector('.mysl-sec');
   let crash = null;
-  const surprise = (k, px, py) => {
+  const surprise = (k, tp) => {
     if (age(k) < DUREE[k]) return;
     OE[k] = T();
-    bruit({ bonhomme: 'eboule', sapin: 'aiguilles', cadeaux: 'miaou', antenne: 'gresille', traineau: 'crash', lune: 'clin' }[k]);
+    bruit({ bonhomme: 'eboule', sapin: 'aiguilles', cadeaux: 'miaou', antenne: 'gresille', traineau: 'crash' }[k]);
     let neuf = 0,
       n = 0;
     try {
@@ -1324,10 +1325,10 @@ function mysLancer(cb, fic) {
       n = Object.keys(S.mysSec).length;
       if (neuf) {
         save();
-        slog('🥚', `Fichier mystère : surprise « ${k} » trouvée (${n}/6)`);
+        slog('🥚', `Fichier mystère : surprise « ${k} » trouvée (${n}/5)`);
       }
     } catch (_) {}
-    secEl.innerHTML = (neuf ? '<i>🥚 Nouveau secret !</i>' : '') + `<b>${SECRETS[k]}</b>` + (n ? `<u>${n}/6</u>` : '');
+    secEl.innerHTML = (neuf ? '<i>🥚 Nouveau secret !</i>' : '') + `<b>${SECRETS[k]}</b>` + (n ? `<u>${n}/5</u>` : '');
     secEl.classList.remove('on');
     void secEl.offsetWidth;
     secEl.classList.add('on');
@@ -1353,7 +1354,7 @@ function mysLancer(cb, fic) {
           c: col[i % col.length]
         });
     }
-    if (k == 'traineau') crash = { x: px, y: py, vx: -40 - Math.random() * 30, vy: -60, r: 0, fume: [] };
+    if (k == 'traineau') crash = { x: tp.x, y: TY, vx: -1.6, vy: 1.4, r: 0, fume: [] };
   };
   const OBS = [
     { t: 'bonhomme', x: -1.3, z: 3.7, r: 0.3, h: 1.05 },
@@ -1361,6 +1362,21 @@ function mysLancer(cb, fic) {
     { t: 'sapin', x: 2.0, z: 7.2, r: 0.45, h: 1.7 },
     { t: 'antenne', x: -1.8, z: 7.4, r: 0.14, h: 1.9 }
   ];
+  // rayon réel de chaque élément à une hauteur donnée (le sapin est un cône, le bonhomme trois boules, l'antenne a des barres en haut)
+  const rayon = (ob, y) =>
+    ob.t == 'sapin'
+      ? Math.max(0.06, ob.r * (1 - y / ob.h) + 0.05)
+      : ob.t == 'bonhomme'
+        ? y < 0.55
+          ? 0.3
+          : y < 0.88
+            ? 0.21
+            : 0.14
+        : ob.t == 'antenne'
+          ? y > ob.h - 0.8
+            ? 0.45
+            : 0.05
+          : ob.r;
   const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
     BORD = 0.75; // bord du toit côté caméra (la gouttière)
   const taille = () => {
@@ -1443,33 +1459,6 @@ function mysLancer(cb, fic) {
       c.arc(mx + a, my + b, r, 0, 7);
       c.fill();
     });
-    const al = age('lune');
-    if (al < DUREE.lune) {
-      // un visage apparaît et fait un clin d'œil
-      c.globalAlpha = Math.min(1, al * 4, (DUREE.lune - al) * 3);
-      c.strokeStyle = c.fillStyle = '#5a4a2a';
-      c.lineWidth = 2;
-      c.beginPath();
-      c.arc(mx - 7, my - 4, 2.4, 0, 7);
-      c.fill();
-      c.beginPath();
-      if (Math.sin(al * 5) > -0.2) c.arc(mx + 7, my - 3, 3.5, Math.PI * 1.1, Math.PI * 1.9);
-      else c.arc(mx + 7, my - 4, 2.4, 0, 7);
-      c.stroke();
-      c.beginPath();
-      c.arc(mx, my + 3, 8, 0.25, Math.PI - 0.25);
-      c.stroke();
-      c.fillStyle = '#ffb3a7';
-      c.beginPath();
-      c.arc(mx - 13, my + 3, 3, 0, 7);
-      c.arc(mx + 13, my + 3, 3, 0, 7);
-      c.fill();
-      c.fillStyle = '#fff6c8';
-      c.font = '14px system-ui';
-      c.textAlign = 'center';
-      c.fillText('✨', mx + 30, my - 18 - al * 6);
-      c.globalAlpha = 1;
-    }
   };
   const lyon = () => {
     // colline de Fourvière et sa basilique, puis les toits de la ville
@@ -1896,16 +1885,20 @@ function mysLancer(cb, fic) {
       }
     });
   };
+  // le traîneau du Père Noël survole le toit toutes les 11 s, juste devant les maisons (sauf s'il vient de s'écraser)
+  const TY = 1.9, // son altitude
+    TZ = 7.6, // sa profondeur
+    TL = 110; // sa longueur dans le dessin
   const traineauPos = t => {
-    // le traîneau du Père Noël passe devant la lune toutes les 10 s (sauf s'il vient de s'écraser)
     if (age('traineau') < DUREE.traineau) return null;
-    const k = (t % 10) / 6;
+    const k = (t % 11) / 8;
     if (k > 1) return null;
-    return { x: W * 1.1 - k * W * 1.25, y: H * 0.14 + Math.sin(k * 6) * 8 };
+    return { x: 6.5 - k * 13, y: TY + Math.sin(k * 6) * 0.12 };
   };
-  const traineauDessin = (x, y, rot, t) => {
+  const traineauDessin = (x, y, rot, t, sc) => {
     c.save();
     c.translate(x, y);
+    c.scale(sc, sc);
     c.rotate(rot);
     c.fillStyle = '#0a1230';
     for (let r = 0; r < 4; r++) {
@@ -1929,57 +1922,77 @@ function mysLancer(cb, fic) {
     c.moveTo(-16, 0);
     c.lineTo(6, 2);
     c.stroke();
+    c.fillStyle = '#7a1424';
     c.beginPath();
     c.moveTo(4, 6);
     c.quadraticCurveTo(6, -4, 22, -2);
     c.lineTo(24, 6);
     c.closePath();
     c.fill();
+    c.fillStyle = '#c0233a';
     c.beginPath();
     c.arc(18, -6, 4, 0, 7);
     c.fill();
-    c.fillStyle = '#c0233a';
+    c.fillStyle = '#ffffff';
     c.beginPath();
-    c.arc(18, -6, 2, 0, 7);
+    c.arc(18, -10, 2, 0, 7);
     c.fill();
     c.restore();
   };
+  // longueur du traîneau en mètres (rennes compris) : 4 m, dont 0,7 m de traîneau à droite
+  const traineauEchelle = s => (s * 4) / TL;
   const traineau = (t, dt) => {
     const tp = traineauPos(t);
-    if (tp) return traineauDessin(tp.x, tp.y, 0, t);
+    if (tp) {
+      const [x, y, s] = P(tp.x, tp.y, TZ);
+      return traineauDessin(x - s * 0.15, y, 0, t, traineauEchelle(s));
+    }
     if (!crash) return;
-    // il tournoie, laisse une traînée de fumée, puis s'écrase derrière les toits
-    const sol = hy + 26;
-    if (crash.y < sol) {
-      crash.vy += 120 * dt;
+    // touché : il tournoie et s'écrase sur le toit
+    if (!crash.boum) {
+      crash.vy -= G * dt;
       crash.x += crash.vx * dt;
       crash.y += crash.vy * dt;
-      crash.r += dt * 4;
-      if (Math.random() < 0.6) crash.fume.push({ x: crash.x, y: crash.y, r: 4, a: 0.6 });
-      if (crash.y >= sol) {
-        for (let i = 0; i < 16; i++)
-          crash.fume.push({ x: crash.x + (Math.random() - 0.5) * 60, y: sol - Math.random() * 20, r: 8 + Math.random() * 10, a: 0.8 });
+      crash.r += dt * 5;
+      if (Math.random() < 0.6) crash.fume.push({ x: crash.x, y: crash.y, r: 0.08, a: 0.6 });
+      if (crash.y <= 0.1) {
+        crash.y = 0.1;
         crash.boum = T();
+        bruit('boum');
+        for (let i = 0; i < 16; i++)
+          crash.fume.push({ x: crash.x + (Math.random() - 0.5) * 1.6, y: Math.random() * 0.3, r: 0.18 + Math.random() * 0.2, a: 0.8 });
       }
     }
     crash.fume = crash.fume.filter(f => (f.a -= dt * 0.35) > 0);
     crash.fume.forEach(f => {
-      f.r += dt * 10;
-      f.y -= dt * 12;
-      c.fillStyle = `rgba(190,200,225,${f.a})`;
+      f.r += dt * 0.25;
+      f.y += dt * 0.3;
+      const [x, y, s] = P(f.x, f.y, TZ);
+      c.fillStyle = `rgba(220,228,245,${f.a})`;
       c.beginPath();
-      c.arc(f.x, f.y, f.r, 0, 7);
+      c.arc(x, y, f.r * s, 0, 7);
       c.fill();
     });
-    if (crash.y < sol) traineauDessin(crash.x, crash.y, crash.r, t);
-    else if (T() - crash.boum < 2.2) {
-      // les jambes du Père Noël dépassent de la neige
-      c.globalAlpha = Math.min(1, (2.2 - (T() - crash.boum)) * 2);
-      c.fillStyle = '#0a1230';
-      c.fillRect(crash.x - 6, sol - 18, 4, 16);
-      c.fillRect(crash.x + 2, sol - 16, 4, 14);
-      c.fillRect(crash.x - 9, sol - 20, 7, 3);
-      c.fillRect(crash.x + 2, sol - 18, 7, 3);
+    const [x, y, s] = P(crash.x, crash.y, TZ);
+    if (!crash.boum) traineauDessin(x, y, crash.r, t, traineauEchelle(s));
+    else if (T() - crash.boum < 3.5) {
+      // les jambes du Père Noël dépassent de la neige (et gigotent)
+      c.globalAlpha = Math.min(1, (3.5 - (T() - crash.boum)) * 2);
+      const k = s * 0.0042,
+        g = Math.sin(T() * 12) * 2;
+      c.save();
+      c.translate(x, y);
+      c.scale(k, k);
+      c.fillStyle = '#c0233a';
+      c.fillRect(-9, -40, 7, 38);
+      c.fillRect(3 + g * 0.3, -36, 7, 34);
+      c.fillStyle = '#ffffff';
+      c.fillRect(-10, -44, 9, 6);
+      c.fillRect(2 + g * 0.3, -40, 9, 6);
+      c.fillStyle = '#1b1b22';
+      c.fillRect(-12 + g, -54, 12, 10);
+      c.fillRect(1 + g, -50, 12, 10);
+      c.restore();
       c.globalAlpha = 1;
     }
   };
@@ -2345,8 +2358,9 @@ function mysLancer(cb, fic) {
       const dx = F.x - ob.x,
         dz = F.z - ob.z,
         d = Math.hypot(dx, dz),
-        m = ob.r + 0.12;
+        m = rayon(ob, F.y) + 0.12;
       if (F.y < ob.h && d < m && d > 0) {
+        surprise(ob.t); // il l'a vraiment touché
         const nx = dx / d,
           nz = dz / d,
           v = F.vx * nx + F.vz * nz;
@@ -2363,14 +2377,20 @@ function mysLancer(cb, fic) {
       // atterrir sur le dessus d'un obstacle bas (les cadeaux)
       if (ob.t == 'cadeaux' && p.y >= ob.h && F.y < ob.h && d < ob.r) {
         F.y = ob.h;
+        surprise('cadeaux');
         if (F.vy < -1) bruit('obstacle', 'cadeaux', Math.min(1, -F.vy / 6));
         F.vy = Math.abs(F.vy) * 0.25;
       }
     });
-    // les surprises : il suffit de passer tout près d'un élément
-    OBS.forEach(ob => {
-      if (Math.hypot(F.x - ob.x, F.z - ob.z) < ob.r + 0.45 && F.y < ob.h + 0.45) surprise(ob.t);
-    });
+    // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
+    const tp = traineauPos(T());
+    if (tp && Math.abs(F.z - TZ) < 0.45 && F.y > tp.y - 0.35 && F.y < tp.y + 0.4 && F.x > tp.x - 3.5 && F.x < tp.x + 0.7) {
+      surprise('traineau', tp);
+      F.vz = -Math.abs(F.vz) * 0.35;
+      F.vy = Math.min(F.vy, 0) * 0.5;
+      F.va += (Math.random() - 0.5) * 10;
+      choc(0.6);
+    }
     if (F.tombe) return;
     // bord du toit côté caméra : il ne revient pas vers nous
     if (F.z < BORD && F.y < 0.5) {
@@ -2485,13 +2505,6 @@ function mysLancer(cb, fic) {
       for (let i = 0; i < 8; i++) pas(dt / 8);
       F.t += dt;
       bruit('glisse', F.sol && !F.in && !F.tombe ? Math.hypot(F.vx, F.vz) : 0);
-      if (!F.in && !F.sol && F.al > 0) {
-        // le traîneau et la lune, tout en haut du ciel
-        const [px, py] = P(F.x, F.y, F.z),
-          tp = traineauPos(t);
-        if (tp && px > tp.x - 98 && px < tp.x + 30 && Math.abs(py - tp.y) < 26) surprise('traineau', tp.x, tp.y);
-        if (Math.hypot(px - W * 0.8, py - H * 0.13) < 46) surprise('lune');
-      }
       if (!F.in) {
         const arrete = F.sol && Math.hypot(F.vx, F.vz) < 0.02;
         F.arret = arrete || F.tombe || F.z > 14 ? F.arret + dt : 0;
@@ -2512,13 +2525,13 @@ function mysLancer(cb, fic) {
       F.al = F.ent;
     }
     ciel(t);
-    traineau(t, dt);
     lyon();
     voisinsDessin(t);
     neige(dt, false);
     toit();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
     const L = OBS.map(ob => [ob.z, () => obstacle(ob, t)]);
+    L.push([TZ, () => traineau(t, dt)]);
     L.push([CZ, () => (chemineeFond(t), F.in && (c.save(), ouverture(), c.clip(), fichier(), c.restore()), chemineeDevant())]);
     if (!F.in) L.push([F.z - (F.z > CZ - CD && F.z < CZ + CD && Math.abs(F.x) < CX ? 1 : 0) * 0, () => (ombre(), fichier())]);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());

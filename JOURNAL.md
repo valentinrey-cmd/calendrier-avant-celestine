@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : les surprises demandent un vrai contact
+- Avant, une surprise se déclenchait si le fichier passait seulement « devant » un élément à l'écran ou à côté. Maintenant il faut vraiment le toucher en 3D, avec sa vraie forme : le sapin est un cône, le bonhomme trois boules, l'antenne a ses barres en haut.
+- Le traîneau ne passe plus dans le ciel devant la lune : il survole le toit (toutes les 11 s), juste devant les maisons, à une vraie position dans la scène. Il faut un lancer très fort au bon moment pour le toucher. Le fichier rebondit dessus, le traîneau tournoie et s'écrase sur le toit dans un nuage de neige, et les jambes du Père Noël gigotent dans la neige.
+- La surprise de la lune est supprimée, car on ne peut pas vraiment la toucher : il reste 5 secrets.
+- Version 1795692698
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Fichier mystère : 6 surprises cachées quand on rate
 - Quand on rate le lancer, toucher certains éléments déclenche une surprise drôle, avec son bruit, puis tout se remet en place :
   - le bonhomme de neige s'écroule (les boules roulent, la tête tourne, le chapeau s'envole) puis se reconstruit ;
