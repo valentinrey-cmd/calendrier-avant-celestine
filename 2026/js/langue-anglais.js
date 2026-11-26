@@ -3153,8 +3153,6 @@ window.TRADUCTIONS_EN = {
   'TD de chimie analytique': 'Analytical chemistry tutorial',
   'Appel avec maman': 'Call with mum',
   'Dîner à l’appart': 'Dinner at the flat',
-  'Révisions à l’appart': 'Revising at the flat',
-  'Lessive et ménage': 'Laundry and cleaning',
   'Pilates': 'Pilates',
   'Soirée film': 'Movie night',
   'Cours de galénique': 'Pharmaceutics class',
@@ -3162,7 +3160,6 @@ window.TRADUCTIONS_EN = {
   'Café': 'Coffee',
   'Réveil (en retard)': 'Wake up (late)',
   'Déj rapide à la fac': 'Quick lunch at uni',
-  'Sieste': 'Nap',
   'Week-end à Reyrieux': 'Weekend in Reyrieux',
   'Raclette en famille': 'Family raclette',
   'Grasse mat’ et brunch': 'Lie-in and brunch',
@@ -3183,5 +3180,13 @@ window.TRADUCTIONS_EN = {
   'Ven. 27': 'Fri. 27',
   'Sam. 28': 'Sat. 28',
   'Dim. 29': 'Sun. 29',
-  'minuit': 'midnight'
+  'minuit': 'midnight',
+  'BU': 'Library',
+  'TD de biochimie': 'Biochemistry tutorial',
+  'Cours de physiologie': 'Physiology class',
+  'Cours d’immunologie': 'Immunology class',
+  'Cours de microbiologie': 'Microbiology class',
+  'Cours de pharmacie clinique': 'Clinical pharmacy class',
+  'TD de statistiques': 'Statistics tutorial',
+  'Cours de toxicologie': 'Toxicology class'
 };

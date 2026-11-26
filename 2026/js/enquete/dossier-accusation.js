@@ -91,7 +91,7 @@ function agdHTML(p) {
           `<button class="ag-e ag-${e[5]}" style="top:${(e[1] - H0) * R}px;height:${Math.max(13, (e[2] - e[1]) * R - 2)}px" onclick="agTap(${p.d},${i})">${e[5] == 'bg' ? '' : `<b>${esc(e[3])}</b>`}</button>`
       )
       .join('')}</div>`;
-  return `<div class="ag"><div class="ag-t"><span></span>${AGJ.map(j => `<span>${j.replace(' ', '<br>')}</span>`).join('')}</div><div class="ag-g" style="height:${(H1 - H0) * R}px"><div class="ag-hs">${heures}</div>${AGJ.map((_, d) => col(d)).join('')}</div><div class="ag-leg"><i class="ag-cours"></i>Cours <i class="ag-amis"></i>Amis <i class="ag-famille"></i>Famille <i class="ag-travail"></i>Travail <i class="ag-perso"></i>Perso</div><p class="ag-info" id="agi">Touche un créneau pour le détail.</p></div>`;
+  return `<div class="ag"><div class="ag-t"><span></span>${AGJ.map(j => `<span>${j.replace(' ', '<br>')}</span>`).join('')}</div><div class="ag-g" style="height:${(H1 - H0) * R}px"><div class="ag-hs">${heures}</div>${AGJ.map((_, d) => col(d)).join('')}</div><div class="ag-leg"><i class="ag-cours"></i>Cours <i class="ag-bu"></i>BU <i class="ag-amis"></i>Amis <i class="ag-famille"></i>Famille <i class="ag-travail"></i>Travail <i class="ag-perso"></i>Perso</div><p class="ag-info" id="agi">Touche un créneau pour le détail.</p></div>`;
 }
 function agTap(d, i) {
   const p = PIECES.find(x => x.d == d && x.k == 'agd'),

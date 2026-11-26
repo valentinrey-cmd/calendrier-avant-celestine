@@ -4,6 +4,13 @@
 
 ---
 
+## 26 novembre 2026 (10 h 50) : agenda du jour 2, semaine de cours bien remplie (version 1795681818)
+
+- Du lundi au vendredi, Célestine a **cours de 8 h à 18 h** (pharmacologie, biochimie, physiologie, chimie analytique, immunologie, microbiologie, pharmacie clinique, galénique, statistiques, toxicologie, TP), et **la BU** dans tous les trous. Nouvelle couleur grise « BU » dans la légende.
+- Les moments utiles à l'enquête gardent leur horaire : ongles mardi 18 h, pause à la BU mercredi 13 h, resto jeudi 20 h, TP vendredi 8 h 30, Reyrieux, pharmacie samedi.
+- Retirés (plus de place en journée) : « Révisions à l'appart », « Lessive et ménage », « Sieste ». L'appel à maman passe le mercredi à 18 h 15, la poste le jeudi à 18 h 15.
+- Fichiers : `2026/js/enquete/suspects-pieces.js` (`p_agenda.ag`), `2026/js/enquete/dossier-accusation.js` (légende), `2026/css/08-dossier.css` (`.ag-bu`), `2026/js/langue-anglais.js`.
+
 ## 26 novembre 2026 (10 h 40) : l'agenda du jour 2 devient un vrai agenda de semaine (version 1795681686)
 
 - L'indice du jour 2 n'est plus un tableau en liste : c'est un **agenda de semaine**, avec les 7 jours en colonnes (lun. 23 → dim. 29) et les heures sur le côté (7 h → minuit).
