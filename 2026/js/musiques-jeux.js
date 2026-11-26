@@ -1092,7 +1092,7 @@ function mysSons(A, musique = true) {
   };
   const iv = A instanceof (window.OfflineAudioContext || Object) ? 0 : setInterval(() => prevoir(0.6), 200);
   prevoir(0.6);
-  return {
+  const sons = {
     prevoir,
     // le geste : un « ffuit » qui monte avec la force
     lance: k => {
@@ -1193,8 +1193,14 @@ function mysSons(A, musique = true) {
       souffle(t, 0.9, 0.09, 'highpass', 2800, 0, 0.7, 0.05);
       for (let i = 0; i < 7; i++) ton(t + 0.05 + i * 0.07, [2637, 3136, 3520, 2794][i % 4], 0.35, 0.025);
     },
+    // le chat dans le cadeau : un miaulement et le « boing » du ressort
     miaou: () => {
-      const t = now() + 0.15,
+      sons.chat(0.15);
+      ton(now(), 300, 0.25, 0.08, 'sine', 900); // le « boing » du ressort
+    },
+    // un miaulement (le chat de la cheminée)
+    chat: (dl = 0) => {
+      const t = now() + dl,
         o = A.createOscillator(),
         f = A.createBiquadFilter(),
         g = A.createGain();
@@ -1212,7 +1218,21 @@ function mysSons(A, musique = true) {
       o.connect(f).connect(g).connect(M);
       o.start(t);
       o.stop(t + 0.65);
-      ton(now(), 300, 0.25, 0.08, 'sine', 900); // le « boing » du ressort
+    },
+    // un mauvais fichier dans la cheminée : le feu s'étouffe, crépite, et le recrache (« pfoouf »)
+    recrache: () => {
+      const t = now();
+      souffle(t, 0.45, 0.1, 'lowpass', 1400, 250, 0.9, 0.02);
+      for (let i = 0; i < 12; i++) souffle(t + 0.2 + Math.random() * 0.5, 0.05, 0.05, 'highpass', 4000, 0, 1, 0.003);
+      souffle(t + 0.55, 0.5, 0.28, 'lowpass', 200, 2200, 0.8, 0.03);
+      ton(t + 0.55, 90, 0.35, 0.2, 'sine', 220);
+    },
+    // des pigeons qui s'envolent : battements d'ailes et petits roucoulements
+    pigeons: () => {
+      const t = now();
+      for (let i = 0; i < 14; i++) souffle(t + i * 0.055 + Math.random() * 0.02, 0.06, 0.06, 'bandpass', 900 + Math.random() * 500, 0, 1.2, 0.004);
+      ton(t, 330, 0.18, 0.035, 'sine', 260);
+      ton(t + 0.2, 300, 0.2, 0.03, 'sine', 240);
     },
     gresille: () => {
       const t = now();
@@ -1262,56 +1282,71 @@ function mysSons(A, musique = true) {
       }, 700);
     }
   };
+  return sons;
 }
 
 /* ---------- Fichier mystère : avant de l'ouvrir, on le lance dans la cheminée du Père Noël ---------- */
 // Lancer « en profondeur » (façon paper toss) : on glisse le doigt vers le haut, le fichier part vers la cheminée.
 // Monde en mètres : x = gauche/droite, y = hauteur, z = profondeur. cb est appelé quand le fichier est tombé dedans.
 function mysLancer(cb, fic) {
-  // l'apparence du fichier lancé dépend du fichier choisi : une photo s'affiche, un document prend l'icône de son type
-  const nom = (fic && fic.name) || 'fichier.avent',
-    ty = (fic && fic.type) || '',
-    ext = (nom.includes('.') ? nom.split('.').pop() : '?').slice(0, 5).toUpperCase(),
-    vis = { k: ext == 'AVENT' ? 'avent' : 'doc', ext, nom };
-  if (ty.startsWith('audio')) Object.assign(vis, { ico: '♪', col: '#7b4fd6' });
-  else if (ty.startsWith('video')) Object.assign(vis, { ico: '▶', col: '#d65a2f' });
-  else if (ty == 'application/pdf' || ext == 'PDF') Object.assign(vis, { ico: 'PDF', col: '#d0312d' });
-  else if (/^(DOCX?|ODT|RTF|TXT|PAGES)$/.test(ext)) Object.assign(vis, { ico: '¶', col: '#2b63c9' });
-  else if (/^(XLSX?|CSV|ODS|NUMBERS)$/.test(ext)) Object.assign(vis, { ico: '▦', col: '#1f8a4c' });
-  else if (/^(ZIP|RAR|7Z)$/.test(ext)) Object.assign(vis, { ico: '🗜', col: '#8a6a2b' });
-  else Object.assign(vis, { ico: '?', col: '#6b7487' });
-  const imgDe = src =>
-    new Promise(ok => {
-      const im = new Image();
-      im.onload = () => ok(im);
-      im.onerror = () => ok(null);
-      im.src = src;
-    });
-  if (fic && ty.startsWith('image')) {
-    const u = URL.createObjectURL(fic);
-    imgDe(u).then(im => im && Object.assign(vis, { k: 'photo', im }));
-  } else if (fic && ty.startsWith('video')) {
-    // une image de la vidéo sert de miniature
-    const u = URL.createObjectURL(fic),
-      v = document.createElement('video');
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = 'auto';
-    v.onloadeddata = () => (v.currentTime = Math.min(1, (v.duration || 2) / 3));
-    v.onseeked = () => {
-      try {
-        const k = document.createElement('canvas');
-        k.width = v.videoWidth;
-        k.height = v.videoHeight;
-        k.getContext('2d').drawImage(v, 0, 0);
-        Object.assign(vis, { k: 'photo', im: k, video: 1 });
-      } catch (_) {}
-    };
-    v.src = u;
-  }
+  // l'apparence du fichier lancé dépend du fichier choisi : une photo s'affiche, un document prend l'icône de son type.
+  // La boîte aux lettres du toit permet d'en choisir un autre sur le téléphone (apparence() refait tout).
+  // vis.ok : c'est bien le fichier mystère (lui seul s'ouvre dans la cheminée) ; vis.noir : recraché, noirci par le feu
+  const vis = {};
+  const apparence = fic => {
+    for (const q in vis) delete vis[q];
+    const nom = (fic && fic.name) || 'fichier.avent',
+      ty = (fic && fic.type) || '',
+      ext = (nom.includes('.') ? nom.split('.').pop() : '?').slice(0, 5).toUpperCase();
+    Object.assign(vis, { k: ext == 'AVENT' ? 'avent' : 'doc', ext, nom, ok: !fic || ext == 'AVENT' });
+    if (fic)
+      fic
+        .slice(0, 9)
+        .arrayBuffer()
+        .then(b => vis.nom == nom && (vis.ok = new TextDecoder().decode(b) == 'AVENTMUS1'))
+        .catch(() => {});
+    if (ty.startsWith('audio')) Object.assign(vis, { ico: '♪', col: '#7b4fd6' });
+    else if (ty.startsWith('video')) Object.assign(vis, { ico: '▶', col: '#d65a2f' });
+    else if (ty == 'application/pdf' || ext == 'PDF') Object.assign(vis, { ico: 'PDF', col: '#d0312d' });
+    else if (/^(DOCX?|ODT|RTF|TXT|PAGES)$/.test(ext)) Object.assign(vis, { ico: '¶', col: '#2b63c9' });
+    else if (/^(XLSX?|CSV|ODS|NUMBERS)$/.test(ext)) Object.assign(vis, { ico: '▦', col: '#1f8a4c' });
+    else if (/^(ZIP|RAR|7Z)$/.test(ext)) Object.assign(vis, { ico: '🗜', col: '#8a6a2b' });
+    else Object.assign(vis, { ico: '?', col: '#6b7487' });
+    const imgDe = src =>
+      new Promise(ok => {
+        const im = new Image();
+        im.onload = () => ok(im);
+        im.onerror = () => ok(null);
+        im.src = src;
+      });
+    if (fic && ty.startsWith('image')) {
+      const u = URL.createObjectURL(fic);
+      imgDe(u).then(im => im && vis.nom == nom && Object.assign(vis, { k: 'photo', im }));
+    } else if (fic && ty.startsWith('video')) {
+      // une image de la vidéo sert de miniature
+      const u = URL.createObjectURL(fic),
+        v = document.createElement('video');
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = 'auto';
+      v.onloadeddata = () => (v.currentTime = Math.min(1, (v.duration || 2) / 3));
+      v.onseeked = () => {
+        try {
+          const k = document.createElement('canvas');
+          k.width = v.videoWidth;
+          k.height = v.videoHeight;
+          k.getContext('2d').drawImage(v, 0, 0);
+          if (vis.nom == nom) Object.assign(vis, { k: 'photo', im: k, video: 1 });
+        } catch (_) {}
+      };
+      v.src = u;
+    }
+  };
+  apparence(fic);
+  let fc = fic; // le fichier en main (celui qu'on ouvrira s'il entre dans la cheminée)
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button><span class="mysl-pas"></span></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
   try {
     if (S.mysTrophee) o.querySelector('.mysl-n').classList.add('trophee');
   } catch (_) {}
@@ -1396,8 +1431,17 @@ function mysLancer(cb, fic) {
     } catch (_) {}
     setTimeout(() => d.remove(), 4200);
   };
+  // une annonce en haut de l'écran (secrets, records) : petit titre doré, texte, compteur facultatif
+  const annonce = (titre, txt, bas = '') => {
+    secEl.innerHTML = (titre ? `<i>${titre}</i>` : '') + `<b>${txt}</b>` + (bas ? `<u>${bas}</u>` : '');
+    secEl.classList.remove('on');
+    void secEl.offsetWidth;
+    secEl.classList.add('on');
+    clearTimeout(annonce.to);
+    annonce.to = setTimeout(() => secEl.classList.remove('on'), 3200);
+  };
   const surprise = (k, tp) => {
-    if (age(k) < DUREE[k]) return;
+    if (!SECRETS[k] || age(k) < DUREE[k]) return; // la boîte aux lettres, par exemple, n'a pas de surprise
     OE[k] = T();
     bruit(
       {
@@ -1425,12 +1469,7 @@ function mysLancer(cb, fic) {
         if (n == NSEC) setTimeout(trophee, 1800);
       }
     } catch (_) {}
-    secEl.innerHTML = (neuf ? '<i>🥚 Nouveau secret !</i>' : '') + `<b>${SECRETS[k]}</b>` + (n ? `<u>${n}/${NSEC}</u>` : '');
-    secEl.classList.remove('on');
-    void secEl.offsetWidth;
-    secEl.classList.add('on');
-    clearTimeout(surprise.to);
-    surprise.to = setTimeout(() => secEl.classList.remove('on'), 3200);
+    annonce(neuf ? '🥚 Nouveau secret !' : '', SECRETS[k], n ? `${n}/${NSEC}` : '');
     // des éclats à l'endroit touché
     const ob = OBS.find(q => q.t == k);
     if (ob) {
@@ -1458,7 +1497,8 @@ function mysLancer(cb, fic) {
     { t: 'bonhomme', x: -1.3, z: 3.7, r: 0.3, h: 1.05 },
     { t: 'cadeaux', x: 1.2, z: 3.1, r: 0.34, h: 0.55 },
     { t: 'sapin', x: 2.0, z: 7.2, r: 0.45, h: 1.7 },
-    { t: 'antenne', x: -1.8, z: 7.4, r: 0.14, h: 1.9 }
+    { t: 'antenne', x: -1.8, z: 7.4, r: 0.14, h: 1.9 },
+    { t: 'boite', x: -3, z: 3.1, r: 0.22, h: 1.2 } // la boîte aux lettres : on y choisit un autre fichier sur le téléphone
   ];
   // rayon réel de chaque élément à une hauteur donnée (le sapin est un cône, le bonhomme trois boules, l'antenne a des barres en haut)
   const rayon = (ob, y) =>
@@ -1941,11 +1981,13 @@ function mysLancer(cb, fic) {
     c.scale(k, k);
     if (vis.k == 'photo') {
       photoDessin();
+      suie();
       c.restore();
       return;
     }
     if (vis.k == 'doc') {
       docDessin();
+      suie();
       c.restore();
       return;
     }
@@ -1996,7 +2038,64 @@ function mysLancer(cb, fic) {
     c.font = '800 7px system-ui,sans-serif';
     c.textAlign = 'center';
     c.fillText('.AVENT', 0, 24.5);
+    suie();
     c.restore();
+  };
+  // le fichier recraché par la cheminée : noirci de suie, les bords brûlés qui rougeoient encore
+  const suie = () => {
+    if (!vis.noir) return;
+    let w = 50,
+      h = 64,
+      oy = 0;
+    if (vis.k == 'photo') {
+      const im = vis.im,
+        r = (im.naturalWidth || im.width) / (im.naturalHeight || im.height);
+      w = (r >= 1 ? 62 : 62 * r) + 8;
+      h = (r >= 1 ? 62 / r : 62) + 8 + (vis.video ? 0 : 6);
+      oy = vis.video ? 0 : 3;
+    }
+    c.shadowColor = 'transparent';
+    // contour déchiqueté, un peu rongé vers l'intérieur
+    c.beginPath();
+    const n = 44;
+    for (let i = 0; i <= n; i++) {
+      const u = (i / n) * 4,
+        cote = Math.floor(u) % 4,
+        v = u - Math.floor(u),
+        j = 1.4 + 1.3 * Math.sin(i * 2.3) + 0.9 * Math.sin(i * 5.7),
+        X = [-w / 2 + v * w, w / 2, w / 2 - v * w, -w / 2][cote],
+        Y = [-h / 2, -h / 2 + v * h, h / 2, h / 2 - v * h][cote],
+        nx = [0, -1, 0, 1][cote],
+        ny = [1, 0, -1, 0][cote];
+      const px = X + nx * j,
+        py = Y + ny * j + oy;
+      i ? c.lineTo(px, py) : c.moveTo(px, py);
+    }
+    c.closePath();
+    c.fillStyle = 'rgba(32,22,16,0.66)';
+    c.fill();
+    const t = T();
+    c.strokeStyle = `rgba(255,${120 + Math.round(40 * Math.sin(t * 7))},40,${0.55 + 0.25 * Math.sin(t * 5)})`;
+    c.lineWidth = 2.4;
+    c.stroke();
+    // taches de suie plus sombres et quelques braises
+    c.fillStyle = 'rgba(12,8,6,0.55)';
+    [
+      [-0.25, -0.3, 0.22],
+      [0.28, 0.1, 0.18],
+      [-0.1, 0.32, 0.2]
+    ].forEach(([a, b, r]) => {
+      c.beginPath();
+      c.ellipse(a * w, b * h + oy, r * w, r * w * 0.7, a * 3, 0, 7);
+      c.fill();
+    });
+    c.fillStyle = '#ffb35c';
+    for (let i = 0; i < 4; i++) {
+      if (Math.sin(t * 6 + i * 2.1) < 0.2) continue;
+      c.beginPath();
+      c.arc(Math.sin(i * 3.7) * w * 0.4, Math.cos(i * 2.9) * h * 0.4 + oy, 1.3, 0, 7);
+      c.fill();
+    }
   };
   const particules = dt => {
     fumees = fumees.filter(p => (p.a -= dt * 0.25) > 0);
@@ -2007,7 +2106,7 @@ function mysLancer(cb, fic) {
       p.z += VENT.z * dt * 0.5;
       const [x, y, s, d] = P(p.x, p.y, p.z);
       if (d < 0.3) return;
-      c.fillStyle = `rgba(225,232,245,${p.a})`;
+      c.fillStyle = p.noir ? `rgba(48,40,38,${p.a})` : `rgba(225,232,245,${p.a})`;
       c.beginPath();
       c.arc(x, y, p.r * s, 0, 7);
       c.fill();
@@ -2623,6 +2722,66 @@ function mysLancer(cb, fic) {
       c.restore();
       bras(-1, false);
       bras(1, false);
+    } else if (ob.t == 'boite') {
+      // la boîte aux lettres : un poteau en bois, une boîte jaune avec sa fente et son petit drapeau rouge.
+      // Quand Célestine est tout près, un anneau brille dans la neige (le bouton « Choisir un fichier » apparaît)
+      const pave = (x0, x1, y0, y1, z0, z1, col) => {
+        const F6 = [
+          [1, 0, 0, [x1, y0, z0], [x1, y0, z1], [x1, y1, z1], [x1, y1, z0]],
+          [-1, 0, 0, [x0, y0, z1], [x0, y0, z0], [x0, y1, z0], [x0, y1, z1]],
+          [0, 0, 1, [x1, y0, z1], [x0, y0, z1], [x0, y1, z1], [x1, y1, z1]],
+          [0, 0, -1, [x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]],
+          [0, 1, 0, [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]]
+        ];
+        F6.forEach(([nx, ny, nz, ...pts]) => {
+          const mx = nx ? (nx > 0 ? x1 : x0) : (x0 + x1) / 2,
+            my = ny ? y1 : (y0 + y1) / 2,
+            mz = nz ? (nz > 0 ? z1 : z0) : (z0 + z1) / 2;
+          if (!vu(nx, ny, nz, mx, my, mz)) return;
+          if (!poly(pts.map(([a, b, cc]) => [ob.x + a, b, ob.z + cc]))) return;
+          c.fillStyle = col;
+          c.fill();
+          const lum = ny ? 0.12 : 0.22 + 0.18 * (nx * 0.6 + nz * 0.8);
+          c.fillStyle = ny ? `rgba(255,255,255,${lum})` : `rgba(0,0,0,${Math.max(0, lum)})`;
+          c.fill();
+        });
+      };
+      const pres = Math.hypot(C.x - ob.x, C.z - ob.z) < BOITE_PRES && !fin;
+      if (pres) {
+        c.strokeStyle = `rgba(255,215,106,${0.55 + 0.3 * Math.sin(t * 5)})`;
+        c.lineWidth = 3;
+        cercle(0, 0.01, 0, 0.5 + 0.04 * Math.sin(t * 5));
+        c.stroke();
+      }
+      pave(-0.045, 0.045, 0, 0.86, -0.045, 0.045, '#6b4428'); // poteau
+      pave(-0.17, 0.17, 0.86, 1.14, -0.22, 0.22, '#f2c230'); // la boîte
+      pave(-0.18, 0.18, 1.14, 1.18, -0.23, 0.23, '#f4f7fd'); // la neige dessus
+      // la fente et une petite enveloppe, sur la face avant (tournée vers le bas du toit)
+      if (vu(0, 0, -1, 0, 1, -0.22)) {
+        if (poly([[ob.x - 0.1, 1.06, ob.z - 0.222], [ob.x + 0.1, 1.06, ob.z - 0.222], [ob.x + 0.1, 1.08, ob.z - 0.222], [ob.x - 0.1, 1.08, ob.z - 0.222]])) {
+          c.fillStyle = '#3b2a12';
+          c.fill();
+        }
+        if (poly([[ob.x - 0.07, 0.92, ob.z - 0.222], [ob.x + 0.07, 0.92, ob.z - 0.222], [ob.x + 0.07, 1.01, ob.z - 0.222], [ob.x - 0.07, 1.01, ob.z - 0.222]])) {
+          c.fillStyle = '#ffffff';
+          c.fill();
+          c.strokeStyle = '#c99a1c';
+          c.lineWidth = 1;
+          c.stroke();
+          const [ax, ay] = P(ob.x - 0.07, 1.01, ob.z - 0.222),
+            [bx, by] = P(ob.x, 0.96, ob.z - 0.222),
+            [cx2, cy2] = P(ob.x + 0.07, 1.01, ob.z - 0.222);
+          c.beginPath();
+          c.moveTo(ax, ay);
+          c.lineTo(bx, by);
+          c.lineTo(cx2, cy2);
+          c.stroke();
+        }
+      }
+      // le drapeau, levé quand Célestine est tout près
+      const lev = pres ? 1 : 0;
+      pave(0.17, 0.19, 0.95, 1.2 + lev * 0.12, 0.1, 0.13, '#8a8f99');
+      pave(0.17, 0.19, 1.12 + lev * 0.12, 1.2 + lev * 0.12, 0.13, 0.27, '#d63a3a');
     } else if (ob.t == 'cadeaux') {
       // de vraies boîtes : on voit le dessus et les côtés tournés vers nous, rubans et nœuds compris
       const boite = (cx, cz, w, dd, h, an, col, rub, y0 = 0, couv = 0) => {
@@ -2969,6 +3128,17 @@ function mysLancer(cb, fic) {
       return;
     }
     const dansBoite = (x, z) => Math.abs(x) < CX && Math.abs(z - CZ) < CD;
+    // le chat assis sur l'ouverture la bouche : le fichier rebondit sur lui, et il file
+    if (CHAT.y > TOP - 0.05 && F.y > TOP - 0.05 && F.y < TOP + 0.5 && Math.abs(F.x - CHAT.x) < OX + 0.05 && Math.abs(F.z - CZ) < OZ + 0.06) {
+      F.y = Math.max(F.y, TOP + 0.02);
+      F.vy = Math.abs(F.vy) * 0.35 + 1.2;
+      F.vz = -Math.abs(F.vz) * 0.4 - 0.7;
+      F.vx = F.vx * 0.4 + (Math.random() - 0.5);
+      F.va += (Math.random() - 0.5) * 8;
+      choc(0.5);
+      chatFile();
+      return;
+    }
     // passage du haut de la cheminée en descendant
     if (p.y >= TOP && F.y < TOP && F.vy < 0) {
       const t = (p.y - TOP) / (p.y - F.y),
@@ -3059,7 +3229,20 @@ function mysLancer(cb, fic) {
         choc(0.6);
       }
     }
-    // Valentin, sur le toit d'à côté : touché par le fichier, il tombe sur les fesses
+    // Valentin, sur le toit d'à côté : un fichier qui arrive à hauteur de ses mains, il l'attrape au vol (une passe !)
+    // et le renvoie tout de suite ; en pleine tête ou dans les jambes, il tombe sur les fesses
+    const dv = Math.hypot(F.x - VAL.x, F.z - VAL.z),
+      dispo = !VAL.tient && !VAL.renvoi && !(VAL.emote && VAL.emote.k == 'aie' && T() - VAL.emote.t < VAL.emote.d);
+    if (!F.sol && !F.deVal && !fin && dispo && dv < 0.65 && F.y > VAL.base + 0.45 && F.y < VAL.base + 1.5) {
+      VAL.tient = 1;
+      VAL.renvoi = { e: 'vise', t: T() - 0.25 };
+      F.vol = 0;
+      F.vx = F.vy = F.vz = 0;
+      passe();
+      bruit('ramasse');
+      parle(VAL, ['Attrapé ! 😎', 'Je l’ai ! 🙌', 'Belle passe ! 👌'][Math.floor(Math.random() * 3)], 1.3);
+      return;
+    }
     if (!F.sol && !F.deVal && F.y > VAL.base + 0.1 && F.y < VAL.base + 1.9 && Math.hypot(F.x - VAL.x, F.z - VAL.z) < 0.36) {
       surprise('valentin');
       geste(VAL, 'aie', 2.2);
@@ -3081,6 +3264,7 @@ function mysLancer(cb, fic) {
     if (!chezVal && (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9)) {
       if (F.y < 0.05 && !F.tombe) {
         F.tombe = 1;
+        casse();
         bruit('tombe');
       }
       return;
@@ -3102,6 +3286,9 @@ function mysLancer(cb, fic) {
     const sy = (chezVal ? VOISIN.h : 0) + 0.03;
     if (F.y <= sy) {
       F.y = sy;
+      // il touche la neige : fin de la série de passes, et longueur du lancer de Célestine
+      if (passes) casse();
+      if (F.moi && !F.touche) ((F.touche = 1), record('dist', Math.hypot(F.x - F.x0, F.z - F.z0)));
       if (F.vy < -1.4) {
         bruit('neige', Math.min(1, -F.vy / 7));
         F.vy = -F.vy * 0.24;
@@ -3126,6 +3313,7 @@ function mysLancer(cb, fic) {
     for (let i = 0; i < 10 * k; i++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 140, t: 0.6, c: '#ffffff' });
   };
   const entre = () => {
+    if (!vis.ok) return recrache(); // ce n'est pas le fichier mystère : la cheminée n'en veut pas
     if (!F.in) bruit('entre');
     F.in = 1;
     F.vy = Math.min(F.vy, -1);
@@ -3133,6 +3321,30 @@ function mysLancer(cb, fic) {
     F.vz *= 0.2;
     if (fin) return;
     fin = 1;
+    // les records sont annoncés après le replay (voir fete)
+    const passesFin = passes,
+      distFin = F.moi ? Math.hypot(F.x - F.x0, F.z - F.z0) : 0;
+    passes = 0;
+    majPasses();
+    fete.recs = () => {
+      if (passesFin) record('passes', passesFin);
+      if (distFin) record('dist', distFin);
+      if (lancers) record('lancers', lancers);
+    };
+    // le tir gagnant est rejoué au ralenti (voir replay) ; la fête et la danse viennent après
+    const hh = HIST.filter(q => T() - q.t < 1.6);
+    if (hh.length > 5) {
+      hh.push({ t: T(), x: 0, y: TOP - 0.3, z: CZ, a: F.a });
+      RP = { t0: T() + 0.5, h: hh, d: (hh[hh.length - 1].t - hh[0].t) / RALENTI };
+      o.classList.add('replay');
+      F.vol = 0;
+      bruit('lance', 0.25);
+    } else fete(0);
+  };
+  // après le replay (ou tout de suite s'il n'y en a pas) : fumée, étincelles, confettis, puis la danse et l'ouverture
+  const fete = att => {
+    o.classList.remove('replay');
+    if (fete.recs) setTimeout(fete.recs, 900);
     o.querySelector('.mysl-n i').textContent = '1';
     o.querySelector('.mysl-n').classList.add('ok');
     tip.textContent = 'Ho ho ho ! 🎅 Bien reçu !';
@@ -3161,10 +3373,36 @@ function mysLancer(cb, fic) {
         confetti();
       } catch (_) {}
     }, 400);
+    if (att) bruit('entre');
     // Célestine fête ça : une chorégraphie de breakdance (voir danse), puis on ouvre le fichier
     C.danse = T() + 0.5;
     setTimeout(() => bruit('beat'), 500);
     setTimeout(fermer, (DANSE + 0.9) * 1000);
+  };
+  // un mauvais fichier (pas le fichier mystère) : le feu s'étouffe et le recrache, noirci et fumant, vers Célestine
+  const recrache = () => {
+    vis.noir = 1;
+    casse();
+    const dx = C.x,
+      dz = C.z - CZ,
+      n = Math.hypot(dx, dz) || 1,
+      v = Math.min(3.2, n * 0.55);
+    Object.assign(F, { x: 0, y: TOP + 0.12, z: CZ, vx: (dx / n) * v, vy: 6, vz: (dz / n) * v, va: 10, sol: 0, deVal: 0, noirT: T() });
+    bruit('recrache');
+    for (let i = 0; i < 24; i++)
+      fumees.push({
+        x: (Math.random() - 0.5) * 0.5,
+        y: TOP + Math.random() * 0.3,
+        z: CZ,
+        r: 0.1 + Math.random() * 0.12,
+        a: 0.85,
+        v: 0.5 + Math.random() * 0.9,
+        noir: 1
+      });
+    const [x, y] = P(0, TOP, CZ);
+    for (let i = 0; i < 30; i++)
+      eclats.push({ x, y, vx: (Math.random() - 0.5) * 260, vy: -60 - Math.random() * 220, t: 0.9, c: ['#ffb35c', '#ff7a2f', '#ffd76a'][i % 3] });
+    tip.textContent = 'Ho ho… ce n’est pas le bon fichier ! 🎅 Choisis-en un autre dans la boîte aux lettres 📮';
   };
   // le fichier sorti du toit retombe du ciel, à un endroit libre du toit
   // flèche rose qui rebondit au-dessus du fichier à ramasser
@@ -3215,7 +3453,7 @@ function mysLancer(cb, fic) {
     o.classList.add('out');
     setTimeout(() => {
       o.remove();
-      cb();
+      cb(fc);
     }, 450);
   };
   /* ===================== Célestine (commandes de jeu) ===================== */
@@ -3763,6 +4001,7 @@ function mysLancer(cb, fic) {
     if (!C.tient && !C.chute && F.vol && F.deVal && !F.sol && F.y > C.y + 0.3 && F.y < C.y + 2 && Math.hypot(F.x - C.x, F.z - C.z) < 0.6) {
       C.tient = 1;
       F.deVal = 0;
+      passe();
       geste(C, 'touche', 0.4);
       parle(C, ['Attrapé ! 🙌', 'Merci ! 😘', 'Je l’ai ! 😄'][Math.floor(Math.random() * 3)], 1.4);
       bruit('ramasse');
@@ -3811,7 +4050,11 @@ function mysLancer(cb, fic) {
       dir = C.phi;
     C.pTir = null;
     C.tient = 0;
+    lancers++;
     F = {
+      moi: 1,
+      x0: m.x,
+      z0: m.z,
       spin: C.spin || 0,
       x: m.x,
       y: m.y,
@@ -4801,6 +5044,522 @@ function mysLancer(cb, fic) {
       }
     }
   };
+  /* ===================== boîte aux lettres, passes, records, chat de la cheminée, pigeons, replay ===================== */
+  // --- la boîte aux lettres : tout près, un bouton ouvre le sélecteur de fichiers du téléphone (photos, fichiers, appareil photo…)
+  const BOITE = OBS.find(ob => ob.t == 'boite'),
+    BOITE_PRES = 1.15,
+    boiteEl = o.querySelector('.mysl-boite');
+  const choisir = g => {
+    if (!g || fin || C.chute) return;
+    fc = g;
+    apparence(g);
+    casse();
+    // Valentin lâche l'ancien fichier s'il l'avait (il retourne à sa place)
+    if (VAL.tient || VAL.renvoi) ((VAL.tient = 0), (VAL.renvoi = { e: 'retour', t: T() }));
+    nouveau();
+    C.ramasse = T(); // elle le sort de la boîte
+    bruit('ramasse');
+    tip.textContent = `📮 ${g.name}`;
+  };
+  boiteEl.querySelector('input').onchange = e => {
+    const g = e.target.files[0];
+    e.target.value = '';
+    choisir(g);
+  };
+  const boiteMaj = () =>
+    boiteEl.classList.toggle('on', !fin && !RP && !C.chute && Math.hypot(C.x - BOITE.x, C.z - BOITE.z) < BOITE_PRES);
+
+  // --- les passes avec Valentin : chaque fichier attrapé au vol compte, la série s'arrête quand il touche la neige
+  let passes = 0,
+    lancers = 0;
+  const pasEl = o.querySelector('.mysl-pas');
+  const majPasses = () => {
+    pasEl.textContent = passes ? `🤝 ${passes} passe${passes > 1 ? 's' : ''}` : '';
+    pasEl.classList.toggle('on', passes > 0);
+  };
+  const passe = () => {
+    passes++;
+    majPasses();
+    pasEl.classList.remove('pop');
+    void pasEl.offsetWidth;
+    pasEl.classList.add('pop');
+  };
+  const casse = () => {
+    if (passes) record('passes', passes);
+    passes = 0;
+    majPasses();
+  };
+
+  // --- les records (gardés dans S.mysRec) : moins de lancers pour livrer, plus long lancer, plus de passes
+  const REC = {
+    lancers: { t: 'Livré en le moins de lancers', u: n => `${n} lancer${n > 1 ? 's' : ''}`, mieux: (a, b) => a < b },
+    dist: { t: 'Plus long lancer', u: n => `${n.toFixed(1).replace('.', ',')} m`, mieux: (a, b) => a > b + 0.05 },
+    passes: { t: 'Plus de passes avec Valentin', u: n => `${n} passe${n > 1 ? 's' : ''}`, mieux: (a, b) => a > b }
+  };
+  const recs = () => {
+    try {
+      return (S.mysRec = S.mysRec || {});
+    } catch (_) {
+      return {};
+    }
+  };
+  const recEl = o.querySelector('.mysl-rec');
+  const majRec = () => {
+    const R = recs();
+    recEl.innerHTML =
+      '<b>🏆 Records</b>' +
+      Object.keys(REC)
+        .map(k => `<p><span>${REC[k].t}</span><em>${R[k] != null ? REC[k].u(R[k]) : '—'}</em></p>`)
+        .join('') +
+      '<small>Touche pour fermer</small>';
+  };
+  const record = (k, v) => {
+    const R = recs(),
+      old = R[k];
+    if (old != null && !REC[k].mieux(v, old)) return;
+    R[k] = k == 'dist' ? Math.round(v * 10) / 10 : v;
+    try {
+      save();
+      slog('🏆', `Fichier mystère : record « ${REC[k].t} » : ${REC[k].u(R[k])}`);
+    } catch (_) {}
+    majRec();
+    if (old == null && k == 'dist') return; // le tout premier lancer n'est pas annoncé
+    annonce('🏆 Nouveau record !', `${REC[k].t} : ${REC[k].u(R[k])}`);
+    bruit('voeu');
+  };
+  majRec();
+  o.querySelector('.mysl-rec-b').onclick = () => (majRec(), recEl.classList.toggle('on'));
+  recEl.onclick = () => recEl.classList.remove('on');
+
+  // --- le chat de la cheminée : de temps en temps, il traverse le toit, saute sur la cheminée et s'assoit sur l'ouverture
+  // (elle est bouchée !), puis repart. Un fichier qui le touche rebondit sur lui, et il file.
+  const CHAT = { e: 0, t: T() + 16 + Math.random() * 10, x: 0, y: -9, z: 0, vx: 0, sens: 1, vite: 1, ph: 0 };
+  const chatSuite = (e, vite = 1) => Object.assign(CHAT, { e, t0: T(), vite });
+  const chatFile = () => {
+    if (CHAT.e != 'assis' && CHAT.e != 'arrive') return;
+    bruit('chat');
+    chatSuite('part', 1.8);
+    tip.textContent = 'Mraaou ! 🐱 Le chat bouchait la cheminée.';
+  };
+  const chatMaj = dt => {
+    if (!CHAT.e) {
+      if (T() > CHAT.t && !fin && !RP) (chatSuite('arrive'), (CHAT.sens = Math.random() < 0.5 ? 1 : -1));
+      return;
+    }
+    const s = CHAT.sens,
+      k = (T() - CHAT.t0) * CHAT.vite,
+      L = (a, b, u) => a + (b - a) * u,
+      lisse = u => u * u * (3 - 2 * u),
+      px = CHAT.x,
+      pz = CHAT.z,
+      // trajet : il arrive d'un côté le long du faîtage, passe derrière la cheminée, saute dessus, puis repart de l'autre côté
+      A = [-4.8 * s, 7.9],
+      B = [-0.8 * s, CZ + 0.62],
+      Cc = [0.8 * s, CZ + 0.62],
+      D = [5 * s, 7.9],
+      saute = (a, b, ya, yb, u) => {
+        CHAT.x = L(a[0], b[0], u);
+        CHAT.z = L(a[1], b[1], u);
+        CHAT.y = L(ya, yb, u) + Math.sin(u * Math.PI) * 0.45;
+        CHAT.anim = 'saut';
+      };
+    if (CHAT.e == 'arrive') {
+      if (k < 2.6) {
+        const u = k / 2.6;
+        CHAT.x = L(A[0], B[0], u);
+        CHAT.z = L(A[1], B[1], u);
+        CHAT.y = 0;
+        CHAT.anim = 'marche';
+      } else if (k < 3.1) saute(B, [0, CZ], 0, TOP, lisse((k - 2.6) / 0.5));
+      else {
+        chatSuite('assis');
+        CHAT.x = 0;
+        CHAT.z = CZ;
+        CHAT.y = TOP;
+        bruit('chat');
+        if (!tip.textContent) tip.textContent = '🐱 Un chat s’est assis sur la cheminée… attends qu’il parte !';
+      }
+    } else if (CHAT.e == 'assis') {
+      CHAT.anim = 'assis';
+      if (k > 7) {
+        if (tip.textContent.startsWith('🐱')) tip.textContent = '';
+        chatSuite('part');
+      }
+    } else if (CHAT.e == 'part') {
+      if (k < 0.5) saute([0, CZ], Cc, TOP, 0, lisse(k / 0.5));
+      else if (k < 3.1) {
+        const u = (k - 0.5) / 2.6;
+        CHAT.x = L(Cc[0], D[0], u);
+        CHAT.z = L(Cc[1], D[1], u);
+        CHAT.y = 0;
+        CHAT.anim = 'marche';
+      } else Object.assign(CHAT, { e: 0, y: -9, t: T() + 24 + Math.random() * 16 });
+    }
+    CHAT.vx = (CHAT.x - px) / (dt || 1);
+    CHAT.vz = (CHAT.z - pz) / (dt || 1);
+    CHAT.ph += dt * 11 * CHAT.vite;
+  };
+  // le chat dessiné de face quand il est assis, de profil quand il marche ou saute (1 unité = 1 cm)
+  const chatDessin = t => {
+    const [x, y, s, d] = P(CHAT.x, CHAT.y, CHAT.z);
+    if (d < 0.4) return;
+    const [x2] = P(CHAT.x + CHAT.vx * 0.05, CHAT.y, CHAT.z + CHAT.vz * 0.05),
+      face = x2 < x ? -1 : 1,
+      k = s * 0.013, // un peu plus grand que nature, pour bien le voir de loin
+      ROUX = '#e3893b',
+      RAYE = '#b45f26';
+    // ombre
+    c.fillStyle = '#0000002a';
+    c.beginPath();
+    c.ellipse(x, y, 18 * k, 4 * k, 0, 0, 7);
+    c.fill();
+    c.save();
+    c.translate(x, y);
+    c.lineCap = 'round';
+    if (CHAT.anim == 'assis') {
+      c.scale(k, k);
+      const q = Math.sin(t * 2.4);
+      // la queue qui balaie
+      c.strokeStyle = ROUX;
+      c.lineWidth = 4.5;
+      c.beginPath();
+      c.moveTo(6, -3);
+      c.quadraticCurveTo(22 + q * 4, -2, 20 + q * 7, -18 + q * 3);
+      c.stroke();
+      // corps en poire, ventre clair
+      c.fillStyle = ROUX;
+      c.beginPath();
+      c.ellipse(0, -12, 10.5, 13, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#f6e2c8';
+      c.beginPath();
+      c.ellipse(0, -9, 5.5, 9, 0, 0, 7);
+      c.fill();
+      // pattes avant (il se lèche une patte de temps en temps)
+      const leche = Math.sin(t * 0.9) > 0.6;
+      c.fillStyle = ROUX;
+      c.beginPath();
+      c.ellipse(-4, -2, 3, 2.4, 0, 0, 7);
+      c.fill();
+      c.beginPath();
+      leche ? c.ellipse(3, -24, 2.6, 3.2, 0.4, 0, 7) : c.ellipse(4, -2, 3, 2.4, 0, 0, 7);
+      c.fill();
+      // tête, oreilles, rayures
+      c.beginPath();
+      c.arc(0, -30, 8.5, 0, 7);
+      c.fill();
+      [-1, 1].forEach(q2 => {
+        c.beginPath();
+        c.moveTo(q2 * 3, -37);
+        c.lineTo(q2 * 8, -42);
+        c.lineTo(q2 * 8.4, -32);
+        c.closePath();
+        c.fill();
+        c.fillStyle = '#f2a7a7';
+        c.beginPath();
+        c.moveTo(q2 * 4.5, -36);
+        c.lineTo(q2 * 7.3, -39.6);
+        c.lineTo(q2 * 7.5, -34);
+        c.closePath();
+        c.fill();
+        c.fillStyle = ROUX;
+      });
+      c.strokeStyle = RAYE;
+      c.lineWidth = 1.4;
+      [-2.5, 0, 2.5].forEach(dx => {
+        c.beginPath();
+        c.moveTo(dx, -38);
+        c.lineTo(dx * 0.8, -34.5);
+        c.stroke();
+      });
+      // yeux (il cligne), nez, moustaches
+      const cligne = Math.sin(t * 1.3) > 0.97 || leche;
+      c.fillStyle = '#ffd84a';
+      [-1, 1].forEach(q2 => {
+        c.beginPath();
+        cligne ? c.rect(q2 * 3.3 - 2, -31, 4, 0.8) : c.ellipse(q2 * 3.3, -31, 2, 2.3, 0, 0, 7);
+        c.fill();
+        if (!cligne) {
+          c.fillStyle = '#1b1b1b';
+          c.fillRect(q2 * 3.3 - 0.45, -32.8, 0.9, 3.6);
+          c.fillStyle = '#ffd84a';
+        }
+      });
+      c.fillStyle = '#e27a8a';
+      c.beginPath();
+      c.moveTo(-1.2, -27.5);
+      c.lineTo(1.2, -27.5);
+      c.lineTo(0, -26.2);
+      c.fill();
+      c.strokeStyle = '#ffffffaa';
+      c.lineWidth = 0.5;
+      [-1, 1].forEach(q2 =>
+        [-0.6, 0.5].forEach(dy => {
+          c.beginPath();
+          c.moveTo(q2 * 2.5, -26.5);
+          c.lineTo(q2 * 10, -27 + dy * 3);
+          c.stroke();
+        })
+      );
+    } else {
+      // de profil : il trotte (pattes qui alternent) ou il saute (tout étiré)
+      c.scale(k * face, k);
+      const sa = CHAT.anim == 'saut',
+        w = Math.sin(CHAT.ph);
+      c.strokeStyle = ROUX;
+      c.lineWidth = 3.4;
+      [
+        [10, 1],
+        [6, -1],
+        [-9, -1],
+        [-13, 1]
+      ].forEach(([px, q2]) => {
+        const a = sa ? (px > 0 ? 0.9 : -0.9) : q2 * w * 0.5;
+        c.beginPath();
+        c.moveTo(px, -12);
+        c.lineTo(px + Math.sin(a) * 11, -12 + Math.cos(a) * 11);
+        c.stroke();
+      });
+      c.lineWidth = 4;
+      c.beginPath();
+      c.moveTo(-15, -15);
+      c.quadraticCurveTo(-26, -20, -24 + w * 2, -32);
+      c.stroke();
+      c.fillStyle = ROUX;
+      c.beginPath();
+      c.ellipse(0, -15, 17, sa ? 6.5 : 7.5, sa ? -0.15 : 0, 0, 7);
+      c.fill();
+      c.strokeStyle = RAYE;
+      c.lineWidth = 1.6;
+      [-8, -2, 4].forEach(px => {
+        c.beginPath();
+        c.moveTo(px, -22);
+        c.lineTo(px + 1.5, -15);
+        c.stroke();
+      });
+      c.fillStyle = ROUX;
+      c.beginPath();
+      c.arc(17, -23, 7, 0, 7);
+      c.fill();
+      c.beginPath();
+      c.moveTo(13, -28);
+      c.lineTo(15, -35);
+      c.lineTo(19, -29);
+      c.fill();
+      c.beginPath();
+      c.moveTo(18, -29);
+      c.lineTo(22, -34);
+      c.lineTo(23, -26);
+      c.fill();
+      c.fillStyle = '#ffd84a';
+      c.beginPath();
+      c.ellipse(20, -24, 1.6, 1.9, 0, 0, 7);
+      c.fill();
+      c.fillStyle = '#e27a8a';
+      c.beginPath();
+      c.arc(23.6, -21.5, 1, 0, 7);
+      c.fill();
+    }
+    c.restore();
+  };
+
+  // --- les pigeons : posés sur le faîtage et la gouttière, ils s'envolent quand le fichier, Célestine ou une boule de neige
+  // passe trop près (ses voisins aussi), font un tour et reviennent se poser
+  const PIG = [
+    [-5.4, RIDGE - 0.1],
+    [-4.9, RIDGE - 0.1],
+    [-4.3, RIDGE - 0.1],
+    [3.6, RIDGE - 0.1],
+    [4.3, RIDGE - 0.1],
+    [-3.6, BORD + 0.1],
+    [-3.1, BORD + 0.1],
+    [4.4, BORD + 0.1]
+  ].map(([x, z]) => ({ hx: x, hz: z, x, y: 0, z, e: 'pose', t: 0, ph: Math.random() * 6, phi: Math.random() < 0.5 ? 1 : -1 }));
+  let pigBruit = 0;
+  const envol = (p, fx, fz) => {
+    if (p.e != 'pose') return;
+    const a = Math.atan2(p.x - fx, p.z - fz) + (Math.random() - 0.5) * 1.2,
+      v = 2.4 + Math.random() * 1.5;
+    Object.assign(p, { e: 'vol', t: T(), vx: Math.sin(a) * v, vz: Math.cos(a) * v, vy: 2 + Math.random() * 1.2 });
+    p.phi = p.vx >= 0 ? 1 : -1;
+    if (T() - pigBruit > 0.6) ((pigBruit = T()), bruit('pigeons'));
+    PIG.forEach(q => q != p && Math.hypot(q.x - p.x, q.z - p.z) < 2.2 && setTimeout(() => envol(q, fx, fz), 80 + Math.random() * 250));
+  };
+  const pigeons = dt => {
+    PIG.forEach(p => {
+      if (p.e == 'pose') {
+        const pres = (a, b, cc, r) => Math.hypot(a - p.x, b - p.y, cc - p.z) < r;
+        if (F.vol && !F.sol && !F.in && pres(F.x, F.y, F.z, 1.4)) envol(p, F.x, F.z);
+        else if (Math.hypot(C.x - p.x, C.z - p.z) < 1.2) envol(p, C.x, C.z);
+        else boules.forEach(b => pres(b.x, b.y, b.z, 1.3) && envol(p, b.x, b.z));
+        if (Math.random() < dt * 0.25) p.phi = -p.phi; // il se retourne
+        p.ph += dt * (Math.sin(T() * 0.7 + p.hx) > 0.3 ? 5 : 0); // il picore de temps en temps
+      } else if (p.e == 'vol') {
+        p.vy += dt * 0.8;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.z += p.vz * dt;
+        p.ph += dt * 26;
+        if (T() - p.t > 3.2) Object.assign(p, { e: 'loin', t: T() + 10 + Math.random() * 8 });
+      } else if (p.e == 'loin') {
+        if (T() > p.t && !fin) {
+          // il revient en planant, d'un peu plus loin et plus haut
+          const a = Math.random() * 6.3;
+          Object.assign(p, { e: 'retour', t: T(), x0: p.hx + Math.sin(a) * 7, y0: 6 + Math.random() * 2, z0: p.hz + Math.cos(a) * 7 });
+        }
+      } else if (p.e == 'retour') {
+        const u = Math.min(1, (T() - p.t) / 2.4),
+          e2 = 1 - (1 - u) * (1 - u);
+        p.x = p.x0 + (p.hx - p.x0) * e2;
+        p.z = p.z0 + (p.hz - p.z0) * e2;
+        p.y = p.y0 * (1 - e2);
+        p.phi = p.hx >= p.x0 ? 1 : -1;
+        p.ph += dt * (u > 0.8 ? 26 : 8);
+        if (u >= 1) Object.assign(p, { e: 'pose', x: p.hx, y: 0, z: p.hz });
+      }
+    });
+  };
+  const pigeonDessin = p => {
+    const [x, y, s, d] = P(p.x, p.y, p.z);
+    if (d < 0.3) return;
+    const k = s * 0.012;
+    c.save();
+    c.translate(x, y);
+    c.scale(k * p.phi, k);
+    const vole = p.e == 'vol' || (p.e == 'retour' && T() - p.t > 1.9),
+      pic = p.e == 'pose' && Math.sin(p.ph) > 0.7;
+    if (!vole && p.e == 'pose') {
+      c.strokeStyle = '#d98a8a';
+      c.lineWidth = 1.2;
+      [-2, 2].forEach(px => {
+        c.beginPath();
+        c.moveTo(px, -4);
+        c.lineTo(px, 0);
+        c.stroke();
+      });
+    }
+    // queue, corps, aile
+    c.fillStyle = '#6f7686';
+    c.beginPath();
+    c.moveTo(-9, -9);
+    c.lineTo(-19, -6);
+    c.lineTo(-18, -11);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#9097a7';
+    c.beginPath();
+    c.ellipse(0, -9, 11, 6.5, vole ? 0 : -0.1, 0, 7);
+    c.fill();
+    if (vole) {
+      const w = Math.sin(p.ph);
+      c.fillStyle = '#7d8494';
+      [1, -1].forEach(q => {
+        c.beginPath();
+        c.moveTo(-4, -11);
+        c.lineTo(5, -11);
+        c.lineTo(-2 + q * 3, -11 - w * 16 * q);
+        c.closePath();
+        c.fill();
+      });
+    } else {
+      c.fillStyle = '#7d8494';
+      c.beginPath();
+      c.ellipse(-2, -10, 7, 4, -0.15, 0, 7);
+      c.fill();
+      c.strokeStyle = '#3e4350';
+      c.lineWidth = 1;
+      [-4, -1].forEach(px => {
+        c.beginPath();
+        c.moveTo(px, -12);
+        c.lineTo(px + 2, -7.5);
+        c.stroke();
+      });
+    }
+    // tête (qui picore), cou irisé, bec, œil
+    const hx = pic ? 12 : 9,
+      hy = pic ? -6 : -16;
+    c.fillStyle = '#5f8f7a';
+    c.beginPath();
+    c.ellipse(7, -12, 4, 3.5, 0.6, 0, 7);
+    c.fill();
+    c.fillStyle = '#7b8192';
+    c.beginPath();
+    c.arc(hx, hy, 4.2, 0, 7);
+    c.fill();
+    c.fillStyle = '#3a3a3a';
+    c.beginPath();
+    c.moveTo(hx + 3.5, hy - 0.5);
+    c.lineTo(hx + 7, hy + 0.8);
+    c.lineTo(hx + 3.5, hy + 1.4);
+    c.fill();
+    c.fillStyle = '#ff8c3a';
+    c.beginPath();
+    c.arc(hx + 1.3, hy - 1, 1.1, 0, 7);
+    c.fill();
+    c.restore();
+  };
+
+  // --- le replay du tir gagnant : les 1,6 dernières secondes du vol, rejouées au ralenti, caméra sur le côté
+  const HIST = [],
+    RALENTI = 0.3;
+  let RP = null;
+  const hist = () => {
+    if (!F.vol || F.in || RP) return;
+    HIST.push({ t: T(), x: F.x, y: F.y, z: F.z, a: F.a });
+    while (HIST.length && T() - HIST[0].t > 1.8) HIST.shift();
+  };
+  const replay = () => {
+    if (!RP) return null;
+    const h = RP.h,
+      tt = Math.max(0, T() - RP.t0) * RALENTI + h[0].t;
+    let i = 0;
+    while (i < h.length - 2 && h[i + 1].t < tt) i++;
+    const a = h[i],
+      b = h[i + 1],
+      u = Math.max(0, Math.min(1, (tt - a.t) / (b.t - a.t || 1)));
+    for (const q of ['x', 'y', 'z', 'a']) F[q] = a[q] + (b[q] - a[q]) * u;
+    F.in = F.y < TOP && Math.abs(F.x) < OX && Math.abs(F.z - CZ) < OZ ? 1 : 0;
+    if (T() - RP.t0 > RP.d + 0.6) {
+      RP = null;
+      Object.assign(F, { in: 1, vol: 1, x: 0, y: TOP - 0.3, z: CZ, vx: 0, vy: -1, vz: 0 });
+      fete(1);
+      return null;
+    }
+    // caméra : sur le côté de la trajectoire, du côté où l'on était, et elle suit le fichier
+    const A = h[0],
+      dx = -A.x,
+      dz = CZ - A.z,
+      n = Math.hypot(dx, dz) || 1,
+      mx = (A.x + 0) / 2,
+      mz = (A.z + CZ) / 2,
+      cote = (V.x - mx) * (dz / n) - (V.z - mz) * (dx / n) >= 0 ? 1 : -1,
+      L = Math.max(3.2, n * 0.75),
+      cx = mx + (dz / n) * cote * L,
+      cz = mz - (dx / n) * cote * L,
+      dh = Math.hypot(F.x - cx, F.z - cz) || 1;
+    return { x: cx, z: cz, yaw: Math.atan2(F.x - cx, F.z - cz), h: -0.9, p: Math.atan2(CAM - 0.9 - F.y, dh) * 0.85, kx: 2.2, kh: 2.2 };
+  };
+  // bandes noires façon retransmission sportive, et le badge « REPLAY »
+  const bandeau = t => {
+    if (!RP) return;
+    const k = Math.min(1, (T() - RP.t0 + 0.5) / 0.4),
+      b = H * 0.09 * k;
+    c.fillStyle = '#05070f';
+    c.fillRect(0, 0, W, b);
+    c.fillRect(0, H - b, W, b);
+    if (k < 1) return;
+    c.font = '800 15px system-ui,sans-serif';
+    c.textAlign = 'left';
+    c.textBaseline = 'middle';
+    c.fillStyle = Math.sin(t * 6) > 0 ? '#ff3b3b' : '#7a1d1d';
+    c.beginPath();
+    c.arc(22, H - b / 2, 6, 0, 7);
+    c.fill();
+    c.fillStyle = '#ffffff';
+    c.fillText('REPLAY', 36, H - b / 2);
+    c.fillStyle = '#ffffff99';
+    c.fillText('× 0,3', 108, H - b / 2);
+  };
   const dessinBoule = b => {
     const [x, y, s, d] = P(b.x, b.y, b.z);
     if (d < 0.3) return;
@@ -5268,13 +6027,13 @@ function mysLancer(cb, fic) {
       if (!F.in && !fin) {
         // raté : il reste là où il s'est arrêté (il faut aller le ramasser) ;
         // tombé du toit : il disparaît puis retombe du ciel sur le toit
-        const repos = F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.03 && Math.abs(F.vy) < 0.05 && !F.tombe;
+        const repos = F.vol && F.t > 0.3 && Math.hypot(F.vx, F.vz) < 0.03 && Math.abs(F.vy) < 0.05 && !F.tombe;
         if (repos && !F.pose) {
           F.pose = 1;
           // sur le toit de Valentin, c'est lui qui va le chercher ; renvoyé par lui et pas attrapé : pas un raté
           if (surVoisin(F.x, F.z)) F.deVal = 0;
           else if (F.deVal) ((F.deVal = 0), (tip.textContent = 'Raté la réception ! Va le ramasser 😉'));
-          else aide();
+          else if (!F.noirT) aide(); // recraché par la cheminée : le message du Père Noël reste affiché
         }
         if (F.tombe) {
           F.al -= dt * 3;
@@ -5286,7 +6045,9 @@ function mysLancer(cb, fic) {
     const K = C.chute,
       dc = K ? T() - K.t : 0;
     let cible = { yaw: ctl.yaw, h: 0, p: 0, kx: 6, kh: 6 };
-    if (K && dc < 1.15) {
+    const rp = replay(); // le replay du tir gagnant prend la main sur la caméra
+    if (rp) cible = rp;
+    else if (K && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
         q = (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1,
@@ -5311,7 +6072,7 @@ function mysLancer(cb, fic) {
     Vt.z = cible.z != null ? cible.z : C.z - Math.cos(Vt.yaw) * 2.6;
     const kc = Math.min(1, dt * cible.kx),
       kh = Math.min(1, dt * cible.kh);
-    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K ? 4 : 14));
+    V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K ? 4 : rp ? 6 : 14));
     V.x += (Vt.x - V.x) * kc;
     V.z += (Vt.z - V.z) * kc;
     V.h += (cible.h - V.h) * kh;
@@ -5321,8 +6082,15 @@ function mysLancer(cb, fic) {
     const sec = K && K.sol ? Math.max(0, 0.4 - (T() - K.sol)) : 0;
     V.sx = sec * (Math.random() - 0.5) * 30;
     V.sy = sec * (Math.random() - 0.5) * 30;
+    hist();
     marche(dt);
     valentin(dt);
+    chatMaj(dt);
+    pigeons(dt);
+    boiteMaj();
+    // le fichier recraché fume encore un moment
+    if (vis.noir && F.noirT && T() - F.noirT < 3 && Math.random() < 0.2)
+      fumees.push({ x: F.x, y: F.y + 0.05, z: F.z, r: 0.03, a: 0.28, v: 0.4, noir: 1 });
     vent(dt);
     ciel(t);
     etoileFilante();
@@ -5366,11 +6134,15 @@ function mysLancer(cb, fic) {
     if (!sous) {
       L.push([prof(VAL.x, VAL.z), () => dessineValentin(t)]);
       boules.forEach(b => L.push([prof(b.x, b.z), () => dessinBoule(b)]));
+      // le chat : sur la cheminée, il passe devant elle
+      if (CHAT.e) L.push([prof(CHAT.x, CHAT.z) - (CHAT.y > TOP - 0.3 ? 0.05 : 0), () => chatDessin(t)]);
+      PIG.forEach(p => p.e != 'loin' && L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
     }
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     particules(dt);
     neige(dt, true);
     devant(t);
+    bandeau(t);
     // fondu au noir avant de réapparaître sur le toit, puis retour de l'image
     const nr =
       C.chute && C.chute.noir ? Math.min(1, (T() - C.chute.noir) / 0.35) : C.revient ? Math.max(0, 1 - (T() - C.revient) / 0.5) : 0;
@@ -5512,7 +6284,7 @@ function mysOpen(input) {
   const f = input.files[0];
   input.value = '';
   if (!f) return;
-  mysLancer(() => mysLire(f), f);
+  mysLancer(g => mysLire(g || f), f);
 }
 async function mysLire(f) {
   try {
