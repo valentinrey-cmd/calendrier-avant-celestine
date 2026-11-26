@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-26 · Fichier mystère : vraie chorégraphie de breakdance et tir façon basket
+- Danse de la victoire refaite (8 s) : toprock (pas croisés, bras qui balancent, buste qui se balance), moonwalk (de profil, elle « marche » mais glisse en arrière), descente au sol, windmill (elle tourne sur le dos, jambes en V, bras écartés), headspin qui accélère, baby freeze (pose figée penchée, une main au sol), saut périlleux pour se relever, puis bras en l'air avec des cœurs qui s'envolent. Un projecteur éclaire la piste, le rythme dure toute la danse, et le fichier s'ouvre juste après.
+- Tir façon basket : en maintenant « Lancer », elle fléchit les genoux et tient le fichier à deux mains au-dessus du front, coudes pliés. En relâchant, elle saute, tend le bras vers le haut et l'avant (coup de poignet) et lâche le fichier en haut du saut. L'autre main se retire, et elle amortit en retombant. Les coudes sont maintenant placés en 3D.
+- Force recalibrée pour ce nouveau tir (de 2,6 à 9,5 m/s) : depuis le départ, la bonne force tient toujours sur environ 0,3 s de la jauge.
+- Version 1795710079
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/index.html`, `2026/version.json`
+
 ## 2026-11-26 · Ménage : capture d'écran de test retirée
 - Suppression de `integ0.png` à la racine du projet : une capture d'écran de test ajoutée par erreur. Rien ne change pour Célestine.
 - Version 1795709747
