@@ -40,9 +40,10 @@ const OBJ3D = {
       [0.63, 0, 0.03, 'Il pend à un gros anneau rond, au lieu d’être serti dans la chaîne.']
     ]
   },
-  bonhomme: { f: '3d/bonhomme.glb', t: 'Le bonhomme de neige', s: 'Le gardien du toit du fichier mystère ☃️', o: '15deg 75deg auto' },
-  traineau: { f: '3d/traineau.glb', t: 'Le traîneau du Père Noël', s: 'Il a fini dans la neige du toit 🛷', o: '35deg 72deg auto' },
-  pizza: { f: '3d/pizza.glb', t: 'Les boîtes de Pizza Mario', s: 'Un souvenir de Trévoux 🍕', o: '30deg 65deg auto' },
+  // les souvenirs de Célestine gagnés contre les boss (vitrine des Trésors)
+  ongles: { f: '3d/ongles.glb', t: 'Tes ongles étoilés', s: 'Amande nude, petites étoiles noires et points blancs 💅', o: '180deg 80deg auto' },
+  lunettes: { f: '3d/lunettes.glb', t: 'Tes lunettes', s: 'Tes grandes lunettes écaille 👓', o: '20deg 75deg auto' },
+  tacos: { f: '3d/tacos.glb', t: 'La galette de tacos', s: 'Bien grillée, avec ses frites et sa sauce fromagère 🌯', o: '20deg 60deg auto' },
   // figurines animées (personnages faits avec Meshy, avec un squelette) : anim = [nom de l'animation dans le fichier, bouton]
   figValentin: {
     f: '3d/fig-valentin.glb',
@@ -64,8 +65,7 @@ const OBJ3D = {
       ['joie', '🎉 Saut de joie'],
       ['salut', '👋 Coucou']
     ]
-  },
-  cadenas: { f: '3d/cadenas.glb', t: 'Le cadenas à code', s: 'Huit chiffres… tu les connais ? 🔒', s2: 'Le code : 03.07.2025. Le jour où tout a commencé 💖', o: '20deg 75deg auto' }
+  }
 };
 
 // chargement de la bibliothèque, une seule fois

@@ -4,6 +4,16 @@
 
 ---
 
+## 28/11/2026 · Vitrine 3D : de vrais souvenirs de Célestine, un par boss (version 1795822594)
+- Chaque souvenir est maintenant lié à un boss précis (avant : au nombre de boss battus). Les cases fermées disent quel boss battre.
+- **Noémie (jour 4) :** sa main avec ses ongles amande nude, petites étoiles noires et points blancs (faite avec Meshy d'après la photo).
+- **Edgar (jour 11) :** une galette de tacos bien grillée, avec frites et sauce fromagère.
+- **Nora (jour 15) :** ses grandes lunettes écaille (verres transparents).
+- **Valentin (métro, jour 22) :** la figurine de Valentin. **Boss final :** la figurine de Célestine (inchangé).
+- Rien pour Emma et la pharmacie de Sandrine pour l'instant.
+- Supprimés : le bonhomme de neige, le traîneau, les boîtes à pizza et le cadenas en 3D (fichiers, textes, traductions).
+- Fichiers : `2026/3d/ongles.glb`, `2026/3d/lunettes.glb`, `2026/3d/tacos.glb` (nouveaux), `2026/3d/bonhomme.glb`, `traineau.glb`, `pizza.glb`, `cadenas.glb` (supprimés), `2026/js/vue-3d.js`, `2026/js/tresors.js`, `2026/js/fichiers.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Pharmacie de Sandrine : phrase du client plus claire (version 1795820951)
 - Le client qui disait « 😷 Ça gratte ici » dit maintenant « 😷 J’ai la gorge qui gratte » (on comprend tout de suite qu'il faut le produit pour la gorge). Traduction anglaise ajoutée.
 - Fichiers : `2026/js/boss/j19-sandrine-comptoir.js`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`.
