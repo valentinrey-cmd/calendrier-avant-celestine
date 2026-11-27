@@ -3244,8 +3244,10 @@ window.TRADUCTIONS_EN = {
   '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
   'Joystick pour marcher, glisse le doigt pour tourner la vue, « Sauter » pour sauter (en courant, jusque chez Valentin !). Maintiens « Lancer » et relâche au bon moment !':
     'Joystick to walk, slide your finger to turn the view, “Jump” to jump (run first, all the way to Valentin’s roof!). Hold “Throw” and let go at the right moment!',
-  'ZQSD pour marcher, flèches (ou la souris) pour tourner, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !':
-    'WASD to walk, arrows (or the mouse) to turn, Space to jump (run first, all the way to Valentin’s roof!). Hold E and let go at the right moment!',
+  'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !':
+    'Click the game: the mouse turns the view (Esc to release it). WASD to walk, Shift to run, Space to jump (run first, all the way to Valentin’s roof!). Hold E and let go at the right moment!',
+  'Aaaaah ! 😱': 'Aaaaah! 😱',
+  'Oups… AAAH ! 😱': 'Oops… AAAH! 😱',
   Sauter: 'Jump',
   'Oh ! Tu es venue me voir ? 😍': 'Oh! You came to see me? 😍',
   'Bienvenue chez moi ! 🏠': 'Welcome to my place! 🏠',

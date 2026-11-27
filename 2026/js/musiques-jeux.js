@@ -1542,7 +1542,7 @@ function mysLancer(cb, fic) {
   o.className = 'mysl';
   o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>${
       matchMedia('(pointer: fine)').matches
-        ? 'ZQSD pour marcher, flèches (ou la souris) pour tourner, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !'
+        ? 'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !'
         : 'Joystick pour marcher, glisse le doigt pour tourner la vue, « Sauter » pour sauter (en courant, jusque chez Valentin !). Maintiens « Lancer » et relâche au bon moment !'
     }</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><button class="mysl-saut"><b></b><span>Sauter</span></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
   try {
@@ -4015,6 +4015,8 @@ function mysLancer(cb, fic) {
     removeEventListener('resize', taille);
     removeEventListener('keydown', bas);
     removeEventListener('keyup', haut);
+    document.removeEventListener('mousemove', souris);
+    if (document.pointerLockElement === cv) document.exitPointerLock();
     o.classList.add('out');
     setTimeout(() => {
       o.remove();
@@ -4399,7 +4401,7 @@ function mysLancer(cb, fic) {
       [nx, nz] = K.n;
     C.v = 0;
     C.vy = 0;
-    if (d < 1.15) {
+    if (K.m == 'bord' && d < 1.15) {
       // au bord : elle se tourne vers le vide, se penche de plus en plus, se rattrape, mouline des bras
       const vise = Math.atan2(nx, nz),
         osc = Math.sin(d * 10);
@@ -4415,15 +4417,29 @@ function mysLancer(cb, fic) {
       }
     } else if (!K.sol) {
       // la chute (un peu ralentie, pour bien la voir) : elle bat des bras et des jambes
-      if (!K.vy) {
+      if (!K.vol) {
+        K.vol = 1;
         K.vy = 1.4;
         C.base = SOL; // son ombre est désormais sur le trottoir
       }
       K.vy -= G * 0.62 * dt;
       C.y += K.vy * dt;
-      const sort = Math.min(0.85, (d - 1.15) * 1.5);
-      C.x = K.x0 + nx * sort;
-      C.z = K.z0 + nz * sort;
+      if (K.m == 'bord') {
+        const sort = Math.min(0.85, (d - 1.15) * 1.5);
+        C.x = K.x0 + nx * sort;
+        C.z = K.z0 + nz * sort;
+      } else {
+        // avec son élan, qui s'essouffle un peu ; dans la ruelle, elle ne traverse pas le mur d'en face
+        C.x += K.vx * dt;
+        C.z += K.vz * dt;
+        K.vx *= 1 - Math.min(1, dt * 0.5);
+        K.vz *= 1 - Math.min(1, dt * 0.5);
+        if (K.rue) C.x = Math.max(9.0, Math.min(10.28, C.x));
+        if (Math.hypot(K.vx, K.vz) > 0.3) {
+          const vise = Math.atan2(K.vx, K.vz);
+          C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 6);
+        }
+      }
       C.lean += (0.12 - C.lean) * Math.min(1, dt * 4);
       C.amp = 1.1; // les jambes pédalent dans le vide
       C.ph += dt * 13;
@@ -4465,6 +4481,7 @@ function mysLancer(cb, fic) {
     if (C.chute) return chute(dt);
     if (C.ko) return ko(dt);
     saut(dt);
+    if (C.chute) return; // elle vient de sauter dans le vide
     const dz = danse();
     if (dz) {
       // pendant la danse, on ne la dirige plus
@@ -4569,7 +4586,9 @@ function mysLancer(cb, fic) {
     // caméra « à la Fortnite » : elle regarde toujours dans le sens de la vue, on voit toujours son dos ;
     // tourner la vue la fait tourner, et le joystick la fait avancer, reculer ou faire des pas de côté
     if (ctl.kt) ctl.yaw += ctl.kt * dt * 2.4;
-    const vise = em == 'boude' ? V.yaw : C.glisse ? null : ctl.yaw;
+    // (comme dans Fortnite : en courant, elle se tourne vers là où elle court ; en l'air, elle garde son cap)
+    const vise =
+      em == 'boude' ? V.yaw : C.glisse || C.saute ? null : C.v > 2.3 && !C.charge && (vx || vz) ? Math.atan2(vx, vz) : ctl.yaw;
     if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 14);
     // elle recule (joystick vers le bas) : l'animation de marche passe à l'envers
     const sp = Math.hypot(vx, vz);
@@ -4623,13 +4642,16 @@ function mysLancer(cb, fic) {
       }
     }
     // pas de barrière invisible : au bord de la gouttière ou d'un côté d'un des deux toits, elle perd l'équilibre et tombe
-    const nBord = !fin && C.y <= 0 ? horsToit() : null;
+    // Lentement, elle mouline des bras au bord avant de tomber ; en courant (ou en glissade), elle trébuche et part
+    // dans le vide avec son élan
+    const nBord = !fin && !C.chute && C.y <= 0 ? horsToit() : null;
     if (nBord) {
       const n = nBord,
         chezV = C.x > MILIEU;
+      if (Math.hypot(vx, vz) > 2.2) return tombe('course', n, vx, vz, 0);
       if (n[1]) C.z = (chezV ? VOISIN.z0 : BORD) + 0.12;
       else C.x = n[0] < 0 ? (chezV ? VOISIN.x0 + 0.12 : -8.88) : chezV ? VOISIN.x1 - 0.12 : 8.88;
-      C.chute = { t: T(), n, vy: 0, x0: C.x, z0: C.z };
+      C.chute = { m: 'bord', t: T(), n, vy: 0, x0: C.x, z0: C.z };
       C.charge = 0;
       C.glisse = 0;
       C.emote = null;
@@ -4713,20 +4735,25 @@ function mysLancer(cb, fic) {
     C.y += C.vy * dt;
     if (C.pTir != null && C.tient && T() - C.tir > 0.2) lacheFichier(); // en haut du saut, bras tendu
     if (C.y <= 0) {
+      // elle a sauté dans le vide (hors des toits, même à 45 cm près) : elle continue sa course et tombe, sans atterrir
+      const n = !fin && horsToit(0.45);
+      if (n) {
+        const a = C.air || { vx: 0, vz: 0 };
+        C.saute = 0;
+        C.air = null;
+        return tombe('saut', n, a.vx, a.vz, C.vy);
+      }
       C.y = 0;
       C.vy = 0;
       if (C.saute) C.v = Math.min(C.v, 2.4); // elle amortit : pas de glissade en retombant
       C.saute = 0;
       C.air = null;
-      // elle retombe dans le vide (la ruelle entre les deux toits, ou à côté d'un toit) : elle tombe tout de suite
-      // tout près d'un toit (moins de 45 cm), elle se rattrape dessus ; sinon elle tombe tout de suite
-      if (horsToit() && !horsToit(0.45)) {
+      // tout près d'un toit (moins de 45 cm), elle se rattrape dessus
+      if (horsToit()) {
         const chezV = C.x > MILIEU;
         C.x = Math.max(chezV ? VOISIN.x0 + 0.15 : -8.73, Math.min(chezV ? VOISIN.x1 - 0.15 : 8.73, C.x));
         C.z = Math.max((chezV ? VOISIN.z0 : BORD) + 0.15, C.z);
       }
-      const n = horsToit();
-      if (n && !fin) return (C.chute = { t: T() - 1.15, n, vy: 0, x0: C.x, z0: C.z });
       C.pose = T(); // elle amortit en retombant
       bruit('pas', 1);
     }
@@ -4744,6 +4771,21 @@ function mysLancer(cb, fic) {
     return C.x < xa ? [-1, 0] : [1, 0];
   };
   const chezValentin = () => surVoisin(C.x, C.z);
+  // elle tombe avec son élan (« course » : elle trébuche au bord ; « saut » : elle a sauté dans le vide)
+  const tombe = (m, n, vx, vz, vy) => {
+    const rue = n[0] != 0 && C.x > 0 && (n[0] > 0 ? C.x < MILIEU : C.x > MILIEU); // la ruelle entre les deux toits
+    C.chute = { m, t: T(), n, vx, vz, vy, vol: 1, rue, x0: C.x, z0: C.z };
+    C.base = SOL; // son ombre est désormais sur le trottoir
+    C.vy = 0;
+    C.charge = 0;
+    C.glisse = 0;
+    C.emote = null;
+    C.ange = 0;
+    btn.classList.remove('on');
+    btn.style.setProperty('--p', 0);
+    parle(C, m == 'saut' ? 'Aaaaah ! 😱' : 'Oups… AAAH ! 😱', 1.3);
+    bruit('aie', 0.8);
+  };
   // sauter (barre d'espace, bouton « Sauter ») : plus loin en courant, assez pour franchir la ruelle (1,5 m)
   const sauter = () => {
     if (fin || C.chute || C.ko || C.y > 0 || C.vy || C.charge || C.danse || C.ange || C.pTir != null) return;
@@ -4817,7 +4859,14 @@ function mysLancer(cb, fic) {
     }
     // la chute du toit : au bord, elle mouline des bras pour garder l'équilibre ; dans le vide, elle bat des bras
     // et des jambes ; en bas, étalée dans la neige
-    if (C.chute) return C.chute.sol ? { a: 'allongee' } : C.chute.vy ? { a: 'vide', v: 1.3 } : { a: 'equilibre', v: 1.5 };
+    // en courant, elle trébuche d'abord ; en sautant, elle bat tout de suite des bras dans le vide
+    if (C.chute) {
+      const K = C.chute,
+        d = tt - K.t;
+      if (K.sol) return { a: 'allongee' };
+      if (K.m == 'course' && d < 0.45) return { a: 'chute', k: 0.04 + 0.3 * cl(d / 0.45) };
+      return K.vol ? { a: 'vide', v: 1.3 } : { a: 'equilibre', v: 1.5 };
+    }
     if (dz)
       switch (dz.e) {
         case 'envol': // la patate : projetée en arrière
@@ -7930,10 +7979,21 @@ function mysLancer(cb, fic) {
         });
       return;
     }
+    // sur ordinateur, comme dans Fortnite : un clic bloque la souris dans le jeu, la bouger tourne la vue (Échap la libère)
+    if (e.pointerType == 'mouse' && cv.requestPointerLock) {
+      if (document.pointerLockElement !== cv)
+        try {
+          const r = cv.requestPointerLock();
+          if (r && r.catch) r.catch(() => {});
+        } catch (_) {}
+      return;
+    }
     if (regard) return;
     regard = { id: e.pointerId, x: e.clientX };
     cv.setPointerCapture(e.pointerId);
   });
+  const souris = e => document.pointerLockElement === cv && (ctl.yaw += e.movementX * 0.0042);
+  document.addEventListener('mousemove', souris);
   cv.addEventListener('pointermove', e => {
     if (!regard || e.pointerId != regard.id) return;
     ctl.yaw += (e.clientX - regard.x) * 0.0075;

@@ -4,6 +4,12 @@
 
 ---
 
+## 27/11/2026 · Toit : déplacement comme Fortnite, souris bloquée sur PC, chutes selon la façon de tomber (version 1795793579)
+- **Comme Fortnite :** elle regarde toujours dans le sens de la caméra (on voit son dos), mais quand elle court, elle se tourne vers là où elle court.
+- **Sur ordinateur :** un clic sur le jeu bloque la souris, et la bouger tourne la vue sans cliquer (Échap la libère). Texte d'aide ordinateur mis à jour (Maj pour courir).
+- **Chutes :** plus de retour au bord quand on saute hors du toit. Trois chutes différentes : en marchant, elle mouline des bras au bord puis tombe ; en courant, elle trébuche et part dans le vide avec son élan ; en sautant, elle continue son saut puis tombe. Dans la ruelle, elle ne traverse plus le mur d'en face.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : sauter, touche E, visite chez Valentin, caméra toujours dans son dos (version 1795792697)
 - **Sauter :** barre d'espace sur ordinateur, nouveau bouton bleu « Sauter » au-dessus de « Lancer » sur téléphone et tablette. Nouvelle animation 3D de saut faite avec Meshy. Elle garde son élan en l'air.
 - **Lancer :** sur ordinateur, c'est maintenant la touche **E** (maintenir puis relâcher), plus Espace.
