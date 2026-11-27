@@ -1797,6 +1797,9 @@ function mysLancer(cb, fic) {
   );
   taille();
   nouveau();
+  FIG3D.charge(); // les figurines 3D de Célestine et Valentin (js/toit-figurines-3d.js)
+  // version de test seulement : accès aux personnages pour vérifier les gestes (outil de test automatique)
+  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, renverse: () => renverse(), fete: () => fete() };
   // les mains vides : le fichier est dans la boîte aux lettres
   if (!fic) ((C.tient = 0), (F.al = 0), (tip.textContent = '📮 Va prendre le fichier dans la boîte aux lettres !'));
   rate = fin = 0;
@@ -4332,6 +4335,10 @@ function mysLancer(cb, fic) {
     return { d: D.h, de: D.e, g: G.h, ge: G.e, acc: C.ps.acc };
   };
   const main = () => {
+    // en 3D : la vraie main droite de la figurine (position notée à la dernière image)
+    const m3 = C.main3;
+    if (m3 && FIG3D.pret('celestine') && T() - m3.t < 0.25)
+      return { x: m3.x, y: m3.y + 0.03, z: m3.z, a: 0.1 * Math.cos(C.phi - V.yaw) + Math.sin(C.ph) * 0.1 * C.amp };
     // le fichier suit sa main droite (même calcul que le dessin)
     // (proj donne un décalage à droite de la caméra et une profondeur vers elle : on les remet dans le monde)
     const [X, Y, Z] = posesLisses().d,
@@ -4682,7 +4689,94 @@ function mysLancer(cb, fic) {
       taille: 1.08
     }
   };
+  /* --- Célestine et Valentin en vraies figurines 3D (FIG3D, js/toit-figurines-3d.js) ---
+     Tant qu'elles ne sont pas chargées, ou si elles ne peuvent pas l'être, les personnages dessinés plus bas restent.
+     geste3D choisit l'animation selon ce que fait le personnage ; k = où en est le geste (de 0 à 1), réglé sur le jeu. */
+  const geste3D = (qui, dz) => {
+    const tt = T(),
+      v = Math.abs(C.v || 0),
+      em = C.emote && tt - C.emote.t < C.emote.d ? C.emote : null,
+      cl = x => Math.max(0, Math.min(1, x)),
+      pas = () => (v > 2.3 ? { a: 'course', v: Math.max(0.7, v / 3.4) } : v > 0.12 ? { a: 'marche', v: Math.max(0.5, v / 1.25) } : { a: 'repos' });
+    if (qui == 'valentin') {
+      const R = C.renvoi;
+      if (em && em.k == 'aie') return { a: 'tombe', k: Math.min(0.95, ((tt - em.t) / em.d) * 1.3) }; // sur les fesses
+      if (em && em.k == 'lance') return { a: 'lancer', k: 0.25 + 0.25 * cl((tt - em.t) / em.d) }; // boule de neige
+      if (em && em.k == 'salut') return { a: 'salut' };
+      if (tt - (C.ramasse || -9) < 0.7) return { a: 'ramasse', k: 0.05 + 0.3 * cl((tt - C.ramasse) / 0.7) };
+      if (R && R.e == 'charge') return { a: 'charge' }; // il charge sa patate
+      if (R && R.e == 'vise') return { a: 'lancer', k: 0.3 };
+      if (R && R.e == 'lance') return { a: 'lancer', k: 0.37 + 0.2 * cl((tt - R.t) / 0.5) };
+      if (C.rit && v < 0.12) return { a: 'rire' }; // Célestine est K.O. : il rigole
+      return pas();
+    }
+    if (C.chute)
+      return C.chute.sol
+        ? { a: 'allongee' }
+        : C.chute.vy
+          ? { a: 'envol', k: 0.14 + 0.03 * Math.sin(tt * 9) }
+          : { a: 'chute', k: 0.12 + 0.06 * Math.sin(tt * 8) }; // au bord, elle vacille
+    if (dz)
+      switch (dz.e) {
+        case 'envol': // la patate : projetée en arrière
+          return { a: 'envol', k: C.ko && C.ko.e == 'stop' ? 0.03 : 0.05 + 0.35 * cl(C.ko && C.ko.tv ? (tt - C.ko.te) / C.ko.tv : 1) };
+        case 'glisse':
+        case 'ko':
+        case 'ange':
+          return { a: 'allongee' };
+        case 'releve':
+          return { a: 'releve', k: 0.5 + 0.21 * cl(dz.d / KO_REL) };
+        case 'secoue':
+          return { a: 'repos' };
+        case 'bravo':
+          return { a: 'joie' };
+        default: // la danse de la victoire
+          return { a: 'danse' };
+      }
+    if (em) return { a: { salut: 'salut', bisou: 'salut', danse: 'danse', boude: 'boude' }[em.k] || 'repos' };
+    if (tt - (C.ramasse || -9) < 0.5) return { a: 'ramasse', k: 0.03 + 0.45 * cl((tt - C.ramasse) / 0.5) };
+    if (C.charge) return { a: 'lancer', k: 0.33 }; // bras armé, elle vise
+    if (tt - (C.tir || -9) < 0.6) return { a: 'lancer', k: 0.33 + 0.25 * cl((tt - C.tir) / 0.6) };
+    if (C.glisse) return { a: 'glisse', k: 0.35 };
+    return pas();
+  };
+  const figurine3D = (t, LK, qui) => {
+    if (P(C.x, C.y, C.z)[3] < 0.5) return;
+    const [sx, sy, ss] = P(C.x, C.base || 0, C.z),
+      dz = qui == 'celestine' ? danse() : null;
+    if (dz && C.danse) {
+      // un projecteur sur la piste de danse
+      const g = c.createRadialGradient(sx, sy, 2, sx, sy, ss * 1.1);
+      g.addColorStop(0, 'rgba(255,240,200,0.55)');
+      g.addColorStop(1, 'rgba(255,240,200,0)');
+      c.fillStyle = g;
+      c.beginPath();
+      c.ellipse(sx, sy, ss * 1.1, ss * 0.32, 0, 0, 7);
+      c.fill();
+    }
+    // ombre au sol
+    c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y - (C.base || 0))})`;
+    c.beginPath();
+    c.ellipse(sx, sy, ss * 0.26, ss * 0.08, 0, 0, 7);
+    c.fill();
+    const m = FIG3D.dessine(
+      c,
+      qui,
+      { x: C.x, y: C.y, z: C.z, phi: C.phi, taille: LK.taille },
+      { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr },
+      geste3D(qui, dz)
+    );
+    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main())
+    if (C.tient) {
+      c.save();
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fichier();
+      c.restore();
+    }
+  };
   const celestine = (t, LK = TENUE.celestine) => {
+    const qui3 = LK === TENUE.valentin ? 'valentin' : 'celestine';
+    if (FIG3D.pret(qui3)) return figurine3D(t, LK, qui3);
     if (P(C.x, C.y, C.z)[3] < 0.5) return;
     const [x, yb, s] = P(C.x, C.y, C.z),
       [sx, sy, ss] = P(C.x, C.base || 0, C.z),
@@ -7471,6 +7565,7 @@ function mysLancer(cb, fic) {
   const dessineValentin = t => {
     aura(t);
     const moi = C;
+    VAL.rit = !!moi.ko; // Célestine est K.O. : la figurine 3D de Valentin rigole
     C = VAL; // on réutilise le même personnage en volume, avec la tenue de Valentin
     try {
       celestine(t, TENUE.valentin);

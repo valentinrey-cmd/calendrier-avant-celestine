@@ -101,6 +101,7 @@ const FICHIERS = {
     'js/labo.js',
     'js/neige-confettis.js',
     'js/vue-3d.js',
+    'js/toit-figurines-3d.js',
     'js/demarrage.js',
   ],
   // images, photos et voix (gardées en cache pour marcher sans connexion)
@@ -211,6 +212,9 @@ const FICHIERS = {
     '3d/cadenas.glb',
     '3d/fig-valentin.glb',
     '3d/fig-celestine.glb',
+    '3d/moteur-3d.min.js',
+    '3d/toit-celestine.glb',
+    '3d/toit-valentin.glb',
   ],
 };
 

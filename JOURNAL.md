@@ -3,6 +3,17 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fichier mystère, le toit : Célestine et Valentin deviennent leurs figurines 3D
+- Dans le jeu « Livraison spéciale » sur le toit, Célestine et Valentin ne sont plus dessinés à la main : ce sont leurs figurines 3D faites avec Meshy, animées, dessinées avec exactement la caméra du jeu, à la bonne place et à la bonne taille. Elles passent devant ou derrière la cheminée, les cadeaux, etc. comme avant.
+- **Gestes de Célestine** : debout, marche, course, glissade, ramasser le fichier, viser (bras armé) puis lancer, salut, bisou, bouder, danse de la victoire puis saut de joie, vaciller au bord et tomber du toit, la « patate » de Valentin (projetée en arrière, étalée dans la neige, elle se relève), l'ange dans la neige.
+- **Gestes de Valentin** : debout, marche, course, ramasser, coucou, lancer une boule de neige, charger sa patate puis la tirer, tomber sur les fesses quand le fichier le touche, rigoler quand Célestine est K.O.
+- Le fichier tenu en main suit la vraie main de la figurine, et part de là au lancer.
+- Les personnages dessinés restent dans le code comme secours : ils réapparaissent tout seuls si la 3D ne peut pas se charger (par exemple sans connexion la première fois).
+- Nouveaux fichiers (chargés seulement à l'ouverture du toit) : `2026/3d/moteur-3d.min.js` (three.js, 575 Ko), `2026/3d/toit-celestine.glb` et `2026/3d/toit-valentin.glb` (2,4 Mo chacun). Version de test : `window.__toit` pour tester les gestes.
+- Coût Meshy : 45 crédits (15 animations ; la marche et la course étaient offertes avec les squelettes). Reste : 729.
+- Version : 1795791175
+- Fichiers : `2026/js/toit-figurines-3d.js` (nouveau), `2026/js/musiques-jeux.js`, `2026/js/fichiers.js`, `2026/3d/` (3 nouveaux fichiers), `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Fichier mystère gardé pour de bon, musique des dialogues du boss final audible
 - **Constat (suivi)** : depuis hier soir, le fichier mystère a été redemandé 8 fois, à chaque fois dans la minute qui suit une nouvelle version du site, au moment où l'appli se recharge. La partie sauvegardée restait, seules les musiques disparaissaient. Dans un navigateur normal, le rangement des musiques résiste aux rechargements : c'est le stockage de la page dans l'appli Android qui se vidait.
 - **Correction 1, partout** : une fois le fichier mystère ouvert sur un appareil, il n'est plus jamais redemandé (marque `avent_mysok`). Si les musiques ont quand même disparu, le jeu ne bloque pas : il le note dans le suivi (« ⚠️ Musiques du fichier mystère disparues… », avec l'état du stockage) et on peut les remettre par Paramètres → Fichier mystère.
