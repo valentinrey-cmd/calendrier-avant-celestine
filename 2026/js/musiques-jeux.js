@@ -99,13 +99,66 @@ const MDB = (() => {
     return { ...reste, blob: new Blob([buf], { type: mime(buf, type, v.name) }) };
   };
   let cache = null; // une seule lecture de toutes les musiques à la fois (sinon elles sont en double dans la mémoire)
+  // Dans l'appli Android (assez récente), les musiques sont gardées par l'appli elle-même, dans ses fichiers :
+  // le stockage de la page se vidait à certaines mises à jour (fichier mystère redemandé). Ailleurs : IndexedDB.
+  const NAT = (() => {
+    try {
+      return window.AventAndroid && AventAndroid.musList ? AventAndroid : null;
+    } catch (_) {
+      return null;
+    }
+  })();
+  const NURL = 'https://valentinrey-cmd.github.io/calendrier-avant-celestine/2026/__mus/';
+  const natListe = () => {
+    try {
+      return JSON.parse(NAT.musList() || '[]');
+    } catch (_) {
+      return [];
+    }
+  };
+  const natPut = async (k, blob, name) => {
+    if (!NAT.musBegin(String(k), name || '', mime(await blob.slice(0, 12).arrayBuffer(), blob.type, name))) throw Error('musBegin');
+    const CH = 786432;
+    for (let o = 0; o < blob.size; o += CH) if (!NAT.musChunk(await b64(blob.slice(o, o + CH)))) throw Error('musChunk');
+    if (!NAT.musEnd()) throw Error('musEnd');
+  };
   const put = async (k, v) => {
-    const b = await brut(v);
     cache = null;
+    if (NAT && v && v.blob) return natPut(k, v.blob, v.name);
+    const b = await brut(v);
     return tx('readwrite', st => st.put(b, String(k)));
   };
-  const del = k => ((cache = null), tx('readwrite', st => st.delete(String(k))));
-  const lire = async () => {
+  const del = k => {
+    cache = null;
+    if (NAT)
+      try {
+        NAT.musDel(String(k));
+      } catch (_) {}
+    return tx('readwrite', st => st.delete(String(k)));
+  };
+  // appli Android : les musiques encore dans IndexedDB (rangées avant) passent dans les fichiers de l'appli
+  const natLire = async () => {
+    let L = natListe();
+    if (!L.length) {
+      const o = await lireIdb().catch(() => ({}));
+      for (const k in o)
+        try {
+          await natPut(k, o[k].blob, o[k].name);
+        } catch (_) {}
+      L = natListe();
+      if (L.length) slog('🎵', `Musiques passées dans les fichiers de l’appli Android (${L.length})`);
+    }
+    const o = {};
+    for (const it of L)
+      try {
+        const r = await fetch(NURL + encodeURIComponent(it.d), { cache: 'no-store' });
+        if (!r.ok) continue;
+        const buf = await r.arrayBuffer();
+        o[it.d] = { blob: new Blob([buf], { type: mime(buf, it.type, it.name) }), name: it.name, at: it.at };
+      } catch (_) {}
+    return o;
+  };
+  const lireIdb = async () => {
     const o = await tx('readonly', (st, set) => {
       const r = {};
       const c = st.openCursor();
@@ -137,7 +190,9 @@ const MDB = (() => {
     }
     return o;
   };
+  const lire = () => (NAT ? natLire() : lireIdb());
   return {
+    natif: !!NAT,
     put,
     del,
     all: () => {
@@ -146,11 +201,13 @@ const MDB = (() => {
       return c;
     },
     // combien de musiques sont rangées, sans les charger
-    count: () =>
-      tx('readonly', (st, set) => {
+    count: async () => {
+      const n = await tx('readonly', (st, set) => {
         const r = st.count();
         r.onsuccess = () => set(r.result || 0);
-      })
+      }).catch(() => 0);
+      return NAT ? Math.max(n, natListe().length) : n;
+    }
   };
 })();
 async function id3Cover(blob) {
@@ -7772,7 +7829,11 @@ async function mysLire(f) {
       confetti();
       ding();
     } catch (_) {}
-    slog('🎁', `Ouvre le fichier mystère (${n} chansons)`);
+    // il ne sera plus jamais redemandé sur cet appareil (mysGate, js/menu-demarrer.js)
+    try {
+      localStorage.setItem('avent_mysok', '1');
+    } catch (_) {}
+    slog('🎁', `Ouvre le fichier mystère (${n} chansons${MDB.natif ? ', gardées par l’appli Android' : ''})`);
     try {
       dispatchEvent(new Event('mysdone'));
     } catch (_) {}

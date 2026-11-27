@@ -60,6 +60,20 @@ public class MainActivity extends Activity {
         try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception e) {}
         return true;
       }
+      // les musiques du fichier mystère, rangées dans les fichiers de l'appli (voir musDir), servies à la page
+      @Override public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest r) {
+        String p = r.getUrl().getPath();
+        if (p == null || !p.contains("/__mus/")) return null;
+        File f = new File(musDir(), cle(p.substring(p.lastIndexOf('/') + 1)) + ".bin");
+        java.util.Map<String, String> h = new java.util.HashMap<>();
+        h.put("Access-Control-Allow-Origin", "*");
+        h.put("Cache-Control", "no-store");
+        try {
+          if (!f.exists()) return new WebResourceResponse("text/plain", null, 404, "Not Found", h, new ByteArrayInputStream(new byte[0]));
+          h.put("Content-Length", String.valueOf(f.length()));
+          return new WebResourceResponse(typeDe(f), null, 200, "OK", h, new FileInputStream(f));
+        } catch (Exception e) { return null; }
+      }
       @Override public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
         if (r.isForMainFrame() && !fellBack) { fellBack = true; v.loadUrl(LOCAL); }
       }
@@ -88,6 +102,18 @@ public class MainActivity extends Activity {
   @Override public void onWindowFocusChanged(boolean f) {
     super.onWindowFocusChanged(f);
     if (f) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+  }
+
+  /* ---------- Musiques du fichier mystère gardées par l'appli ----------
+     Elles sont rangées dans les fichiers privés de l'appli (musiques/<clé>.bin + <clé>.txt = type et nom),
+     et non dans le stockage de la page : elles survivent aux mises à jour du site et de l'appli
+     (seule une désinstallation les efface). La page les lit par l'adresse …/__mus/<clé>. */
+  File musDir() { File d = new File(getFilesDir(), "musiques"); d.mkdirs(); return d; }
+  static String cle(String k) { return k == null ? "" : k.replaceAll("[^A-Za-z0-9_-]", ""); }
+  String typeDe(File bin) {
+    try (BufferedReader r = new BufferedReader(new FileReader(new File(bin.getParentFile(), bin.getName().replace(".bin", ".txt"))))) {
+      String t = r.readLine(); return t == null || t.isEmpty() ? "audio/mpeg" : t;
+    } catch (Exception e) { return "audio/mpeg"; }
   }
 
   boolean askedNotif = false;
@@ -132,6 +158,53 @@ public class MainActivity extends Activity {
       }
     }
     @JavascriptInterface public void mediaStop() { MusicService.close(); }
+    // musiques : musBegin, musChunk… (morceaux en base64), musEnd ; musList = la liste en JSON ; musDel = en retirer une
+    File mtmp; OutputStream mos; String mcle, mtype, mnom;
+    @JavascriptInterface public boolean musBegin(String k, String nom, String type) {
+      try {
+        if (mos != null) mos.close();
+        mcle = cle(k); mtype = type; mnom = nom == null ? "" : nom.replace("\n", " ");
+        if (mcle.isEmpty()) return false;
+        mtmp = new File(musDir(), mcle + ".part");
+        mos = new BufferedOutputStream(new FileOutputStream(mtmp), 1 << 20);
+        return true;
+      } catch (Exception e) { return false; }
+    }
+    @JavascriptInterface public boolean musChunk(String b64) {
+      try { mos.write(Base64.decode(b64, Base64.DEFAULT)); return true; } catch (Exception e) { return false; }
+    }
+    @JavascriptInterface public boolean musEnd() {
+      try {
+        mos.close(); mos = null;
+        File bin = new File(musDir(), mcle + ".bin");
+        if (bin.exists()) bin.delete();
+        if (!mtmp.renameTo(bin)) return false;
+        try (Writer w = new FileWriter(new File(musDir(), mcle + ".txt"))) { w.write((mtype == null ? "" : mtype) + "\n" + mnom + "\n" + System.currentTimeMillis()); }
+        return true;
+      } catch (Exception e) { return false; }
+    }
+    @JavascriptInterface public String musList() {
+      StringBuilder b = new StringBuilder("[");
+      File[] fs = musDir().listFiles();
+      if (fs != null) for (File f : fs) {
+        if (!f.getName().endsWith(".bin")) continue;
+        String k = f.getName().replace(".bin", ""), t = "audio/mpeg", n = k; long at = f.lastModified();
+        try (BufferedReader r = new BufferedReader(new FileReader(new File(musDir(), k + ".txt")))) {
+          String a = r.readLine(), c = r.readLine(), d = r.readLine();
+          if (a != null && !a.isEmpty()) t = a; if (c != null) n = c; if (d != null) at = Long.parseLong(d.trim());
+        } catch (Exception e) {}
+        if (b.length() > 1) b.append(',');
+        b.append("{\"d\":\"").append(k).append("\",\"type\":\"").append(t.replace("\"", ""))
+          .append("\",\"name\":\"").append(n.replace("\\", "").replace("\"", "'")).append("\",\"at\":").append(at)
+          .append(",\"size\":").append(f.length()).append('}');
+      }
+      return b.append(']').toString();
+    }
+    @JavascriptInterface public boolean musDel(String k) {
+      String c = cle(k);
+      new File(musDir(), c + ".txt").delete();
+      return new File(musDir(), c + ".bin").delete();
+    }
     @JavascriptInterface public void fileShare() {
       runOnUiThread(() -> {
         try {

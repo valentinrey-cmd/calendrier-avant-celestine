@@ -13,7 +13,8 @@ document.addEventListener(
   true
 );
 const VMPOS = {};
-function vMusic(keys, pk, VOL) {
+// calme = musique de fond sous des dialogues (repli : un fond d'espion discret plutôt que la musique de l'album)
+function vMusic(keys, pk, VOL, calme) {
   keys = keys || ['b24', 'b11'];
   VOL = VOL || 0.75;
   let a = null,
@@ -60,10 +61,11 @@ function vMusic(keys, pk, VOL) {
         }
       if (dead) return;
       if (!it || !it.blob) {
-        fb = 1;
+        // pas de musique dans le fichier mystère : musique de l'album, ou (calme) un fond d'espion discret
+        fb = calme ? 2 : 1;
         window.__vidOn = 0;
         try {
-          ALBM.start();
+          fb == 2 ? MUS.play('filature', 0.045) : ALBM.start();
         } catch (_) {}
         return;
       }
@@ -130,7 +132,7 @@ function vMusic(keys, pk, VOL) {
       const my = ++tok;
       if (fb) {
         try {
-          ALBM.stop(0.4);
+          fb == 2 ? MUS.stop() : ALBM.stop(0.4);
         } catch (_) {}
         return;
       }
@@ -161,7 +163,7 @@ function vMusic(keys, pk, VOL) {
       const my = ++tok;
       if (fb) {
         try {
-          ALBM.start();
+          fb == 2 ? MUS.play('filature', 0.045) : ALBM.start();
         } catch (_) {}
         return;
       }
@@ -197,7 +199,7 @@ function vMusic(keys, pk, VOL) {
       window.__vidOn = 0;
       if (fb) {
         try {
-          ALBM.stop(0.6);
+          fb == 2 ? MUS.stop() : ALBM.stop(0.6);
         } catch (_) {}
       }
       if (a) {
@@ -887,7 +889,8 @@ function vBoss(test, sp, so) {
       if (st.c <= 0) return 'lose';
     }
   };
-  const DLGV = 0.0214;
+  // volume de la musique pendant les dialogues (emplacement « Combat final · dialogues », b30) : bien audible, mais sous les voix
+  const DLGV = 0.11;
   const DJK = () => {
     const a = Array.from({ length: 24 }, (_, i) => String(i + 1));
     for (let i = a.length - 1; i > 0; i--) {
@@ -991,7 +994,7 @@ function vBoss(test, sp, so) {
             mu = st.dmu;
             mu.resume();
           } else {
-            mu = vMusic(k == 5 ? ['b31', 'b30', 'b26'] : ['b30', 'b26'], k == 5 ? 0 : 'vbd', DLGV);
+            mu = vMusic(k == 5 ? ['b31', 'b30', 'b26'] : ['b30', 'b26'], k == 5 ? 0 : 'vbd', DLGV, true);
             if (mk === 'd') st.dmu = mu;
           }
           st.mk = mk;

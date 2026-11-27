@@ -711,12 +711,33 @@ function smOpen(force, at) {
   // Le fichier mystère n'est demandé qu'une seule fois par appareil : à chaque lancement, on regarde si ses musiques
   // sont bien rangées sur l'appareil (MDB, js/musiques-jeux.js). Si oui, on passe ; sinon (premier lancement, ou musiques
   // effacées par l'appareil), on le demande.
+  // Le fichier mystère n'est demandé qu'une fois par appareil : après, la marque 'avent_mysok' (posée par mysLire)
+  // laisse toujours passer. Si les musiques ont quand même disparu, on ne bloque pas : on le note dans le suivi
+  // (avec de quoi comprendre pourquoi) ; il reste « Paramètres → Fichier mystère » pour les remettre.
   const mysGate = go => {
     if (window.__mysOk || window.__mysSkip) return go();
+    let deja = false;
+    try {
+      deja = !!localStorage.getItem('avent_mysok');
+    } catch (_) {}
     MDB.count()
-      .then(n => {
+      .then(async n => {
         if (n) {
           window.__mysOk = 1;
+          try {
+            localStorage.setItem('avent_mysok', '1');
+          } catch (_) {}
+          return go();
+        }
+        if (deja) {
+          window.__mysOk = 1;
+          let info = location.protocol + (MDB.natif ? ' · appli Android' : '');
+          try {
+            const e = await navigator.storage.estimate();
+            info += ` · stockage ${Math.round((e.usage || 0) / 1048576)}/${Math.round((e.quota || 0) / 1048576)} Mo`;
+            info += (await navigator.storage.persisted()) ? ' · protégé' : ' · non protégé';
+          } catch (_) {}
+          slog('⚠️', 'Musiques du fichier mystère disparues de l’appareil (' + info + ')');
           return go();
         }
         log('fichier mystère demandé');
