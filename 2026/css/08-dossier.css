@@ -592,22 +592,6 @@
 .v3-hs[data-visible='false'] {
   opacity: 0.25;
 }
-.v3-grav {
-  width: auto;
-  height: auto;
-  border: 0;
-  box-shadow: none;
-}
-.v3-grav em {
-  font: 700 0.95rem 'Dancing Script', cursive;
-  color: #ffe9a8;
-  background: #2a1a3acc;
-  border: 1px solid #ffd76a;
-  border-radius: 10px;
-  padding: 1px 8px;
-  white-space: nowrap;
-  text-shadow: 0 0 8px #ffcf4a;
-}
 .v3-btn {
   display: block;
   margin: 8px auto 0;

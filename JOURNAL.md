@@ -3,6 +3,15 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fin du jeu : le bracelet 3D a sa petite plaque gravée « 03.07.2025 »
+- Nouveau modèle `2026/3d/bracelet-grave.glb` : le bracelet 3D avec une petite plaque dorée accrochée à la chaîne par un anneau, près du fermoir, où « ♥ 03.07.2025 ♥ » est vraiment gravé en creux (lisible de près, avec reflets). La plaque est fabriquée par programme (Meshy ne sait pas graver un texte) : script dans `outils/3d-plaque/`.
+- **Cinématique de fin** : dans la carte de la gravure, la caméra fait le tour du bracelet, s'approche de la plaque, fait un gros plan sur la date gravée (flash, paillettes), puis recule. L'ancienne étiquette « ✨ gravé ici » flottante est supprimée (styles et traduction compris), puisque la date se lit sur la plaque.
+- **Vitrine des Trésors** : après le boss final, le bracelet montré est la version avec la plaque. Pendant l'enquête (dossier, vitrine), c'est toujours le bracelet sans plaque.
+- On peut maintenant zoomer de plus près sur tous les objets 3D.
+- Coût Meshy : 0 crédit.
+- Version : 1795788950
+- Fichiers : `2026/3d/bracelet-grave.glb` (nouveau), `outils/3d-plaque/` (nouveau), `2026/js/vue-3d.js`, `2026/js/fichiers.js`, `2026/js/langue-anglais.js`, `2026/css/08-dossier.css`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Playlist Android : vraie cause trouvée (le focus audio)
 - **Constat** : certaines musiques (ex. « Loser ») se coupaient tout de suite dans la playlist mais jouaient en entier dans leur mini-jeu. Le suivi montrait « Pause du téléphone ignorée » puis « Musique coupée juste après le lancement ».
 - **Cause** : en mode playlist (et seulement là), la page prévient le lecteur « système » de l'appli Android que la musique joue (notification). Ce lecteur demandait alors le focus audio du téléphone et le volait à la WebView, qui gère déjà le sien : la WebView mettait la musique en pause. Les mini-jeux ne préviennent pas ce lecteur, d'où la différence.

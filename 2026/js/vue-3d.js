@@ -17,7 +17,11 @@ const OBJ3D = {
       [0.04, 0.03, 0.9, 'Un seul cœur rose, taillé comme une pierre et tenu par de petites griffes.'],
       [-0.4, 0, -0.78, 'Un fermoir mousqueton, et deux petits anneaux pour régler la longueur.']
     ],
-    grav: [-0.63, -0.02, -0.69]
+    // après le boss final : le même bracelet avec la petite plaque gravée « ♥ 03.07.2025 ♥ » accrochée près du fermoir
+    // (plaque ajoutée à la main au modèle Meshy, voir CLAUDE.md) ; grav = centre de la plaque, grt = angle de caméra face au texte
+    fg: '3d/bracelet-grave.glb',
+    grav: [-0.976, -0.037, -0.452],
+    grt: 245
   },
   coeur: {
     f: '3d/coeur.glb',
@@ -81,15 +85,15 @@ const v3Charge = () =>
   }));
 
 const v3Pos = p => p.map(v => v + 'm').join(' ');
-// le <model-viewer> d'un objet ; o.grav = afficher l'endroit de la gravure (o.grav peut être le texte de l'étiquette)
+// le <model-viewer> d'un objet ; o.grav = la version gravée (fichier fg) quand l'objet en a une
 function v3MV(id, o = {}) {
   const M = OBJ3D[id],
     D = S.det || {};
-  return `<model-viewer class="v3-mv" src="${M.f}" alt="${esc(M.t)}" camera-controls touch-action="none" orbit-sensitivity="0.5" interpolation-decay="110" min-camera-orbit="auto 15deg auto" max-camera-orbit="auto 165deg auto" ${M.anim ? `autoplay animation-name="${M.anim[0][0]}"` : 'auto-rotate rotation-per-second="14deg"'} interaction-prompt="none" environment-image="neutral" exposure="1.15" shadow-intensity="1" camera-orbit="${M.o}">${(
+  return `<model-viewer class="v3-mv" src="${(o.grav && M.fg) || M.f}" alt="${esc(M.t)}" camera-controls min-camera-orbit="auto auto 0.05m" touch-action="none" orbit-sensitivity="0.5" interpolation-decay="110" min-camera-orbit="auto 15deg auto" max-camera-orbit="auto 165deg auto" ${M.anim ? `autoplay animation-name="${M.anim[0][0]}"` : 'auto-rotate rotation-per-second="14deg"'} interaction-prompt="none" environment-image="neutral" exposure="1.15" shadow-intensity="1" camera-orbit="${M.o}">${(
     M.det || []
   )
     .map((d, i) => `<span slot="hotspot-${i}" class="v3-hs${D['v3_' + id + i] ? ' on' : ''}" data-position="${v3Pos(d)}"><b>${i + 1}</b></span>`)
-    .join('')}${o.grav && M.grav ? `<span slot="hotspot-grav" class="v3-hs on v3-grav" data-position="${v3Pos(M.grav)}"><em>${typeof o.grav == 'string' ? o.grav : '✨ 03.07.2025'}</em></span>` : ''}</model-viewer>`;
+    .join('')}</model-viewer>`;
 }
 const v3Liste = id =>
   (OBJ3D[id].det || []).map((d, i) => ((S.det || {})['v3_' + id + i] ? `<li><b>${i + 1}.</b> ${esc(d[3])}</li>` : '')).join('');
@@ -231,7 +235,7 @@ function v3Eclat(zone, n = 26) {
 }
 
 // boss final : le bracelet gravé en 3D remplace le dessin de la carte, avec un vrai plan de cinéma :
-// la caméra arrive de loin, fait le tour du bracelet au ralenti, plonge sur la gravure (flash, paillettes, étiquette),
+// la caméra arrive de loin, fait le tour du bracelet au ralenti, plonge sur la petite plaque où la date est gravée (flash, paillettes),
 // puis recule. Si Célestine touche le bracelet, le film s'arrête et elle le tourne elle-même.
 function v3Gravure(carte) {
   v3Charge().then(
@@ -240,12 +244,10 @@ function v3Gravure(carte) {
       if (!sv || !carte.isConnected) return;
       const w = document.createElement('div');
       w.className = 'v3-carte';
-      w.innerHTML = v3MV('bracelet', { grav: '✨ gravé ici' }) + '<small class="v3-tourne">🔄 Tourne-le du doigt</small>';
-      const mv = w.querySelector('model-viewer'),
-        hs = mv.querySelector('.v3-grav');
+      w.innerHTML = v3MV('bracelet', { grav: 1 }) + '<small class="v3-tourne">🔄 Tourne-le du doigt</small>';
+      const mv = w.querySelector('model-viewer');
       mv.removeAttribute('auto-rotate');
-      mv.setAttribute('camera-orbit', '20deg 85deg 170%');
-      hs.classList.remove('on');
+      mv.setAttribute('camera-orbit', '70deg 82deg 170%');
       // toucher le bracelet ne fait pas avancer la scène
       ['pointerdown', 'click', 'touchstart'].forEach(t => mv.addEventListener(t, e => e.stopPropagation()));
       w.style.cssText = 'position:absolute;opacity:0;pointer-events:none';
@@ -256,7 +258,7 @@ function v3Gravure(carte) {
           sv.replaceWith(w);
           w.style.cssText = '';
           carte.classList.add('v3-ok');
-          v3Film(mv, w, hs);
+          v3Film(mv, w);
         },
         { once: true }
       );
@@ -264,41 +266,46 @@ function v3Gravure(carte) {
     () => {}
   );
 }
-function v3Film(mv, w, hs) {
+function v3Film(mv, w) {
   const T = [],
-    g = OBJ3D.bracelet.grav,
-    plan = (ms, fn) => T.push(setTimeout(() => w.isConnected && fn(), ms)),
-    revele = () => {
-      if (hs.classList.contains('on')) return;
-      hs.classList.add('on');
-      v3Eclat(w);
-      try {
-        SFX('ok');
-      } catch (_) {}
-    };
+    M = OBJ3D.bracelet,
+    th = M.grt,
+    plan = (ms, fn) => T.push(setTimeout(() => w.isConnected && fn(), ms));
+  let vu = 0;
+  const revele = () => {
+    if (vu++) return;
+    v3Eclat(w);
+    try {
+      SFX('ok');
+    } catch (_) {}
+  };
   mv.addEventListener('camera-change', e => {
     if (!e.detail || e.detail.source != 'user-interaction' || !T.length) return;
     T.forEach(clearTimeout);
     T.length = 0;
     mv.interpolationDecay = 110;
-    revele();
   });
+  // 1. tour du bracelet au ralenti, 2. on s'approche de la plaque, 3. gros plan sur la date gravée (flash, paillettes), 4. on recule
   plan(150, () => {
     mv.interpolationDecay = 1100;
-    mv.cameraOrbit = '165deg 55deg 105%';
+    mv.cameraOrbit = `${th - 50}deg 55deg 105%`;
   });
-  plan(2700, () => {
+  plan(2600, () => {
     mv.interpolationDecay = 800;
-    mv.cameraTarget = v3Pos(g);
-    mv.cameraOrbit = '215deg 40deg 0.42m';
+    mv.cameraTarget = v3Pos(M.grav);
+    mv.cameraOrbit = `${th}deg 34deg 0.62m`;
   });
-  plan(4700, revele);
-  plan(8200, () => {
+  plan(4300, () => {
+    mv.interpolationDecay = 700;
+    mv.cameraOrbit = `${th}deg 16deg 0.44m`;
+  });
+  plan(5600, revele);
+  plan(8800, () => {
     mv.interpolationDecay = 600;
     mv.cameraTarget = 'auto auto auto';
-    mv.cameraOrbit = '200deg 55deg auto';
+    mv.cameraOrbit = `${th}deg 55deg auto`;
   });
-  plan(10200, () => {
+  plan(10800, () => {
     T.length = 0;
     mv.interpolationDecay = 110;
     mv.autoRotate = true;

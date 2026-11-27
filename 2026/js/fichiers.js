@@ -202,6 +202,7 @@ const FICHIERS = {
   modeles3d: [
     '3d/model-viewer.min.js',
     '3d/bracelet.glb',
+    '3d/bracelet-grave.glb',
     '3d/coeur.glb',
     '3d/vinted.glb',
     '3d/bonhomme.glb',
