@@ -4,6 +4,10 @@
 
 ---
 
+## 28/11/2026 · Pharmacie de Sandrine : phrase du client plus claire (version 1795820951)
+- Le client qui disait « 😷 Ça gratte ici » dit maintenant « 😷 J’ai la gorge qui gratte » (on comprend tout de suite qu'il faut le produit pour la gorge). Traduction anglaise ajoutée.
+- Fichiers : `2026/js/boss/j19-sandrine-comptoir.js`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Boss final : cadenas un peu plus dur, dernier mélange des pizzas (version 1795808326)
 - **Cadenas (partie 4) :** réglage moyen, entre l'ancienne version et la version simplifiée : le cadran accélère un peu à chaque chiffre (toujours sans à-coups), la zone du bon chiffre se resserre doucement, 12 s par chiffre, une erreur coûte un peu plus de vie.
 - **Boîtes à pizza (partie 3) :** une 4e étape à la fin : « Dernier mélange ! », 4 boîtes, 9 échanges un peu plus rapides, et de temps en temps deux échanges en même temps.

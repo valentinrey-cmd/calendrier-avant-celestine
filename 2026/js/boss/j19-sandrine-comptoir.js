@@ -17,7 +17,7 @@ try {
     const ASK = {
       fievre: ['🤒 J’ai 38,5 !', '🥵 Je suis brûlant', '🤒 Mon fils est chaud'],
       rhume: ['🤧 Atchoum !', '🤧 Mon nez coule', '🤧 Je renifle depuis lundi'],
-      gorge: ['😷 Mal à la gorge', '🗣️ J’ai plus de voix', '😷 Ça gratte ici'],
+      gorge: ['😷 Mal à la gorge', '🗣️ J’ai plus de voix', '😷 J’ai la gorge qui gratte'],
       bobo: ['🤕 Je me suis coupé', '🔪 L’épluche-légumes…', '🦵 Je suis tombée à vélo'],
       peau: ['🥶 Mes mains gercent', '🧤 J’ai la peau sèche', '💋 Mes lèvres craquent'],
       bebe: ['👶 C’est pour mon petit', '🍼 Le bébé a faim', '👶 Pour ma petite-fille']
