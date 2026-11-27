@@ -15,18 +15,32 @@ function meView() {
 `;
 }
 
-// 🧊 La vitrine 3D : le bracelet, puis un souvenir de plus à chaque boss vaincu (objets dans OBJ3D, js/vue-3d.js)
-const VITRINE = ['bonhomme', 'traineau', 'pizza', 'cadenas'];
+// 🧊 La vitrine 3D (objets dans OBJ3D, js/vue-3d.js) : [objet, emoji, nombre de boss vaincus qu'il faut]
+// ('fin' = après le boss final). Un souvenir débloqué mais pas encore ouvert est « nouveau » (pas dans S.v3Vus) :
+// sa case saute et brille, et à l'ouverture il tombe du ciel en tournant.
+const VITRINE = [
+  ['bracelet', '💗', 0],
+  ['bonhomme', '☃️', 1],
+  ['figValentin', '🕺', 2],
+  ['traineau', '🛷', 3],
+  ['pizza', '🍕', 4],
+  ['cadenas', '🔒', 5],
+  ['figCelestine', '💃', 'fin']
+];
 function vitrineHTML() {
   const nb = Object.keys(S.boss || {}).filter(k => S.boss[k]).length + (S.vbDone ? 1 : 0),
-    o = S.vbDone ? "{grav:1,s2:1}" : '{}',
-    case3d = (id, ok, ic) =>
-      ok
-        ? `<button class="v3-case" onclick="vue3d('${id}',${o})"><span>${ic}</span><b>${esc(OBJ3D[id].t)}</b><small>🧊 Voir en 3D</small></button>`
-        : `<div class="v3-case lock"><span>🔒</span><b>Souvenir mystère</b><small>⚔️ Bats un boss</small></div>`;
-  return `<h2>🧊 Ma vitrine 3D</h2><div class="panel"><p class="muted" style="margin:0 0 8px">Des objets en vrai volume, à faire tourner du doigt. Un nouveau souvenir à chaque boss vaincu.</p><div class="v3-vit">${case3d(
-    'bracelet',
-    1,
-    '💗'
-  )}${VITRINE.map((id, i) => case3d(id, nb > i, ['☃️', '🛷', '🍕', '🔒'][i])).join('')}</div></div>`;
+    vus = S.v3Vus || [],
+    fin = S.vbDone ? 'grav:1,s2:1,' : '';
+  return `<h2>🧊 Ma vitrine 3D</h2><div class="panel"><p class="muted" style="margin:0 0 8px">Des objets en vrai volume, à faire tourner du doigt. Un nouveau souvenir à chaque boss vaincu.</p><div class="v3-vit">${VITRINE.map(
+    ([id, ic, n]) => {
+      if (!OBJ3D[id]) return '';
+      const ok = n == 'fin' ? !!S.vbDone : nb >= n,
+        neuf = ok && n !== 0 && !vus.includes(id);
+      return ok
+        ? `<button class="v3-case${neuf ? ' v3-new' : ''}" onclick="this.classList.remove('v3-new');vue3d('${id}',{${fin}nouveau:${neuf ? 1 : 0}})"><span>${ic}</span><b>${esc(
+            OBJ3D[id].t
+          )}</b><small>${neuf ? '✨ Nouveau !' : '🧊 Voir en 3D'}</small></button>`
+        : `<div class="v3-case lock"><span>🔒</span><b>Souvenir mystère</b><small>${n == 'fin' ? '🏆 Après le boss final' : '⚔️ Bats un boss'}</small></div>`;
+    }
+  ).join('')}</div></div>`;
 }

@@ -650,7 +650,8 @@
 }
 .v3-carte {
   position: relative;
-  height: 170px;
+  height: 210px;
+  --progress-bar-height: 0px;
   margin: -4px 0 4px;
 }
 .v3-tourne {
@@ -661,4 +662,116 @@
   font: 600 0.68rem system-ui;
   color: #d9c9ff;
   opacity: 0.8;
+}
+/* animations 3D : flash et paillettes (v3Eclat), arrivée d'un nouveau souvenir (v3Arrivee), case « Nouveau ! » de la vitrine */
+.v3-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, #fff8d8, #ffd76a99 35%, transparent 70%);
+  animation: v3Flash 0.9s ease-out forwards;
+}
+@keyframes v3Flash {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.v3-pail {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.v3-pail i {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  background: radial-gradient(circle, #fff 0 18%, #ffe48a 30%, transparent 68%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  transform: scale(0);
+  animation: v3Pail 1.5s var(--d) ease-out forwards;
+}
+@keyframes v3Pail {
+  30% {
+    transform: scale(calc(var(--s) * 1.6)) rotate(45deg);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0) rotate(160deg) translateY(18px);
+    opacity: 0;
+  }
+}
+.v3-nouveau::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 70%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd76a55, transparent 65%);
+  pointer-events: none;
+  animation: v3Halo 2.4s ease-in-out 1.6s infinite both;
+}
+@keyframes v3Halo {
+  0%,
+  100% {
+    opacity: 0.4;
+    scale: 0.9;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.1;
+  }
+}
+.v3-banniere {
+  position: absolute;
+  left: 50%;
+  top: 12px;
+  translate: -50% 0;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: #ffd76a;
+  color: #3a2410;
+  font: 800 0.85rem system-ui;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px #0006;
+  pointer-events: none;
+  animation: v3Ban 0.6s 1.7s cubic-bezier(0.3, 1.5, 0.6, 1) both;
+}
+@keyframes v3Ban {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+.v3-case.v3-new {
+  border-color: #ffd76a;
+  box-shadow: 0 0 14px #ffd76a88;
+  animation: v3Neuf 1.6s ease-in-out infinite;
+}
+.v3-case.v3-new small {
+  color: #ffd76a;
+  opacity: 1;
+  font-weight: 800;
+}
+@keyframes v3Neuf {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-4px) scale(1.04);
+  }
+}
+.v3-anims {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px 0 0;
 }

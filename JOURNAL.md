@@ -3,6 +3,18 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Animations 3D : film de la gravure, souvenirs qui tombent du ciel, figurines qui dansent
+- **Boss final, la gravure en film** : dans la carte de la gravure, le bracelet 3D arrive de côté, la caméra en fait le tour au ralenti, plonge sur l'endroit gravé (flash, paillettes dorées, étiquette « ✨ gravé ici »), puis recule. Si Célestine touche le bracelet, le film s'arrête et elle le tourne elle-même. Le toucher ne fait toujours pas avancer la scène.
+- **Vitrine des Trésors, nouveaux souvenirs** : un souvenir débloqué mais pas encore ouvert saute et brille dans la vitrine (« ✨ Nouveau ! »). À l'ouverture, il tombe du ciel en tournant, rebondit, puis un halo doré, des paillettes et la bannière « ✨ Nouveau souvenir ! » apparaissent. Les souvenirs déjà vus sont gardés dans `S.v3Vus`.
+- **Figurines animées** de Célestine et de Valentin, faites avec Meshy à partir de leurs photos (doudoune rose et lunettes écaille pour elle, doudoune verte pour lui), avec un squelette :
+  - Valentin arrive dans la vitrine après 2 boss vaincus : il danse le hip-hop, ou fait coucou ;
+  - Célestine arrive après le boss final : elle danse, saute de joie, ou fait coucou.
+  - Des boutons sous la figurine changent d'animation.
+- Nouvel ordre de la vitrine : bracelet (dès le début), bonhomme de neige (1 boss), Valentin (2), traîneau (3), pizzas (4), cadenas (5), Célestine (après le boss final). Les cases fermées disent ce qu'il faut faire.
+- Coût Meshy : 116 crédits (dessins des figurines, passage en 3D, simplification, squelettes, 6 animations). Reste : 774.
+- Version : 1795775067
+- Fichiers : `2026/3d/fig-valentin.glb` et `2026/3d/fig-celestine.glb` (nouveaux), `2026/js/vue-3d.js`, `2026/js/tresors.js`, `2026/js/fichiers.js`, `2026/js/langue-anglais.js`, `2026/css/08-dossier.css`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Objets 3D : on les fait tourner du doigt sans à-coups
 - Glisser le doigt vers le haut ou le bas ne faisait pas basculer l'objet (sur iPad, la fenêtre défilait à la place), et un petit glissement faisait faire un tiers de tour. Maintenant l'objet suit le doigt dans tous les sens, deux fois plus doucement, sans pouvoir passer complètement dessous.
 - L'objet arrête de tourner tout seul dès qu'on le touche (avant, la rotation automatique repartait et « luttait » contre le doigt).

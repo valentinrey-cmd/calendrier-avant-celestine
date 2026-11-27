@@ -208,6 +208,8 @@ const FICHIERS = {
     '3d/traineau.glb',
     '3d/pizza.glb',
     '3d/cadenas.glb',
+    '3d/fig-valentin.glb',
+    '3d/fig-celestine.glb',
   ],
 };
 
