@@ -3,6 +3,14 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Toit : caméra à la Fortnite, vrai fichier 3D dans la main, chutes plus naturelles
+- **Caméra** : elle suit Célestine de dos, à hauteur d'épaule et décalée sur sa droite (Célestine un peu à gauche de l'image), plus près qu'avant. Quand elle avance, la vue se replace toute seule derrière elle (sauf pendant qu'on tourne la vue au doigt, et pas quand elle revient vers nous). En visant (bouton « Lancer » maintenu), la caméra se rapproche de son épaule. Les plans de cinéma (chute du toit, patate, replay) ne changent pas.
+- **Fichier en main** : ce n'est plus une image plate collée sur la main, mais un vrai objet 3D avec de l'épaisseur (paquet cadeau « .AVENT », tirage photo ou document, avec exactement le même dessin qu'avant), serré dans la moufle droite, qui suit les mouvements du bras et que la main ou le corps peuvent cacher. Pareil pour Valentin quand il tient le fichier.
+- **Chute du toit** : au bord, Célestine mouline des bras pour garder l'équilibre (vraie animation), puis dans le vide elle bat des bras et des jambes en continu, avant de s'étaler dans la neige. Avant : des poses figées qui tremblaient.
+- Coût Meshy : 9 crédits (3 animations essayées ; « vide 2 », figée, n'est pas gardée). Reste : 720.
+- Version : 1795791926
+- Fichiers : `2026/js/toit-figurines-3d.js`, `2026/js/musiques-jeux.js`, `2026/3d/moteur-3d.min.js`, `2026/3d/toit-celestine.glb`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Fichier mystère, le toit : Célestine et Valentin deviennent leurs figurines 3D
 - Dans le jeu « Livraison spéciale » sur le toit, Célestine et Valentin ne sont plus dessinés à la main : ce sont leurs figurines 3D faites avec Meshy, animées, dessinées avec exactement la caméra du jeu, à la bonne place et à la bonne taille. Elles passent devant ou derrière la cheminée, les cadeaux, etc. comme avant.
 - **Gestes de Célestine** : debout, marche, course, glissade, ramasser le fichier, viser (bras armé) puis lancer, salut, bisou, bouder, danse de la victoire puis saut de joie, vaciller au bord et tomber du toit, la « patate » de Valentin (projetée en arrière, étalée dans la neige, elle se relève), l'ange dans la neige.

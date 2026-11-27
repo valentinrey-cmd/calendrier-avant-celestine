@@ -1566,10 +1566,10 @@ function mysLancer(cb, fic) {
     } catch (_) {}
   };
   const cv = o.querySelector('canvas'),
-    c = cv.getContext('2d'),
     tip = o.querySelector('.mysl-tip'),
     joy = o.querySelector('.mysl-joy'),
     btn = o.querySelector('.mysl-lance');
+  let c = cv.getContext('2d'); // « let » : le dessin du fichier sert aussi d'image au fichier 3D tenu en main (texFichier)
   // --- monde ---
   const CAM = 2.9, // hauteur de la caméra
     CZ = 6, // profondeur de la cheminée
@@ -1734,7 +1734,8 @@ function mysLancer(cb, fic) {
       w: (i * 13) % 4
     }));
   };
-  // caméra : elle suit Célestine, 2,6 m derrière elle, dans l'angle choisi au doigt (V = où elle est, Vt = où elle va, en douceur)
+  // caméra « à la Fortnite » : derrière Célestine, à hauteur d'épaule, décalée sur sa droite, dans l'angle choisi au doigt,
+  // et qui se replace derrière elle quand elle avance (V = où elle est, Vt = où elle va, en douceur ; réglages dans la boucle)
   const V = { x: 0, z: 0, yaw: 0, h: 0, p: 0, sx: 0, sy: 0 }, // h : la caméra monte (en m) ; p : elle regarde vers le bas (en radians)
     Vt = { x: 0, z: 0, yaw: 0 };
   const cam = (x, z) => {
@@ -2183,19 +2184,46 @@ function mysLancer(cb, fic) {
     c.translate(x, y);
     c.rotate(F.a);
     c.scale(k, k);
+    faceF(true);
+    c.restore();
+  };
+  // la taille du fichier, en « unités » (0,0042 m chacune) : celle de la photo, sinon 50 × 64
+  const tailleF = () => {
+    if (vis.k != 'photo') return [50, 64];
+    const im = vis.im,
+      r = (im.naturalWidth || im.width) / (im.naturalHeight || im.height);
+    return [(r >= 1 ? 62 : 62 * r) + 8, (r >= 1 ? 62 / r : 62) + 8 + (vis.video ? 0 : 6)];
+  };
+  // l'image du fichier 3D tenu en main (FIG3D) : le même dessin, dans une toile à part (bords d'image = bords du fichier)
+  const texFichier = () => {
+    const [w, h] = tailleF(),
+      e = 5,
+      t = document.createElement('canvas');
+    t.width = Math.round(w * e);
+    t.height = Math.round(h * e);
+    const moi = c;
+    c = t.getContext('2d');
+    try {
+      c.setTransform(e, 0, 0, e, (w * e) / 2, (h * e) / 2 + (vis.k == 'photo' && !vis.video ? -3 * e : 0));
+      faceF(false);
+    } finally {
+      c = moi;
+    }
+    return { cv: t, w: w * 0.0042, h: h * 0.0042, ep: vis.k == 'photo' ? 0.004 : vis.k == 'doc' ? 0.008 : 0.055, cle: vis.k + (vis.nom || '') + (vis.noir ? '#' : '') };
+  };
+  // le dessin du fichier (centré, en « unités ») ; ombre = son ombre portée quand il est dessiné à plat dans la scène
+  const faceF = ombre => {
     if (vis.k == 'photo') {
       photoDessin();
       suie();
-      c.restore();
       return;
     }
     if (vis.k == 'doc') {
       docDessin();
       suie();
-      c.restore();
       return;
     }
-    c.shadowColor = '#0005';
+    if (ombre) c.shadowColor = '#0005';
     c.shadowBlur = 16;
     c.shadowOffsetY = 8;
     c.fillStyle = '#fdfdfb';
@@ -2243,7 +2271,6 @@ function mysLancer(cb, fic) {
     c.textAlign = 'center';
     c.fillText('.AVENT', 0, 24.5);
     suie();
-    c.restore();
   };
   // le fichier recraché par la cheminée : noirci de suie, les bords brûlés qui rougeoient encore
   const suie = () => {
@@ -4523,6 +4550,12 @@ function mysLancer(cb, fic) {
     // elle pivote vers là où elle va ; en armant le lancer, elle se tourne dans le sens de la vue ; elle boude dos à nous
     const vise = C.charge ? ctl.yaw : em == 'boude' ? V.yaw : vx || vz ? Math.atan2(vx, vz) : null;
     if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 10);
+    // caméra « à la Fortnite » : quand elle avance, la vue se replace toute seule derrière elle
+    // (pas si on tourne la vue au doigt, ni quand elle revient vers nous, sinon la vue ferait des tours)
+    if (!regard && m > 0.12 && !bloque && !C.glisse && !fin) {
+      const ec = Math.atan2(Math.sin(C.phi - ctl.yaw), Math.cos(C.phi - ctl.yaw));
+      if (Math.abs(ec) < 1.9) ctl.yaw += ec * Math.min(1, dt * 1.7 * m);
+    }
     C.x += vx * dt;
     C.z += vz * dt;
     C.amp += ((C.v > 0.05 ? Math.min(1.3, C.v / 1.2) : em == 'danse' ? 0.5 : em == 'boude' ? 0.12 : 0) - C.amp) * Math.min(1, dt * 8);
@@ -4710,12 +4743,9 @@ function mysLancer(cb, fic) {
       if (C.rit && v < 0.12) return { a: 'rire' }; // Célestine est K.O. : il rigole
       return pas();
     }
-    if (C.chute)
-      return C.chute.sol
-        ? { a: 'allongee' }
-        : C.chute.vy
-          ? { a: 'envol', k: 0.14 + 0.03 * Math.sin(tt * 9) }
-          : { a: 'chute', k: 0.12 + 0.06 * Math.sin(tt * 8) }; // au bord, elle vacille
+    // la chute du toit : au bord, elle mouline des bras pour garder l'équilibre ; dans le vide, elle bat des bras
+    // et des jambes ; en bas, étalée dans la neige
+    if (C.chute) return C.chute.sol ? { a: 'allongee' } : C.chute.vy ? { a: 'vide', v: 1.3 } : { a: 'equilibre', v: 1.5 };
     if (dz)
       switch (dz.e) {
         case 'envol': // la patate : projetée en arrière
@@ -4762,17 +4792,18 @@ function mysLancer(cb, fic) {
     const m = FIG3D.dessine(
       c,
       qui,
-      { x: C.x, y: C.y, z: C.z, phi: C.phi, taille: LK.taille },
+      {
+        x: C.x,
+        y: C.y,
+        z: C.z,
+        phi: C.phi,
+        taille: LK.taille,
+        objet: C.tient && F.al > 0 ? { cle: vis.k + (vis.nom || '') + (vis.noir ? '#' : ''), faire: texFichier, vit: vis.noir } : null
+      },
       { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr },
       geste3D(qui, dz)
     );
-    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main())
-    if (C.tient) {
-      c.save();
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
-      fichier();
-      c.restore();
-    }
+    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main()) ; il est dessiné en 3D, dans sa moufle
   };
   const celestine = (t, LK = TENUE.celestine) => {
     const qui3 = LK === TENUE.valentin ? 'valentin' : 'celestine';
@@ -7619,10 +7650,13 @@ function mysLancer(cb, fic) {
         }
       }
     }
-    // la caméra suit Célestine à 2,6 m, dans l'angle choisi au doigt ; pendant une chute, elle devient une caméra de cinéma
+    // la caméra « à la Fortnite » : derrière Célestine (d m), à hauteur d'épaule, décalée sur sa droite (ep m),
+    // dans l'angle choisi au doigt (et qui se replace derrière elle quand elle avance, voir marche) ;
+    // en visant, elle se rapproche de l'épaule ; pendant une chute, elle devient une caméra de cinéma
     const K = C.chute,
-      dc = K ? T() - K.t : 0;
-    let cible = { yaw: ctl.yaw, h: 0, p: 0, kx: 6, kh: 6 };
+      dc = K ? T() - K.t : 0,
+      vis3 = C.charge && !fin;
+    let cible = { yaw: ctl.yaw, h: vis3 ? -1.2 : -1.0, p: vis3 ? 0.1 : 0.15, kx: 7, kh: 5, d: vis3 ? 1.65 : 2.3, ep: vis3 ? 0.55 : 0.4 };
     const rp = replay(dt), // le replay du tir gagnant prend la main sur la caméra
       KOc = C.ko && C.ko.e != 'secoue';
     if (KOc) {
@@ -7656,8 +7690,8 @@ function mysLancer(cb, fic) {
       };
     }
     Vt.yaw = cible.yaw;
-    Vt.x = cible.x != null ? cible.x : C.x - Math.sin(Vt.yaw) * 2.6;
-    Vt.z = cible.z != null ? cible.z : C.z - Math.cos(Vt.yaw) * 2.6;
+    Vt.x = cible.x != null ? cible.x : C.x - Math.sin(Vt.yaw) * cible.d + Math.cos(Vt.yaw) * cible.ep;
+    Vt.z = cible.z != null ? cible.z : C.z - Math.cos(Vt.yaw) * cible.d - Math.sin(Vt.yaw) * cible.ep;
     const kc = Math.min(1, dt * cible.kx),
       kh = Math.min(1, dt * cible.kh);
     V.yaw += Math.atan2(Math.sin(Vt.yaw - V.yaw), Math.cos(Vt.yaw - V.yaw)) * Math.min(1, dt * (K || KOc ? 4 : 14));

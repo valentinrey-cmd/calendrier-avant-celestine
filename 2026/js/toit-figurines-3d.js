@@ -10,7 +10,8 @@
 //   FIG3D.charge()                         au début ;
 //   FIG3D.pret(qui)                        vrai quand la figurine 'celestine' ou 'valentin' est prête ;
 //   FIG3D.dessine(c, qui, P, cam, g)       pour la dessiner, et récupérer la position de sa main droite (pour le fichier) ;
-//      P = { x, y, z, phi, taille, pench } : sa place dans le monde (y = ses pieds), son orientation, sa taille ;
+//      P = { x, y, z, phi, taille, pench, objet } : sa place dans le monde (y = ses pieds), son orientation, sa taille,
+//          et le fichier qu'il tient (voir objet) ;
 //      cam = { x, y, z, yaw, p, f, cx, cy, W, H, dpr } : la caméra du jeu ;
 //      g = { a: nom de l'animation, k: avancement de 0 à 1 (geste réglé par le jeu) ou absent (en boucle), v: vitesse }.
 const FIG3D = (() => {
@@ -72,11 +73,12 @@ const FIG3D = (() => {
                     const mix = new T.AnimationMixer(o),
                       clips = {};
                     g.animations.forEach(a => (clips[a.name] = mix.clipAction(a)));
-                    let main = null;
-                    o.traverse(n => /^RightHand$/.test(n.name) && (main = n));
+                    let main = null,
+                      avb = null;
+                    o.traverse(n => (/^RightHand$/.test(n.name) && (main = n), /^RightForeArm$/.test(n.name) && (avb = n)));
                     // sa taille réelle dans le fichier, pour la mettre à la hauteur du personnage du jeu (HAUT)
                     const b = new T.Box3().setFromObject(o);
-                    fig[qui] = { o, mix, clips, main, cur: null, t: performance.now(), h: b.max.y - b.min.y || 1, y0: b.min.y };
+                    fig[qui] = { o, mix, clips, main, avb, cur: null, t: performance.now(), h: b.max.y - b.min.y || 1, y0: b.min.y };
                     ok();
                   },
                   undefined,
@@ -132,6 +134,57 @@ const FIG3D = (() => {
     }
   };
 
+  // Le fichier tenu en main : un vrai objet 3D (paquet cadeau, tirage photo ou document), avec l'image du fichier du jeu
+  // sur ses faces. Il est serré dans la moufle droite : il pend dans le prolongement de l'avant-bras, son bord du haut
+  // dans la main, sa face tournée en biais vers l'arrière (on la voit de dos, caméra à la Fortnite). ob = { cle, faire() → { cv, w, h, ep }, vit : image qui bouge }.
+  const v1 = {},
+    PRISE = 1, // le fichier, à la même taille que dans le jeu
+    DANS = 0.03; // ce qui rentre dans la moufle (en m)
+  const objet = (F, ob, e3) => {
+    if (!ob || !F.main || !F.avb) return F.obj && (F.obj.visible = false);
+    const now = performance.now();
+    if (!F.obj || F.objCle !== ob.cle || (ob.vit && now - F.objT > 350)) {
+      const t = ob.faire(),
+        tex = new T.CanvasTexture(t.cv);
+      tex.colorSpace = T.SRGBColorSpace;
+      tex.anisotropy = 4;
+      const face = new T.MeshStandardMaterial({ map: tex, roughness: 0.5, metalness: 0 }),
+        bord = new T.MeshStandardMaterial({ color: 0xeee9df, roughness: 0.75 }),
+        dos = t.ep > 0.006 ? face : new T.MeshStandardMaterial({ color: 0xf6f3ec, roughness: 0.8 });
+      if (F.obj) {
+        scene.remove(F.obj);
+        F.obj.geometry.dispose();
+        new Set(F.obj.material).forEach(m => (m.map && m.map.dispose(), m.dispose()));
+      }
+      F.obj = new T.Mesh(new T.BoxGeometry(t.w * PRISE, t.h * PRISE, t.ep), [bord, bord, bord, bord, face, dos]);
+      F.obj.frustumCulled = false;
+      F.objH = t.h * PRISE;
+      F.objCle = ob.cle;
+      F.objT = now;
+      scene.add(F.obj);
+    }
+    const V = v1.V || (v1.V = T.Vector3),
+      pH = (v1.a = v1.a || new V()),
+      pA = (v1.b = v1.b || new V()),
+      dir = (v1.c = v1.c || new V()),
+      n = (v1.d = v1.d || new V()),
+      X = (v1.e = v1.e || new V()),
+      Y = (v1.f = v1.f || new V()),
+      m = (v1.m = v1.m || new T.Matrix4());
+    F.main.getWorldPosition(pH);
+    F.avb.getWorldPosition(pA);
+    dir.subVectors(pH, pA).normalize(); // vers le bout des doigts
+    n.set(-0.55, 0, -0.85).applyQuaternion(F.o.quaternion); // en biais : vers sa droite et vers l'arrière (la caméra la suit de dos)
+    n.addScaledVector(dir, -n.dot(dir)).normalize(); // la face du fichier, perpendiculaire à l'avant-bras
+    Y.copy(dir).negate(); // le haut de l'image vers la main
+    X.crossVectors(Y, n);
+    m.makeBasis(X, Y, n);
+    F.obj.quaternion.setFromRotationMatrix(m);
+    const main = 0.075 * (e3 / (F.e3n || e3)); // longueur de la moufle (poignet → bout), à la taille du personnage
+    F.obj.position.copy(pH).addScaledVector(dir, main - DANS + F.objH / 2);
+    F.obj.visible = true;
+  };
+
   // le personnage, rendu dans un cadre autour de lui puis collé dans l'image du jeu.
   // Monde du jeu (x à droite, y en haut, z) → monde 3D (x, y, -z).
   const tmp = { v: null };
@@ -147,6 +200,9 @@ const FIG3D = (() => {
     o.rotation.set(0, Math.PI - P.phi, 0);
     o.scale.setScalar(e3);
     if (P.pench) o.rotateX(P.pench);
+    o.updateMatrixWorld(true);
+    F.e3n = F.e3n || e3;
+    objet(F, P.objet, e3);
     // la caméra du jeu : droite (cos, 0, sin), haut (sin·sp, cp, -cos·sp), elle regarde vers (sin·cp, -sp, -cos·cp)
     const co = Math.cos(cam.yaw),
       si = Math.sin(cam.yaw),
@@ -189,7 +245,7 @@ const FIG3D = (() => {
     e[11] = -1;
     e[14] = (-2 * fa * n) / (fa - n);
     camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
-    for (const q in fig) if (fig[q] !== F) fig[q].o.visible = false;
+    for (const q in fig) if (fig[q] !== F) ((fig[q].o.visible = false), fig[q].obj && (fig[q].obj.visible = false));
     ren.setViewport(0, 0, pw, ph);
     ren.setScissor(0, 0, pw, ph);
     ren.setScissorTest(true);
@@ -197,6 +253,7 @@ const FIG3D = (() => {
     ren.render(scene, camera);
     c.drawImage(ren.domElement, 0, BUF - ph, pw, ph, x0, y0, w, h);
     o.visible = false;
+    if (F.obj) F.obj.visible = false;
     // la main droite, dans le monde du jeu
     if (!F.main) return null;
     o.updateMatrixWorld(true);
