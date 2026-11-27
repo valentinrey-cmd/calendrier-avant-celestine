@@ -4,6 +4,10 @@
 
 ---
 
+## 28/11/2026 · Vitrine 3D : les lunettes après Emma (version 1795822838)
+- Les lunettes de Célestine se gagnent en battant Emma (jour 8, le test de vue), et plus Nora. Rien pour Nora et Sandrine pour l'instant.
+- Fichiers : `2026/js/tresors.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Vitrine 3D : de vrais souvenirs de Célestine, un par boss (version 1795822594)
 - Chaque souvenir est maintenant lié à un boss précis (avant : au nombre de boss battus). Les cases fermées disent quel boss battre.
 - **Noémie (jour 4) :** sa main avec ses ongles amande nude, petites étoiles noires et points blancs (faite avec Meshy d'après la photo).

@@ -3321,7 +3321,7 @@ window.TRADUCTIONS_EN = {
   'Souvenir mystère': 'Mystery keepsake',
   '⚔️ Bats Noémie': '⚔️ Beat Noémie',
   '⚔️ Bats Edgar': '⚔️ Beat Edgar',
-  '⚔️ Bats Nora': '⚔️ Beat Nora',
+  '⚔️ Bats Emma': '⚔️ Beat Emma',
   '⚔️ Bats Valentin': '⚔️ Beat Valentin',
   '🔄 Tourne-le du doigt': '🔄 Spin it with your finger',
   '🎵 Cette musique ne se lit pas sur cet appareil': '🎵 This song can’t play on this device'

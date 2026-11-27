@@ -21,8 +21,8 @@ function meView() {
 const VITRINE = [
   ['bracelet', '💗', 0],
   ['ongles', '💅', 4], // Noémie
+  ['lunettes', '👓', 8], // Emma (le test de vue)
   ['tacos', '🌯', 11], // Edgar
-  ['lunettes', '👓', 15], // Nora
   ['figValentin', '🕺', 22], // Valentin (le métro)
   ['figCelestine', '💃', 'fin']
 ];
