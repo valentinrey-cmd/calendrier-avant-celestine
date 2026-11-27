@@ -3249,6 +3249,7 @@ window.TRADUCTIONS_EN = {
   'Bon… on remonte ! 🪜': 'Okay… back up we go! 🪜',
   'Aaaaah ! 😱': 'Aaaaah! 😱',
   'Oups… AAAH ! 😱': 'Oops… AAAH! 😱',
+  'Dernière étape. Là, je mélange pour de vrai. 😈': 'Last round. Now I’m shuffling for real. 😈',
   Sauter: 'Jump',
   'Oh ! Tu es venue me voir ? 😍': 'Oh! You came to see me? 😍',
   'Bienvenue chez moi ! 🏠': 'Welcome to my place! 🏠',

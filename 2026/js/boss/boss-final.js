@@ -1816,7 +1816,7 @@ function vBoss(test, sp, so) {
             W = r.width,
             H = r.height,
             y0 = H * 0.64,
-            need = 3;
+            need = 4; // 3 manches, puis un dernier mélange plus dur
           const V = im(VIMG.v, 'vb-pzv vv'),
             SP = el('div', 'vb-pzsay', ''),
             MSG = el('div', 'vb-pzmsg', ''),
@@ -1864,7 +1864,8 @@ function vBoss(test, sp, so) {
               setTimeout(() => done(v), v == 'ok' ? 900 : 300);
             };
             while (!stop && alive) {
-              const n = round < 2 ? 3 : 4,
+              const fin = hits == need - 1, // la dernière étape : 4 boîtes, mélange plus long et plus rapide
+                n = fin || round >= 2 ? 4 : 3,
                 bw = Math.min(W * (n == 3 ? 0.25 : 0.2), 100),
                 gp = (W - bw * n) / (n + 1),
                 sx = q => gp + q * (bw + gp);
@@ -1888,17 +1889,19 @@ function vBoss(test, sp, so) {
                 BR.style.left = parseFloat(bx.style.left) + bw * 0.04 + 'px';
                 BR.style.top = y0 - bw * 0.22 + 'px';
               };
-              msg(`🍕 Boîte ${hits + 1}/${need} · Regarde bien… 👀`);
-              say(
-                [
-                  'Le bracelet est ici. Regarde bien…',
-                  'Facile, celle-là. 😇',
-                  'Une boîte de plus. 😏',
-                  'Ça se corse…',
-                  'Quatre boîtes. Bonne chance !',
-                  'Dernière chance…'
-                ][Math.min(5, round)]
-              );
+              msg(fin ? `🔥 Dernier mélange ! Boîte ${need}/${need} · Regarde bien… 👀` : `🍕 Boîte ${hits + 1}/${need} · Regarde bien… 👀`);
+              if (fin) say('Dernière étape. Là, je mélange pour de vrai. 😈');
+              else
+                say(
+                  [
+                    'Le bracelet est ici. Regarde bien…',
+                    'Facile, celle-là. 😇',
+                    'Une boîte de plus. 😏',
+                    'Ça se corse…',
+                    'Quatre boîtes. Bonne chance !',
+                    'Dernière chance…'
+                  ][Math.min(5, round)]
+                );
               await sleep(700);
               if (stop || !alive) return;
               putBr(B[prize]);
@@ -1909,13 +1912,14 @@ function vBoss(test, sp, so) {
               B[prize].classList.remove('open');
               await sleep(420);
               BR.classList.remove('on');
-              const sw = Math.min(7, 4 + round),
-                dur = Math.max(0.42, 0.62 - round * 0.04);
+              const sw = fin ? 9 : Math.min(7, 4 + round),
+                dur = fin ? 0.4 : Math.max(0.42, 0.62 - round * 0.04);
               B.forEach(q => q.style.setProperty('--dur', dur + 's'));
               V.classList.add('mix');
               for (let k = 0; k < sw && !stop && alive; k++) {
                 const ix = [...Array(n).keys()].sort(() => Math.random() - 0.5),
-                  pairs = [[ix[0], ix[1]]];
+                  // au dernier mélange, de temps en temps, deux échanges en même temps (un sur trois)
+                  pairs = fin && k % 3 == 1 ? [[ix[0], ix[1]], [ix[2], ix[3]]] : [[ix[0], ix[1]]];
                 for (const [a, c] of pairs) {
                   const ba = B[a],
                     bc = B[c],
@@ -2088,9 +2092,10 @@ function vBoss(test, sp, so) {
               )
               .join('');
           };
-          // (simplifié : le cadran tourne doucement, toujours à la même allure, et la zone du bon chiffre est large)
-          const spd = () => (62 + k * 5) * (k % 2 ? -1 : 1);
-          const tol = () => 15;
+          // (réglage moyen : plus facile que la version d'origine — pas d'accélérations, zone plus large, plus de temps —
+          // mais le cadran accélère un peu à chaque chiffre et la zone se resserre doucement)
+          const spd = () => (78 + k * 9) * (k % 2 ? -1 : 1);
+          const tol = () => Math.max(10.5, 15 - k * 0.65);
 
           plate();
           msg(`🔒 Chiffre 1/${need} · touche sous ▼`);
@@ -2163,7 +2168,7 @@ function vBoss(test, sp, so) {
                 busy = 1;
                 setTimeout(() => (busy = 0), 450);
                 tl = 0;
-                if (ouch(10, null)) return end('lose');
+                if (ouch(15, null)) return end('lose');
               }
             };
             cv.onpointerdown = e => {
@@ -2344,7 +2349,7 @@ function vBoss(test, sp, so) {
               x.fill();
               // chrono du chiffre
               if (k < need && !busy) {
-                const f = Math.max(0, 1 - tl / 15);
+                const f = Math.max(0, 1 - tl / 12);
                 x.fillStyle = '#0006';
                 x.beginPath();
                 x.roundRect(cx - RD, cy + RD * 1.25, RD * 2, 8, 4);
@@ -2367,13 +2372,13 @@ function vBoss(test, sp, so) {
               if (k < need && !busy) {
                 rot += spd() * dt;
                 tl += dt;
-                if (tl > 15) {
+                if (tl > 12) {
                   tl = 0;
                   hint[k] = 1;
                   plate();
                   word('⏱️ Trop lent !', 'b');
                   say('Tic-tac… 😏');
-                  if (ouch(8, null)) {
+                  if (ouch(12, null)) {
                     end('lose');
                     return;
                   }

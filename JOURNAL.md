@@ -4,6 +4,11 @@
 
 ---
 
+## 27/11/2026 · Boss final : cadenas un peu plus dur, dernier mélange des pizzas (version 1795808326)
+- **Cadenas (partie 4) :** réglage moyen, entre l'ancienne version et la version simplifiée : le cadran accélère un peu à chaque chiffre (toujours sans à-coups), la zone du bon chiffre se resserre doucement, 12 s par chiffre, une erreur coûte un peu plus de vie.
+- **Boîtes à pizza (partie 3) :** une 4e étape à la fin : « Dernier mélange ! », 4 boîtes, 9 échanges un peu plus rapides, et de temps en temps deux échanges en même temps.
+- Fichiers : `2026/js/boss/boss-final.js`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : beaucoup plus fluide, regard haut/bas plus doux (version 1795806271)
 - **Regarder en haut / en bas :** fini l'image qui se déforme : la caméra monte ou descend doucement autour d'elle, en s'inclinant à peine.
 - **Fluidité (rien ne change à l'écran) :** les deux figurines 3D sont calculées ensemble dans une seule image de travail, juste assez grande, puis collées (une seule recopie par image au lieu de deux, sur une image 1024 × 1024) ; plus d'anticrénelage matériel (l'image 3D est déjà calculée plus fine que l'écran) ; figurines allégées (31 000 → 14 000 triangles, même squelette, mêmes animations, même aspect) ; image du jeu à 1,5 × la finesse de l'écran au lieu de 2. Mesuré : environ 3 fois plus d'images par seconde.
