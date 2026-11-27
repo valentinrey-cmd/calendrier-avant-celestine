@@ -262,7 +262,10 @@ const YTM = (() => {
               } catch (_) {}
           } else if (a == 'p') {
             if (au.paused) lance();
-            else au.pause();
+            else {
+              pz = 'bouton';
+              au.pause();
+            }
           } else if (a == 's') {
             S.shuf = S.shuf === false;
             save();
@@ -345,6 +348,7 @@ const YTM = (() => {
       if (Date.now() - lastSync > 15000) msync();
       if (slp && slp !== 'end' && Date.now() >= slp) {
         slp = 0;
+        pz = 'jeu';
         au.pause();
         toast('🌙 Bonne nuit !');
       }
@@ -370,6 +374,16 @@ const YTM = (() => {
   };
   au.onseeked = () => msync();
   au.onpause = () => {
+    // coupée par l'appareil juste après le lancement (focus audio du téléphone…) : on note pourquoi et on relance une fois
+    if (!pz && mode && au.getAttribute('src') && !au.ended && Date.now() - t0 < 4000) {
+      slog('🎵', `Musique coupée juste après le lancement (état ${au.readyState}/${au.networkState}${rejoue ? ', après relance' : ''})`);
+      if (!rejoue) {
+        rejoue = 1;
+        const p = au.play();
+        if (p && p.catch) p.catch(() => {});
+      }
+    }
+    pz = '';
     if (box) box.querySelectorAll('[data-a="p"]').forEach(b => (b.textContent = '▶'));
     msync();
     try {
@@ -424,14 +438,20 @@ const YTM = (() => {
     lance();
   }
   // lancer la lecture ; si l'appareil refuse, le bouton repasse sur ▶ (un nouveau toucher relance) et Valentin le voit dans le suivi
+  let t0 = 0, // moment du dernier lancement
+    rejoue = 0, // déjà relancée une fois après une coupure inexpliquée ?
+    pz = ''; // qui a mis en pause (vide = l'appareil, sans qu'on le demande)
   function lance() {
+    t0 = Date.now();
+    rejoue = 0;
+    pz = '';
     const p = au.play();
     if (p && p.catch)
       p.catch(e => {
         if (!box) return;
         box.classList.add('tap');
         box.querySelectorAll('[data-a="p"]').forEach(b => (b.textContent = '▶'));
-        if (e && e.name != 'AbortError') slog('🎵', `Musique refusée par l'appareil (${(e && e.name) || '?'})`);
+        slog('🎵', `Musique refusée par l'appareil (${(e && e.name) || '?'}, état ${au.readyState}/${au.networkState})`);
       });
   }
   au.onerror = () => {
@@ -568,6 +588,7 @@ const YTM = (() => {
     if (auto && mrep() == 2) return list(li, 1, 1);
     if (auto && slp === 'end') {
       slp = 0;
+      pz = 'jeu';
       au.pause();
       toast('🌙 Bonne nuit !');
       return;
@@ -594,6 +615,7 @@ const YTM = (() => {
       let O = ORD.filter(j => A.includes(j) && j !== li);
       if (!O.length) {
         if (auto && mrep() == 0) {
+          pz = 'jeu';
           au.pause();
           toast('🎵 Tout a été écouté !');
           return;
@@ -611,6 +633,7 @@ const YTM = (() => {
     let p = k + 1;
     if (p >= A.length) {
       if (auto && mrep() == 0) {
+        pz = 'jeu';
         au.pause();
         toast('🎵 Fin de la playlist');
         return;
@@ -819,12 +842,19 @@ const YTM = (() => {
       return;
     }
     if (c == 'pause') {
-      if (mode) au.pause();
+      if (!mode) return;
+      // le téléphone demande une pause juste après un lancement : c'est le lecteur du téléphone qui se bat avec la page, on ignore
+      if (Date.now() - t0 < 3000) {
+        slog('🎵', 'Pause du téléphone ignorée (juste après le lancement)');
+        return;
+      }
+      pz = 'appareil';
+      au.pause();
       return;
     }
     if (c == 'toggle') {
       if (au.paused) window.__mediaCmd('play');
-      else au.pause();
+      else window.__mediaCmd('pause');
       return;
     }
     if (c == 'next') {
@@ -917,6 +947,7 @@ const YTM = (() => {
     },
     hold() {
       if (mode && !au.paused) {
+        pz = 'jeu';
         au.pause();
         return 1;
       }

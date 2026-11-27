@@ -41,7 +41,12 @@ public class MusicService extends Service {
   final BroadcastReceiver noisy = new BroadcastReceiver() {
     @Override public void onReceive(Context c, Intent i) { if (playing) MainActivity.cmd("pause"); }
   };
+  boolean hasFocus = false; // on ne redemande pas le focus à chaque mise à jour (sinon on le vole à la page en boucle)
+  long focusAt = 0; // moment de notre dernière demande de focus audio
   final AudioManager.OnAudioFocusChangeListener focus = ch -> {
+    // juste après notre demande, une perte de focus vient de la WebView elle-même (la page qui lance la musique) : on l'ignore
+    if (SystemClock.elapsedRealtime() - focusAt < 3000) return;
+    if (ch != AudioManager.AUDIOFOCUS_GAIN) hasFocus = false;
     if (ch == AudioManager.AUDIOFOCUS_LOSS || ch == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) { if (playing) { pausedByFocus = ch == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT; MainActivity.cmd("pause"); } }
     else if (ch == AudioManager.AUDIOFOCUS_GAIN && pausedByFocus) { pausedByFocus = false; MainActivity.cmd("play"); }
   };
@@ -139,18 +144,23 @@ public class MusicService extends Service {
 
     if (playing) {
       if (!wl.isHeld()) wl.acquire(6 * 60 * 60 * 1000L);
-      if (Build.VERSION.SDK_INT >= 26) {
-        if (afr == null) afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-          .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-          .setOnAudioFocusChangeListener(focus).build();
-        am.requestAudioFocus(afr);
-      } else am.requestAudioFocus(focus, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+      if (!hasFocus) {
+        hasFocus = true;
+        focusAt = SystemClock.elapsedRealtime();
+        if (Build.VERSION.SDK_INT >= 26) {
+          if (afr == null) afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+            .setOnAudioFocusChangeListener(focus).build();
+          am.requestAudioFocus(afr);
+        } else am.requestAudioFocus(focus, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+      }
     } else if (wl.isHeld()) wl.release();
   }
 
   void shut() {
     playing = false;
     try { if (wl.isHeld()) wl.release(); } catch (Exception e) { }
+    hasFocus = false;
     try { if (Build.VERSION.SDK_INT >= 26 && afr != null) am.abandonAudioFocusRequest(afr); else am.abandonAudioFocus(focus); } catch (Exception e) { }
     try { stopForeground(true); } catch (Exception e) { }
     getSystemService(NotificationManager.class).cancel(7);

@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Playlist sur Android : la musique ne se coupe plus toute seule au lancement
+- **Problème** : sur l'appli Android, en touchant ▶ dans la playlist, la musique se mettait tout de suite en pause (0:00, bouton revenu sur ▶).
+- **Cause probable** : le lecteur « système » de l'appli Android (notification, écran verrouillé) redemandait le focus audio du téléphone à chaque mise à jour. Il le volait ainsi à la page qui joue la musique, puis renvoyait un ordre « pause » à la page.
+- **Correction dans la page** (`js/musiques-jeux.js`) : un ordre « pause » venu du téléphone dans les 3 secondes qui suivent un lancement est ignoré. Une coupure inexpliquée juste après le lancement relance la musique une fois. Chaque cas est noté dans le suivi de Valentin (« Pause du téléphone ignorée… », « Musique coupée juste après le lancement… ») pour savoir ce qui se passe vraiment.
+- **Correction dans l'appli Android** (`MusicService.java`) : le focus audio n'est demandé qu'une fois par écoute, et une perte de focus juste après la demande est ignorée. Elle ne s'applique qu'après réinstallation de l'APK.
+- Version **1795787682**. Fichiers : `2026/js/musiques-jeux.js`, `android/app/src/main/java/io/github/valentinrey/avent/MusicService.java`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`.
+
 ## 2026-11-27 · Playlist : le bouton ▶ relance bien la musique
 - **Problème** : dans la playlist, en appuyant sur ▶, le bouton passait tout de suite sur ⏸ mais la musique ne démarrait pas.
 - **Cause probable** : les musiques redevenues des fichiers audio à chaque lancement (correction précédente) pouvaient ne pas avoir de type de son. Safari refuse alors de les lire. En plus, toutes les musiques étaient chargées deux fois dans la mémoire au démarrage.
