@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Playlist : le bouton ▶ relance bien la musique
+- **Problème** : dans la playlist, en appuyant sur ▶, le bouton passait tout de suite sur ⏸ mais la musique ne démarrait pas.
+- **Cause probable** : les musiques redevenues des fichiers audio à chaque lancement (correction précédente) pouvaient ne pas avoir de type de son. Safari refuse alors de les lire. En plus, toutes les musiques étaient chargées deux fois dans la mémoire au démarrage.
+- **Correction** (`MDB`, `js/musiques-jeux.js`) : le type du son (mp3, m4a, wav…) est lu dans les premiers octets du fichier, sinon d'après son nom. Les musiques sont lues une seule fois et gardées en cache, et le contrôle du fichier mystère au démarrage se contente de les compter (`MDB.count()`, `mysGate` dans `js/menu-demarrer.js`).
+- **Bouton honnête** : le bouton affiche ⏸ seulement quand la musique joue vraiment. Si l'appareil refuse ou n'arrive pas à lire la musique, il repasse sur ▶ (un nouveau toucher relance), un petit message s'affiche, et la raison est envoyée dans le suivi de Valentin (« Musique refusée… » ou « Musique illisible… »).
+- Version **1795787337**. Fichiers : `2026/js/musiques-jeux.js`, `2026/js/menu-demarrer.js`, `2026/js/langue-anglais.js`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`.
+
 ## 2026-11-27 · Fichier mystère : les musiques restent sur l'appareil, même après avoir fermé l'appli
 - **Problème** : après avoir ouvert le fichier mystère, les musiques marchaient. Mais une fois l'appli fermée puis rouverte, le jeu ne redemandait pas le fichier et les musiques ne se lançaient plus. Cause : sur iPad et iPhone, Safari n'arrive plus à relire un fichier audio rangé tel quel dans le stockage de l'appareil (IndexedDB) après une relance (bug connu de WebKit).
 - **Correction du rangement** (`MDB`, `js/musiques-jeux.js`) : les musiques sont maintenant rangées en données brutes et redeviennent des fichiers audio à chaque lancement. Les musiques déjà rangées à l'ancienne sont converties automatiquement si elles se lisent encore, sinon elles sont retirées.

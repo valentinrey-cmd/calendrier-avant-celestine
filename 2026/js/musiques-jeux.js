@@ -70,54 +70,87 @@ const MDB = (() => {
           t.onerror = () => rej(t.error);
         })
     );
+  // le type du son, lu dans ses premiers octets (sinon d'après le nom) : sans type, Safari refuse de lancer la musique
+  const mime = (buf, type, nom) => {
+    try {
+      const u = new Uint8Array(buf, 0, Math.min(12, buf.byteLength)),
+        txt = (i, n) => String.fromCharCode(...u.slice(i, i + n));
+      if (txt(0, 3) == 'ID3' || (u[0] == 0xff && (u[1] & 0xe0) == 0xe0 && (u[1] & 0x06) != 0)) return 'audio/mpeg';
+      if (u[0] == 0xff && (u[1] & 0xf6) == 0xf0) return 'audio/aac';
+      if (txt(4, 4) == 'ftyp') return 'audio/mp4';
+      if (txt(0, 4) == 'RIFF') return 'audio/wav';
+      if (txt(0, 4) == 'OggS') return 'audio/ogg';
+      if (txt(0, 4) == 'fLaC') return 'audio/flac';
+    } catch (_) {}
+    if (/^audio\//.test(type || '')) return type;
+    const x = (String(nom || '').match(/\.(\w+)$/) || [])[1];
+    return { mp3: 'audio/mpeg', m4a: 'audio/mp4', mp4: 'audio/mp4', aac: 'audio/aac', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac' }[
+      String(x).toLowerCase()
+    ] || 'audio/mpeg';
+  };
   const brut = async v => {
     if (!v || !v.blob) return v;
     const { blob, ...reste } = v;
-    return { ...reste, buf: await blob.arrayBuffer(), type: blob.type || '' };
+    const buf = await blob.arrayBuffer();
+    return { ...reste, buf, type: mime(buf, blob.type, v.name) };
   };
+  const fichier = v => {
+    const { buf, type, ...reste } = v;
+    return { ...reste, blob: new Blob([buf], { type: mime(buf, type, v.name) }) };
+  };
+  let cache = null; // une seule lecture de toutes les musiques à la fois (sinon elles sont en double dans la mémoire)
   const put = async (k, v) => {
     const b = await brut(v);
+    cache = null;
     return tx('readwrite', st => st.put(b, String(k)));
   };
-  const del = k => tx('readwrite', st => st.delete(String(k)));
+  const del = k => ((cache = null), tx('readwrite', st => st.delete(String(k))));
+  const lire = async () => {
+    const o = await tx('readonly', (st, set) => {
+      const r = {};
+      const c = st.openCursor();
+      c.onsuccess = () => {
+        const x = c.result;
+        if (x) {
+          r[x.key] = x.value;
+          x.continue();
+        } else set(r);
+      };
+    });
+    for (const k in o) {
+      const v = o[k];
+      if (!v) continue;
+      if (v.buf) o[k] = fichier(v);
+      else if (v.blob) {
+        // rangée à l'ancienne : on la convertit si elle se lit encore, sinon on la retire
+        try {
+          const b = await brut(v);
+          await tx('readwrite', st => st.put(b, String(k)));
+          o[k] = fichier(b);
+        } catch (_) {
+          delete o[k];
+          try {
+            await tx('readwrite', st => st.delete(String(k)));
+          } catch (_) {}
+        }
+      } else delete o[k];
+    }
+    return o;
+  };
   return {
     put,
     del,
-    all: async () => {
-      const o = await tx('readonly', (st, set) => {
-        const r = {};
-        const c = st.openCursor();
-        c.onsuccess = () => {
-          const x = c.result;
-          if (x) {
-            r[x.key] = x.value;
-            x.continue();
-          } else set(r);
-        };
-      });
-      for (const k in o) {
-        const v = o[k];
-        if (!v) continue;
-        if (v.buf) {
-          const { buf, type, ...reste } = v;
-          o[k] = { ...reste, blob: new Blob([buf], { type: type || '' }) };
-        } else if (v.blob) {
-          // rangée à l'ancienne : on la convertit si elle se lit encore, sinon on la retire
-          try {
-            const b = await brut(v);
-            await tx('readwrite', st => st.put(b, String(k)));
-            const { buf, type, ...reste } = b;
-            o[k] = { ...reste, blob: new Blob([buf], { type }) };
-          } catch (_) {
-            delete o[k];
-            try {
-              await del(k);
-            } catch (_) {}
-          }
-        }
-      }
-      return o;
-    }
+    all: () => {
+      const c = cache || (cache = lire());
+      c.catch(() => cache === c && (cache = null));
+      return c;
+    },
+    // combien de musiques sont rangées, sans les charger
+    count: () =>
+      tx('readonly', (st, set) => {
+        const r = st.count();
+        r.onsuccess = () => set(r.result || 0);
+      })
   };
 })();
 async function id3Cover(blob) {
@@ -208,7 +241,7 @@ const YTM = (() => {
     box.id = 'ytm';
     if (big) box.classList.add('big');
     box.innerHTML = `<div class="ytbig"><div class="ytcov"><span>🎵</span></div><div class="ytt"><b>${esc(sg.t)}</b><small>${esc(sg.a || '')}</small></div><input type="range" class="ytsk" min="0" max="1000" value="0" aria-label="Avancer dans la musique"><div class="yttm"><span class="ytcu">0:00</span><span class="ytdu">0:00</span></div>
-   <div class="ytbtn">${ctrl ? `<button class="ytc ytsh ${S.shuf !== false ? 'on' : ''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>` : ''}<button class="ytc" data-a="${ctrl ? '-1' : '-10'}">${ctrl ? '⏮' : '↺10'}</button><button class="ytc ytpp" data-a="p">⏸</button><button class="ytc" data-a="${ctrl ? '1' : '10'}">${ctrl ? '⏭' : '10↻'}</button>${ctrl ? `<button class="ytc ytrp ${mrep() ? 'on' : ''}" data-a="r" aria-label="Répéter">${mrep() == 2 ? '🔂' : '🔁'}</button>` : ''}</div>${ctrl ? `<div class="ytx"><button class="ytc ytfv" data-a="f" aria-label="Favori">${isFav(k) ? '❤️' : '🤍'}</button><button class="ytc ytzb" data-a="z" aria-label="Minuteur de sommeil">🌙<small class="ytzz">${slpTxt()}</small></button><button class="ytc" data-a="q" aria-label="File d’attente">📃</button><button class="ytc" data-a="l" aria-label="Bibliothèque">📚</button><label class="ytvl">🔊<input type="range" class="ytvo" min="0" max="100" value="${Math.round(S.mvol == null ? 85 : S.mvol)}" aria-label="Volume"></label></div><div class="ytq" hidden></div>` : ''}</div>
+   <div class="ytbtn">${ctrl ? `<button class="ytc ytsh ${S.shuf !== false ? 'on' : ''}" data-a="s" aria-label="Ordre aléatoire">🔀</button>` : ''}<button class="ytc" data-a="${ctrl ? '-1' : '-10'}">${ctrl ? '⏮' : '↺10'}</button><button class="ytc ytpp" data-a="p">${au.paused ? '▶' : '⏸'}</button><button class="ytc" data-a="${ctrl ? '1' : '10'}">${ctrl ? '⏭' : '10↻'}</button>${ctrl ? `<button class="ytc ytrp ${mrep() ? 'on' : ''}" data-a="r" aria-label="Répéter">${mrep() == 2 ? '🔂' : '🔁'}</button>` : ''}</div>${ctrl ? `<div class="ytx"><button class="ytc ytfv" data-a="f" aria-label="Favori">${isFav(k) ? '❤️' : '🤍'}</button><button class="ytc ytzb" data-a="z" aria-label="Minuteur de sommeil">🌙<small class="ytzz">${slpTxt()}</small></button><button class="ytc" data-a="q" aria-label="File d’attente">📃</button><button class="ytc" data-a="l" aria-label="Bibliothèque">📚</button><label class="ytvl">🔊<input type="range" class="ytvo" min="0" max="100" value="${Math.round(S.mvol == null ? 85 : S.mvol)}" aria-label="Volume"></label></div><div class="ytq" hidden></div>` : ''}</div>
    <div class="ytb"><button class="ytc" data-a="p">⏸</button><button class="ytl" title="Agrandir">🎵 ${esc(sg.t)} · ${esc(sg.a || '')}</button>${ctrl ? '<button class="ytc" data-a="-1">⏮</button><button class="ytc" data-a="1">⏭</button>' : ''}<button class="ytc" data-a="x">✕</button></div>`;
     document.body.appendChild(box);
     const tg = () => box.classList.toggle('big');
@@ -228,7 +261,7 @@ const YTM = (() => {
                 bgm();
               } catch (_) {}
           } else if (a == 'p') {
-            if (au.paused) au.play().catch(() => {});
+            if (au.paused) lance();
             else au.pause();
           } else if (a == 's') {
             S.shuf = S.shuf === false;
@@ -388,12 +421,26 @@ const YTM = (() => {
     route();
     setV();
     au.currentTime = 0;
+    lance();
+  }
+  // lancer la lecture ; si l'appareil refuse, le bouton repasse sur ▶ (un nouveau toucher relance) et Valentin le voit dans le suivi
+  function lance() {
     const p = au.play();
     if (p && p.catch)
-      p.catch(() => {
-        if (box) box.classList.add('tap');
+      p.catch(e => {
+        if (!box) return;
+        box.classList.add('tap');
+        box.querySelectorAll('[data-a="p"]').forEach(b => (b.textContent = '▶'));
+        if (e && e.name != 'AbortError') slog('🎵', `Musique refusée par l'appareil (${(e && e.name) || '?'})`);
       });
   }
+  au.onerror = () => {
+    if (!au.getAttribute('src')) return;
+    if (box) box.querySelectorAll('[data-a="p"]').forEach(b => (b.textContent = '▶'));
+    const c = au.error ? au.error.code : '?';
+    toast('🎵 Cette musique ne se lit pas sur cet appareil');
+    slog('🎵', `Musique illisible (erreur ${c}, ${NM[key] || key || '?'})`);
+  };
   function stop() {
     if (mode == 'list') {
       try {

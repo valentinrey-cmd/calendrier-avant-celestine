@@ -3308,5 +3308,6 @@ window.TRADUCTIONS_EN = {
   'Souvenir mystère': 'Mystery keepsake',
   '⚔️ Bats un boss': '⚔️ Beat a boss',
   '🔄 Tourne-le du doigt': '🔄 Spin it with your finger',
-  '✨ gravé ici': '✨ engraved here'
+  '✨ gravé ici': '✨ engraved here',
+  '🎵 Cette musique ne se lit pas sur cet appareil': '🎵 This song can’t play on this device'
 };

@@ -713,9 +713,8 @@ function smOpen(force, at) {
   // effacées par l'appareil), on le demande.
   const mysGate = go => {
     if (window.__mysOk || window.__mysSkip) return go();
-    MDB.all()
-      .then(o => {
-        const n = Object.keys(o || {}).filter(k => o[k] && o[k].blob).length;
+    MDB.count()
+      .then(n => {
         if (n) {
           window.__mysOk = 1;
           return go();
