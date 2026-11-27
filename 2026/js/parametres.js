@@ -90,7 +90,7 @@ function setView() {
  <h2>🎄 Décorations</h2><div class="panel">${deco.map(x => `<p><label><input type="checkbox" ${S[x.id] !== false ? 'checked' : ''} onchange="S['${x.id}']=this.checked;save();snowCount();${x.id == 'voix' ? 'ding()' : ''}"> ${x.ic} ${esc(x.n)}</label></p>`).join('') || '<p class="muted" style="margin:0">Fabrique des décorations au 🧪 labo pour les activer ici.</p>'}</div>
  <h2>😜 Options spéciales</h2><div class="panel"><p><label><input type="checkbox" onchange="if(this.checked){const c=this;setTimeout(()=>{c.checked=false},600);toast('Impossible : fonctionnalité intégrée au produit 🤷')}"> 🔇 Couper les blagues nulles de Valentin</label></p><p><label><input type="checkbox" onchange="if(this.checked){const c=this;toast('Mode adulte responsable : activé…');setTimeout(()=>{c.checked=false;toast('On a essayé. Ça n’a pas tenu.')},2000)}"> 🧑‍💼 Mode adulte responsable</label></p></div>
  <h2>📲 Appli et sauvegarde</h2>${APP.web() && !APP.standalone() ? '<div class="panel"><button class="alt" onclick="installScreen(true)">📲 Installer l’appli sur cet appareil</button></div>' : ''}${syncHTML()}
- <h2>ℹ️ À propos</h2><div class="panel center"><p style="margin:0">🔎 Dossier n°24 · Le bracelet aux cœurs roses</p><p class="muted" style="margin:4px 0 0;font-size:.85rem">Fait avec ❤️ par Valentin, pour Célestine.<br>${
+ <h2>ℹ️ À propos</h2><div class="panel center"><p style="margin:0">🔎 Dossier n°24 · Le bracelet au cœur rose</p><p class="muted" style="margin:4px 0 0;font-size:.85rem">Fait avec ❤️ par Valentin, pour Célestine.<br>${
    isFinite(+APPV)
      ? (() => {
          const d = new Date(APPV * 1000),

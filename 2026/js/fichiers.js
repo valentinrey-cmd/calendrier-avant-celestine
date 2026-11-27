@@ -100,6 +100,7 @@ const FICHIERS = {
     'js/sons.js',
     'js/labo.js',
     'js/neige-confettis.js',
+    'js/vue-3d.js',
     'js/demarrage.js',
   ],
   // images, photos et voix (gardées en cache pour marcher sans connexion)
@@ -195,6 +196,18 @@ const FICHIERS = {
     'media/persos/detoures/nora.webp',
     'media/persos/detoures/erika.webp',
     'media/persos/detoures/eya.webp',
+  ],
+  // 🧊 objets 3D (faits avec Meshy) et leur afficheur model-viewer : chargés seulement quand on ouvre un objet
+  // (js/vue-3d.js), pas au démarrage ; mis en cache à la première ouverture. Le 1er fichier doit rester l'afficheur.
+  modeles3d: [
+    '3d/model-viewer.min.js',
+    '3d/bracelet.glb',
+    '3d/coeur.glb',
+    '3d/vinted.glb',
+    '3d/bonhomme.glb',
+    '3d/traineau.glb',
+    '3d/pizza.glb',
+    '3d/cadenas.glb',
   ],
 };
 

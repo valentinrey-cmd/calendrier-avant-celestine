@@ -2978,8 +2978,8 @@ window.TRADUCTIONS_EN = {
     'Tuesday evening, my bracelet was on your table. I saw it in your story.',
   'Évidemment ! Tu l’avais ENLEVÉ pour le gel. Je ne vernis pas les bijoux, moi.':
     'Of course! You TOOK IT OFF for the gel. I don’t varnish jewellery.',
-  '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅':
-    '…Okay. It fell. A little heart got chipped. I glued it back with nail glue. Nobody can tell, it’s pro work. 💅',
+  '…Bon. Il est tombé. Le cœur est sorti de ses griffes. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅':
+    '…Okay. It fell. The heart came out of its prongs. I glued it back with nail glue. Nobody can tell, it’s pro work. 💅',
   'Colle à ongles sur un bijou en or. Je note : « dégradation, mais avec talent ». 📝':
     'Nail glue on gold jewellery. Noted: “damage, but done with talent”. 📝',
   'Et regarde ma photo de 19 h 40 : mes ongles finis… et le bracelet À TON POIGNET.':
@@ -3001,8 +3001,8 @@ window.TRADUCTIONS_EN = {
   'J’ai testé tes verres avec mon appli. Ta correction a bougé, au fait. Je voulais t’offrir de nouvelles lunettes pour Noël. Surprise. Ratée. Merci.':
     'I tested your lenses with my app. Your prescription has changed, by the way. I wanted to give you new glasses for Christmas. Surprise. Ruined. Thanks.',
   'Et le bracelet, pendant ce temps ? 🧐': 'And the bracelet, meanwhile? 🧐',
-  'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.':
-    'On her wrist, right in front of me. 9:12 pm photo: gold chain, little pink hearts. Even Valentin would have seen it. Well… maybe.',
+  'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petit cœur rose. Même Valentin l’aurait vu. Enfin… peut-être.':
+    'On her wrist, right in front of me. 9:12 pm photo: gold chain, a little pink heart. Even Valentin would have seen it. Well… maybe.',
   'Emma… je suis la pire. 😳': 'Emma… I’m the worst. 😳',
   'Je sais. Avec tes nouvelles lunettes, tu liras mieux ton prochain suspect. 😌':
     'I know. With your new glasses, you’ll read your next suspect better. 😌',
@@ -3202,7 +3202,7 @@ window.TRADUCTIONS_EN = {
   'Entrée': 'In',
   'Sortie': 'Out',
   'Vendredi 27 novembre, de l’ouverture à la fermeture. Chaque étudiant badge à l’entrée et à la sortie.': 'Friday 27 November, from opening to closing. Every student badges in and out.',
-  'Je compte les cœurs : 5. Et un petit fermoir.': 'I count the hearts: 5. And a small clasp.',
+  'Un seul cœur rose, taillé comme une pierre et tenu par de petites griffes. Et un fermoir.': 'A single pink heart, cut like a gem and held by little prongs. And a clasp.',
   'Sur la serviette, à côté des vernis : mon bracelet.': 'On the towel, next to the polish: my bracelet.',
   'À mon poignet : le bracelet.': 'On my wrist: the bracelet.',
   'À mon poignet, quelque chose de rose qui brille.': 'On my wrist, something pink and shiny.',
@@ -3212,9 +3212,9 @@ window.TRADUCTIONS_EN = {
   'Mes lunettes, sorties de leur étui.': 'My glasses, out of their case.',
   'Dans les mains de Nora : ma trousse rose.': "In Nora's hands: my pink pencil case.",
   'Au fond, dans le vide-poche : un petit éclat doré et rose.': 'In the background, in the tray: a small gold and pink glint.',
-  'Ce cœur-là a une petite fissure, comme s’il avait été recollé.': 'That heart has a small crack, as if it had been glued back.',
-  'Je compte les cœurs : 4.': 'I count the hearts: 4.',
-  'Un gros anneau rond au bout de la chaîne.': 'A big round ring at the end of the chain.',
+  'Autour des griffes du cœur : une trace brillante, comme de la colle.': 'Around the heart’s prongs: a shiny smear, like glue.',
+  'Ce cœur-là est tout plat et lisse : il n’est pas taillé comme une pierre.': 'This heart is flat and smooth: it isn’t cut like a gem.',
+  'Il pend à un gros anneau rond, au lieu d’être serti dans la chaîne.': 'It hangs from a big round ring instead of being set in the chain.',
   'Mardi 18 h 05 · story de Noémie.': "Tuesday 6:05 pm · Noémie's story.",
   'Mardi 19 h 40 · story de Noémie.': "Tuesday 7:40 pm · Noémie's story.",
   'Mercredi 13 h · BU Rockefeller · photo d’Erika.': "Wednesday 1 pm · Rockefeller library · Erika's photo.",
@@ -3263,5 +3263,39 @@ window.TRADUCTIONS_EN = {
   'Un ange dans la neige 👼': 'A snow angel 👼',
   'Quelle glissade ! ⛸️': 'What a slide! ⛸️',
   'Tous les secrets !': 'All the secrets!',
-  'Les 10 surprises du toit sont trouvées.': 'All 10 rooftop surprises found.'
+  'Les 10 surprises du toit sont trouvées.': 'All 10 rooftop surprises found.',
+  // 🧊 objets en 3D (js/vue-3d.js, vitrine des Trésors)
+  'Mon bracelet': 'My bracelet',
+  'Le bracelet au cœur rose': 'The pink-heart bracelet',
+  'au cœur rose': 'with the pink heart',
+  'Plaqué or, maille forçat, un cœur rose serti griffes.': 'Gold-plated cable chain, one prong-set pink heart.',
+  'Un seul cœur rose, taillé comme une pierre et tenu par de petites griffes.': 'A single pink heart, cut like a gem and held by little prongs.',
+  'Un fermoir mousqueton, et deux petits anneaux pour régler la longueur.': 'A lobster clasp, and two little rings to adjust the length.',
+  'Le cœur, de très près': 'The heart, up close',
+  'Agrandissement du Dr Rodolphe, en volume.': 'Dr Rodolphe’s magnification, in 3D.',
+  'Sur une griffe : une trace brillante, comme de la colle. Ce cœur a été recollé.': 'On one prong: a shiny smear, like glue. This heart was glued back.',
+  'Le bracelet de l’annonce': 'The bracelet from the listing',
+  'Celui qu’erika_lyo vend 12 € sur Vinted.': 'The one erika_lyo is selling for €12 on Vinted.',
+  'Le bonhomme de neige': 'The snowman',
+  'Le gardien du toit du fichier mystère ☃️': 'The guardian of the mystery-file rooftop ☃️',
+  'Le traîneau du Père Noël': 'Santa’s sleigh',
+  'Il a fini dans la neige du toit 🛷': 'It ended up in the rooftop snow 🛷',
+  'Les boîtes de Pizza Mario': 'The Pizza Mario boxes',
+  'Un souvenir de Trévoux 🍕': 'A souvenir from Trévoux 🍕',
+  'Le cadenas à code': 'The combination padlock',
+  'Huit chiffres… tu les connais ? 🔒': 'Eight digits… do you know them? 🔒',
+  'Le code : 03.07.2025. Le jour où tout a commencé 💖': 'The code: 03.07.2025. The day it all began 💖',
+  '⏳ Chargement de l’objet en 3D…': '⏳ Loading the 3D object…',
+  '🔄 Fais-le tourner du doigt, pince pour zoomer.': '🔄 Spin it with your finger, pinch to zoom.',
+  'Touche un détail pour le noter.': 'Tap a detail to note it.',
+  '😕 L’objet n’a pas pu s’afficher. Réessaie avec une connexion.': '😕 The object couldn’t be shown. Try again with a connection.',
+  '😕 La 3D a besoin d’une connexion la première fois. Réessaie avec Internet.': '😕 3D needs a connection the first time. Try again online.',
+  '🧊 Voir l’objet en 3D': '🧊 See the object in 3D',
+  '🧊 Voir en 3D': '🧊 See in 3D',
+  '🧊 Ma vitrine 3D': '🧊 My 3D showcase',
+  'Des objets en vrai volume, à faire tourner du doigt. Un nouveau souvenir à chaque boss vaincu.': 'Real 3D objects to spin with your finger. A new keepsake for every boss beaten.',
+  'Souvenir mystère': 'Mystery keepsake',
+  '⚔️ Bats un boss': '⚔️ Beat a boss',
+  '🔄 Tourne-le du doigt': '🔄 Spin it with your finger',
+  '✨ gravé ici': '✨ engraved here'
 };

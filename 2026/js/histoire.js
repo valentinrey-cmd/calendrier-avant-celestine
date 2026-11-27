@@ -9,7 +9,7 @@ Object.assign(STORY, {
       ['e', 'Lieutenant Pépin. Vingt-deux ans de maison, quatre cafés par matinée. Je vous écoute, madame ? ☕'],
       [
         'c',
-        'Bonjour… je viens déclarer la disparition d’un bracelet. Une chaîne fine en or, avec des petits cœurs roses. 😢',
+        'Bonjour… je viens déclarer la disparition d’un bracelet. Une chaîne fine en or, avec un petit cœur rose serti. 😢',
         { fx: 'cin' }
       ],
       ['e', 'D’accord. Je prends votre déclaration. Vous l’avez depuis quand ? 📝', { fx: 'pop:📝' }],
@@ -115,7 +115,7 @@ Object.assign(STORY, {
       ['n', 'Noémie souffle sur ses ongles.', { fx: 'bin' }],
       [
         'b',
-        'Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré.'
+        'Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Le cœur est sorti de ses griffes, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré.'
       ],
       ['e', 'Je note sa déposition. À vous de voir ce qu’elle vaut. 🗂️', { fx: 'ein' }]
     ]
@@ -411,7 +411,7 @@ Object.assign(STORY, {
       ['b', 'Évidemment ! Tu l’avais ENLEVÉ pour le gel. Je ne vernis pas les bijoux, moi.'],
       [
         'b',
-        '…Bon. Il est tombé. Un petit cœur s’est ébréché. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅',
+        '…Bon. Il est tombé. Le cœur est sorti de ses griffes. Je l’ai recollé à la colle à ongles. Personne ne voit rien, c’est du travail de pro. 💅',
         { fx: 'pop:💅' }
       ],
       ['e', 'Colle à ongles sur un bijou en or. Je note : « dégradation, mais avec talent ». 📝', { fx: 'ein' }],
@@ -448,7 +448,7 @@ Object.assign(STORY, {
       ['e', 'Et le bracelet, pendant ce temps ? 🧐', { fx: 'ein' }],
       [
         'b',
-        'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petits cœurs roses. Même Valentin l’aurait vu. Enfin… peut-être.',
+        'À son poignet, en face de moi. Photo de 21 h 12 : chaîne dorée, petit cœur rose. Même Valentin l’aurait vu. Enfin… peut-être.',
         { fx: 'pop:🍕' }
       ],
       ['n', 'Le procureur tamponne le dossier.', { fx: 'out:emma' }],

@@ -6,7 +6,7 @@
 
 Ce qui est vérifié :
   1. le numéro de version est le même dans 2026/index.html (APPV) et 2026/version.json ;
-  2. chaque fichier listé dans 2026/js/fichiers.js existe, et chaque fichier de js/, css/, media/ y est listé ;
+  2. chaque fichier listé dans 2026/js/fichiers.js existe, et chaque fichier de js/, css/, media/, 3d/ y est listé ;
   3. aucun nom global (const / let / function en début de ligne) n'est déclaré dans deux fichiers ;
   4. la syntaxe de chaque fichier JS (si node est installé).
 """
@@ -46,16 +46,16 @@ if not appv or appv.group(1) != vj:
 # 2. liste des fichiers
 fich = lire('js/fichiers.js')
 listes = {}
-for nom in ('tete', 'corps', 'medias'):
+for nom in ('tete', 'corps', 'medias', 'modeles3d'):
     m = re.search(nom + r':\s*\[(.*?)\]', fich, re.S)
     listes[nom] = re.findall(r"'([^']+)'", m.group(1)) if m else []
-tous = listes['tete'] + listes['corps'] + listes['medias']
+tous = listes['tete'] + listes['corps'] + listes['medias'] + listes['modeles3d']
 for f in tous:
     if not os.path.isfile(os.path.join(SITE, f)):
         erreurs.append(f'listé dans fichiers.js mais absent : {f}')
 if len(set(tous)) != len(tous):
     erreurs.append('un fichier est listé deux fois dans fichiers.js')
-for dossier in ('js', 'css', 'media'):
+for dossier in ('js', 'css', 'media', '3d'):
     for base, _, noms in os.walk(os.path.join(SITE, dossier)):
         for n in noms:
             rel = os.path.relpath(os.path.join(base, n), SITE).replace(os.sep, '/')
@@ -64,7 +64,7 @@ for dossier in ('js', 'css', 'media'):
 
 # 3. noms globaux en double
 vus = {}
-for f in [x for x in tous if x.endswith('.js')] + ['js/fichiers.js']:
+for f in [x for x in tous if x.endswith('.js') and not x.startswith('3d/')] + ['js/fichiers.js']:
     for m in re.finditer(r'^(?:const|let|var|function|async function|class)\s+([A-Za-z_$][\w$]*)', lire(f), re.M):
         nm = m.group(1)
         if nm in vus and vus[nm] != f:
@@ -74,7 +74,7 @@ for f in [x for x in tous if x.endswith('.js')] + ['js/fichiers.js']:
 # 4. syntaxe
 node = shutil.which('node')
 if node:
-    for f in [x for x in tous if x.endswith('.js')] + ['js/fichiers.js', 'sw.js']:
+    for f in [x for x in tous if x.endswith('.js') and not x.startswith('3d/')] + ['js/fichiers.js', 'sw.js']:
         r = subprocess.run([node, '--check', os.path.join(SITE, f)], capture_output=True, text=True)
         if r.returncode:
             erreurs.append(f'erreur de syntaxe dans {f} :\n' + r.stderr.strip()[:600])

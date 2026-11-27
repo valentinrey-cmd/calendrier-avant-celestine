@@ -3,6 +3,23 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Objets en 3D (Meshy) et le vrai bracelet à un seul cœur
+- **Le bracelet est maintenant le vrai** (Histoire d'Or, « Carpantus ») : plaqué or, maille forçat, **un seul cœur rose** taillé et serti griffes. L'histoire est adaptée partout :
+  - le titre devient « Dossier n°24 · Le bracelet au cœur rose » (écran de démarrage, logo, onglet du navigateur, appli installée, CGU, Paramètres, dossier) ;
+  - les logos et tous les dessins du dossier n'ont plus qu'un cœur, serti dans la chaîne ;
+  - la main courante, le prologue et Pépin parlent d'« un petit cœur rose serti » ;
+  - le faux bracelet Vinted se trahit autrement : un cœur plat et lisse (pas taillé) qui pend à un gros anneau. L'annonce dit « cœur rose » ;
+  - Noémie avoue que le cœur est sorti de ses griffes et qu'elle l'a recollé ; l'agrandissement du Dr Rodolphe montre une trace de colle sur les griffes ;
+  - les détails à repérer sur les photos (bracelet, Vinted, agrandissement) sont réécrits. Traductions anglaises mises à jour.
+- **Objets en vraie 3D**, faits avec Meshy (à partir des photos du vrai bracelet et de descriptions), à faire tourner du doigt et à zoomer :
+  - **Dossier** : sous les photos du bracelet, de l'annonce Vinted et de l'agrandissement, un bouton « 🧊 Voir l'objet en 3D ». On y trouve des détails en touchant le modèle (le cœur taillé, le fermoir ; le cœur plat, le gros anneau ; la trace de colle sur une griffe). Ils sont entourés, notés et gardés dans `S.det` (clés `v3_…`).
+  - **Trésors** : nouvelle « 🧊 Ma vitrine 3D ». Le bracelet est là dès le début, puis un souvenir de plus à chaque boss vaincu : bonhomme de neige, traîneau, boîtes de Pizza Mario, cadenas à code. Après le boss final, le bracelet montre où il est gravé (« ✨ 03.07.2025 ») et le cadenas donne son code.
+  - **Boss final** : dans la carte de la gravure, le dessin du bracelet est remplacé par le vrai bracelet en 3D qui tourne (« ✨ gravé ici »). Le toucher ne fait pas avancer la scène. Sans connexion la première fois, le dessin reste.
+- Les modèles (7 fichiers, 12,7 Mo en tout) et l'afficheur model-viewer (1 Mo) sont dans `2026/3d/` et ne sont chargés qu'à la première ouverture d'un objet, puis gardés en cache. `outils/verifier.py` vérifie aussi ce dossier.
+- Coût Meshy : 210 crédits.
+- Version : 1795773331
+- Fichiers : `2026/3d/` (8 nouveaux fichiers), `2026/js/vue-3d.js` (nouveau), `2026/js/fichiers.js`, `2026/js/tresors.js`, `2026/js/enquete/suspects-pieces.js`, `2026/js/enquete/dossier-accusation.js`, `2026/js/boss/boss-final.js`, `2026/js/histoire.js`, `2026/js/menu-demarrer.js`, `2026/js/parametres.js`, `2026/js/gags.js`, `2026/js/langue-anglais.js`, `2026/css/08-dossier.css`, `2026/manifest.webmanifest`, `outils/verifier.py`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Page d'installation : bouton pour télécharger le fichier mystère
 - La page de téléchargement de l'appli (`2026/app.html`, celle du QR code) affiche maintenant, sous les instructions, un encadré « 🎁 Le fichier mystère ». Il explique qu'il faut aussi le télécharger pour la boîte aux lettres du toit, avec un bouton doré « 📥 Télécharger le fichier mystère » (lien SwissTransfer, ouvert dans un nouvel onglet). C'est pareil sur iPhone, iPad, Android et ordinateur.
 - Le lien n'est pas recopié : la page le lit dans `CONTENU.mysLien` (`js/contenu.js`), le même que dans le jeu. Quand le lien SwissTransfer change (il expire au bout de 15 jours), il suffit de le changer à cet endroit.

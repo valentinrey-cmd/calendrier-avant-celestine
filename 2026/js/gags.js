@@ -142,7 +142,7 @@ const PUBS = [
   ],
   [
     'cgl',
-    `<div class="fp-in"><div class="fp-choc">📱💥</div><p class="fp-q">« Oh non… ma tablette est fêlée ! »</p><p class="fp-q">« Pas de panique, madame. »</p><b class="fp-b">Chocglass® répare,<br>Chocglass® remplace.</b><p class="fp-s">Intervention en 30 minutes, même à Écully. 🚐</p><p class="fp-sm">Franchise : 1 bisou. Les petits cœurs roses ébréchés ne sont pas couverts.</p>${MGB}</div>`
+    `<div class="fp-in"><div class="fp-choc">📱💥</div><p class="fp-q">« Oh non… ma tablette est fêlée ! »</p><p class="fp-q">« Pas de panique, madame. »</p><b class="fp-b">Chocglass® répare,<br>Chocglass® remplace.</b><p class="fp-s">Intervention en 30 minutes, même à Écully. 🚐</p><p class="fp-sm">Franchise : 1 bisou. Les petits cœurs roses recollés ne sont pas couverts.</p>${MGB}</div>`
   ],
   [
     'orl',

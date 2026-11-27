@@ -102,11 +102,11 @@ function agTap(d, i) {
   o.classList.add('on');
 }
 // une photo du dossier : on peut la toucher pour repérer soi-même des détails (zones dans PHZ, js/enquete/suspects-pieces.js)
-function phFig(f, cap) {
+function phFig(f, cap, id) {
   const Z = PHZ[f];
   return `<figure class="pc-ph"><div class="ph-w" ${Z ? `onclick="phTap(event,'${f}')"` : ''}>${PH[f]}<div class="ph-mks" id="phm_${f}">${phMarks(f)}</div></div><figcaption>${esc(cap || '')}</figcaption>${
     Z ? `<p class="ph-hint">🔍 Touche la photo pour repérer un détail.</p><ul class="ph-det" id="phd_${f}">${phList(f)}</ul>` : ''
-  }</figure>`;
+  }${PH3D[f] ? `<button class="sm v3-btn" onclick="vue3d('${PH3D[f]}',{retour:'pieceOpen(\\'${id}\\')'})">🧊 Voir l’objet en 3D</button>` : ''}</figure>`;
 }
 const phMarks = f =>
   (PHZ[f] || [])
@@ -157,7 +157,7 @@ function pieceBody(p) {
   if (k == 'agd') return agdHTML(p);
   if (k == 'tab')
     return `<table class="pc-tab"><tr>${p.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>${p.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>${p.note ? `<p class="pc-note">${esc(p.note)}</p>` : ''}`;
-  if (k == 'photo') return `<div class="pc-phs">${p.ph.map((f, i) => phFig(f, p.cap[i])).join('')}</div>`;
+  if (k == 'photo') return `<div class="pc-phs">${p.ph.map((f, i) => phFig(f, p.cap[i], p.id)).join('')}</div>`;
   if (k == 'linky') return linkySVG();
   if (k == 'plan') return planSVG();
   if (k == 'lettre')
@@ -256,7 +256,7 @@ function enqHTML(t) {
   }
   if (t == 'map') B = `<p class="enq-h"><small>Lyon et ses environs : où chacun a croisé Célestine.</small></p>${mapHTML(sd)}`;
   if (t == 'brd') B = brdHTML();
-  return `<div class="enq"><p class="muted" style="margin:0 0 8px;font-size:.85rem">📁 Dossier n°24 · Le bracelet aux cœurs roses · <b>${on.length}/${PIECES.length}</b> pièces</p><div class="enq-tabs">${T.map(([k, l]) => `<button class="${k == t ? 'on' : ''}" onclick="enqOpen('${k}')">${l}</button>`).join('')}</div>${B}</div>`;
+  return `<div class="enq"><p class="muted" style="margin:0 0 8px;font-size:.85rem">📁 Dossier n°24 · Le bracelet au cœur rose · <b>${on.length}/${PIECES.length}</b> pièces</p><div class="enq-tabs">${T.map(([k, l]) => `<button class="${k == t ? 'on' : ''}" onclick="enqOpen('${k}')">${l}</button>`).join('')}</div>${B}</div>`;
 }
 function enqOpen(t) {
   popup(
@@ -361,7 +361,7 @@ function accuseGo(id, again) {
 function storyHTML() {
   const sd = S.story || {},
     L = STORD.filter(k => sd[k]);
-  return `<h2>📖 L’histoire</h2><div class="panel">${L.length ? `<p class="muted" style="margin:0 0 8px;font-size:.85rem">Le mystère du bracelet aux cœurs roses… Revois les scènes déjà débloquées.</p><div class="st-list">${L.map(k => `<button class="sm alt" onclick="story('${k}')">${esc(STORY[k].t)}</button>`).join('')}</div>` : '<p class="muted" style="margin:0">L’histoire commence avec la première case…</p>'}</div>`;
+  return `<h2>📖 L’histoire</h2><div class="panel">${L.length ? `<p class="muted" style="margin:0 0 8px;font-size:.85rem">Le mystère du bracelet au cœur rose… Revois les scènes déjà débloquées.</p><div class="st-list">${L.map(k => `<button class="sm alt" onclick="story('${k}')">${esc(STORY[k].t)}</button>`).join('')}</div>` : '<p class="muted" style="margin:0">L’histoire commence avec la première case…</p>'}</div>`;
 }
 function showBon(i) {
   const b = S.bons[i];

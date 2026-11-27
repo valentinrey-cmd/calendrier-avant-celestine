@@ -1,4 +1,4 @@
-/* ================= 🗂️ ENQUÊTE · Le bracelet aux cœurs roses (dossier n°24) ================= */
+/* ================= 🗂️ ENQUÊTE · Le bracelet au cœur rose (dossier n°24) ================= */
 const SUSP = [
   {
     id: 'noemie',
@@ -152,12 +152,13 @@ const phDefs = p => `<defs>
 // petit cœur rose brillant, centré en (x, y), taille s
 const phCoeur = (p, x, y, s, rot = 0, recolle = false) =>
   `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s / 10})"><path d="M0 4 C-7 -1 -6 -8 -2.6 -8 C-1.2 -8 -0.3 -7 0 -6 C.3 -7 1.2 -8 2.6 -8 C6 -8 7 -1 0 4Z" fill="url(#${p}co)" stroke="#b83a6c" stroke-width=".7"/><ellipse cx="-2.6" cy="-5" rx="1.6" ry=".9" fill="#fff" opacity=".8" transform="rotate(-30 -2.6 -5)"/>${
-    recolle ? '<path d="M-1 -6.5 L.6 -3.2 L-.4 -.6 L1 2" fill="none" stroke="#fff6" stroke-width=".55"/>' : ''
+    recolle ? '<path d="M3.2 -8.6 Q7.6 -7.4 6.4 -3.4 Q5 -5.6 2.6 -6.4Z" fill="#fffbe8" opacity=".55" stroke="#fff" stroke-width=".3"/><circle cx="6" cy="-6.6" r=".7" fill="#fff"/>' : ''
   }</g>`;
-// le bracelet : chaîne en maillons dorés le long d'une courbe, avec des cœurs et un fermoir
+// le bracelet : chaîne en maillons dorés le long d'une courbe, un cœur et un fermoir.
+// Le vrai a un seul cœur taillé, serti au milieu de la chaîne (griffes) ; o.pend = cœur qui pend au bout d'un anneau (le faux de Vinted)
 const phBracelet = (p, x1, y1, x2, y2, sag, o = {}) => {
   const n = o.n || 34,
-    hearts = o.h || 5,
+    hearts = o.h || 1,
     hs = o.hs || 9,
     pt = t => {
       const cx = (x1 + x2) / 2,
@@ -177,9 +178,11 @@ const phBracelet = (p, x1, y1, x2, y2, sag, o = {}) => {
   for (let i = 0; i < hearts; i++) {
     const t = (i + 1) / (hearts + 1),
       [hx, hy] = pt(t);
-    s +=
-      `<line x1="${hx}" y1="${hy - 1}" x2="${hx}" y2="${hy + hs * 0.35}" stroke="url(#${p}or)" stroke-width="${hs * 0.09}"/>` +
-      phCoeur(p, hx, hy + hs * 0.75, hs, (t - 0.5) * 14, o.recolle == i);
+    s += o.pend
+      ? `<circle cx="${hx}" cy="${hy + hs * 0.3}" r="${hs * 0.26}" fill="none" stroke="url(#${p}or)" stroke-width="${hs * 0.1}"/>` +
+        phCoeur(p, hx, hy + hs * 1.25, hs * 0.85, (t - 0.5) * 14, o.recolle == i)
+      : phCoeur(p, hx, hy + hs * 0.15, hs * 0.8, 0, o.recolle == i) +
+        [-0.32, 0.32, 0].map((dx, k) => `<circle cx="${hx + dx * hs}" cy="${hy + hs * (k == 2 ? 0.52 : -0.38)}" r="${hs * 0.07}" fill="url(#${p}or)"/>`).join('');
   }
   if (o.eclat)
     o.eclat.forEach(([ex, ey, er]) => {
@@ -256,7 +259,6 @@ ${Array.from({ length: 7 }, (_, i) => `<path d="M0 ${162 + i * 9} Q160 ${158 + i
 <ellipse cx="0" cy="-6" rx="78" ry="24" fill="#7a1f33" opacity=".55"/>
 ${phBracelet('br', -74, -14, 74, -14, 30, {
   n: 46,
-  h: 5,
   hs: 15,
   w: 2.3,
   sw: 1.5,
@@ -328,7 +330,7 @@ ${[
 ]
   .map(([a, b]) => `<circle cx="${a}" cy="${b}" r="7" fill="#fff" stroke="#eee"/>`)
   .join('')}
-${phBracelet('sn', 112, 168, 192, 164, 14, { n: 30, h: 5, hs: 9, w: 1.4, eclat: [[150, 182, 3.4]] })}
+${phBracelet('sn', 112, 168, 192, 164, 14, { n: 30, hs: 9, w: 1.4, eclat: [[150, 182, 3.4]] })}
 ${phStory('sn', 'noemie.nails', '18 h 05', 96)}
 <g transform="translate(160 66) rotate(-4)"><rect x="-86" y="-15" width="172" height="28" rx="8" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#c0234a">Prête pour le gel 💅</text></g>`
   ),
@@ -361,7 +363,7 @@ ${(() => {
 <path d="M-11 -26 Q-10 -6 -7 12 M-1 -28 L0 12 M9 -26 Q8 -6 5 12" fill="none" stroke="${om}" stroke-width=".9" opacity=".35"/>
 <path d="M-17 40 Q0 45 17 40" fill="none" stroke="${om}" stroke-width=".9" opacity=".6"/>`;
 })()}
-${phBracelet('og', -18, 34, 18, 34, 10, { n: 24, h: 5, hs: 7.5, w: 1.4, sw: 1, eclat: [[-3, 52, 3]] })}
+${phBracelet('og', -18, 34, 18, 34, 10, { n: 24, hs: 7.5, w: 1.4, sw: 1, eclat: [[-3, 52, 3]] })}
 </g>
 ${phStory('og', 'noemie.nails', '19 h 40', 230)}
 <g transform="translate(78 82) rotate(-6)"><rect x="-58" y="-15" width="116" height="28" rx="14" fill="#fff"/><text x="0" y="5" text-anchor="middle" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="800" fill="#e0567f">Baby pink 💗</text></g>`
@@ -518,21 +520,20 @@ ${phTampon(312, 16, 'VEN. 7:51', 'end')}`
 ${Array.from({ length: 17 }, (_, i) => `<path d="M${i * 20} 0 V220" stroke="#2c3e4a" stroke-width="1"/>`).join('')}${Array.from({ length: 12 }, (_, i) => `<path d="M0 ${i * 20} H320" stroke="#2c3e4a" stroke-width="1"/>`).join('')}
 <circle cx="150" cy="112" r="96" fill="#f7d7e0"/><circle cx="150" cy="112" r="96" fill="url(#zmgl)" opacity=".25"/>
 <clipPath id="zmcl"><circle cx="150" cy="112" r="96"/></clipPath><ellipse cx="150" cy="150" rx="140" ry="40" fill="#fbe9ee" stroke="#d9a3b3" stroke-width="5" clip-path="url(#zmcl)"/>
-<g>${phBracelet('zm', 74, 92, 226, 92, 28, { n: 40, h: 5, hs: 19, w: 3, sw: 1.8, recolle: 2 })}</g>
+<g>${phBracelet('zm', 74, 92, 226, 92, 28, { n: 40, hs: 30, w: 3, sw: 1.8, recolle: 0 })}</g>
 <circle cx="150" cy="112" r="96" fill="none" stroke="#c9d6de" stroke-width="7"/><circle cx="150" cy="112" r="102" fill="none" stroke="#7d8e99" stroke-width="3"/>
 <g font-family="'Courier New',monospace" font-size="10" fill="#9fe8ff" font-weight="700"><path d="M154 128 L250 178" stroke="#ffb347" stroke-width="1.2"/><text x="252" y="184" fill="#ffb347">trace de</text><text x="252" y="196" fill="#ffb347">colle ?</text></g>
 ${phTampon(8, 16, 'LABO · ×8 · VIDE-POCHE · 7:51')}
 <g transform="translate(26 196)"><path d="M0 0 h50 M0 -4 v8 M50 -4 v8" stroke="#9fe8ff" stroke-width="1.5"/><text x="25" y="-6" text-anchor="middle" font-family="'Courier New',monospace" font-size="8" fill="#9fe8ff">1 cm</text></g>`
   ),
-  // 12. une annonce Vinted repérée par Gérald (fausse piste : 4 cœurs, gros anneau)
+  // 12. une annonce Vinted repérée par Gérald (fausse piste : cœur plat qui pend à un gros anneau)
   vinted: phSvg(
     'vt',
     `<rect width="320" height="220" fill="#f5f6f7"/>
 <rect x="0" y="0" width="320" height="24" fill="#ffffff"/><path d="M0 24 H320" stroke="#e3e6e8"/><text x="12" y="17" font-family="Inter,system-ui,sans-serif" font-size="13" font-weight="800" fill="#0f8f96">Vinted</text><text x="308" y="16" text-anchor="end" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#7a8288">sam. 28 nov. · 16:12</text>
 <rect x="8" y="32" width="166" height="180" rx="6" fill="#fbfaf7"/><path d="M8 150 Q90 136 174 154 V212 H8Z" fill="#efe9df"/>
-${phBracelet('vt', 28, 112, 150, 110, 34, { n: 34, h: 4, hs: 15, w: 2.6, sw: 1.7 })}
-<circle cx="157" cy="109" r="7" fill="none" stroke="url(#vtor)" stroke-width="2.6"/>
-<g font-family="Inter,system-ui,sans-serif"><text x="186" y="48" font-size="11.5" font-weight="700" fill="#1c1c1e">Bracelet doré</text><text x="186" y="62" font-size="11.5" font-weight="700" fill="#1c1c1e">cœurs roses</text>
+${phBracelet('vt', 28, 112, 150, 110, 34, { n: 34, hs: 30, w: 2.6, sw: 1.7, pend: 1 })}
+<g font-family="Inter,system-ui,sans-serif"><text x="186" y="48" font-size="11.5" font-weight="700" fill="#1c1c1e">Bracelet doré</text><text x="186" y="62" font-size="11.5" font-weight="700" fill="#1c1c1e">cœur rose</text>
 <text x="186" y="84" font-size="15" font-weight="800" fill="#1c1c1e">12,00 €</text><text x="186" y="98" font-size="8.5" fill="#7a8288">Très bon état · porté 2 fois</text>
 <path d="M186 108 H310" stroke="#e3e6e8"/><circle cx="198" cy="124" r="10" fill="#d9c6b0"/><text x="198" y="128" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">E</text>
 <text x="213" y="121" font-size="9.5" font-weight="700" fill="#1c1c1e">erika_lyo</text><text x="213" y="133" font-size="8.5" fill="#f0a500">★★★★★ <tspan fill="#7a8288">(38)</tspan></text>
@@ -544,7 +545,7 @@ ${phBracelet('vt', 28, 112, 150, 110, 34, { n: 34, h: 4, hs: 15, w: 2.6, sw: 1.7
 
 // les détails à repérer soi-même en touchant les photos : [x, y, rayon (dessin de 320 × 220), ce qu'on remarque]
 const PHZ = {
-  bracelet: [[160, 128, 70, 'Je compte les cœurs : 5. Et un petit fermoir.']],
+  bracelet: [[160, 128, 70, 'Un seul cœur rose, taillé comme une pierre et tenu par de petites griffes. Et un fermoir.']],
   storyn: [[152, 174, 40, 'Sur la serviette, à côté des vernis : mon bracelet.']],
   ongles: [[176, 190, 30, 'À mon poignet : le bracelet.']],
   bu: [[153, 110, 16, 'À mon poignet, quelque chose de rose qui brille.']],
@@ -556,12 +557,14 @@ const PHZ = {
   ],
   tp: [[172, 152, 30, 'Dans les mains de Nora : ma trousse rose.']],
   snap: [[262, 70, 20, 'Au fond, dans le vide-poche : un petit éclat doré et rose.']],
-  zoom: [[150, 122, 26, 'Ce cœur-là a une petite fissure, comme s’il avait été recollé.']],
+  zoom: [[150, 112, 30, 'Autour des griffes du cœur : une trace brillante, comme de la colle.']],
   vinted: [
-    [90, 140, 56, 'Je compte les cœurs : 4.'],
-    [157, 109, 12, 'Un gros anneau rond au bout de la chaîne.']
+    [89, 162, 22, 'Ce cœur-là est tout plat et lisse : il n’est pas taillé comme une pierre.'],
+    [89, 137, 10, 'Il pend à un gros anneau rond, au lieu d’être serti dans la chaîne.']
   ]
 };
+// les photos qui ont aussi leur objet en 3D (OBJ3D, js/vue-3d.js) : bouton « Voir en 3D » sous la photo
+const PH3D = { bracelet: 'bracelet', zoom: 'coeur', vinted: 'vinted' };
 /* ---------- les pièces du dossier ---------- */
 const PIECES = [
   {
@@ -574,7 +577,7 @@ const PIECES = [
     body: [
       'MAIN COURANTE · n° 2026/8e/12-018 · mardi 1er décembre 2026, 8 h 40',
       'Déclarante : Célestine, étudiante en pharmacie, Lyon 8e.',
-      '« J’ai perdu, ou on m’a volé, mon bracelet : une chaîne fine en or avec des petits cœurs roses. Valentin me l’a offert le 24 décembre dernier.',
+      '« J’ai perdu, ou on m’a volé, mon bracelet : une chaîne fine en or avec un petit cœur rose serti. Valentin me l’a offert le 24 décembre dernier.',
       'Je l’enlève pour les TP et pour la douche. Vendredi matin, j’avais TP : je l’ai rangé dans ma trousse, comme d’habitude.',
       'Je suis partie le vendredi soir chez mes parents, à Reyrieux. J’ai travaillé samedi à la pharmacie. Dimanche à 21 h 30, en vidant mon sac : plus de bracelet. Ni dans la trousse, ni dans le sac, ni dans le vide-poche. »',
       'Personnes vues dans la semaine : Noémie, Emma, Nora, Erika, Eya, Edgar, Valérie, Sandrine, Valentin.'
@@ -911,7 +914,7 @@ const PIECES = [
     t: 'Aveux · Noémie',
     k: 'aveu',
     who: 'noemie',
-    body: '« Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Un petit cœur s’est ébréché, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré. »'
+    body: '« Bon… je t’ai fait l’enlever pour le gel. Et je l’ai fait tomber. Le cœur est sorti de ses griffes, je l’ai recollé à la colle à ongles. Pardon ! Mais je te l’ai remis au poignet à 19 h 40, juré. »'
   },
   {
     id: 'a8',
