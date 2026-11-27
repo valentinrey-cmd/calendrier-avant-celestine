@@ -3,6 +3,15 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+
+## 27/11/2026 · Toit : sauter, touche E, visite chez Valentin, caméra toujours dans son dos (version 1795792697)
+- **Sauter :** barre d'espace sur ordinateur, nouveau bouton bleu « Sauter » au-dessus de « Lancer » sur téléphone et tablette. Nouvelle animation 3D de saut faite avec Meshy. Elle garde son élan en l'air.
+- **Lancer :** sur ordinateur, c'est maintenant la touche **E** (maintenir puis relâcher), plus Espace.
+- **Toit de Valentin :** en courant, un saut franchit la ruelle. Elle peut marcher sur son toit (et tomber de ses bords). Valentin l'accueille, ne lui lance plus de boules de neige, danse avec elle si elle fait bisou ou danse, et lui rend le fichier en main au lieu de la patate. Le suivi reçoit « 🏠 rend visite à Valentin ».
+- **Caméra :** on voit toujours son dos. Tourner la vue (doigt, souris, ou flèches gauche/droite) la fait tourner aussi ; le joystick / ZQSD la fait avancer, reculer (marche à l'envers) ou faire des pas de côté.
+- Textes d'aide (version ordinateur à part) et traductions anglaises.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/css/06-boss-playlist.css`, `2026/3d/toit-celestine.glb`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 2026-11-27 · Toit : caméra à la Fortnite, vrai fichier 3D dans la main, chutes plus naturelles
 - **Caméra** : elle suit Célestine de dos, à hauteur d'épaule et décalée sur sa droite (Célestine un peu à gauche de l'image), plus près qu'avant. Quand elle avance, la vue se replace toute seule derrière elle (sauf pendant qu'on tourne la vue au doigt, et pas quand elle revient vers nous). En visant (bouton « Lancer » maintenu), la caméra se rapproche de son épaule. Les plans de cinéma (chute du toit, patate, replay) ne changent pas.
 - **Fichier en main** : ce n'est plus une image plate collée sur la main, mais un vrai objet 3D avec de l'épaisseur (paquet cadeau « .AVENT », tirage photo ou document, avec exactement le même dessin qu'avant), serré dans la moufle droite, qui suit les mouvements du bras et que la main ou le corps peuvent cacher. Pareil pour Valentin quand il tient le fichier.

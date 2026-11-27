@@ -1540,7 +1540,11 @@ function mysLancer(cb, fic) {
   let fc = fic; // le fichier en main (celui qu'on ouvrira s'il entre dans la cheminée)
   const o = document.createElement('div');
   o.className = 'mysl';
-  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>Joystick pour marcher, glisse le doigt pour tourner la vue. Maintiens « Lancer » et relâche au bon moment !</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
+  o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>${
+      matchMedia('(pointer: fine)').matches
+        ? 'ZQSD pour marcher, flèches (ou la souris) pour tourner, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !'
+        : 'Joystick pour marcher, glisse le doigt pour tourner la vue, « Sauter » pour sauter (en courant, jusque chez Valentin !). Maintiens « Lancer » et relâche au bon moment !'
+    }</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><button class="mysl-saut"><b></b><span>Sauter</span></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
   try {
     if (S.mysTrophee) o.querySelector('.mysl-n').classList.add('trophee');
   } catch (_) {}
@@ -1568,7 +1572,8 @@ function mysLancer(cb, fic) {
   const cv = o.querySelector('canvas'),
     tip = o.querySelector('.mysl-tip'),
     joy = o.querySelector('.mysl-joy'),
-    btn = o.querySelector('.mysl-lance');
+    btn = o.querySelector('.mysl-lance'),
+    btnSaut = o.querySelector('.mysl-saut');
   let c = cv.getContext('2d'); // « let » : le dessin du fichier sert aussi d'image au fichier 3D tenu en main (texFichier)
   // --- monde ---
   const CAM = 2.9, // hauteur de la caméra
@@ -1800,7 +1805,7 @@ function mysLancer(cb, fic) {
   nouveau();
   FIG3D.charge(); // les figurines 3D de Célestine et Valentin (js/toit-figurines-3d.js)
   // version de test seulement : accès aux personnages pour vérifier les gestes (outil de test automatique)
-  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, renverse: () => renverse(), fete: () => fete() };
+  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, ctl: () => ctl, renverse: () => renverse(), fete: () => fete() };
   // les mains vides : le fichier est dans la boîte aux lettres
   if (!fic) ((C.tient = 0), (F.al = 0), (tip.textContent = '📮 Va prendre le fichier dans la boîte aux lettres !'));
   rate = fin = 0;
@@ -4017,8 +4022,8 @@ function mysLancer(cb, fic) {
     }, 450);
   };
   /* ===================== Célestine (commandes de jeu) ===================== */
-  // Joystick (ou flèches / ZQSD) pour la faire marcher, glisser le doigt (ou la souris) pour tourner la vue autour d'elle,
-  // bouton « Lancer » (ou barre d'espace) maintenu : la jauge de force monte et descend, on relâche pour lancer droit devant.
+  // Joystick (ou ZQSD) pour la faire marcher, glisser le doigt (ou la souris, ou les flèches) pour tourner la vue : elle tourne
+  // avec, on voit toujours son dos ; « Sauter » (ou Espace) pour sauter ; bouton « Lancer » (ou touche E) maintenu : la jauge de force monte et descend, on relâche pour lancer droit devant.
   // Célestine est un petit personnage « en volume » : chaque partie a sa place autour d'elle (en cm, X = sa droite,
   // Y = hauteur, Z = devant elle). C.phi = le sens où elle regarde : 0 = de dos (elle s'éloigne), π/2 = vers la droite,
   // π = vers nous. Elle pivote vraiment : toutes les positions entre de dos, de profil et de face existent.
@@ -4381,7 +4386,7 @@ function mysLancer(cb, fic) {
     };
   };
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
-  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, yaw: 0 };
+  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, kt: 0, yaw: 0 };
   // la chute du toit, en vraie 3D :
   // 1. au bord, elle vacille en moulinant des bras (la caméra passe sur le côté pour bien voir le vide) ;
   // 2. elle bascule et tombe en battant des bras et des jambes, la caméra la suit dans sa chute, entre les immeubles ;
@@ -4502,8 +4507,21 @@ function mysLancer(cb, fic) {
       C.angeFait = 0;
       C.angeAxe = [Math.cos(V.yaw), -Math.sin(V.yaw)];
     }
-    // la glissade : elle a couru et on lâche le joystick d'un coup
-    if (C.glisse) {
+    // en l'air, elle garde son élan (on peut juste l'infléchir un peu au joystick)
+    if (C.saute && C.air) {
+      if (m > 0.12) {
+        const dx = co * ix + si * -iy,
+          dz = -si * ix + co * -iy,
+          n = Math.hypot(dx, dz);
+        C.air.vx += (dx / n) * dt * 2.5;
+        C.air.vz += (dz / n) * dt * 2.5;
+        const sp = Math.hypot(C.air.vx, C.air.vz),
+          mx = Math.max(1.7, C.air.v0);
+        if (sp > mx) ((C.air.vx *= mx / sp), (C.air.vz *= mx / sp));
+      }
+      vx = C.air.vx;
+      vz = C.air.vz;
+    } else if (C.glisse) {
       const g = C.glisse,
         sp = Math.hypot(g.vx, g.vz),
         ns = Math.max(0, sp - 2.4 * dt);
@@ -4548,14 +4566,14 @@ function mysLancer(cb, fic) {
       C.vite = 0;
     }
     // elle pivote vers là où elle va ; en armant le lancer, elle se tourne dans le sens de la vue ; elle boude dos à nous
-    const vise = C.charge ? ctl.yaw : em == 'boude' ? V.yaw : vx || vz ? Math.atan2(vx, vz) : null;
-    if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 10);
-    // caméra « à la Fortnite » : quand elle avance, la vue se replace toute seule derrière elle
-    // (pas si on tourne la vue au doigt, ni quand elle revient vers nous, sinon la vue ferait des tours)
-    if (!regard && m > 0.12 && !bloque && !C.glisse && !fin) {
-      const ec = Math.atan2(Math.sin(C.phi - ctl.yaw), Math.cos(C.phi - ctl.yaw));
-      if (Math.abs(ec) < 1.9) ctl.yaw += ec * Math.min(1, dt * 1.7 * m);
-    }
+    // caméra « à la Fortnite » : elle regarde toujours dans le sens de la vue, on voit toujours son dos ;
+    // tourner la vue la fait tourner, et le joystick la fait avancer, reculer ou faire des pas de côté
+    if (ctl.kt) ctl.yaw += ctl.kt * dt * 2.4;
+    const vise = em == 'boude' ? V.yaw : C.glisse ? null : ctl.yaw;
+    if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 14);
+    // elle recule (joystick vers le bas) : l'animation de marche passe à l'envers
+    const sp = Math.hypot(vx, vz);
+    C.recul = sp > 0.05 && (vx * Math.sin(C.phi) + vz * Math.cos(C.phi)) / sp < -0.3;
     C.x += vx * dt;
     C.z += vz * dt;
     C.amp += ((C.v > 0.05 ? Math.min(1.3, C.v / 1.2) : em == 'danse' ? 0.5 : em == 'boude' ? 0.12 : 0) - C.amp) * Math.min(1, dt * 8);
@@ -4592,11 +4610,25 @@ function mysLancer(cb, fic) {
       }
     });
     C.z = Math.min(RIDGE - 0.3, C.z);
-    // pas de barrière invisible : au bord de la gouttière ou d'un côté du toit, elle perd l'équilibre et tombe
-    if (!fin && C.y <= 0 && (C.z < BORD + 0.12 || Math.abs(C.x) > 8.88)) {
-      const n = C.z < BORD + 0.12 ? [0, -1] : [Math.sign(C.x), 0];
-      if (n[1]) C.z = BORD + 0.12;
-      else C.x = n[0] * 8.88;
+    // chez Valentin : on ne lui passe pas à travers, ni à travers son petit conduit de cheminée
+    if (chezValentin()) {
+      const dv = Math.hypot(C.x - VAL.x, C.z - VAL.z);
+      if (dv < 0.5 && dv > 0) ((C.x = VAL.x + ((C.x - VAL.x) / dv) * 0.5), (C.z = VAL.z + ((C.z - VAL.z) / dv) * 0.5));
+      const e2 = VOISIN.ce + 0.22;
+      if (Math.abs(C.x - VOISIN.cx) < e2 && Math.abs(C.z - VOISIN.cz) < e2) {
+        const px = e2 - Math.abs(C.x - VOISIN.cx),
+          pz = e2 - Math.abs(C.z - VOISIN.cz);
+        if (px < pz) C.x = VOISIN.cx + Math.sign(C.x - VOISIN.cx || 1) * e2;
+        else C.z = VOISIN.cz + Math.sign(C.z - VOISIN.cz || 1) * e2;
+      }
+    }
+    // pas de barrière invisible : au bord de la gouttière ou d'un côté d'un des deux toits, elle perd l'équilibre et tombe
+    const nBord = !fin && C.y <= 0 ? horsToit() : null;
+    if (nBord) {
+      const n = nBord,
+        chezV = C.x > MILIEU;
+      if (n[1]) C.z = (chezV ? VOISIN.z0 : BORD) + 0.12;
+      else C.x = n[0] < 0 ? (chezV ? VOISIN.x0 + 0.12 : -8.88) : chezV ? VOISIN.x1 - 0.12 : 8.88;
       C.chute = { t: T(), n, vy: 0, x0: C.x, z0: C.z };
       C.charge = 0;
       C.glisse = 0;
@@ -4683,9 +4715,46 @@ function mysLancer(cb, fic) {
     if (C.y <= 0) {
       C.y = 0;
       C.vy = 0;
+      if (C.saute) C.v = Math.min(C.v, 2.4); // elle amortit : pas de glissade en retombant
+      C.saute = 0;
+      C.air = null;
+      // elle retombe dans le vide (la ruelle entre les deux toits, ou à côté d'un toit) : elle tombe tout de suite
+      // tout près d'un toit (moins de 45 cm), elle se rattrape dessus ; sinon elle tombe tout de suite
+      if (horsToit() && !horsToit(0.45)) {
+        const chezV = C.x > MILIEU;
+        C.x = Math.max(chezV ? VOISIN.x0 + 0.15 : -8.73, Math.min(chezV ? VOISIN.x1 - 0.15 : 8.73, C.x));
+        C.z = Math.max((chezV ? VOISIN.z0 : BORD) + 0.15, C.z);
+      }
+      const n = horsToit();
+      if (n && !fin) return (C.chute = { t: T() - 1.15, n, vy: 0, x0: C.x, z0: C.z });
       C.pose = T(); // elle amortit en retombant
       bruit('pas', 1);
     }
+  };
+  // Les deux toits (le nôtre : |x| < 8,88, z > gouttière ; celui de Valentin : VOISIN). Hors des deux, au sol : elle tombe.
+  // Renvoie le sens du vide le plus proche, ou null si elle est bien sur un toit.
+  const MILIEU = (8.88 + 10.4) / 2; // le milieu de la ruelle
+  const horsToit = (marge = 0) => {
+    const chezV = C.x > MILIEU,
+      xa = (chezV ? VOISIN.x0 + 0.12 : -8.88) - marge,
+      xb = (chezV ? VOISIN.x1 - 0.12 : 8.88) + marge,
+      za = (chezV ? VOISIN.z0 + 0.12 : BORD + 0.12) - marge;
+    if (C.x >= xa && C.x <= xb && C.z >= za) return null;
+    if (C.z < za) return [0, -1];
+    return C.x < xa ? [-1, 0] : [1, 0];
+  };
+  const chezValentin = () => surVoisin(C.x, C.z);
+  // sauter (barre d'espace, bouton « Sauter ») : plus loin en courant, assez pour franchir la ruelle (1,5 m)
+  const sauter = () => {
+    if (fin || C.chute || C.ko || C.y > 0 || C.vy || C.charge || C.danse || C.ange || C.pTir != null) return;
+    C.vy = C.v > 2.3 ? 3.9 : 3.3;
+    C.saute = T();
+    const d = C.v > 0.05 && C.dir ? C.dir : [0, 0];
+    C.air = { vx: d[0] * C.v, vz: d[1] * C.v, v0: C.v };
+    C.emote = null;
+    C.glisse = null;
+    C.idle = 0;
+    bruit('pas', 1);
   };
   // les tenues : Célestine (doudoune rose, queue-de-cheval, lunettes, taches de rousseur) et Valentin (doudoune verte, cheveux courts)
   const TENUE = {
@@ -4730,12 +4799,15 @@ function mysLancer(cb, fic) {
       v = Math.abs(C.v || 0),
       em = C.emote && tt - C.emote.t < C.emote.d ? C.emote : null,
       cl = x => Math.max(0, Math.min(1, x)),
-      pas = () => (v > 2.3 ? { a: 'course', v: Math.max(0.7, v / 3.4) } : v > 0.12 ? { a: 'marche', v: Math.max(0.5, v / 1.25) } : { a: 'repos' });
+      sens = qui != 'valentin' && C.recul ? -1 : 1, // à reculons : l'animation à l'envers
+      pas = () =>
+        v > 2.3 ? { a: 'course', v: sens * Math.max(0.7, v / 3.4) } : v > 0.12 ? { a: 'marche', v: sens * Math.max(0.5, v / 1.25) } : { a: 'repos' };
     if (qui == 'valentin') {
       const R = C.renvoi;
       if (em && em.k == 'aie') return { a: 'tombe', k: Math.min(0.95, ((tt - em.t) / em.d) * 1.3) }; // sur les fesses
       if (em && em.k == 'lance') return { a: 'lancer', k: 0.25 + 0.25 * cl((tt - em.t) / em.d) }; // boule de neige
       if (em && em.k == 'salut') return { a: 'salut' };
+      if (em && em.k == 'danse') return { a: 'danse' }; // il danse avec elle, chez lui
       if (tt - (C.ramasse || -9) < 0.7) return { a: 'ramasse', k: 0.05 + 0.3 * cl((tt - C.ramasse) / 0.7) };
       if (R && R.e == 'charge') return { a: 'charge' }; // il charge sa patate
       if (R && R.e == 'vise') return { a: 'lancer', k: 0.3 };
@@ -4767,6 +4839,7 @@ function mysLancer(cb, fic) {
     if (tt - (C.ramasse || -9) < 0.5) return { a: 'ramasse', k: 0.03 + 0.45 * cl((tt - C.ramasse) / 0.5) };
     if (C.charge) return { a: 'lancer', k: 0.33 }; // bras armé, elle vise
     if (tt - (C.tir || -9) < 0.6) return { a: 'lancer', k: 0.33 + 0.25 * cl((tt - C.tir) / 0.6) };
+    if (C.saute) return { a: 'saut', k: 0.15 + 0.3 * cl((tt - C.saute) / 0.75) }; // elle pousse sur ses jambes, puis vole
     if (C.glisse) return { a: 'glisse', k: 0.35 };
     return pas();
   };
@@ -5571,6 +5644,20 @@ function mysLancer(cb, fic) {
         if (!VAL.tient) return ((VAL.renvoi = null), false);
         Object.assign(R, { e: 'vise', t: T() });
       }
+    } else if (R.e == 'vise' && chezValentin() && !C.chute && !C.ko) {
+      // elle est chez lui : pas de patate, il va lui rendre le fichier en main
+      const dx = C.x - VAL.x,
+        dz = C.z - VAL.z,
+        d = Math.hypot(dx, dz) || 1;
+      if (d < 0.95 || valCourt(dt, C.x - (dx / d) * 0.75, C.z - (dz / d) * 0.75, 2.2)) {
+        VAL.tient = 0;
+        VAL.renvoi = null;
+        VAL.v = 0;
+        C.tient = 1;
+        bruit('ramasse');
+        parle(VAL, ['Tiens, c’est le tien 😘', 'Je te le rends… pour cette fois 😏'][Math.floor(Math.random() * 2)], 1.8);
+        tip.textContent = '';
+      }
     } else if (R.e == 'vise') {
       VAL.v = 0;
       const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
@@ -5644,6 +5731,24 @@ function mysLancer(cb, fic) {
     VAL.v = 0;
     const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
     VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 4);
+    // Célestine vient lui rendre visite sur son toit : il l'accueille, ne lui lance plus de boules de neige,
+    // et si elle lui fait un bisou ou danse à côté de lui, il danse avec elle
+    if (chezValentin() && !C.chute) {
+      if (!VAL.visite) {
+        VAL.visite = 1;
+        if (!occupe) geste(VAL, 'salut', 1.6);
+        parle(VAL, ['Oh ! Tu es venue me voir ? 😍', 'Bienvenue chez moi ! 🏠', 'Tu as sauté ?! T’es folle 😂'][Math.floor(Math.random() * 3)], 2);
+        slog('🏠', 'Toit : rend visite à Valentin sur son toit');
+      }
+      VAL.boule = Math.max(VAL.boule, T() + 5);
+      VAL.coucou = Math.max(VAL.coucou, T() + 7);
+      const ce = C.emote && T() - C.emote.t < C.emote.d ? C.emote.k : null;
+      if ((ce == 'bisou' || ce == 'danse') && Math.hypot(C.x - VAL.x, C.z - VAL.z) < 2 && !occupe && T() > (VAL.danseAvec || 0)) {
+        VAL.danseAvec = T() + 6;
+        geste(VAL, 'danse', 3);
+        parle(VAL, ce == 'bisou' ? 'Moi aussi ! 😘💕' : 'On danse ?! 🕺💃', 1.8);
+      }
+    } else VAL.visite = 0;
     if (!VAL.coucou) ((VAL.coucou = T() + 4), (VAL.boule = T() + 10));
     if (!occupe && !fin && T() > VAL.coucou) {
       geste(VAL, 'salut', 1.6);
@@ -7903,15 +8008,23 @@ function mysLancer(cb, fic) {
   btn.addEventListener('pointerup', e => ((C.spin = effet(e)), (btn.querySelector('u').textContent = ''), lancer()));
   btn.addEventListener('pointercancel', e => ((C.spin = 0), lancer()));
   btn.addEventListener('contextmenu', e => e.preventDefault());
-  // clavier (sur ordinateur) : flèches ou ZQSD / WASD pour marcher, espace pour lancer
+  btnSaut.addEventListener('pointerdown', e => (e.preventDefault(), e.stopPropagation(), sauter()));
+  btnSaut.addEventListener('contextmenu', e => e.preventDefault());
+  // clavier (sur ordinateur) : ZQSD / WASD (et flèches haut / bas) pour marcher, flèches gauche / droite pour tourner, espace pour sauter, E (maintenue) pour lancer
   const touches = {};
   const clavier = () => {
     const k = n => (touches[n] ? 1 : 0);
-    ctl.kx = k('ArrowRight') + k('d') - k('ArrowLeft') - k('q') - k('a');
+    ctl.kx = k('d') - k('q') - k('a'); // Q / D : pas de côté
+    ctl.kt = k('ArrowRight') - k('ArrowLeft'); // flèches gauche / droite : tourner la vue (et elle avec)
     ctl.ky = k('ArrowDown') + k('s') - k('ArrowUp') - k('z') - k('w');
   };
   const bas = e => {
     if (e.key == ' ') {
+      e.preventDefault();
+      if (!e.repeat) sauter();
+      return;
+    }
+    if (e.key == 'e' || e.key == 'E') {
       e.preventDefault();
       if (!e.repeat) armer();
       return;
@@ -7922,7 +8035,8 @@ function mysLancer(cb, fic) {
     clavier();
   };
   const haut = e => {
-    if (e.key == ' ') return ((C.spin = ctl.kx * 0.8), lancer());
+    if (e.key == ' ') return;
+    if (e.key == 'e' || e.key == 'E') return ((C.spin = (ctl.kx || ctl.kt) * 0.8), lancer());
     touches[e.key.length == 1 ? e.key.toLowerCase() : e.key] = 0;
     clavier();
   };
