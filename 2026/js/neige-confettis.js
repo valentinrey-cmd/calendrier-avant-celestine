@@ -57,7 +57,7 @@ function confetti() {
 (function loop() {
   cx.clearRect(0, 0, cv.width, cv.height);
   if (!matchMedia('(prefers-reduced-motion:reduce)').matches) {
-    const hz = HEART() && !document.body.classList.contains('playing');
+    const hz = HEART() && !document.body.classList.contains('playing') && !document.getElementById('v3z'); // pause pendant un objet 3D (js/vue-3d.js)
     cx.fillStyle = '#fffb';
     if (hz)
       F.forEach((f, i) => {

@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Objets 3D : on les fait tourner du doigt sans à-coups
+- Glisser le doigt vers le haut ou le bas ne faisait pas basculer l'objet (sur iPad, la fenêtre défilait à la place), et un petit glissement faisait faire un tiers de tour. Maintenant l'objet suit le doigt dans tous les sens, deux fois plus doucement, sans pouvoir passer complètement dessous.
+- L'objet arrête de tourner tout seul dès qu'on le touche (avant, la rotation automatique repartait et « luttait » contre le doigt).
+- Les cœurs et cadeaux qui tombent en fond se mettent en pause tant qu'un objet 3D est ouvert, pour que la tablette reste fluide.
+- Version : 1795773809
+- Fichiers : `2026/js/vue-3d.js`, `2026/js/neige-confettis.js`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Objets en 3D (Meshy) et le vrai bracelet à un seul cœur
 - **Le bracelet est maintenant le vrai** (Histoire d'Or, « Carpantus ») : plaqué or, maille forçat, **un seul cœur rose** taillé et serti griffes. L'histoire est adaptée partout :
   - le titre devient « Dossier n°24 · Le bracelet au cœur rose » (écran de démarrage, logo, onglet du navigateur, appli installée, CGU, Paramètres, dossier) ;

@@ -63,7 +63,7 @@ const v3Pos = p => p.map(v => v + 'm').join(' ');
 function v3MV(id, o = {}) {
   const M = OBJ3D[id],
     D = S.det || {};
-  return `<model-viewer class="v3-mv" src="${M.f}" alt="${esc(M.t)}" camera-controls touch-action="pan-y" auto-rotate auto-rotate-delay="2500" rotation-per-second="18deg" interaction-prompt="none" environment-image="neutral" exposure="1.15" shadow-intensity="1" camera-orbit="${M.o}">${(
+  return `<model-viewer class="v3-mv" src="${M.f}" alt="${esc(M.t)}" camera-controls touch-action="none" orbit-sensitivity="0.5" interpolation-decay="110" min-camera-orbit="auto 15deg auto" max-camera-orbit="auto 165deg auto" auto-rotate rotation-per-second="14deg" interaction-prompt="none" environment-image="neutral" exposure="1.15" shadow-intensity="1" camera-orbit="${M.o}">${(
     M.det || []
   )
     .map((d, i) => `<span slot="hotspot-${i}" class="v3-hs${D['v3_' + id + i] ? ' on' : ''}" data-position="${v3Pos(d)}"><b>${i + 1}</b></span>`)
@@ -97,6 +97,7 @@ function vue3d(id, o = {}) {
       z.innerHTML = v3MV(id, o) + '<p class="v3-load">⏳ Chargement de l’objet en 3D…</p>';
       const mv = z.querySelector('model-viewer'),
         ld = z.querySelector('.v3-load');
+      v3Stop(mv);
       mv.addEventListener('load', () => ld && ld.remove());
       mv.addEventListener('error', () => ld && (ld.textContent = '😕 L’objet n’a pas pu s’afficher. Réessaie avec une connexion.'));
       if (n) v3Toucher(mv, id);
@@ -111,6 +112,8 @@ function vue3d(id, o = {}) {
   } catch (_) {}
 }
 
+// dès que Célestine le touche, l'objet arrête de tourner tout seul (sinon il « lutte » contre le doigt)
+const v3Stop = mv => mv.addEventListener('camera-change', e => e.detail && e.detail.source == 'user-interaction' && (mv.autoRotate = false));
 // toucher le modèle (sans le faire tourner) : on cherche le détail le plus proche, à l'écran
 function v3Toucher(mv, id) {
   let x0 = 0,
@@ -175,6 +178,7 @@ function v3Gravure(carte) {
       w.innerHTML = v3MV('bracelet', { grav: '✨ gravé ici' }) + '<small class="v3-tourne">🔄 Tourne-le du doigt</small>';
       const mv = w.querySelector('model-viewer');
       mv.setAttribute('camera-orbit', '200deg 55deg auto');
+      v3Stop(mv);
       // toucher le bracelet ne fait pas avancer la scène
       ['pointerdown', 'click', 'touchstart'].forEach(t => mv.addEventListener(t, e => e.stopPropagation()));
       mv.addEventListener('load', () => {
