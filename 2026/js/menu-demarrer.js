@@ -708,25 +708,16 @@ function smOpen(force, at) {
     'Astuce : le brigadier Gérald ne sait pas garder un secret.',
     'Astuce : ne fais confiance à personne… sauf à Pépin.'
   ];
-  // Le fichier mystère n'est demandé qu'une seule fois par appareil : une fois ouvert, une marque est gardée
-  // (CLE_SAUVEGARDE + '_mys', posée par mysLire) et on peut relancer ou commencer une partie sans lui.
-  const mysDeja = () => {
-    try {
-      return !!localStorage.getItem(CLE_SAUVEGARDE + '_mys');
-    } catch (_) {
-      return false;
-    }
-  };
+  // Le fichier mystère n'est demandé qu'une seule fois par appareil : à chaque lancement, on regarde si ses musiques
+  // sont bien rangées sur l'appareil (MDB, js/musiques-jeux.js). Si oui, on passe ; sinon (premier lancement, ou musiques
+  // effacées par l'appareil), on le demande.
   const mysGate = go => {
-    if (window.__mysOk || window.__mysSkip || mysDeja()) return go();
+    if (window.__mysOk || window.__mysSkip) return go();
     MDB.all()
       .then(o => {
         const n = Object.keys(o || {}).filter(k => o[k] && o[k].blob).length;
         if (n) {
           window.__mysOk = 1;
-          try {
-            localStorage.setItem(CLE_SAUVEGARDE + '_mys', '1');
-          } catch (_) {}
           return go();
         }
         log('fichier mystère demandé');

@@ -39,7 +39,11 @@ const SONGS = {
   b30: { t: 'Combat final · dialogues', a: 'Musique au choix' },
   b31: { t: 'Combat final · scène de fin', a: 'Musique au choix' }
 };
-/* Les fichiers audio sont importés par Valentin (mode admin) et gardés uniquement sur cet appareil (IndexedDB) */
+/* Les fichiers audio (venus du fichier mystère, ou importés par Valentin en mode admin) sont gardés sur cet appareil (IndexedDB).
+   Ils y sont rangés en données brutes (ArrayBuffer) et redeviennent des fichiers audio (Blob) à la lecture : sur iPad et
+   iPhone, Safari n'arrive plus à lire un Blob rangé tel quel une fois l'appli fermée puis rouverte (bug de WebKit).
+   Les musiques rangées à l'ancienne (en Blob) sont converties au premier chargement si elles sont encore lisibles,
+   sinon elles sont retirées : le fichier mystère sera alors redemandé (voir mysGate, js/menu-demarrer.js). */
 const MDB = (() => {
   let dbp = null;
   const db = () =>
@@ -66,21 +70,54 @@ const MDB = (() => {
           t.onerror = () => rej(t.error);
         })
     );
+  const brut = async v => {
+    if (!v || !v.blob) return v;
+    const { blob, ...reste } = v;
+    return { ...reste, buf: await blob.arrayBuffer(), type: blob.type || '' };
+  };
+  const put = async (k, v) => {
+    const b = await brut(v);
+    return tx('readwrite', st => st.put(b, String(k)));
+  };
+  const del = k => tx('readwrite', st => st.delete(String(k)));
   return {
-    put: (k, v) => tx('readwrite', st => st.put(v, String(k))),
-    del: k => tx('readwrite', st => st.delete(String(k))),
-    all: () =>
-      tx('readonly', (st, set) => {
-        const o = {};
+    put,
+    del,
+    all: async () => {
+      const o = await tx('readonly', (st, set) => {
+        const r = {};
         const c = st.openCursor();
         c.onsuccess = () => {
           const x = c.result;
           if (x) {
-            o[x.key] = x.value;
+            r[x.key] = x.value;
             x.continue();
-          } else set(o);
+          } else set(r);
         };
-      })
+      });
+      for (const k in o) {
+        const v = o[k];
+        if (!v) continue;
+        if (v.buf) {
+          const { buf, type, ...reste } = v;
+          o[k] = { ...reste, blob: new Blob([buf], { type: type || '' }) };
+        } else if (v.blob) {
+          // rangée à l'ancienne : on la convertit si elle se lit encore, sinon on la retire
+          try {
+            const b = await brut(v);
+            await tx('readwrite', st => st.put(b, String(k)));
+            const { buf, type, ...reste } = b;
+            o[k] = { ...reste, blob: new Blob([buf], { type }) };
+          } catch (_) {
+            delete o[k];
+            try {
+              await del(k);
+            } catch (_) {}
+          }
+        }
+      }
+      return o;
+    }
   };
 })();
 async function id3Cover(blob) {
@@ -7654,10 +7691,6 @@ async function mysLire(f) {
     try {
       confetti();
       ding();
-    } catch (_) {}
-    // il ne sera plus jamais demandé sur cet appareil (vérifié par mysGate, js/menu-demarrer.js)
-    try {
-      localStorage.setItem(CLE_SAUVEGARDE + '_mys', '1');
     } catch (_) {}
     slog('🎁', `Ouvre le fichier mystère (${n} chansons)`);
     try {
