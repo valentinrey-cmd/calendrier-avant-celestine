@@ -12,8 +12,6 @@ import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.session.MediaSession;
@@ -24,7 +22,8 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Base64;
 
-/** Lecteur « système » : notification, écran verrouillé, casque, focus audio. La musique elle-même joue dans la WebView. */
+/** Lecteur « système » : notification, écran verrouillé, casque. La musique elle-même joue dans la WebView.
+ *  Le focus audio est géré par la WebView elle-même : ce service ne le demande pas (sinon il le vole à la page, qui se met en pause). */
 public class MusicService extends Service {
   static MusicService inst;
   static boolean playing = false;
@@ -33,24 +32,12 @@ public class MusicService extends Service {
   static long pos = 0, dur = 0;
   static Bitmap cover;
   MediaSession ms;
-  AudioManager am;
-  AudioFocusRequest afr;
   PowerManager.WakeLock wl;
-  boolean pausedByFocus = false, fg = false;
+  boolean fg = false;
 
   final BroadcastReceiver noisy = new BroadcastReceiver() {
     @Override public void onReceive(Context c, Intent i) { if (playing) MainActivity.cmd("pause"); }
   };
-  boolean hasFocus = false; // on ne redemande pas le focus à chaque mise à jour (sinon on le vole à la page en boucle)
-  long focusAt = 0; // moment de notre dernière demande de focus audio
-  final AudioManager.OnAudioFocusChangeListener focus = ch -> {
-    // juste après notre demande, une perte de focus vient de la WebView elle-même (la page qui lance la musique) : on l'ignore
-    if (SystemClock.elapsedRealtime() - focusAt < 3000) return;
-    if (ch != AudioManager.AUDIOFOCUS_GAIN) hasFocus = false;
-    if (ch == AudioManager.AUDIOFOCUS_LOSS || ch == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) { if (playing) { pausedByFocus = ch == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT; MainActivity.cmd("pause"); } }
-    else if (ch == AudioManager.AUDIOFOCUS_GAIN && pausedByFocus) { pausedByFocus = false; MainActivity.cmd("play"); }
-  };
-
   static void update(Context c, String t, String a, boolean p, long po, long du, String b64) {
     title = t == null ? "" : t; artist = a == null ? "" : a; playing = p; pos = po; dur = du;
     if (b64 != null && b64.length() > 0) {
@@ -66,7 +53,6 @@ public class MusicService extends Service {
   @Override public void onCreate() {
     super.onCreate();
     inst = this;
-    am = (AudioManager) getSystemService(AUDIO_SERVICE);
     NotificationManager nm = getSystemService(NotificationManager.class);
     if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CH) == null) {
       NotificationChannel ch = new NotificationChannel(CH, "Musique", NotificationManager.IMPORTANCE_LOW);
@@ -144,24 +130,12 @@ public class MusicService extends Service {
 
     if (playing) {
       if (!wl.isHeld()) wl.acquire(6 * 60 * 60 * 1000L);
-      if (!hasFocus) {
-        hasFocus = true;
-        focusAt = SystemClock.elapsedRealtime();
-        if (Build.VERSION.SDK_INT >= 26) {
-          if (afr == null) afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-            .setOnAudioFocusChangeListener(focus).build();
-          am.requestAudioFocus(afr);
-        } else am.requestAudioFocus(focus, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-      }
     } else if (wl.isHeld()) wl.release();
   }
 
   void shut() {
     playing = false;
     try { if (wl.isHeld()) wl.release(); } catch (Exception e) { }
-    hasFocus = false;
-    try { if (Build.VERSION.SDK_INT >= 26 && afr != null) am.abandonAudioFocusRequest(afr); else am.abandonAudioFocus(focus); } catch (Exception e) { }
     try { stopForeground(true); } catch (Exception e) { }
     getSystemService(NotificationManager.class).cancel(7);
     stopSelf();

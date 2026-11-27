@@ -3,6 +3,13 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Playlist Android : vraie cause trouvée (le focus audio)
+- **Constat** : certaines musiques (ex. « Loser ») se coupaient tout de suite dans la playlist mais jouaient en entier dans leur mini-jeu. Le suivi montrait « Pause du téléphone ignorée » puis « Musique coupée juste après le lancement ».
+- **Cause** : en mode playlist (et seulement là), la page prévient le lecteur « système » de l'appli Android que la musique joue (notification). Ce lecteur demandait alors le focus audio du téléphone et le volait à la WebView, qui gère déjà le sien : la WebView mettait la musique en pause. Les mini-jeux ne préviennent pas ce lecteur, d'où la différence.
+- **Correction de l'appli Android** (`MusicService.java`) : le service ne demande plus du tout le focus audio, c'est la WebView qui s'en charge. Le bricolage de la version précédente (délai de 3 s, focus une fois par écoute) est retiré. L'appli s'annonce avec `AventFocus/0` (`MainActivity.java`).
+- **En attendant la réinstallation** (`msync`, `js/musiques-jeux.js`) : avec l'ancienne appli (sans `AventFocus/0`), la page ne lui dit plus jamais « ça joue ». La playlist marche, mais la musique s'arrête quand on quitte l'appli, jusqu'à la réinstallation de l'APK.
+- Version **1795788165**. Fichiers : `2026/js/musiques-jeux.js`, `android/…/MusicService.java`, `android/…/MainActivity.java`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`.
+
 ## 2026-11-27 · Playlist sur Android : la musique ne se coupe plus toute seule au lancement
 - **Problème** : sur l'appli Android, en touchant ▶ dans la playlist, la musique se mettait tout de suite en pause (0:00, bouton revenu sur ▶).
 - **Cause probable** : le lecteur « système » de l'appli Android (notification, écran verrouillé) redemandait le focus audio du téléphone à chaque mise à jour. Il le volait ainsi à la page qui joue la musique, puis renvoyait un ordre « pause » à la page.

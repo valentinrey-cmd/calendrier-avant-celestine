@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     s.setTextZoom(100);
     s.setUseWideViewPort(true);
     s.setLoadWithOverviewMode(true);
-    s.setUserAgentString(s.getUserAgentString() + " AventApp/1");
+    s.setUserAgentString(s.getUserAgentString() + " AventApp/1 AventFocus/0");
     w.setOverScrollMode(View.OVER_SCROLL_NEVER);
     w.setWebViewClient(new WebViewClient() {
       @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {

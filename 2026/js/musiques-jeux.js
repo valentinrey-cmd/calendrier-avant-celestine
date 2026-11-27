@@ -780,11 +780,13 @@ const YTM = (() => {
     } catch (_) {}
     try {
       if (window.AventAndroid && AventAndroid.mediaUpdate) {
+        // l'ancienne appli Android (sans « AventFocus/0 ») vole le focus audio à la page quand on lui dit « ça joue » : la musique
+        // se coupe aussitôt. Avec elle, on ne lui dit jamais « ça joue » (la musique s'arrête alors quand on quitte l'appli).
         const send = c =>
           AventAndroid.mediaUpdate(
             sg.t,
             sg.a || '',
-            !au.paused,
+            !au.paused && /AventFocus\/0/.test(navigator.userAgent),
             (au.currentTime || 0) * 1000,
             (isFinite(au.duration) ? au.duration : 0) * 1000,
             c
