@@ -1813,7 +1813,7 @@ function vBoss(test, sp, so) {
             W = r.width,
             H = r.height,
             y0 = H * 0.64,
-            need = 5;
+            need = 3;
           const V = im(VIMG.v, 'vb-pzv vv'),
             SP = el('div', 'vb-pzsay', ''),
             MSG = el('div', 'vb-pzmsg', ''),
@@ -1861,8 +1861,8 @@ function vBoss(test, sp, so) {
               setTimeout(() => done(v), v == 'ok' ? 900 : 300);
             };
             while (!stop && alive) {
-              const n = round < 2 ? 3 : round < 4 ? 4 : 5,
-                bw = Math.min(W * (n == 3 ? 0.25 : n == 4 ? 0.2 : 0.165), 100),
+              const n = round < 2 ? 3 : 4,
+                bw = Math.min(W * (n == 3 ? 0.25 : 0.2), 100),
                 gp = (W - bw * n) / (n + 1),
                 sx = q => gp + q * (bw + gp);
               L.querySelectorAll('.vb-pzb,.vb-pzjunk').forEach(e => e.remove());
@@ -1892,7 +1892,7 @@ function vBoss(test, sp, so) {
                   'Facile, celle-là. 😇',
                   'Une boîte de plus. 😏',
                   'Ça se corse…',
-                  'Cinq boîtes. Bonne chance !',
+                  'Quatre boîtes. Bonne chance !',
                   'Dernière chance…'
                 ][Math.min(5, round)]
               );
@@ -1906,19 +1906,13 @@ function vBoss(test, sp, so) {
               B[prize].classList.remove('open');
               await sleep(420);
               BR.classList.remove('on');
-              const sw = 5 + round * 2,
-                dur = Math.max(0.25, 0.58 - round * 0.065);
+              const sw = Math.min(7, 4 + round),
+                dur = Math.max(0.42, 0.62 - round * 0.04);
               B.forEach(q => q.style.setProperty('--dur', dur + 's'));
               V.classList.add('mix');
               for (let k = 0; k < sw && !stop && alive; k++) {
                 const ix = [...Array(n).keys()].sort(() => Math.random() - 0.5),
-                  dbl = round >= 3 && n >= 4 && Math.random() < 0.45,
-                  pairs = dbl
-                    ? [
-                        [ix[0], ix[1]],
-                        [ix[2], ix[3]]
-                      ]
-                    : [[ix[0], ix[1]]];
+                  pairs = [[ix[0], ix[1]]];
                 for (const [a, c] of pairs) {
                   const ba = B[a],
                     bc = B[c],

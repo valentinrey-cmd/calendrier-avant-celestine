@@ -3,6 +3,12 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Fichier mystère demandé une seule fois, boîtes à pizza plus faciles
+- **Fichier mystère** : il n'est plus demandé qu'une seule fois par appareil. Dès qu'il est ouvert, une marque est gardée (`avent_v5_mys`, ou `avent_test_mys` pour la version de test). Ensuite on peut relancer l'appli ou commencer une nouvelle partie sans lui, même si l'iPad a vidé la mémoire des chansons. Avant, le jeu ne savait qu'il avait été ouvert qu'en retrouvant ses chansons. Une remise à zéro générale (`REMISE_A_ZERO`) le redemande, comme le reste.
+- **Boss final, les boîtes à pizza** plus faciles : 3 bonnes boîtes à trouver au lieu de 5, jamais plus de 4 boîtes (au lieu de 5), moins de mélanges (4 à 7 au lieu de 5 à 13), plus lents, et plus jamais deux échanges en même temps.
+- Version : 1795775384
+- Fichiers : `2026/js/menu-demarrer.js`, `2026/js/musiques-jeux.js`, `2026/js/boss/boss-final.js`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Animations 3D : film de la gravure, souvenirs qui tombent du ciel, figurines qui dansent
 - **Boss final, la gravure en film** : dans la carte de la gravure, le bracelet 3D arrive de côté, la caméra en fait le tour au ralenti, plonge sur l'endroit gravé (flash, paillettes dorées, étiquette « ✨ gravé ici »), puis recule. Si Célestine touche le bracelet, le film s'arrête et elle le tourne elle-même. Le toucher ne fait toujours pas avancer la scène.
 - **Vitrine des Trésors, nouveaux souvenirs** : un souvenir débloqué mais pas encore ouvert saute et brille dans la vitrine (« ✨ Nouveau ! »). À l'ouverture, il tombe du ciel en tournant, rebondit, puis un halo doré, des paillettes et la bannière « ✨ Nouveau souvenir ! » apparaissent. Les souvenirs déjà vus sont gardés dans `S.v3Vus`.

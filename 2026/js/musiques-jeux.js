@@ -7655,6 +7655,10 @@ async function mysLire(f) {
       confetti();
       ding();
     } catch (_) {}
+    // il ne sera plus jamais demandé sur cet appareil (vérifié par mysGate, js/menu-demarrer.js)
+    try {
+      localStorage.setItem(CLE_SAUVEGARDE + '_mys', '1');
+    } catch (_) {}
     slog('🎁', `Ouvre le fichier mystère (${n} chansons)`);
     try {
       dispatchEvent(new Event('mysdone'));
