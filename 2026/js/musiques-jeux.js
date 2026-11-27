@@ -1718,7 +1718,7 @@ function mysLancer(cb, fic) {
   const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
     BORD = 0.6; // gouttière (le bas du toit) : au-delà, le fichier tombe du toit
   const taille = () => {
-    dpr = Math.min(2, devicePixelRatio || 1);
+    dpr = Math.min(1.5, devicePixelRatio || 1); // 1,5 suffit (à peine moins fin que 2, mais bien plus fluide sur téléphone)
     W = innerWidth;
     H = innerHeight;
     cv.width = W * dpr;
@@ -5075,10 +5075,45 @@ function mysLancer(cb, fic) {
     if (C.glisse) return { a: 'glisse', k: 0.35 };
     return pas();
   };
+  // La figurine 3D du personnage en cours (C) : calculée par prepa3D() avant la scène, collée ici à son tour
+  const calc3D = qui => {
+    if (!FIG3D.pret(qui) || P(C.x, C.y, C.z)[3] < 0.5) return;
+    const LK = qui == 'valentin' ? TENUE.valentin : TENUE.celestine,
+      dz = qui == 'celestine' ? danse() : null;
+    C.dz3 = dz;
+    const m = FIG3D.rendre(
+      qui,
+      {
+        x: C.x,
+        y: C.y,
+        z: C.z,
+        phi: C.phi,
+        taille: LK.taille,
+        objet: C.tient && F.al > 0 ? { cle: vis.k + (vis.nom || '') + (vis.noir ? '#' : ''), faire: texFichier, vit: vis.noir } : null
+      },
+      { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr },
+      geste3D(qui, dz)
+    );
+    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main()) ; il est dessiné en 3D, dans sa moufle
+  };
+  // les deux figurines, calculées ensemble au début de l'image (une seule recopie de l'image 3D par image : bien plus fluide)
+  const prepa3D = sous => {
+    FIG3D.debut();
+    calc3D('celestine');
+    if (sous) return;
+    const moi = C;
+    VAL.rit = !!moi.ko; // Célestine est K.O. : la figurine 3D de Valentin rigole
+    C = VAL;
+    try {
+      calc3D('valentin');
+    } finally {
+      C = moi;
+    }
+  };
   const figurine3D = (t, LK, qui) => {
     if (P(C.x, C.y, C.z)[3] < 0.5) return;
     const [sx, sy, ss] = P(C.x, C.base || 0, C.z),
-      dz = qui == 'celestine' ? danse() : null;
+      dz = qui == 'celestine' ? C.dz3 : null;
     if (dz && C.danse) {
       // un projecteur sur la piste de danse
       const g = c.createRadialGradient(sx, sy, 2, sx, sy, ss * 1.1);
@@ -5096,21 +5131,7 @@ function mysLancer(cb, fic) {
       c.ellipse(sx, sy, ss * 0.26, ss * 0.08, 0, 0, 7);
       c.fill();
     }
-    const m = FIG3D.dessine(
-      c,
-      qui,
-      {
-        x: C.x,
-        y: C.y,
-        z: C.z,
-        phi: C.phi,
-        taille: LK.taille,
-        objet: C.tient && F.al > 0 ? { cle: vis.k + (vis.nom || '') + (vis.noir ? '#' : ''), faire: texFichier, vit: vis.noir } : null
-      },
-      { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr },
-      geste3D(qui, dz)
-    );
-    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main()) ; il est dessiné en 3D, dans sa moufle
+    FIG3D.colle(c, qui);
   };
   const celestine = (t, LK = TENUE.celestine) => {
     const qui3 = LK === TENUE.valentin ? 'valentin' : 'celestine';
@@ -7984,7 +8005,6 @@ function mysLancer(cb, fic) {
   const dessineValentin = t => {
     aura(t);
     const moi = C;
-    VAL.rit = !!moi.ko; // Célestine est K.O. : la figurine 3D de Valentin rigole
     C = VAL; // on réutilise le même personnage en volume, avec la tenue de Valentin
     try {
       celestine(t, TENUE.valentin);
@@ -8044,12 +8064,12 @@ function mysLancer(cb, fic) {
     const K = C.chute,
       dc = K ? T() - K.t : 0,
       vis3 = (C.charge || ctl.vise) && !fin;
-    // (ctl.pit : on regarde plus haut ou plus bas en glissant le doigt / la souris de haut en bas ; la caméra tourne autour
-    // d'elle : plus haute quand on regarde vers le bas)
+    // (ctl.pit, de -1 à 1 : en glissant le doigt / la souris de haut en bas, la caméra monte ou descend doucement autour
+    // d'elle, en s'inclinant à peine : l'image reste droite, rien ne se déforme)
     let cible = {
       yaw: ctl.yaw,
-      h: (vis3 ? -1.2 : -1.0) + ctl.pit * 0.9,
-      p: (vis3 ? 0.1 : 0.15) + ctl.pit,
+      h: (vis3 ? -1.2 : -1.0) + ctl.pit * (ctl.pit > 0 ? 1.4 : 0.6),
+      p: (vis3 ? 0.1 : 0.15) + ctl.pit * 0.12,
       kx: 7,
       kh: 5,
       d: vis3 ? 1.65 : 2.3,
@@ -8207,6 +8227,7 @@ function mysLancer(cb, fic) {
       if (CHAT.e) L.push([prof(CHAT.x, CHAT.z) - (CHAT.y > TOP - 0.3 ? 0.05 : 0), () => chatDessin(t)]);
       PIG.forEach(p => L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
     }
+    prepa3D(sous);
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     viseeTrace();
     particules(dt);
@@ -8254,8 +8275,8 @@ function mysLancer(cb, fic) {
     cv.setPointerCapture(e.pointerId);
   });
   // regarder en haut / en bas (le doigt ou la souris de haut en bas), dans des limites raisonnables
-  const tangage = dy => (ctl.pit = Math.max(-0.5, Math.min(0.42, ctl.pit + dy)));
-  const souris = e => document.pointerLockElement === cv && ((ctl.yaw += e.movementX * 0.0042), tangage(e.movementY * 0.0035));
+  const tangage = dy => (ctl.pit = Math.max(-1, Math.min(1, ctl.pit + dy)));
+  const souris = e => document.pointerLockElement === cv && ((ctl.yaw += e.movementX * 0.0042), tangage(e.movementY * 0.004));
   document.addEventListener('mousemove', souris);
   // les boutons de la souris (souris bloquée) : clic gauche maintenu = la jauge, relâché = le lancer ; clic droit maintenu = viser
   const clicBas = e => {
@@ -8279,7 +8300,7 @@ function mysLancer(cb, fic) {
   cv.addEventListener('pointermove', e => {
     if (!regard || e.pointerId != regard.id) return;
     ctl.yaw += (e.clientX - regard.x) * 0.0075;
-    tangage((e.clientY - regard.y) * 0.006);
+    tangage((e.clientY - regard.y) * 0.007);
     regard.x = e.clientX;
     regard.y = e.clientY;
   });

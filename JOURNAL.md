@@ -4,6 +4,11 @@
 
 ---
 
+## 27/11/2026 · Toit : beaucoup plus fluide, regard haut/bas plus doux (version 1795806271)
+- **Regarder en haut / en bas :** fini l'image qui se déforme : la caméra monte ou descend doucement autour d'elle, en s'inclinant à peine.
+- **Fluidité (rien ne change à l'écran) :** les deux figurines 3D sont calculées ensemble dans une seule image de travail, juste assez grande, puis collées (une seule recopie par image au lieu de deux, sur une image 1024 × 1024) ; plus d'anticrénelage matériel (l'image 3D est déjà calculée plus fine que l'écran) ; figurines allégées (31 000 → 14 000 triangles, même squelette, mêmes animations, même aspect) ; image du jeu à 1,5 × la finesse de l'écran au lieu de 2. Mesuré : environ 3 fois plus d'images par seconde.
+- Fichiers : `2026/js/toit-figurines-3d.js`, `2026/js/musiques-jeux.js`, `2026/3d/toit-celestine.glb`, `2026/3d/toit-valentin.glb`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : regarder en haut et en bas, échelles de la ruelle ; boss final et métro simplifiés (version 1795805562)
 - **Toit :** on peut regarder en haut et en bas (glisser le doigt ou bouger la souris de haut en bas).
 - **Échelles de la ruelle :** quand elle remonte entre les deux immeubles, la caméra reste dans la ruelle et la filme de biais : on voit l'échelle (avant, la caméra était dans le mur d'en face et l'échelle cachée).

@@ -2,25 +2,35 @@
 // Les figurines ont été faites avec Meshy à partir de leurs photos, avec un squelette et des animations
 // (fichiers 3d/toit-celestine.glb et 3d/toit-valentin.glb, une animation par geste : voir GESTES3D).
 // Elles sont dessinées par un petit moteur 3D (3d/moteur-3d.min.js = three.js), chargé seulement à l'ouverture du toit.
-// Chaque personnage est rendu à part, dans un petit cadre autour de lui, avec exactement la caméra du jeu
-// (même position, même direction, même focale), puis collé dans l'image du jeu à sa place dans l'ordre de profondeur.
+// Chaque personnage est rendu dans un petit cadre autour de lui, avec exactement la caméra du jeu (même position, même
+// direction, même focale), puis collé dans l'image du jeu à sa place dans l'ordre de profondeur.
+// Pour aller vite : les deux personnages sont rendus côte à côte dans la même image de travail (une « fente » chacun),
+// AVANT d'être collés : la recopie de l'image 3D vers l'image du jeu (le plus coûteux) ne se fait qu'une fois par image.
 // Tant que la 3D n'est pas prête (ou si elle ne peut pas se charger), le jeu garde ses personnages dessinés.
 //
 // Le jeu (mysLancer, js/musiques-jeux.js) appelle :
 //   FIG3D.charge()                         au début ;
 //   FIG3D.pret(qui)                        vrai quand la figurine 'celestine' ou 'valentin' est prête ;
-//   FIG3D.dessine(c, qui, P, cam, g)       pour la dessiner, et récupérer la position de sa main droite (pour le fichier) ;
+//   FIG3D.debut()                          au début de chaque image du jeu ;
+//   FIG3D.rendre(qui, P, cam, g)           pour la calculer (avant de dessiner la scène), et récupérer la position de sa
+//                                          main droite (pour le fichier) ;
+//   FIG3D.colle(c, qui)                    pour la coller dans l'image du jeu, à son tour dans l'ordre de profondeur ;
 //      P = { x, y, z, phi, taille, pench, objet } : sa place dans le monde (y = ses pieds), son orientation, sa taille,
 //          et le fichier qu'il tient (voir objet) ;
 //      cam = { x, y, z, yaw, p, f, cx, cy, W, H, dpr } : la caméra du jeu ;
 //      g = { a: nom de l'animation, k: avancement de 0 à 1 (geste réglé par le jeu) ou absent (en boucle), v: vitesse }.
 const FIG3D = (() => {
   const FIC = { celestine: '3d/toit-celestine.glb', valentin: '3d/toit-valentin.glb' },
-    BUF = 1024, // taille maximale (en pixels) du cadre de rendu d'un personnage
+    BUF = 768, // taille maximale (en pixels) du cadre de rendu d'un personnage
+    NET = 1.5, // netteté maximale : 1,5 pixel de rendu par pixel d'écran (au-delà, ça ne se voit pas et ça coûte cher)
+    PAS = 128; // l'image de travail grandit ou rétrécit par paliers (la redimensionner coûte cher)
     HAUT = 1.62; // hauteur d'un personnage du jeu (taille 1), en mètres
   let etat = 'rien',
     T,
     ren,
+    taille = PAS, // taille actuelle de l'image de travail (carrée)
+    besoin = 0, // le plus grand cadre demandé ces dernières images
+    nb = 0,
     scene,
     camera;
   const fig = {};
@@ -39,10 +49,13 @@ const FIG3D = (() => {
       .then(() => {
         T = window.T3;
         const cv = document.createElement('canvas');
-        cv.width = cv.height = BUF;
-        ren = new T.WebGLRenderer({ canvas: cv, alpha: true, antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: false });
+        cv.width = taille * 2; // deux fentes côte à côte : Célestine, Valentin
+        cv.height = taille;
+        // (l'image est recopiée tout de suite après chaque rendu : pas besoin de la garder en mémoire ; pas d'anticrénelage
+        // matériel non plus : elle est calculée 1,5 fois plus fine que l'écran puis réduite, ce qui lisse déjà les bords)
+        ren = new T.WebGLRenderer({ canvas: cv, alpha: true, antialias: false, preserveDrawingBuffer: false, premultipliedAlpha: false });
         ren.setPixelRatio(1);
-        ren.setSize(BUF, BUF, false);
+        ren.setSize(taille * 2, taille, false);
         ren.outputColorSpace = T.SRGBColorSpace;
         ren.toneMapping = T.ACESFilmicToneMapping;
         ren.toneMappingExposure = 1.05;
@@ -187,10 +200,14 @@ const FIG3D = (() => {
 
   // le personnage, rendu dans un cadre autour de lui puis collé dans l'image du jeu.
   // Monde du jeu (x à droite, y en haut, z) → monde 3D (x, y, -z).
-  const tmp = { v: null };
-  const dessine = (c, qui, P, cam, g) => {
+  const tmp = { v: null },
+    FENTE = { celestine: 0, valentin: 1 };
+  let image = 0; // le numéro de l'image du jeu
+  const debut = () => image++;
+  const rendre = (qui, P, cam, g) => {
     const F = fig[qui];
     if (!F) return null;
+    F.cadre = null;
     anime(F, g || {});
     const o = F.o,
       s = P.taille || 1,
@@ -229,9 +246,18 @@ const FIG3D = (() => {
     if (x1 - x0 < 2 || y1 - y0 < 2) return null;
     const w = x1 - x0,
       h = y1 - y0,
-      k = Math.min(cam.dpr, BUF / w, BUF / h),
+      k = Math.min(cam.dpr, NET, BUF / w, BUF / h),
       pw = Math.max(1, Math.round(w * k)),
       ph = Math.max(1, Math.round(h * k));
+    // l'image de travail juste assez grande (par paliers) : plus elle est petite, moins la recopie coûte
+    besoin = Math.max(besoin, pw, ph);
+    const voulu = Math.min(BUF, Math.ceil(besoin / PAS) * PAS);
+    if (voulu > taille || (++nb > 90 && voulu < taille)) {
+      taille = voulu;
+      ren.setSize(taille * 2, taille, false);
+      for (const q in fig) fig[q].cadre = null; // l'image de travail est effacée : l'autre personnage sera recalculé
+    }
+    if (nb > 90) ((nb = 0), (besoin = Math.max(pw, ph)));
     // projection pour ce cadre seulement (même focale et même centre d'image que le jeu)
     const n = 0.05,
       fa = 200,
@@ -246,12 +272,13 @@ const FIG3D = (() => {
     e[14] = (-2 * fa * n) / (fa - n);
     camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
     for (const q in fig) if (fig[q] !== F) ((fig[q].o.visible = false), fig[q].obj && (fig[q].obj.visible = false));
-    ren.setViewport(0, 0, pw, ph);
-    ren.setScissor(0, 0, pw, ph);
+    const ox = (FENTE[qui] || 0) * taille;
+    ren.setViewport(ox, 0, pw, ph);
+    ren.setScissor(ox, 0, pw, ph);
     ren.setScissorTest(true);
     ren.clear();
     ren.render(scene, camera);
-    c.drawImage(ren.domElement, 0, BUF - ph, pw, ph, x0, y0, w, h);
+    F.cadre = { ox, pw, ph, x0, y0, w, h, image };
     o.visible = false;
     if (F.obj) F.obj.visible = false;
     // la main droite, dans le monde du jeu
@@ -261,5 +288,10 @@ const FIG3D = (() => {
     F.main.getWorldPosition(tmp.v);
     return { x: tmp.v.x, y: tmp.v.y, z: -tmp.v.z };
   };
-  return { charge, pret, dessine };
+  const colle = (c, qui) => {
+    const F = fig[qui],
+      K = F && F.cadre;
+    if (K && K.image == image) c.drawImage(ren.domElement, K.ox, taille - K.ph, K.pw, K.ph, K.x0, K.y0, K.w, K.h);
+  };
+  return { charge, pret, debut, rendre, colle };
 })();
