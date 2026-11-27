@@ -4,6 +4,14 @@
 
 ---
 
+## 27/11/2026 · Toit : échelles, Valentin qui suit, K.O. et ruelle corrigés (version 1795804226)
+- **Échelles :** on ne les voit plus à travers les immeubles (en entier seulement depuis la rue ou la ruelle devant elles, sinon juste le haut qui dépasse des toits), reflet plus discret.
+- **Montée :** elle est bien sur l'échelle (plus devant, à côté) ; nouvelle animation Meshy plus lente aux grands gestes, avec un plan coupé : à peu près la même durée.
+- **Valentin :** sur son toit, il la suit partout en courant (plus de retour à sa place, plus de glissade) et lui rend le fichier directement ; quand elle repart, il retourne à sa place et relance comme avant. Ses jambes marchent ou courent dès qu'il bouge.
+- **Patate :** après le K.O., plus de glissade sur un pied (la glissade, le lancer ou le geste en cours sont annulés) ; on ne peut plus armer ni faire de geste pendant le K.O.
+- **Ruelle :** l'immeuble collé au bout de celui de Valentin est déplacé : une ruelle de 1,6 m, et la chute ne traverse plus son mur.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/3d/toit-celestine.glb`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : incohérences corrigées, échelle de secours, souris sur PC (version 1795795154)
 - **Empreintes :** plus de traces de pas en l'air (saut, vide) ni de bruit de pas en l'air ; les traces de chaque toit sont dessinées juste après lui, donc on ne les voit plus à travers les cheminées.
 - **Valentin :** ses pieds avancent à sa vitesse (il ne glisse plus) et il laisse des empreintes sur son toit.

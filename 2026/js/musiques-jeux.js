@@ -3727,7 +3727,13 @@ function mysLancer(cb, fic) {
         Object.assign(K, { e: 'secoue', te: T() });
         parle(C, ['Tu vas me le payer ! 😤', 'Même pas mal ! 😝', 'REVANCHE ! 💪'][Math.floor(Math.random() * 3)], 1.8);
       }
-    } else if (d > KO_SEC) C.ko = 0;
+    } else if (d > KO_SEC) {
+      // fini : plus de glissade, de lancer ou de geste restés en suspens (sinon elle repartait en glissant sur un pied)
+      C.ko = 0;
+      Object.assign(C, { glisse: null, charge: 0, emote: null, saute: 0, air: null, vite: 0, v: 0, vy: 0, pTir: null, ange: 0 });
+      btn.classList.remove('on');
+      btn.style.setProperty('--p', 0);
+    }
   };
   // la « patate » de Valentin : une traînée de feu et d'énergie derrière le fichier
   const trainee = () => {
@@ -4494,7 +4500,7 @@ function mysLancer(cb, fic) {
         C.z += K.vz * dt;
         K.vx *= 1 - Math.min(1, dt * 0.5);
         K.vz *= 1 - Math.min(1, dt * 0.5);
-        if (K.rue) C.x = Math.max(9.0, Math.min(10.28, C.x));
+        if (K.rue) C.x = Math.max(K.rue[0], Math.min(K.rue[1], C.x));
         if (Math.hypot(K.vx, K.vz) > 0.3) {
           const vise = Math.atan2(K.vx, K.vz);
           C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 6);
@@ -4525,19 +4531,20 @@ function mysLancer(cb, fic) {
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
   // Les échelles de secours, sur les façades des deux immeubles : le pied du mur (x, z) et le côté de la rue (n)
+  // (g : la largeur de la rue ou de la ruelle devant le mur, d'où on peut la voir en entier)
   const ECH = [
-    { x: -6, z: 0.6, n: [0, -1] },
-    { x: 0, z: 0.6, n: [0, -1] },
-    { x: 6, z: 0.6, n: [0, -1] },
-    { x: -9, z: 4.5, n: [-1, 0] },
-    { x: 9, z: 2.6, n: [1, 0] },
-    { x: 9, z: 6.6, n: [1, 0] },
-    { x: 10.4, z: 4.6, n: [-1, 0] },
-    { x: 12.6, z: 0.6, n: [0, -1] },
-    { x: 17, z: 0.6, n: [0, -1] },
-    { x: 19, z: 4.5, n: [1, 0] }
+    { x: -6, z: 0.6, n: [0, -1], g: 9.5 },
+    { x: 0, z: 0.6, n: [0, -1], g: 9.5 },
+    { x: 6, z: 0.6, n: [0, -1], g: 9.5 },
+    { x: -9, z: 4.5, n: [-1, 0], g: 9 },
+    { x: 9, z: 2.6, n: [1, 0], g: 1.4 },
+    { x: 9, z: 6.6, n: [1, 0], g: 1.4 },
+    { x: 10.4, z: 4.6, n: [-1, 0], g: 1.4 },
+    { x: 12.6, z: 0.6, n: [0, -1], g: 9.5 },
+    { x: 17, z: 0.6, n: [0, -1], g: 9.5 },
+    { x: 19, z: 4.5, n: [1, 0], g: 1.5 }
   ];
-  const ECH_D = 0.32; // elle grimpe à 32 cm du mur
+  const ECH_D = 0.24; // elle grimpe à 24 cm du mur, mains et pieds sur les barreaux (à 14 cm du mur)
   // Après une chute : étalée dans la neige de la rue, elle se relève, marche jusqu'à l'échelle la plus proche (sur le mur
   // d'où elle est tombée), grimpe, et enjambe le haut pour revenir sur le toit
   const remonte = (dt, K) => {
@@ -4585,13 +4592,13 @@ function mysLancer(cb, fic) {
     C.v = 0;
     C.amp = 0;
     if (K.e == 'grimpe') {
-      // barreau après barreau, à la vitesse de ses bras et de ses jambes (0,8 m/s) ; comme au cinéma, au bout de 2,5 s,
-      // un plan coupé la montre tout près du haut (sinon il faudrait 12 s pour monter les 9,6 m de l'immeuble)
+      // barreau après barreau, à la vitesse de ses bras et de ses jambes (de grands gestes, 0,3 m/s) ; comme au cinéma,
+      // au bout de 2,2 s, un plan coupé la montre tout près du haut (sinon il faudrait 30 s pour monter les 9,6 m)
       C.x = bx;
       C.z = bz;
       C.y = Math.min(-0.9, C.y + ECH_V * dt);
-      if (!K.coupe && tt - K.te > 2.5 && C.y < -3) ((K.coupe = 1), (C.y = -2.6), Object.assign(V, { h: C.y + 1.9 - CAM }));
-      if ((K.bar = (K.bar || 0) + ECH_V * dt) > 0.3) ((K.bar = 0), bruit('pas', 0.35));
+      if (!K.coupe && tt - K.te > 2.2 && C.y < -3) ((K.coupe = 1), (C.y = -1.75), Object.assign(V, { h: C.y + 1.9 - CAM }));
+      if ((K.bar = (K.bar || 0) + ECH_V * dt) > 0.16) ((K.bar = 0), bruit('pas', 0.35));
       if (C.y >= -0.9) Object.assign(K, { e: 'fin', te: tt });
     } else if (K.e == 'fin') {
       // elle enjambe le rebord (l'animation la monte de 90 cm) et pose le pied sur le toit
@@ -4607,15 +4614,18 @@ function mysLancer(cb, fic) {
     }
   };
   const ECH_FIN = 1.6, // secondes pour enjamber le haut de l'échelle
-    ECH_V = 0.8; // vitesse de montée (m/s), celle de l'animation « echelle » jouée 2,4 fois plus vite
+    ECH_V = 0.305; // vitesse de montée (m/s) : celle de l'animation « echelle » (32 cm par boucle de 1,63 s) jouée 1,6 fois plus vite
   // le dessin d'une échelle : deux montants et des barreaux, du trottoir jusqu'au-dessus du rebord du toit
   // (vue depuis le toit, on n'en voit que le haut, qui dépasse du rebord)
   const echelle = E => {
     const [nx, nz] = E.n,
       tx = -nz,
       tz = nx,
-      dehors = (V.x - E.x) * nx + (V.z - E.z) * nz > 0,
-      y0 = dehors ? SOL : -0.05,
+      dn = (V.x - E.x) * nx + (V.z - E.z) * nz, // la caméra devant le mur (dans la rue ou la ruelle) : on la voit en entier
+      enFace = dn > 0 && dn < E.g,
+      haut = CAM + V.h > 0.2; // au-dessus des toits : on ne voit que le haut, qui dépasse du rebord
+    if (!enFace && !haut) return; // cachée par les immeubles
+    const y0 = enFace ? SOL : -0.05,
       pt = (u, y, e = 0.14) => P(E.x + nx * e + tx * u, y, E.z + nz * e + tz * u),
       trait = (a, b, l, col) => {
         if (a[3] < 0.25 || b[3] < 0.25) return;
@@ -4633,7 +4643,7 @@ function mysLancer(cb, fic) {
     // les montants, qui se recourbent au-dessus du rebord vers le toit
     [-0.22, 0.22].forEach(u => {
       trait(pt(u, y0), pt(u, 0.95), 0.04, '#2b3046');
-      trait(pt(u, y0), pt(u, 0.95), 0.015, 'rgba(190,205,240,0.5)'); // reflet de la lune sur le métal
+      trait(pt(u, y0), pt(u, 0.95), 0.012, 'rgba(160,175,215,0.22)'); // un léger reflet de la lune sur le métal
       trait(pt(u, 0.95), pt(u, 1.05, -0.05), 0.04, '#2b3046');
       trait(pt(u, 1.05, -0.05), pt(u, 0.02, -0.3), 0.04, '#2b3046');
     });
@@ -4842,7 +4852,7 @@ function mysLancer(cb, fic) {
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
   const armer = () => {
-    if (fin || C.chute || !C.tient || C.charge || C.y > 0 || C.pTir != null) return;
+    if (fin || C.chute || C.ko || !C.tient || C.charge || C.y > 0 || C.pTir != null) return;
     C.charge = T();
     C.p = 0;
     btn.classList.add('on');
@@ -4936,7 +4946,8 @@ function mysLancer(cb, fic) {
   const chezValentin = () => surVoisin(C.x, C.z);
   // elle tombe avec son élan (« course » : elle trébuche au bord ; « saut » : elle a sauté dans le vide)
   const tombe = (m, n, vx, vz, vy) => {
-    const rue = n[0] != 0 && C.x > 0 && (n[0] > 0 ? C.x < MILIEU : C.x > MILIEU); // la ruelle entre les deux toits
+    // les ruelles : entre nos deux toits, et au bout de l'immeuble de Valentin (elle ne traverse pas le mur d'en face)
+    const rue = n[0] > 0 && C.x < MILIEU ? [9.0, 10.28] : n[0] < 0 && C.x > MILIEU && C.x < 12 ? [9.0, 10.28] : n[0] > 0 && C.x > MILIEU ? [19.12, 20.48] : null;
     C.chute = { m, t: T(), n, vx, vz, vy, vol: 1, rue, x0: C.x, z0: C.z };
     C.base = SOL; // son ombre est désormais sur le trottoir
     C.vy = 0;
@@ -5010,6 +5021,9 @@ function mysLancer(cb, fic) {
     if (qui == 'valentin') {
       const R = C.renvoi;
       if (em && em.k == 'aie') return { a: 'tombe', k: Math.min(0.95, ((tt - em.t) / em.d) * 1.3) }; // sur les fesses
+      // ses pieds avancent exactement à sa vitesse (longueurs de pas mesurées dans ses animations : 1,06 m/s en marchant,
+      // 1,9 m/s en courant, à vitesse normale) : dès qu'il bouge, il marche ou court (il ne glisse jamais)
+      if (v > 0.12) return v > 1.6 ? { a: 'course', v: v / 1.9 } : { a: 'marche', v: Math.max(0.4, v / 1.06) };
       if (em && em.k == 'lance') return { a: 'lancer', k: 0.25 + 0.25 * cl((tt - em.t) / em.d) }; // boule de neige
       if (em && em.k == 'salut') return { a: 'salut' };
       if (em && em.k == 'danse') return { a: 'danse' }; // il danse avec elle, chez lui
@@ -5017,10 +5031,8 @@ function mysLancer(cb, fic) {
       if (R && R.e == 'charge') return { a: 'charge' }; // il charge sa patate
       if (R && R.e == 'vise') return { a: 'lancer', k: 0.3 };
       if (R && R.e == 'lance') return { a: 'lancer', k: 0.37 + 0.2 * cl((tt - R.t) / 0.5) };
-      if (C.rit && v < 0.12) return { a: 'rire' }; // Célestine est K.O. : il rigole
-      // ses pieds avancent exactement à sa vitesse (longueurs de pas mesurées dans ses animations : 1,06 m/s en marchant,
-      // 1,9 m/s en courant, à vitesse normale) : il ne glisse plus sur la neige
-      return v > 1.6 ? { a: 'course', v: v / 1.9 } : v > 0.12 ? { a: 'marche', v: Math.max(0.4, v / 1.06) } : { a: 'repos' };
+      if (C.rit) return { a: 'rire' }; // Célestine est K.O. : il rigole
+      return { a: 'repos' };
     }
     // la chute du toit : au bord, elle mouline des bras pour garder l'équilibre ; dans le vide, elle bat des bras
     // et des jambes ; en bas, étalée dans la neige
@@ -5031,7 +5043,7 @@ function mysLancer(cb, fic) {
       if (K.sol) {
         if (K.e == 'releve') return { a: 'releve', k: 0.5 + 0.21 * cl((tt - K.te) / KO_REL) };
         if (K.e == 'va') return pas();
-        if (K.e == 'grimpe') return { a: 'echelle', v: 2.4 };
+        if (K.e == 'grimpe') return { a: 'echelle', v: 1.6 };
         if (K.e == 'fin') return { a: 'echfin', k: 0.02 + 0.66 * cl((tt - K.te) / ECH_FIN) };
         return { a: 'allongee' };
       }
@@ -5864,6 +5876,8 @@ function mysLancer(cb, fic) {
         Object.assign(R, { e: 'retour', t: T() });
       }
     } else if (R.e == 'retour') {
+      // elle est sur son toit : il ne retourne pas à sa place, il va directement lui rendre le fichier
+      if (VAL.tient && chezValentin() && !C.chute) return (Object.assign(R, { e: 'vise', t: T() }), true);
       if (T() - R.t > 0.35 && valCourt(dt, VAL0.x, VAL0.z, 3)) {
         if (!VAL.tient) return ((VAL.renvoi = null), false);
         Object.assign(R, { e: 'vise', t: T() });
@@ -5873,7 +5887,7 @@ function mysLancer(cb, fic) {
       const dx = C.x - VAL.x,
         dz = C.z - VAL.z,
         d = Math.hypot(dx, dz) || 1;
-      if (d < 0.95 || valCourt(dt, C.x - (dx / d) * 0.75, C.z - (dz / d) * 0.75, 2.2)) {
+      if (d < 0.95 || valCourt(dt, C.x - (dx / d) * 0.75, C.z - (dz / d) * 0.75, 3.2)) {
         VAL.tient = 0;
         VAL.renvoi = null;
         VAL.v = 0;
@@ -5963,6 +5977,7 @@ function mysLancer(cb, fic) {
       }
     }
     if (valRelance(dt, occupe)) return valBoules(dt);
+    const vAvant = VAL.v; // sa vitesse à l'image d'avant (pour qu'il accélère quand il la suit)
     VAL.v = 0;
     const vise = Math.atan2(C.x - VAL.x, C.z - VAL.z);
     VAL.phi += Math.atan2(Math.sin(vise - VAL.phi), Math.cos(vise - VAL.phi)) * Math.min(1, dt * 4);
@@ -5977,13 +5992,26 @@ function mysLancer(cb, fic) {
       }
       VAL.boule = Math.max(VAL.boule, T() + 5);
       VAL.coucou = Math.max(VAL.coucou, T() + 7);
+      // il la suit partout sur son toit, en courant, et s'arrête à 1 m d'elle
+      const dx = C.x - VAL.x,
+        dz = C.z - VAL.z,
+        d = Math.hypot(dx, dz);
+      if (d > 1.4 && !occupe) {
+        const { x0, x1, z0, z1 } = VOISIN;
+        VAL.v = vAvant;
+        valCourt(dt, Math.max(x0 + 0.4, Math.min(x1 - 0.4, C.x - (dx / d) * 1)), Math.max(z0 + 0.4, Math.min(z1 - 0.4, C.z - (dz / d) * 1)), 3.2);
+      }
       const ce = C.emote && T() - C.emote.t < C.emote.d ? C.emote.k : null;
       if ((ce == 'bisou' || ce == 'danse') && Math.hypot(C.x - VAL.x, C.z - VAL.z) < 2 && !occupe && T() > (VAL.danseAvec || 0)) {
         VAL.danseAvec = T() + 6;
         geste(VAL, 'danse', 3);
         parle(VAL, ce == 'bisou' ? 'Moi aussi ! 😘💕' : 'On danse ?! 🕺💃', 1.8);
       }
-    } else VAL.visite = 0;
+    } else {
+      VAL.visite = 0;
+      // elle est repartie : il retourne à sa place, au bord de son toit, face à notre toit
+      if (Math.hypot(VAL.x - VAL0.x, VAL.z - VAL0.z) > 0.1 && !occupe) ((VAL.v = vAvant), valCourt(dt, VAL0.x, VAL0.z, 3.2));
+    }
     if (!VAL.coucou) ((VAL.coucou = T() + 4), (VAL.boule = T() + 10));
     if (!occupe && !fin && T() > VAL.coucou) {
       geste(VAL, 'salut', 1.6);
@@ -7125,7 +7153,7 @@ function mysLancer(cb, fic) {
       i++;
     }
     // à droite de l'immeuble de Valentin, dans l'alignement
-    B.push({ x0: 19.05, x1: 26, z0: 0.6, z1: 9, top: 1.2, col: cols[2], id: i++ });
+    B.push({ x0: 20.6, x1: 26, z0: 0.6, z1: 9, top: 1.2, col: cols[2], id: i++ }); // après une ruelle de 1,6 m
     B.push({ x0: 26.05, x1: 34, z0: 0.6, z1: 9, top: -0.9, col: cols[5], id: i++ });
     // des voitures garées, couvertes de neige (le long de la rue de devant, puis de la rue de gauche)
     const V0 = [];
@@ -8234,7 +8262,7 @@ function mysLancer(cb, fic) {
   // emotes : un bouton 😊 ouvre quatre gestes
   const emo = o.querySelector('.mysl-emo');
   const emote = k => {
-    if (fin || C.charge || C.glisse || C.ange) return;
+    if (fin || C.charge || C.glisse || C.ange || C.ko || C.chute) return;
     const d = { salut: 1.8, bisou: 1.5, danse: 3, boude: 2.6 }[k];
     geste(C, k, d);
     parle(C, { salut: '👋', bisou: '😘', danse: '🎶', boude: '😤' }[k], d);
