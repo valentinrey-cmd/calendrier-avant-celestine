@@ -4454,7 +4454,7 @@ function mysLancer(cb, fic) {
     };
   };
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
-  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, kt: 0, yaw: 0, vise: 0 };
+  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, kt: 0, yaw: 0, vise: 0, pit: 0 };
   // la chute du toit, en vraie 3D :
   // 1. au bord, elle vacille en moulinant des bras (la caméra passe sur le côté pour bien voir le vide) ;
   // 2. elle bascule et tombe en battant des bras et des jambes, la caméra la suit dans sa chute, entre les immeubles ;
@@ -8044,7 +8044,17 @@ function mysLancer(cb, fic) {
     const K = C.chute,
       dc = K ? T() - K.t : 0,
       vis3 = (C.charge || ctl.vise) && !fin;
-    let cible = { yaw: ctl.yaw, h: vis3 ? -1.2 : -1.0, p: vis3 ? 0.1 : 0.15, kx: 7, kh: 5, d: vis3 ? 1.65 : 2.3, ep: vis3 ? 0.55 : 0.4 };
+    // (ctl.pit : on regarde plus haut ou plus bas en glissant le doigt / la souris de haut en bas ; la caméra tourne autour
+    // d'elle : plus haute quand on regarde vers le bas)
+    let cible = {
+      yaw: ctl.yaw,
+      h: (vis3 ? -1.2 : -1.0) + ctl.pit * 0.9,
+      p: (vis3 ? 0.1 : 0.15) + ctl.pit,
+      kx: 7,
+      kh: 5,
+      d: vis3 ? 1.65 : 2.3,
+      ep: vis3 ? 0.55 : 0.4
+    };
     const rp = replay(dt), // le replay du tir gagnant prend la main sur la caméra
       KOc = C.ko && C.ko.e != 'secoue';
     if (KOc) {
@@ -8058,13 +8068,26 @@ function mysLancer(cb, fic) {
         cz = mz + nx * q * zoom;
       cible = { x: cx, z: cz, yaw: Math.atan2(mx - cx, mz - cz), h: -1.4 + C.y * 0.5, p: 0.1, kx: C.ko.e == 'stop' ? 12 : 5, kh: 5 };
     } else if (K && K.ech) {
-      // elle remonte : la caméra la suit dans la rue, puis la regarde grimper, de dos, depuis la rue
-      const [nx, nz] = K.ech.n,
+      // elle remonte : la caméra la suit dans la rue, puis la regarde grimper, de dos, depuis la rue ; dans une ruelle
+      // (étroite), elle reste entre les deux murs et la regarde de biais, un peu plus loin le long du mur
+      const E = K.ech,
+        [nx, nz] = E.n,
         va = K.e == 'va',
-        yw = va ? C.phi : Math.atan2(-nx, -nz),
+        rue = E.g < 2,
+        lo = Math.min(E.x, E.x + nx * E.g) + 0.08,
+        hi = Math.max(E.x, E.x + nx * E.g) - 0.08;
+      let yw = va ? C.phi : Math.atan2(-nx, -nz),
         bx = va ? C.x - Math.sin(yw) * 2.8 : C.x + nx * 3,
         bz = va ? C.z - Math.cos(yw) * 2.8 : C.z + nz * 3;
-      cible = { x: bx, z: bz, yaw: yw, h: (va ? SOL : C.y) + 1.9 - CAM, p: va ? 0.12 : 0.08, kx: 3, kh: 4 };
+      if (rue) {
+        if (!va) {
+          bx = E.x + nx * E.g * 0.85;
+          bz = C.z + (C.z < 4.5 ? 1 : -1) * 2.6;
+          yw = Math.atan2(C.x - bx, C.z - bz);
+        }
+        bx = Math.max(lo, Math.min(hi, bx));
+      }
+      cible = { x: bx, z: bz, yaw: yw, h: (va ? SOL : C.y) + 1.9 - CAM, p: va ? 0.12 : rue ? 0.02 : 0.08, kx: 3, kh: 4 };
     } else if (K && K.m == 'bord' && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
@@ -8227,10 +8250,12 @@ function mysLancer(cb, fic) {
       return;
     }
     if (regard) return;
-    regard = { id: e.pointerId, x: e.clientX };
+    regard = { id: e.pointerId, x: e.clientX, y: e.clientY };
     cv.setPointerCapture(e.pointerId);
   });
-  const souris = e => document.pointerLockElement === cv && (ctl.yaw += e.movementX * 0.0042);
+  // regarder en haut / en bas (le doigt ou la souris de haut en bas), dans des limites raisonnables
+  const tangage = dy => (ctl.pit = Math.max(-0.5, Math.min(0.42, ctl.pit + dy)));
+  const souris = e => document.pointerLockElement === cv && ((ctl.yaw += e.movementX * 0.0042), tangage(e.movementY * 0.0035));
   document.addEventListener('mousemove', souris);
   // les boutons de la souris (souris bloquée) : clic gauche maintenu = la jauge, relâché = le lancer ; clic droit maintenu = viser
   const clicBas = e => {
@@ -8254,7 +8279,9 @@ function mysLancer(cb, fic) {
   cv.addEventListener('pointermove', e => {
     if (!regard || e.pointerId != regard.id) return;
     ctl.yaw += (e.clientX - regard.x) * 0.0075;
+    tangage((e.clientY - regard.y) * 0.006);
     regard.x = e.clientX;
+    regard.y = e.clientY;
   });
   const finRegard = e => regard && e.pointerId == regard.id && (regard = null);
   cv.addEventListener('pointerup', finRegard);

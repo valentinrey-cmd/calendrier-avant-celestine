@@ -4,6 +4,13 @@
 
 ---
 
+## 27/11/2026 · Toit : regarder en haut et en bas, échelles de la ruelle ; boss final et métro simplifiés (version 1795805562)
+- **Toit :** on peut regarder en haut et en bas (glisser le doigt ou bouger la souris de haut en bas).
+- **Échelles de la ruelle :** quand elle remonte entre les deux immeubles, la caméra reste dans la ruelle et la filme de biais : on voit l'échelle (avant, la caméra était dans le mur d'en face et l'échelle cachée).
+- **Boss final, le cadenas :** le cadran tourne beaucoup plus doucement (sans accélérations), la zone du bon chiffre est plus large, 15 s par chiffre au lieu de 9, et une erreur coûte moins de vie.
+- **Boss du métro (jour 22) :** un peu plus facile : 5 vies, plus lent, plus d'espace entre les obstacles, on rattrape Valentin plus vite et une collision fait moins reculer.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/boss/boss-final.js`, `2026/js/boss/boss.js`, `2026/js/boss/j22-valentin-metro.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : échelles, Valentin qui suit, K.O. et ruelle corrigés (version 1795804226)
 - **Échelles :** on ne les voit plus à travers les immeubles (en entier seulement depuis la rue ou la ruelle devant elles, sinon juste le haut qui dépasse des toits), reflet plus discret.
 - **Montée :** elle est bien sur l'échelle (plus devant, à côté) ; nouvelle animation Meshy plus lente aux grands gestes, avec un plan coupé : à peu près la même durée.

@@ -194,7 +194,7 @@ try {
       if (spT <= 0) {
         spawn();
         gates--;
-        spT = Math.max(0.5, 1 - 0.45 * k()) * (0.85 + Math.random() * 0.3);
+        spT = Math.max(0.62, 1.15 - 0.4 * k()) * (0.85 + Math.random() * 0.3); // un peu plus d'espace entre les obstacles
       }
       for (const o of O) {
         o.D -= sp * dt;
@@ -225,7 +225,7 @@ try {
             lives--;
             inv = 1.1;
             bad = performance.now();
-            gap = Math.max(0, gap - 0.08);
+            gap = Math.max(0, gap - 0.05);
             try {
               SFX('bad');
             } catch (_) {}

@@ -58,7 +58,7 @@ function bossCfg(d) {
     11: { n: 'Edgar', ic: '🌯', who: 'edgar', g: 'bkebab', p: { hp: 6, lives: 3, time: 140 } },
     15: { n: 'Nora', ic: '📚', who: 'nora', g: 'bfiches', p: { hp: 18, lives: 3, time: 100 } },
     19: { n: 'Sandrine', ic: '💊', who: 'sandrine', g: 'bcomptoir', p: { hp: 20, lives: 3, time: 120 } },
-    22: { n: 'Valentin', ic: '🚇', who: 'valentin', g: 'bmetro', p: { lives: 4, time: 110, v: 265, rate: 0.0155 } }
+    22: { n: 'Valentin', ic: '🚇', who: 'valentin', g: 'bmetro', p: { lives: 5, time: 120, v: 235, rate: 0.018 } }
   };
   return C[d] || null;
 }

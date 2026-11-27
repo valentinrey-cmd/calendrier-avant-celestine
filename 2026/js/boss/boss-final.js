@@ -2072,7 +2072,6 @@ function vBoss(test, sp, so) {
             RD = Math.min(W * 0.28, 100);
           let k = 0,
             rot = Math.random() * 360,
-            T = 0,
             tl = 0,
             hint = {},
             stop = false,
@@ -2089,12 +2088,9 @@ function vBoss(test, sp, so) {
               )
               .join('');
           };
-          const spd = () => {
-            const base = 105 + k * 24,
-              w = k >= 4 ? 1 + 0.5 * Math.sin(T * 2.4) : 1;
-            return base * w * (k % 2 ? -1 : 1);
-          };
-          const tol = () => Math.max(7, 15 - k * 1.1);
+          // (simplifié : le cadran tourne doucement, toujours à la même allure, et la zone du bon chiffre est large)
+          const spd = () => (62 + k * 5) * (k % 2 ? -1 : 1);
+          const tol = () => 15;
 
           plate();
           msg(`🔒 Chiffre 1/${need} · touche sous ▼`);
@@ -2167,7 +2163,7 @@ function vBoss(test, sp, so) {
                 busy = 1;
                 setTimeout(() => (busy = 0), 450);
                 tl = 0;
-                if (ouch(22, null)) return end('lose');
+                if (ouch(10, null)) return end('lose');
               }
             };
             cv.onpointerdown = e => {
@@ -2348,7 +2344,7 @@ function vBoss(test, sp, so) {
               x.fill();
               // chrono du chiffre
               if (k < need && !busy) {
-                const f = Math.max(0, 1 - tl / 9);
+                const f = Math.max(0, 1 - tl / 15);
                 x.fillStyle = '#0006';
                 x.beginPath();
                 x.roundRect(cx - RD, cy + RD * 1.25, RD * 2, 8, 4);
@@ -2367,18 +2363,17 @@ function vBoss(test, sp, so) {
               if (!alive) return;
               const dt = Math.min(0.05, (now - last) / 1000);
               last = now;
-              T += dt;
               flash = Math.max(0, flash - dt * 3);
               if (k < need && !busy) {
                 rot += spd() * dt;
                 tl += dt;
-                if (tl > 9) {
+                if (tl > 15) {
                   tl = 0;
                   hint[k] = 1;
                   plate();
                   word('⏱️ Trop lent !', 'b');
                   say('Tic-tac… 😏');
-                  if (ouch(18, null)) {
+                  if (ouch(8, null)) {
                     end('lose');
                     return;
                   }
