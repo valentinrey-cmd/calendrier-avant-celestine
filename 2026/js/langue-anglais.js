@@ -3244,8 +3244,9 @@ window.TRADUCTIONS_EN = {
   '📥 Télécharger le fichier mystère': '📥 Download the mystery file',
   'Joystick pour marcher, glisse le doigt pour tourner la vue, « Sauter » pour sauter (en courant, jusque chez Valentin !). Maintiens « Lancer » et relâche au bon moment !':
     'Joystick to walk, slide your finger to turn the view, “Jump” to jump (run first, all the way to Valentin’s roof!). Hold “Throw” and let go at the right moment!',
-  'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !':
-    'Click the game: the mouse turns the view (Esc to release it). WASD to walk, Shift to run, Space to jump (run first, all the way to Valentin’s roof!). Hold E and let go at the right moment!',
+  'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Clic droit pour viser, maintiens le clic gauche et relâche au bon moment !':
+    'Click the game: the mouse turns the view (Esc to release it). WASD to walk, Shift to run, Space to jump (run first, all the way to Valentin’s roof!). Right-click to aim, hold the left click and let go at the right moment!',
+  'Bon… on remonte ! 🪜': 'Okay… back up we go! 🪜',
   'Aaaaah ! 😱': 'Aaaaah! 😱',
   'Oups… AAAH ! 😱': 'Oops… AAAH! 😱',
   Sauter: 'Jump',

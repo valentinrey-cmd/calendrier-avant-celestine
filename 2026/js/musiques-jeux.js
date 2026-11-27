@@ -1542,7 +1542,7 @@ function mysLancer(cb, fic) {
   o.className = 'mysl';
   o.innerHTML = `<canvas></canvas><div class="mysl-h"><b>Livraison spéciale</b><small>${
       matchMedia('(pointer: fine)').matches
-        ? 'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Maintiens E et relâche au bon moment !'
+        ? 'Clique sur le jeu : la souris tourne la vue (Échap pour la libérer). ZQSD pour marcher, Maj pour courir, Espace pour sauter (en courant, jusque chez Valentin !). Clic droit pour viser, maintiens le clic gauche et relâche au bon moment !'
         : 'Joystick pour marcher, glisse le doigt pour tourner la vue, « Sauter » pour sauter (en courant, jusque chez Valentin !). Maintiens « Lancer » et relâche au bon moment !'
     }</small><span class="mysl-n">Livré <i>0</i></span><span class="mysl-vent"><i></i><em></em></span><button class="mysl-rec-b" aria-label="Records">🏆</button></div><div class="mysl-rec"></div><p class="mysl-tip"></p><p class="mysl-sec"></p><div class="mysl-joy"><i></i></div><label class="mysl-boite">📮 Choisir un fichier<input type="file"></label><button class="mysl-lance"><b><i></i></b><span>Lancer</span><u></u></button><button class="mysl-saut"><b></b><span>Sauter</span></button><div class="mysl-emo"><button class="mysl-emo-b">😊</button><div><button data-e="salut">👋</button><button data-e="bisou">😘</button><button data-e="danse">💃</button><button data-e="boude">😤</button></div></div>`;
   try {
@@ -3971,6 +3971,64 @@ function mysLancer(cb, fic) {
   };
   // le fichier sorti du toit retombe du ciel, à un endroit libre du toit
   // flèche rose qui rebondit au-dessus du fichier à ramasser
+  // Viser (clic droit maintenu, sur ordinateur) : des pointillés montrent la courbe du fichier, avec la force de la jauge
+  // (à mi-force tant qu'on n'arme pas), le vent et l'effet — le même calcul que le vrai vol (voir lacheFichier et pas)
+  const viseeTrace = () => {
+    if (!ctl.vise || !C.tient || fin || C.chute || C.ko || C.y > 0) return;
+    const p = C.charge ? C.p || 0 : 0.5,
+      v = VMIN + (VMAX - VMIN) * p,
+      m = main(),
+      dir = C.phi,
+      spin = ctl.kx * 0.8,
+      h = 1 / 60;
+    let x = m.x,
+      y = m.y + 0.34, // il part en haut du petit saut
+      z = m.z,
+      vx = Math.sin(dir) * v * Math.cos(ANG),
+      vy = v * Math.sin(ANG),
+      vz = Math.cos(dir) * v * Math.cos(ANG);
+    const pts = [];
+    for (let i = 0; i < 240; i++) {
+      vy -= G * h;
+      if (y > 0.05) {
+        vx += VENT.x * h;
+        vz += VENT.z * h;
+        if (spin) {
+          const n = Math.hypot(vx, vz) || 1;
+          vx += (vz / n) * spin * 2.6 * h;
+          vz += (-vx / n) * spin * 2.6 * h;
+        }
+      }
+      x += vx * h;
+      y += vy * h;
+      z += vz * h;
+      const dansChem = Math.abs(x) < CX && Math.abs(z - CZ) < CD;
+      if (dansChem && y < TOP) break; // dans la cheminée (ou contre elle)
+      if (y <= 0 && ((Math.abs(x) < 8.9 && z > BORD && z < RIDGE) || surVoisin(x, z))) break; // sur un toit
+      if (y < -3) break;
+      if (i % 3 == 0) pts.push([x, y, z]);
+    }
+    c.save();
+    pts.forEach(([x2, y2, z2], i) => {
+      const [sx, sy, ss, d] = P(x2, y2, z2);
+      if (d < 0.3) return;
+      c.fillStyle = `rgba(255,255,255,${0.9 - (i / pts.length) * 0.5})`;
+      c.beginPath();
+      c.arc(sx, sy, Math.max(1.5, ss * 0.035), 0, 7);
+      c.fill();
+    });
+    // là où il va tomber : un petit rond dans la neige
+    if (y > -3) {
+      const pr = Array.from({ length: 20 }, (_, i) => [x + Math.cos((i / 20) * 6.283) * 0.22, Math.max(0, Math.min(y, TOP)), z + Math.sin((i / 20) * 6.283) * 0.22]);
+      if (poly(pr)) {
+        c.strokeStyle = 'rgba(255,255,255,0.85)';
+        c.lineWidth = 2;
+        c.setLineDash([5, 4]);
+        c.stroke();
+      }
+    }
+    c.restore();
+  };
   const fleche = (t, fx = F.x, fy = F.y, fz = F.z) => {
     const [x, y, s, d] = P(fx, fy + 0.5 + Math.abs(Math.sin(t * 4)) * 0.12, fz);
     if (d < 0.4) return;
@@ -4016,6 +4074,8 @@ function mysLancer(cb, fic) {
     removeEventListener('keydown', bas);
     removeEventListener('keyup', haut);
     document.removeEventListener('mousemove', souris);
+    removeEventListener('mouseup', clicHaut);
+    document.removeEventListener('pointerlockchange', verrou);
     if (document.pointerLockElement === cv) document.exitPointerLock();
     o.classList.add('out');
     setTimeout(() => {
@@ -4388,7 +4448,7 @@ function mysLancer(cb, fic) {
     };
   };
   // les commandes : joystick (jx, jy de -1 à 1), clavier, rotation de la vue
-  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, kt: 0, yaw: 0 };
+  const ctl = { jx: 0, jy: 0, kx: 0, ky: 0, kt: 0, yaw: 0, vise: 0 };
   // la chute du toit, en vraie 3D :
   // 1. au bord, elle vacille en moulinant des bras (la caméra passe sur le côté pour bien voir le vide) ;
   // 2. elle bascule et tombe en battant des bras et des jambes, la caméra la suit dans sa chute, entre les immeubles ;
@@ -4461,21 +4521,123 @@ function mysLancer(cb, fic) {
           eclats.push({ x, y, vx: (Math.random() - 0.5) * 300, vy: -Math.random() * 260, t: 1, c: j % 4 ? '#ffffff' : '#cfe0ff' });
         parle(C, 'Aïe aïe aïe… 😵', 1.4);
       }
-    } else {
-      // elle reste un moment étalée, puis fondu au noir et retour sur le toit
-      const ds = T() - K.sol;
-      if (ds > 1.7 && !K.noir) K.noir = T();
-      if (K.noir && T() - K.noir > 0.35) {
-        Object.assign(C, { x: 0, z: 2.6, y: 0, base: 0, vy: 0, rot: 0, lean: 0, phi: 0, amp: 0, chute: null, ps: null, idle: 0 });
-        ctl.yaw = 0;
-        Object.assign(V, { x: 0, z: 0, yaw: 0, h: 0, p: 0 });
-        Object.assign(Vt, { x: 0, z: 0, yaw: 0 });
-        hy = hc;
-        C.revient = T();
+    } else remonte(dt, K); // en bas : elle se relève et remonte par l'échelle de secours
+    if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
+  };
+  // Les échelles de secours, sur les façades des deux immeubles : le pied du mur (x, z) et le côté de la rue (n)
+  const ECH = [
+    { x: -6, z: 0.6, n: [0, -1] },
+    { x: 0, z: 0.6, n: [0, -1] },
+    { x: 6, z: 0.6, n: [0, -1] },
+    { x: -9, z: 4.5, n: [-1, 0] },
+    { x: 9, z: 2.6, n: [1, 0] },
+    { x: 9, z: 6.6, n: [1, 0] },
+    { x: 10.4, z: 4.6, n: [-1, 0] },
+    { x: 12.6, z: 0.6, n: [0, -1] },
+    { x: 17, z: 0.6, n: [0, -1] },
+    { x: 19, z: 4.5, n: [1, 0] }
+  ];
+  const ECH_D = 0.32; // elle grimpe à 32 cm du mur
+  // Après une chute : étalée dans la neige de la rue, elle se relève, marche jusqu'à l'échelle la plus proche (sur le mur
+  // d'où elle est tombée), grimpe, et enjambe le haut pour revenir sur le toit
+  const remonte = (dt, K) => {
+    const tt = T();
+    C.rot = 0;
+    if (!K.e) {
+      if (tt - K.sol < 1.4) return;
+      Object.assign(K, { e: 'releve', te: tt });
+    }
+    if (K.e == 'releve') {
+      if (tt - K.te < KO_REL) return;
+      // l'échelle la plus proche, sur le mur d'où elle est tombée (sinon la plus proche de toutes)
+      const chezV = K.x0 > MILIEU,
+        memeMur = ECH.filter(e => e.n[0] == K.n[0] && e.n[1] == K.n[1] && e.x > MILIEU == chezV),
+        d = e => Math.hypot(e.x + e.n[0] * ECH_D - C.x, e.z + e.n[1] * ECH_D - C.z);
+      K.ech = (memeMur.length ? memeMur : ECH).reduce((a, b) => (d(b) < d(a) ? b : a));
+      Object.assign(K, { e: 'va', te: tt });
+      parle(C, 'Bon… on remonte ! 🪜', 1.4);
+    }
+    const E = K.ech,
+      [nx, nz] = E.n,
+      bx = E.x + nx * ECH_D,
+      bz = E.z + nz * ECH_D;
+    if (K.e == 'va') {
+      // elle marche jusqu'au pied de l'échelle
+      const dx = bx - C.x,
+        dz = bz - C.z,
+        dd = Math.hypot(dx, dz);
+      if (dd < 0.05) Object.assign(K, { e: 'grimpe', te: tt });
+      else {
+        const v = Math.min(1.6, dd * 3 + 0.3);
+        C.x += (dx / dd) * Math.min(dd, v * dt);
+        C.z += (dz / dd) * Math.min(dd, v * dt);
+        C.v = v;
+        C.amp = Math.min(1.3, v / 1.2);
+        C.ph += dt * (3 + v * 3.2);
+        const vise = Math.atan2(dx, dz);
+        C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 8);
+        return;
+      }
+    }
+    // face au mur
+    const mur = Math.atan2(-nx, -nz);
+    C.phi += Math.atan2(Math.sin(mur - C.phi), Math.cos(mur - C.phi)) * Math.min(1, dt * 10);
+    C.v = 0;
+    C.amp = 0;
+    if (K.e == 'grimpe') {
+      // barreau après barreau, à la vitesse de ses bras et de ses jambes (0,8 m/s) ; comme au cinéma, au bout de 2,5 s,
+      // un plan coupé la montre tout près du haut (sinon il faudrait 12 s pour monter les 9,6 m de l'immeuble)
+      C.x = bx;
+      C.z = bz;
+      C.y = Math.min(-0.9, C.y + ECH_V * dt);
+      if (!K.coupe && tt - K.te > 2.5 && C.y < -3) ((K.coupe = 1), (C.y = -2.6), Object.assign(V, { h: C.y + 1.9 - CAM }));
+      if ((K.bar = (K.bar || 0) + ECH_V * dt) > 0.3) ((K.bar = 0), bruit('pas', 0.35));
+      if (C.y >= -0.9) Object.assign(K, { e: 'fin', te: tt });
+    } else if (K.e == 'fin') {
+      // elle enjambe le rebord (l'animation la monte de 90 cm) et pose le pied sur le toit
+      const k = Math.min(1, (tt - K.te) / ECH_FIN),
+        dans = ECH_D + 0.38; // 38 cm à l'intérieur du toit
+      C.x = bx - nx * dans * Math.max(0, (k - 0.35) / 0.65);
+      C.z = bz - nz * dans * Math.max(0, (k - 0.35) / 0.65);
+      if (k >= 1) {
+        Object.assign(C, { y: 0, base: 0, vy: 0, rot: 0, lean: 0, amp: 0, chute: null, ps: null, idle: 0 });
+        ctl.yaw = C.phi;
         parle(C, 'Plus de peur que de mal ! 😅', 1.8);
       }
     }
-    if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
+  };
+  const ECH_FIN = 1.6, // secondes pour enjamber le haut de l'échelle
+    ECH_V = 0.8; // vitesse de montée (m/s), celle de l'animation « echelle » jouée 2,4 fois plus vite
+  // le dessin d'une échelle : deux montants et des barreaux, du trottoir jusqu'au-dessus du rebord du toit
+  // (vue depuis le toit, on n'en voit que le haut, qui dépasse du rebord)
+  const echelle = E => {
+    const [nx, nz] = E.n,
+      tx = -nz,
+      tz = nx,
+      dehors = (V.x - E.x) * nx + (V.z - E.z) * nz > 0,
+      y0 = dehors ? SOL : -0.05,
+      pt = (u, y, e = 0.14) => P(E.x + nx * e + tx * u, y, E.z + nz * e + tz * u),
+      trait = (a, b, l, col) => {
+        if (a[3] < 0.25 || b[3] < 0.25) return;
+        c.strokeStyle = col;
+        c.lineWidth = Math.max(1, l * (a[2] + b[2]) * 0.5);
+        c.beginPath();
+        c.moveTo(a[0], a[1]);
+        c.lineTo(b[0], b[1]);
+        c.stroke();
+      };
+    c.save();
+    c.lineCap = 'round';
+    // les barreaux
+    for (let y = Math.ceil(y0 / 0.3) * 0.3; y < 0.9; y += 0.3) trait(pt(-0.21, y), pt(0.21, y), 0.025, '#4a5068');
+    // les montants, qui se recourbent au-dessus du rebord vers le toit
+    [-0.22, 0.22].forEach(u => {
+      trait(pt(u, y0), pt(u, 0.95), 0.04, '#2b3046');
+      trait(pt(u, y0), pt(u, 0.95), 0.015, 'rgba(190,205,240,0.5)'); // reflet de la lune sur le métal
+      trait(pt(u, 0.95), pt(u, 1.05, -0.05), 0.04, '#2b3046');
+      trait(pt(u, 1.05, -0.05), pt(u, 0.02, -0.3), 0.04, '#2b3046');
+    });
+    c.restore();
   };
   const marche = dt => {
     if (C.chute) return chute(dt);
@@ -4564,7 +4726,7 @@ function mysLancer(cb, fic) {
     } else if (m > 0.12 && !bloque) {
       // tout au bout du joystick (ou Maj sur le clavier) pendant un moment : elle court
       C.vite = m > 0.95 ? (C.vite || 0) + dt : 0;
-      const court = C.vite > 0.45 || touches.Shift,
+      const court = (C.vite > 0.45 || touches.Shift) && !ctl.vise, // en visant (clic droit), elle marche
         sp = court ? 3.3 : 1.7 * m;
       C.v = Math.min(sp, C.v + dt * (court ? 4 : 5));
       const dx = co * ix + si * -iy,
@@ -4588,7 +4750,7 @@ function mysLancer(cb, fic) {
     if (ctl.kt) ctl.yaw += ctl.kt * dt * 2.4;
     // (comme dans Fortnite : en courant, elle se tourne vers là où elle court ; en l'air, elle garde son cap)
     const vise =
-      em == 'boude' ? V.yaw : C.glisse || C.saute ? null : C.v > 2.3 && !C.charge && (vx || vz) ? Math.atan2(vx, vz) : ctl.yaw;
+      em == 'boude' ? V.yaw : C.glisse || C.saute ? null : C.v > 2.3 && !C.charge && !ctl.vise && (vx || vz) ? Math.atan2(vx, vz) : ctl.yaw;
     if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 14);
     // elle recule (joystick vers le bas) : l'animation de marche passe à l'envers
     const sp = Math.hypot(vx, vz);
@@ -4605,9 +4767,10 @@ function mysLancer(cb, fic) {
     C.ph += dt * (C.v > 0.05 ? 3 + C.v * 3.2 : em == 'danse' ? 9 : em == 'boude' ? 12 : 0);
     if (Math.floor(ph0 / Math.PI) != Math.floor(C.ph / Math.PI) && C.v > 0.05) {
       // un pas : son, et une empreinte de botte dans la neige (pied gauche, pied droit)
-      bruit('pas', C.amp);
+      if (C.y <= 0.02) bruit('pas', C.amp); // pas de bruit de pas en l'air
       const q = Math.floor(C.ph / Math.PI) % 2 ? 1 : -1;
-      traces.push({ x: C.x + q * 0.1 * Math.cos(C.phi), z: C.z - q * 0.1 * Math.sin(C.phi), a: C.phi, t: T() });
+      // seulement les pieds posés sur un toit (pas en l'air pendant un saut, ni au-dessus du vide)
+      if (C.y <= 0.02 && !horsToit()) traces.push({ x: C.x + q * 0.1 * Math.cos(C.phi), z: C.z - q * 0.1 * Math.sin(C.phi), a: C.phi, t: T() });
       if (traces.length > 220) traces.splice(0, traces.length - 220);
     }
     // la cheminée et les obstacles l'arrêtent (et elle déclenche les surprises en les touchant)
@@ -4855,7 +5018,9 @@ function mysLancer(cb, fic) {
       if (R && R.e == 'vise') return { a: 'lancer', k: 0.3 };
       if (R && R.e == 'lance') return { a: 'lancer', k: 0.37 + 0.2 * cl((tt - R.t) / 0.5) };
       if (C.rit && v < 0.12) return { a: 'rire' }; // Célestine est K.O. : il rigole
-      return pas();
+      // ses pieds avancent exactement à sa vitesse (longueurs de pas mesurées dans ses animations : 1,06 m/s en marchant,
+      // 1,9 m/s en courant, à vitesse normale) : il ne glisse plus sur la neige
+      return v > 1.6 ? { a: 'course', v: v / 1.9 } : v > 0.12 ? { a: 'marche', v: Math.max(0.4, v / 1.06) } : { a: 'repos' };
     }
     // la chute du toit : au bord, elle mouline des bras pour garder l'équilibre ; dans le vide, elle bat des bras
     // et des jambes ; en bas, étalée dans la neige
@@ -4863,7 +5028,13 @@ function mysLancer(cb, fic) {
     if (C.chute) {
       const K = C.chute,
         d = tt - K.t;
-      if (K.sol) return { a: 'allongee' };
+      if (K.sol) {
+        if (K.e == 'releve') return { a: 'releve', k: 0.5 + 0.21 * cl((tt - K.te) / KO_REL) };
+        if (K.e == 'va') return pas();
+        if (K.e == 'grimpe') return { a: 'echelle', v: 2.4 };
+        if (K.e == 'fin') return { a: 'echfin', k: 0.02 + 0.66 * cl((tt - K.te) / ECH_FIN) };
+        return { a: 'allongee' };
+      }
       if (K.m == 'course' && d < 0.45) return { a: 'chute', k: 0.04 + 0.3 * cl(d / 0.45) };
       return K.vol ? { a: 'vide', v: 1.3 } : { a: 'equilibre', v: 1.5 };
     }
@@ -4906,11 +5077,13 @@ function mysLancer(cb, fic) {
       c.ellipse(sx, sy, ss * 1.1, ss * 0.32, 0, 0, 7);
       c.fill();
     }
-    // ombre au sol
-    c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y - (C.base || 0))})`;
-    c.beginPath();
-    c.ellipse(sx, sy, ss * 0.26, ss * 0.08, 0, 0, 7);
-    c.fill();
+    // ombre au sol (pas d'ombre dans le vide, au-dessus de la ruelle : seulement sur un toit, ou en bas dans la rue)
+    if ((C.base || 0) < 0 || !horsToit()) {
+      c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y - (C.base || 0))})`;
+      c.beginPath();
+      c.ellipse(sx, sy, ss * 0.26, ss * 0.08, 0, 0, 7);
+      c.fill();
+    }
     const m = FIG3D.dessine(
       c,
       qui,
@@ -4955,11 +5128,13 @@ function mysLancer(cb, fic) {
       c.ellipse(sx, sy, ss * 1.1, ss * 0.32, 0, 0, 7);
       c.fill();
     }
-    // ombre au sol
-    c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y - (C.base || 0))})`;
-    c.beginPath();
-    c.ellipse(sx + (dz ? dz.mx * u : 0), sy, ss * 0.26, ss * 0.08, 0, 0, 7);
-    c.fill();
+    // ombre au sol (pas dans le vide)
+    if ((C.base || 0) < 0 || !horsToit()) {
+      c.fillStyle = `rgba(60,75,110,${0.3 / (1 + C.y - (C.base || 0))})`;
+      c.beginPath();
+      c.ellipse(sx + (dz ? dz.mx * u : 0), sy, ss * 0.26, ss * 0.08, 0, 0, 7);
+      c.fill();
+    }
     c.save();
     c.translate(x, yb);
     c.scale(u * LK.taille, u * LK.taille);
@@ -5764,6 +5939,17 @@ function mysLancer(cb, fic) {
   };
   const valentin = dt => {
     const occupe = VAL.emote && T() - VAL.emote.t < VAL.emote.d;
+    // ses empreintes dans la neige de son toit, un pied après l'autre
+    if (VAL.v > 0.1) {
+      VAL.pasD = (VAL.pasD || 0) + VAL.v * dt;
+      const pl = VAL.v > 1.6 ? 0.85 : 0.5; // la longueur d'un pas
+      if (VAL.pasD > pl) {
+        VAL.pasD -= pl;
+        VAL.pied = -(VAL.pied || 1);
+        traces.push({ x: VAL.x + VAL.pied * 0.11 * Math.cos(VAL.phi), z: VAL.z - VAL.pied * 0.11 * Math.sin(VAL.phi), a: VAL.phi, t: T() });
+        if (traces.length > 220) traces.splice(0, traces.length - 220);
+      }
+    }
     VAL.amp += ((VAL.v > 0.05 ? Math.min(1.3, VAL.v / 1.2) : 0) - VAL.amp) * Math.min(1, dt * 8);
     VAL.ph += dt * (VAL.v > 0.05 ? 3 + VAL.v * 3.2 : 0);
     // le fichier suit sa main tant qu'il le tient
@@ -5831,7 +6017,17 @@ function mysLancer(cb, fic) {
       b.y += b.vy * dt;
       b.z += b.vz * dt;
       const surNous = (Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE) || surVoisin(b.x, b.z);
-      if (b.y > C.y && b.y < C.y + 1.75 && Math.hypot(b.x - C.x, b.z - C.z) < 0.38) {
+      // les cheminées (la nôtre et son petit conduit), le bonhomme de neige, le sapin… : elle s'écrase dessus
+      const mur =
+        (Math.abs(b.x) < CX + 0.04 && Math.abs(b.z - CZ) < CD + 0.04 && b.y < TOP) ||
+        (Math.abs(b.x - VOISIN.cx) < VOISIN.ce + 0.06 && Math.abs(b.z - VOISIN.cz) < VOISIN.ce + 0.06 && b.y < VOISIN.ch) ||
+        OBS.some(ob => b.y < ob.h && Math.hypot(b.x - ob.x, b.z - ob.z) < rayon(ob, Math.max(0, b.y)));
+      if (mur) {
+        boules.splice(i, 1);
+        bruit('neige', 0.5);
+        const [x, y] = P(b.x, b.y, b.z);
+        for (let j = 0; j < 14; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 150, vy: -Math.random() * 110, t: 0.5, c: '#ffffff' });
+      } else if (b.y > C.y && b.y < C.y + 1.75 && Math.hypot(b.x - C.x, b.z - C.z) < 0.38) {
         // en plein sur Célestine !
         boules.splice(i, 1);
         geste(C, 'touche', 0.5);
@@ -7186,6 +7382,7 @@ function mysLancer(cb, fic) {
     facade(-9, 0.6, 9, 0.6, V.z < 0.6);
     facade(9, 0.6, 9, RIDGE, V.x > 9);
     facade(-9, RIDGE, -9, 0.6, V.x < -9);
+    facade(9, RIDGE, -9, RIDGE, V.z > RIDGE); // l'arrière
   };
   // le toit voisin : le même genre de toit que le nôtre (neige, tuiles, faîtage), séparé par une ruelle
   /* ===================== la neige au sol : le rendu des deux toits ===================== */
@@ -7528,12 +7725,18 @@ function mysLancer(cb, fic) {
     }
     return pts;
   };
-  const empreintes = () => {
+  // les traces d'un des deux toits (« nous » ou « voisin ») : chacun juste après son toit, avant ce qui est posé dessus
+  // (cheminées…), pour qu'on ne les voie pas à travers
+  const empreintes = (cote = 'nous') => {
     const now = T();
-    lumiereEcran();
-    // les vieilles empreintes de pas disparaissent (l'ange, le sillon et le cratère restent)
-    for (let i = traces.length - 1; i >= 0; i--) if (!traces[i].ange && !traces[i].sillon && !traces[i].cratere && now - traces[i].t > 24) traces.splice(i, 1);
+    if (cote == 'nous') {
+      lumiereEcran();
+      // les vieilles empreintes de pas disparaissent (l'ange, le sillon et le cratère restent)
+      for (let i = traces.length - 1; i >= 0; i--)
+        if (!traces[i].ange && !traces[i].sillon && !traces[i].cratere && now - traces[i].t > 24) traces.splice(i, 1);
+    }
     traces.forEach(q => {
+      if (q.x > MILIEU != (cote == 'voisin')) return;
       const age = now - q.t,
         [, , , dq] = P(q.x, 0, q.z);
       if (dq < 0.3 || dq > 22) return;
@@ -7691,6 +7894,8 @@ function mysLancer(cb, fic) {
     const { x0, x1, z0, z1, h } = VOISIN;
     facade(x0, z1, x0, z0, V.x < x0); // côté ruelle, face à notre toit
     facade(x0, z0, x1, z0, V.z < z0); // côté rue
+    facade(x1, z0, x1, z1, V.x > x1); // le bout de l'immeuble, de l'autre côté
+    facade(x1, z1, x0, z1, V.z > z1); // l'arrière
     if (sous) return; // caméra sous le niveau des toits : on ne voit que les façades
     // le pan de toit enneigé (le même rendu que le nôtre) et ses bords : la ruelle, le faîtage, la rue
     neigeToit(x0, x1, z0, z1, h, 1, [
@@ -7698,6 +7903,7 @@ function mysLancer(cb, fic) {
       [x0, z1, x1, z1, 0, 1, -1],
       [x0, z0, x1, z0, 0, -1, 3]
     ]);
+    empreintes('voisin'); // les traces sur son toit, sous sa cheminée
     // un petit conduit de cheminée en briques
     const { cx, cz, ce: e, ch: ht } = VOISIN;
     [
@@ -7809,7 +8015,7 @@ function mysLancer(cb, fic) {
     // en visant, elle se rapproche de l'épaule ; pendant une chute, elle devient une caméra de cinéma
     const K = C.chute,
       dc = K ? T() - K.t : 0,
-      vis3 = C.charge && !fin;
+      vis3 = (C.charge || ctl.vise) && !fin;
     let cible = { yaw: ctl.yaw, h: vis3 ? -1.2 : -1.0, p: vis3 ? 0.1 : 0.15, kx: 7, kh: 5, d: vis3 ? 1.65 : 2.3, ep: vis3 ? 0.55 : 0.4 };
     const rp = replay(dt), // le replay du tir gagnant prend la main sur la caméra
       KOc = C.ko && C.ko.e != 'secoue';
@@ -7823,7 +8029,15 @@ function mysLancer(cb, fic) {
         cx = mx - nz * q * zoom,
         cz = mz + nx * q * zoom;
       cible = { x: cx, z: cz, yaw: Math.atan2(mx - cx, mz - cz), h: -1.4 + C.y * 0.5, p: 0.1, kx: C.ko.e == 'stop' ? 12 : 5, kh: 5 };
-    } else if (K && dc < 1.15) {
+    } else if (K && K.ech) {
+      // elle remonte : la caméra la suit dans la rue, puis la regarde grimper, de dos, depuis la rue
+      const [nx, nz] = K.ech.n,
+        va = K.e == 'va',
+        yw = va ? C.phi : Math.atan2(-nx, -nz),
+        bx = va ? C.x - Math.sin(yw) * 2.8 : C.x + nx * 3,
+        bz = va ? C.z - Math.cos(yw) * 2.8 : C.z + nz * 3;
+      cible = { x: bx, z: bz, yaw: yw, h: (va ? SOL : C.y) + 1.9 - CAM, p: va ? 0.12 : 0.08, kx: 3, kh: 4 };
+    } else if (K && K.m == 'bord' && dc < 1.15) {
       // elle vacille : la caméra passe sur le côté, un peu plus bas, pour voir à la fois Célestine et le vide
       const [nx, nz] = K.n,
         q = (V.x - C.x) * -nz + (V.z - C.z) * nx >= 0 ? 1 : -1,
@@ -7903,13 +8117,13 @@ function mysLancer(cb, fic) {
     // pendant la chute, quand la caméra passe sous le niveau des toits, on ne dessine plus rien de ce qui est sur les toits
     const sous = CAM + V.h < 0.15;
     // le toit d'en face est plus loin : on le dessine d'abord, notre toit passe devant
-    if (sous) (toitVoisin(true), facadesNous());
-    else if (V.x < VOISIN.x0) (toitVoisin(), facadesNous(), toit());
-    else (facadesNous(), toit(), toitVoisin());
-    if (!sous) empreintes();
+    if (sous) (toitVoisin(true), facadesNous(), ECH.forEach(echelle));
+    else if (V.x < VOISIN.x0) (toitVoisin(), facadesNous(), toit(), empreintes());
+    else (facadesNous(), toit(), empreintes(), toitVoisin());
     brume();
     // tout ce qui est sur le toit, dessiné du plus loin au plus proche
     const L = sous ? [] : OBS.map(ob => [prof(ob.x, ob.z), () => obstacle(ob, t)]);
+    if (!sous) ECH.forEach(E => L.push([prof(E.x + E.n[0] * 0.14, E.z + E.n[1] * 0.14), () => echelle(E)]));
     if (!sous) {
       const tp = traineauPos(t);
       L.push([tp ? prof(tp.x, tp.z) : crash ? prof(crash.x, crash.z) : 0, () => traineau(t, dt)]);
@@ -7943,19 +8157,13 @@ function mysLancer(cb, fic) {
       PIG.forEach(p => L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
     }
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
+    viseeTrace();
     particules(dt);
     neige(dt, true);
     devant(t);
     ambiance();
     mangaFx(t);
     habillage(t);
-    // fondu au noir avant de réapparaître sur le toit, puis retour de l'image
-    const nr =
-      C.chute && C.chute.noir ? Math.min(1, (T() - C.chute.noir) / 0.35) : C.revient ? Math.max(0, 1 - (T() - C.revient) / 0.5) : 0;
-    if (nr > 0) {
-      c.fillStyle = `rgba(6,10,26,${nr})`;
-      c.fillRect(0, 0, W, H);
-    }
     raf = requestAnimationFrame(boucle);
   };
 
@@ -7979,10 +8187,12 @@ function mysLancer(cb, fic) {
         });
       return;
     }
-    // sur ordinateur, comme dans Fortnite : un clic bloque la souris dans le jeu, la bouger tourne la vue (Échap la libère)
+    // sur ordinateur, comme dans Fortnite : un premier clic bloque la souris dans le jeu, la bouger tourne la vue (Échap la
+    // libère) ; ensuite clic gauche = lancer, clic droit = viser (voir clicBas / clicHaut)
     if (e.pointerType == 'mouse' && cv.requestPointerLock) {
       if (document.pointerLockElement !== cv)
         try {
+          cv.dataset.verrou = 1; // ce clic-là ne lance rien
           const r = cv.requestPointerLock();
           if (r && r.catch) r.catch(() => {});
         } catch (_) {}
@@ -7994,6 +8204,25 @@ function mysLancer(cb, fic) {
   });
   const souris = e => document.pointerLockElement === cv && (ctl.yaw += e.movementX * 0.0042);
   document.addEventListener('mousemove', souris);
+  // les boutons de la souris (souris bloquée) : clic gauche maintenu = la jauge, relâché = le lancer ; clic droit maintenu = viser
+  const clicBas = e => {
+    if (document.pointerLockElement !== cv || cv.dataset.verrou) return;
+    e.preventDefault();
+    C.idle = 0;
+    if (e.button == 0) armer();
+    else if (e.button == 2) ctl.vise = 1;
+  };
+  const clicHaut = e => {
+    if (e.button == 0 && cv.dataset.verrou) return delete cv.dataset.verrou;
+    if (e.button == 0 && C.charge) ((C.spin = ctl.kx * 0.8), lancer());
+    else if (e.button == 2) ctl.vise = 0;
+  };
+  cv.addEventListener('mousedown', clicBas);
+  addEventListener('mouseup', clicHaut);
+  cv.addEventListener('contextmenu', e => e.preventDefault());
+  // Échap libère la souris : on arrête de viser
+  const verrou = () => document.pointerLockElement !== cv && ((ctl.vise = 0), delete cv.dataset.verrou);
+  document.addEventListener('pointerlockchange', verrou);
   cv.addEventListener('pointermove', e => {
     if (!regard || e.pointerId != regard.id) return;
     ctl.yaw += (e.clientX - regard.x) * 0.0075;

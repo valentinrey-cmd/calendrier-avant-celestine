@@ -4,6 +4,15 @@
 
 ---
 
+## 27/11/2026 · Toit : incohérences corrigées, échelle de secours, souris sur PC (version 1795795154)
+- **Empreintes :** plus de traces de pas en l'air (saut, vide) ni de bruit de pas en l'air ; les traces de chaque toit sont dessinées juste après lui, donc on ne les voit plus à travers les cheminées.
+- **Valentin :** ses pieds avancent à sa vitesse (il ne glisse plus) et il laisse des empreintes sur son toit.
+- **Immeuble de Valentin :** façade du bout (et l'arrière des deux immeubles) dessinée.
+- **Ombre :** plus d'ombre en l'air au-dessus de la ruelle. **Boules de neige :** elles s'écrasent sur les cheminées, le bonhomme, le sapin…
+- **Après une chute :** plus de fondu magique : elle se relève, marche jusqu'à l'échelle de secours la plus proche (10 échelles sur les façades), grimpe (plan coupé pendant la montée) et enjambe le rebord. Nouvelles animations Meshy « échelle » et « fin d'échelle ».
+- **PC :** souris bloquée après un clic ; clic gauche maintenu puis relâché pour lancer, clic droit maintenu pour viser (caméra rapprochée et pointillés de la trajectoire, avec le vent et l'effet).
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `2026/3d/toit-celestine.glb`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 27/11/2026 · Toit : déplacement comme Fortnite, souris bloquée sur PC, chutes selon la façon de tomber (version 1795793579)
 - **Comme Fortnite :** elle regarde toujours dans le sens de la caméra (on voit son dos), mais quand elle court, elle se tourne vers là où elle court.
 - **Sur ordinateur :** un clic sur le jeu bloque la souris, et la bouger tourne la vue sans cliquer (Échap la libère). Texte d'aide ordinateur mis à jour (Maj pour courir).
