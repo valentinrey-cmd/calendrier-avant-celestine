@@ -3,6 +3,12 @@
 > **Règle :** toute IA (Claude ou autre) qui modifie le site **ajoute une entrée tout en haut** de ce journal à chaque demande de Valentin : la date, ce qui a changé en français simple, le numéro de version et les fichiers touchés. Elle supprime aussi l'ancienne version de ce qui est modifié et range le code au bon endroit (voir les 3 règles d'or dans `CLAUDE.md`). Lis d'abord `CLAUDE.md`, qui contient la carte du code.
 
 ---
+## 2026-11-27 · Page d'installation : bouton pour télécharger le fichier mystère
+- La page de téléchargement de l'appli (`2026/app.html`, celle du QR code) affiche maintenant, sous les instructions, un encadré « 🎁 Le fichier mystère ». Il explique qu'il faut aussi le télécharger pour la boîte aux lettres du toit, avec un bouton doré « 📥 Télécharger le fichier mystère » (lien SwissTransfer, ouvert dans un nouvel onglet). C'est pareil sur iPhone, iPad, Android et ordinateur.
+- Le lien n'est pas recopié : la page le lit dans `CONTENU.mysLien` (`js/contenu.js`), le même que dans le jeu. Quand le lien SwissTransfer change (il expire au bout de 15 jours), il suffit de le changer à cet endroit.
+- Version : 1795771072
+- Fichiers : `2026/app.html`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`, `JOURNAL.md`
+
 ## 2026-11-27 · Fichier mystère : tout le toit refait graphiquement (neige, traces, ciel, lumière, ambiance)
 - **La neige au sol**, sur notre toit et sur celui de Valentin. L'ancienne couche blanche unie avec ses lignes de tuiles est supprimée et remplacée par :
   - un dégradé de profondeur : bleuté et voilé au loin, blanc presque chaud tout près ;

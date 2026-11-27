@@ -100,7 +100,7 @@ Avant d'écrire du code, choisis l'endroit selon ce tableau. **Ne crée pas de n
 | Les gags (chat, pubs, carte de détective, arrêt maladie de Pépin…) | `js/gags.js` |
 | Les Trésors (onglet 🎁) / les Paramètres | `js/tresors.js` / `js/parametres.js` |
 | Le mode admin (toucher 7 fois la photo en haut à gauche, puis code 2412) | `js/admin.js` |
-| L'écran d'installation de l'appli | `js/installation.js` (+ page `app.html`) |
+| L'écran d'installation de l'appli | `js/installation.js` (+ page `app.html`, qui propose aussi de télécharger le fichier mystère : elle lit le lien `mysLien` dans `js/contenu.js`) |
 | La neige, les confettis | `js/neige-confettis.js` |
 | L'adaptation téléphone / tablette | `js/ecran.js` |
 | La mise à jour automatique de l'appli | `js/mise-a-jour.js` |

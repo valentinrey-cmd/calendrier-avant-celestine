@@ -9,6 +9,8 @@ h1{font-size:1.9rem;color:#fff;text-shadow:0 3px 0 #c2185b,0 0 18px #ffd34d;marg
 .btn{display:inline-block;margin:18px 0 8px;padding:15px 30px;border-radius:999px;font-weight:800;font-size:1.15rem;color:#fff;text-decoration:none;background:linear-gradient(145deg,#4ff0a0,#0b9a52);box-shadow:0 5px 0 #064a2a}
 ol{text-align:left;max-width:430px;margin:12px auto;padding:14px 18px 14px 38px;border-radius:16px;background:#ffffff33;box-shadow:inset 0 0 0 1px #ffffff66}li{margin:6px 0}
 small{opacity:.65}a.l{color:#b0125b}
+.mys{max-width:430px;margin:20px auto 4px;padding:16px 18px;border-radius:18px;background:#fff6;box-shadow:inset 0 0 0 1px #fff9}.mys b.t{display:block;font-size:1.1rem;color:#8a0f47}
+.btn.dl{background:linear-gradient(145deg,#ffd76a,#f0a020);box-shadow:0 5px 0 #a8650a;color:#5a2a00;margin:12px 0 6px}
 </style></head><body>
 <img src="icon-anim.svg" alt="">
 <h1>Dossier n°24</h1>
@@ -27,4 +29,9 @@ else if(and){c.innerHTML=`<p>Pour ton appareil Android 🤖</p><a class="btn" hr
 <ol><li>Quand le téléchargement est fini, touche <b>Ouvrir</b></li><li>Si Android le demande, <b>autorise l'installation</b> puis reviens en arrière</li><li>Touche <b>Installer</b> <small>(et « Installer quand même » si Play Protect s'affiche)</small></li><li>L'icône <b>Dossier n°24</b> est dans tes applis !</li></ol>`}
 else{c.innerHTML=`<p>Ouvre ce lien sur ta <b>tablette</b> ou ton <b>téléphone</b> (iPad, iPhone ou Android) pour installer l'appli.</p><a class="btn" href="./">🎄 Jouer ici dans le navigateur</a>`}
 const sw=document.createElement('p');sw.innerHTML='<small>Ce lien marche sur <b>iPad, iPhone et Android</b> : la page s\'adapte toute seule à l\'appareil.</small>';c.appendChild(sw);
+// le fichier mystère : son lien SwissTransfer est lu dans js/contenu.js (CONTENU.mysLien), le même que dans le jeu
+fetch('js/contenu.js').then(r=>r.text()).then(t=>{const l=(t.match(/mysLien:\s*'([^']+)'/)||[])[1];if(!l)return;
+const m=document.createElement('div');m.className='mys';
+m.innerHTML=`<b class="t">🎁 Le fichier mystère</b><p>Télécharge aussi le fichier mystère de Valentin : tu en auras besoin dans l'appli, sur le toit, dans la boîte aux lettres 📮.</p><a class="btn dl" href="${l}" target="_blank" rel="noopener">📥 Télécharger le fichier mystère</a><p><small>Il est un peu lourd : attends bien la fin du téléchargement.</small></p>`;
+c.after(m)}).catch(()=>{});
 </script></body></html>
