@@ -4,6 +4,21 @@
 
 ---
 
+## 28/11/2026 · Toit : bruitages du bac à sable, boules de neige énormes, le bonhomme revient (version 1795867032)
+- **Bruitages** (tout est synthétisé) :
+  - « boïng » du trampoline ;
+  - barreaux en métal de l'échelle de secours ;
+  - mains qui attrapent un rebord, puis effort pour se hisser ;
+  - réception plus ou moins sourde selon la hauteur ;
+  - boule de neige façonnée puis lancée, « pof » quand elle s'écrase ;
+  - « bong » du ballon ;
+  - frottement de la luge et d'une boule qui roule, qui suivent leur vitesse ;
+  - sifflement des fusées, explosion et crépitement des étincelles ;
+  - « pouf » magique quand le bonhomme revient.
+- **Boules de neige énormes :** une boule qui roule dans la neige grossit vraiment (environ 5 cm de rayon par mètre de roulade), jusqu'à 2,6 m de haut. Plus elle est grosse, plus elle est lourde à pousser. Une boule qui roule ne passe plus à travers Célestine. Un bonhomme refait avec d'énormes boules se casse en énormes boules.
+- **Le bonhomme revient :** quand toutes ses boules de neige sont tombées du toit, il réapparaît à sa place après un « pouf » magique (et peut se recasser).
+- Fichiers : `2026/js/musiques-jeux.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : la luge a une vraie collision et glisse dans le bon sens (version 1795865867)
 - **Collision :** on ne traverse plus la luge en marchant. Elle a sa vraie forme (0,61 × 0,97 m), tournée selon son cap, et elle arrête Célestine par le côté, par l'avant ou en biais. On peut sauter dessus (assise à 32 cm). Les boules et le ballon rebondissent dessus.
 - **Dans le bon sens :** le modèle 3D était tourné à l'envers (Célestine glissait dossier devant) et pivotait à l'inverse dans les virages. Maintenant l'avant de la luge est devant, Célestine est assise les pieds devant et le dos vers le dossier. Quand elle monte, c'est elle qui prend le cap de la luge (la luge ne pivote plus d'un coup).
