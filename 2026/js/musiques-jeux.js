@@ -1742,8 +1742,25 @@ function mysLancer(cb, fic) {
     });
     L.push({ b: 1, x: TRAMP.x, z: TRAMP.z, hx: TRAMP.r * 0.85, hz: TRAMP.r * 0.85, h: TRAMP.h, tramp: 1 });
     L.push({ b: 1, x: FEUX.x, z: FEUX.z, hx: 0.24, hz: 0.24, h: FEUX.h });
+    if (!C.luge) L.push({ b: 1, x: LUGE.x, z: LUGE.z, a: LUGE.a, hx: 0.3, hz: 0.48, h: 0.32, luge: 1 }); // (0,61 × 0,97 m, assise à 32 cm)
     ROULE.forEach(r => r.y > -1 && !r.porte && L.push({ s: 1, x: r.x, z: r.z, r: r.r, y: r.y, h: r.y + r.r, boule: r }));
     return L;
+  };
+  // Une caisse tournée (la luge : u.a = son cap) a ses mesures (hx en travers, hz en long) dans son propre repère :
+  // loc donne la position d'un point par rapport à elle dans ce repère, mon ramène un déplacement de ce repère au monde.
+  const loc = (u, x, z) => {
+    const dx = x - u.x,
+      dz = z - u.z;
+    if (!u.a) return [dx, dz];
+    const co = Math.cos(u.a),
+      si = Math.sin(u.a);
+    return [dx * co - dz * si, dx * si + dz * co];
+  };
+  const mon = (u, lx, lz) => {
+    if (!u.a) return [lx, lz];
+    const co = Math.cos(u.a),
+      si = Math.sin(u.a);
+    return [lx * co + lz * si, -lx * si + lz * co];
   };
   // la hauteur du dessus d'un support sous le point (x, z) (0 si rien) ; pour une boule, le haut de la sphère à cet endroit
   const dessus = (u, x, z, marge = 0.07) => {
@@ -1751,7 +1768,8 @@ function mysLancer(cb, fic) {
       const d = Math.hypot(x - u.x, z - u.z);
       return d < u.r * 0.6 ? u.y + Math.sqrt(u.r * u.r - d * d) : -1; // (sur le haut seulement : pas les pieds dans la pente)
     }
-    return Math.abs(x - u.x) < u.hx + marge && Math.abs(z - u.z) < u.hz + marge ? u.h : -1;
+    const [lx, lz] = loc(u, x, z);
+    return Math.abs(lx) < u.hx + marge && Math.abs(lz) < u.hz + marge ? u.h : -1;
   };
   // le sol sous ses pieds : le plus haut des dessus qui ne sont pas au-dessus d'elle (à une marche près, ou à m près)
   let surQuoi = null; // ce qu'il y a sous elle (le dernier support trouvé par hautSous)
@@ -1774,7 +1792,8 @@ function mysLancer(cb, fic) {
       const d = Math.hypot(dx, dz) || 1;
       return [dx / d, dz / d];
     }
-    return Math.abs(dx) - u.hx > Math.abs(dz) - u.hz ? [Math.sign(dx) || 1, 0] : [0, Math.sign(dz) || 1];
+    const [lx, lz] = loc(u, C.x, C.z);
+    return Math.abs(lx) - u.hx > Math.abs(lz) - u.hz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1);
   };
   // Le bonhomme de neige cassé : ses trois boules (la grande, la moyenne et la tête) tombent et restent sur le toit.
   // On les pousse en courant dedans (elles roulent, en tournant), on peut monter dessus. Une boule qui sort du toit tombe
@@ -1919,7 +1938,7 @@ function mysLancer(cb, fic) {
     C.luge = 1;
     C.x = LUGE.x;
     C.z = LUGE.z;
-    LUGE.a = C.phi;
+    C.phi = LUGE.a; // elle s'installe dans le sens de la luge (la caméra suit : voir lugeMarche)
     LUGE.v = 3.8;
     C.v = 0;
     C.glisse = null;
@@ -1990,7 +2009,7 @@ function mysLancer(cb, fic) {
     const n = horsToit();
     if (n && !fin) {
       C.luge = 0;
-      ((LUGE.x = LUGE.x0), (LUGE.z = LUGE.z0), (LUGE.v = 0));
+      ((LUGE.x = LUGE.x0), (LUGE.z = LUGE.z0), (LUGE.v = 0), (LUGE.a = 0));
       tombe('course', n, vx, vz, 1.5);
     }
   };
@@ -2129,13 +2148,18 @@ function mysLancer(cb, fic) {
       // les murs : la cheminée, le conduit de Valentin, la pile de cadeaux, la boîte aux lettres (elle rebondit)
       supports().forEach(u => {
         if (u.s || b.y - b.r > u.h - 0.05) return;
-        const ex = u.hx + b.r,
+        const [lx, lz] = loc(u, b.x, b.z),
+          ex = u.hx + b.r,
           ez = u.hz + b.r,
-          px = ex - Math.abs(b.x - u.x),
-          pz = ez - Math.abs(b.z - u.z);
+          px = ex - Math.abs(lx),
+          pz = ez - Math.abs(lz);
         if (px <= 0 || pz <= 0) return;
-        if (px < pz) ((b.x = u.x + Math.sign(b.x - u.x || 1) * ex), (b.vx = -b.vx * 0.4));
-        else ((b.z = u.z + Math.sign(b.z - u.z || 1) * ez), (b.vz = -b.vz * 0.4));
+        // (dans le repère de la caisse : elle ressort par le côté le plus proche, sa vitesse de ce côté s'inverse)
+        const [n0, n1] = px < pz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1),
+          vn = b.vx * n0 + b.vz * n1;
+        b.x += n0 * Math.min(px, pz);
+        b.z += n1 * Math.min(px, pz);
+        if (vn < 0) ((b.vx -= 1.4 * vn * n0), (b.vz -= 1.4 * vn * n1));
         if (Math.hypot(b.vx, b.vz) > 0.8) bruit('neige', 0.4);
       });
       // le sapin, l'antenne
@@ -5363,12 +5387,13 @@ function mysLancer(cb, fic) {
           ng = gx < gz ? [Math.sign(C.x - u.x) || 1, 0] : [0, Math.sign(C.z - u.z) || 1];
         if (gx > 0 && gz > 0 && -(Math.sin(C.phi) * ng[0] + Math.cos(C.phi) * ng[1]) > 0.35) return accroche(u, ng);
       }
-      const ex = u.hx + CORPS,
+      const [lx, lz] = loc(u, C.x, C.z),
+        ex = u.hx + CORPS,
         ez = u.hz + CORPS,
-        px = ex - Math.abs(C.x - u.x),
-        pz = ez - Math.abs(C.z - u.z);
+        px = ex - Math.abs(lx),
+        pz = ez - Math.abs(lz);
       if (px <= 0 || pz <= 0) continue;
-      const n = px < pz ? [Math.sign(C.x - u.x) || 1, 0] : [0, Math.sign(C.z - u.z) || 1]; // le côté touché, vers elle
+      const n = px < pz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1); // le côté touché, vers elle
       const e = Math.min(px < pz ? px : pz, pas1);
       C.x += n[0] * e;
       C.z += n[1] * e;
@@ -5408,10 +5433,12 @@ function mysLancer(cb, fic) {
       // arrêtée avec les pieds à moitié dans le vide, au bord d'une caisse : elle revient doucement dessus
       const u = surQuoi;
       if (!C.vy && u && u.b && C.v < 0.05) {
-        const ox = Math.abs(C.x - u.x) - (u.hx - 0.04),
-          oz = Math.abs(C.z - u.z) - (u.hz - 0.04);
-        if (ox > 0) C.x -= Math.sign(C.x - u.x) * Math.min(ox, dt * 0.6);
-        if (oz > 0) C.z -= Math.sign(C.z - u.z) * Math.min(oz, dt * 0.6);
+        const [lx, lz] = loc(u, C.x, C.z),
+          ox = Math.abs(lx) - (u.hx - 0.04),
+          oz = Math.abs(lz) - (u.hz - 0.04),
+          [mx, mz] = mon(u, ox > 0 ? -Math.sign(lx) * Math.min(ox, dt * 0.6) : 0, oz > 0 ? -Math.sign(lz) * Math.min(oz, dt * 0.6) : 0);
+        C.x += mx;
+        C.z += mz;
       }
     }
     if (!C.vy) C.dessus = surQuoi;
@@ -5874,7 +5901,7 @@ function mysLancer(cb, fic) {
       ROULE.forEach((b, i) => L.push({ cle: 'roule' + i, mod: b.k, x: b.x, y: b.y, z: b.z, centre: 1, dim: [2 * b.r, null, null], q: b.q }));
       // les jouets du bac à sable
       L.push({ cle: 'jTramp', mod: 'trampoline', x: TRAMP.x, z: TRAMP.z, dim: [2 * TRAMP.r + 0.1, TRAMP.h + 0.04, 2 * TRAMP.r + 0.1] });
-      L.push({ cle: 'jLuge', mod: 'luge', x: LUGE.x, z: LUGE.z, rot: LUGE.a, dim: [null, 0.5, null] });
+      L.push({ cle: 'jLuge', mod: 'luge', x: LUGE.x, z: LUGE.z, rot: Math.PI - LUGE.a, dim: [null, 0.5, null] }); // (son avant vers son cap)
       L.push({ cle: 'jFeux', mod: 'feux', x: FEUX.x, z: FEUX.z, dim: [null, 0.95, null] });
     }
     const m = FIG3D.rendreTout(L, { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr });

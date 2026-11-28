@@ -4,6 +4,11 @@
 
 ---
 
+## 28/11/2026 · Toit : la luge a une vraie collision et glisse dans le bon sens (version 1795865867)
+- **Collision :** on ne traverse plus la luge en marchant. Elle a sa vraie forme (0,61 × 0,97 m), tournée selon son cap, et elle arrête Célestine par le côté, par l'avant ou en biais. On peut sauter dessus (assise à 32 cm). Les boules et le ballon rebondissent dessus.
+- **Dans le bon sens :** le modèle 3D était tourné à l'envers (Célestine glissait dossier devant) et pivotait à l'inverse dans les virages. Maintenant l'avant de la luge est devant, Célestine est assise les pieds devant et le dos vers le dossier. Quand elle monte, c'est elle qui prend le cap de la luge (la luge ne pivote plus d'un coup).
+- Fichiers : `2026/js/musiques-jeux.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : Célestine saute, monte sur les objets et en redescend de façon réaliste (version 1795864063)
 - **Nouveau saut :** une vraie animation de saut (Meshy « Regular Jump ») remplace l'ancienne, qui était un petit élan suivi de pas. Elle plie les jambes, s'élance bras levés, replie les jambes en l'air, les déplie en approchant du sol et amortit à la réception. L'animation suit la vraie trajectoire du saut.
 - **Monter sur un objet :** sur un objet bas (cadeaux, ballon, boules), elle saute et se pose dessus, jambes repliées, sans saut d'image. Sur un objet haut (boîte aux lettres, cheminée, conduit de Valentin), elle s'accroche au rebord, mains posées dessus, puis se hisse et se relève debout dessus. Avant, elle était téléportée en haut, les pieds dans le vide.
