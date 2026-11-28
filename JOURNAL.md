@@ -4,6 +4,11 @@
 
 ---
 
+## 28/11/2026 · Toit : la luge ne traverse plus les immeubles (version 1795896179)
+- En fonçant dans la ruelle sans passer par le trampoline, la luge et Célestine traversaient l'immeuble de Valentin : les murs des immeubles n'étaient pas pris en compte pour la luge.
+- Maintenant, sous le niveau d'un toit, la luge bute contre les murs. Lancée assez vite (environ 6 m/s), elle franchit la ruelle et passe le rebord d'en face. Sinon, elle tape dans le mur (bruit de choc, gerbe de neige, « Aïe ! 😵 »), s'arrête net, et Célestine tombe dans la ruelle puis remonte par l'échelle. La luge revient à sa place.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : un vrai monde solide (immeubles, objets, collisions communes), la luge s'envole sur le trampoline (version 1795895828)
 - **Le fichier qui flottait au-dessus de la ruelle :** chaque morceau du jeu avait sa propre limite de toit (8,88 m pour Célestine, 9 m pour le fichier). Dans ces 12 cm, le fichier se croyait sur le toit et restait suspendu dans le vide. Il n'y a plus qu'une seule description du monde.
 - **Monde solide :** les immeubles sont des blocs pleins, du trottoir jusqu'au toit, avec de vrais murs. Chaque objet du toit a sa boîte de collision (cheminées, cadeaux, boîte aux lettres, trampoline, caisse de feux, luge) ou son cylindre (bonhomme, sapin, antenne). Le fichier, les boules de neige lancées, les boules du bonhomme et le ballon s'y cognent tous avec les mêmes règles : arêtes arrondies, rebonds, objets qui se posent ou glissent.

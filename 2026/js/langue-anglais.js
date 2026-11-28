@@ -3263,6 +3263,7 @@ window.TRADUCTIONS_EN = {
   'Wiiiii ! 🛷': 'Wheeee! 🛷',
   'Oooh ! 🎆': 'Ooooh! 🎆',
   'Aïe ! 😂': 'Ouch! 😂',
+  'Aïe ! 😵': 'Ouch! 😵',
   'Tu vas voir ! 😤': 'Just you wait! 😤',
   'Pas la tête ! 🙈': 'Not the head! 🙈',
   'Ah, c’est la guerre ! ❄️': 'Oh, it’s war now! ❄️',

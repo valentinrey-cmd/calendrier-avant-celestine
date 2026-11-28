@@ -2208,6 +2208,46 @@ function mysLancer(cb, fic) {
         surprise(ob.t);
       }
     });
+    // Les immeubles : de vrais blocs pleins. Plus bas que leur toit, la luge ne traverse pas leurs murs : tout juste sous
+    // le rebord et lancée assez vite (elle a franchi la ruelle), elle passe dessus ; sinon elle tape dans le mur, s'arrête
+    // net, et Célestine tombe dans la ruelle. (Le mur du toit qu'elle quitte la repousse seulement vers le vide.)
+    for (const u of IMM()) {
+      if (LUGE.y >= u.h - 0.02) continue;
+      const [lx, lz] = loc(u, LUGE.x, LUGE.z),
+        qx = Math.max(-u.hx, Math.min(u.hx, lx)),
+        qz = Math.max(-u.hz, Math.min(u.hz, lz)),
+        d = Math.hypot(lx - qx, lz - qz);
+      if (d >= LR) continue;
+      const [nx, nz] = d > 1e-6 ? [(lx - qx) / d, (lz - qz) / d] : Math.abs(lx) - u.hx > Math.abs(lz) - u.hz ? [Math.sign(lx) || 1, 0] : [0, Math.sign(lz) || 1],
+        vn = vx * nx + vz * nz;
+      if (vn > -0.3) {
+        // elle s'en éloigne (elle quitte ce toit) : le mur la repousse juste vers le vide
+        LUGE.x += nx * (LR - d);
+        LUGE.z += nz * (LR - d);
+        continue;
+      }
+      if (u.h - LUGE.y < 0.25 && LUGE.v > 3) {
+        // tout juste sous le rebord, lancée : elle passe dessus (ça secoue) et continue sur ce toit
+        LUGE.x = u.x + qx - nx * 0.06;
+        LUGE.z = u.z + qz - nz * 0.06;
+        ((LUGE.y = u.h), (LUGE.vy = 0), (LUGE.v *= 0.8));
+        bruit('atterrit', 0.9);
+        continue;
+      }
+      // elle tape dans le mur : la luge s'arrête net, Célestine tombe dans la ruelle (la luge revient à sa place)
+      LUGE.x += nx * (LR - d);
+      LUGE.z += nz * (LR - d);
+      ((C.x = LUGE.x), (C.z = LUGE.z), (C.y = LUGE.y));
+      bruit('crash');
+      bruit('luge', 0);
+      const [px, py] = P(LUGE.x - nx * LR, LUGE.y + 0.3, LUGE.z - nz * LR);
+      for (let j = 0; j < 22; j++) eclats.push({ x: px, y: py, vx: (Math.random() - 0.5) * 220, vy: -Math.random() * 160, t: 0.7, c: '#ffffff' });
+      parle(C, 'Aïe ! 😵', 1.6);
+      C.luge = 0;
+      const vy = Math.min(0, LUGE.vy);
+      ((LUGE.x = LUGE.x0), (LUGE.z = LUGE.z0), (LUGE.y = 0), (LUGE.vy = 0), (LUGE.v = 0), (LUGE.a = 0));
+      return tombe('saut', horsToit() || [nx, nz], 0, 0, vy);
+    }
     if (LUGE.y < 1.5) LUGE.z = Math.min(RIDGE - 0.3, LUGE.z); // le faîtage
     // ce qu'il y a sous elle
     const sous = solSous(LUGE.x, LUGE.z, vol ? yAvant : LUGE.y, vol ? 0.02 : 0.31);
