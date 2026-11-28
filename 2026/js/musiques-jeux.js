@@ -1804,7 +1804,7 @@ function mysLancer(cb, fic) {
     ELAN = 0.09;
   const supports = () => {
     const L = [
-      { b: 1, x: 0, z: CZ, hx: CX, hz: CD, h: TOP },
+      { b: 1, chim: 1, x: 0, z: CZ, hx: CX, hz: CD, h: TOP },
       { b: 1, x: VOISIN.cx, z: VOISIN.cz, hx: VOISIN.ce, hz: VOISIN.ce, h: VOISIN.ch }
     ];
     OBS.forEach(ob => {
@@ -1813,7 +1813,7 @@ function mysLancer(cb, fic) {
     });
     L.push({ b: 1, x: TRAMP.x, z: TRAMP.z, hx: TRAMP.r * 0.85, hz: TRAMP.r * 0.85, h: TRAMP.h, tramp: 1 });
     L.push({ b: 1, x: FEUX.x, z: FEUX.z, hx: 0.24, hz: 0.24, h: FEUX.h, feux: 1 });
-    if (!C.luge) L.push({ b: 1, x: LUGE.x, z: LUGE.z, a: LUGE.a, hx: 0.3, hz: 0.48, h: 0.32, luge: 1 }); // (0,61 × 0,97 m, assise à 32 cm)
+    if (!C.luge) L.push({ b: 1, x: LUGE.x, z: LUGE.z, a: LUGE.a, hx: 0.3, hz: 0.48, y0: LUGE.y, h: LUGE.y + 0.32, luge: 1 }); // (0,61 × 0,97 m, assise à 32 cm)
     ROULE.forEach(r => r.y > -1 && !r.porte && L.push({ s: 1, x: r.x, z: r.z, r: r.r, y: r.y, h: r.y + r.r, boule: r }));
     return L;
   };
@@ -1852,6 +1852,17 @@ function mysLancer(cb, fic) {
       if (t > h && t <= y + m) ((h = t), (surQuoi = u));
     }
     return h;
+  };
+  // le sol sous un point (x, z) : le plus haut des toits et des dessus d'objets, pas plus haut que y + m (sinon, la rue) ;
+  // rend { h, u } (u : sur quoi)
+  const solSous = (x, z, y, m) => {
+    let h = SOL,
+      su = null;
+    for (const u of [...IMM(), ...supports()]) {
+      const t = u.imm ? (Math.abs(loc(u, x, z)[0]) < u.hx && Math.abs(loc(u, x, z)[1]) < u.hz ? u.h : -99) : dessus(u, x, z);
+      if (t > h && t <= y + m) ((h = t), (su = u));
+    }
+    return { h, u: su };
   };
   // un support reconnu d'une image à l'autre (supports() les refait à chaque fois)
   const cleU = u => (u ? (u.boule ? u.boule : u.x.toFixed(2) + ',' + u.z.toFixed(2)) : null);
@@ -1901,7 +1912,7 @@ function mysLancer(cb, fic) {
   //   Le bouton d'action (« Lancer » / E / clic gauche) change selon ce qu'il y a autour d'elle : voir agir().
   const TRAMP = { x: 4.7, z: 4.3, r: 0.6, h: 0.27 },
     FEUX = { x: 4.4, z: 7.6, h: 0.5 },
-    LUGE = { x: -5.6, z: 2.6, a: 0, v: 0, x0: -5.6, z0: 2.6 },
+    LUGE = { x: -5.6, z: 2.6, y: 0, vy: 0, a: 0, v: 0, x0: -5.6, z0: 2.6 },
     FUSEES = [], // les fusées qui montent, puis leurs étincelles
     ETINC = [];
   // le bouton d'action : « Lancer » le fichier, ou ce qu'on peut faire ici (boule de neige, ramasser, luge, allumer…)
@@ -1911,6 +1922,98 @@ function mysLancer(cb, fic) {
     const ac = action(),
       txt = ac ? { Boule: 'Boule ❄️', Ramasser: 'Ramasser', Poser: 'Poser', Luge: 'Luge 🛷', Descendre: 'Descendre', Allumer: 'Allumer 🎆' }[ac] : 'Lancer';
     if (btnAvant != txt) ((btnAvant = txt), (btnTxt.textContent = txt));
+  };
+  // ---- Le monde solide. Tout ce qui bouge sans être un personnage (le fichier, les boules de neige lancées, les boules
+  // du bonhomme, le ballon) s'y cogne avec les mêmes règles (heurte) :
+  //  - les immeubles sont des blocs pleins, du trottoir jusqu'au toit (IMM) : on ne passe pas à travers leurs murs, et une
+  //    boule trop grosse pour la ruelle reste coincée entre les deux immeubles ;
+  //  - chaque objet du toit a sa boîte (cheminées, cadeaux, boîte aux lettres, caisse de feux, luge, trampoline : supports)
+  //    ou son cylindre (bonhomme, sapin, antenne : OBS, rayon selon la hauteur, voir rayon).
+  let IMM_ = null;
+  const IMM = () =>
+    IMM_ ||
+    (IMM_ = [
+      { b: 1, imm: 'nous', x: 0, z: (BORD + RIDGE) / 2, hx: 8.88, hz: (RIDGE - BORD) / 2, y0: SOL, h: 0 },
+      {
+        b: 1,
+        imm: 'valentin',
+        x: (VOISIN.x0 + VOISIN.x1) / 2,
+        z: (VOISIN.z0 + VOISIN.z1) / 2,
+        hx: (VOISIN.x1 - VOISIN.x0) / 2,
+        hz: (VOISIN.z1 - VOISIN.z0) / 2,
+        y0: SOL,
+        h: VOISIN.h
+      },
+      ...VILLE.B.map(B => ({ b: 1, imm: 'ville', x: (B.x0 + B.x1) / 2, z: (B.z0 + B.z1) / 2, hx: (B.x1 - B.x0) / 2, hz: (B.z1 - B.z0) / 2, y0: SOL, h: B.top }))
+    ]);
+  const solides = () => [
+    ...IMM(),
+    ...supports().filter(u => u.b),
+    ...OBS.filter(ob => ob.t != 'cadeaux' && ob.t != 'boite').map(ob => ({ cyl: 1, ob, x: ob.x, z: ob.z, h: ob.h }))
+  ];
+  // Une chose qui bouge (o : x, y, z, vx, vy, vz) touche le monde solide : une sphère de rayon r autour d'un cœur plat de
+  // demi-largeur e (le fichier ; 0 pour une boule). Elle ressort par le plus court chemin (le point le plus proche de
+  // chaque bloc : les arêtes et les coins sont arrondis, comme en vrai) et rebondit : kSol sur un dessus, kMur contre un
+  // côté, 0,85 sur la toile du trampoline ; un tout petit rebond sur un dessus s'éteint (seuil) : elle s'y pose.
+  // Rend ce qu'elle a touché : [{ u (le solide), n: [nx, ny, nz] (vers elle), v (sa vitesse contre lui, < 0 = un choc) }].
+  const heurte = (o, r, e, kSol, kMur, ignore, seuil = 1.2) => {
+    const L = [];
+    for (const u of solides()) {
+      if (ignore && ignore(u)) continue;
+      let nx,
+        ny,
+        nz,
+        p;
+      if (u.cyl) {
+        if (o.y - r > u.h || o.y + r < 0) continue;
+        const dx = o.x - u.x,
+          dz = o.z - u.z,
+          d = Math.hypot(dx, dz),
+          m = rayon(u.ob, Math.max(0, Math.min(u.h, o.y))) + r + e;
+        if (d >= m || d == 0) continue;
+        ((nx = dx / d), (ny = 0), (nz = dz / d), (p = m - d));
+      } else {
+        const y0 = u.y0 || 0,
+          [lx, lz] = loc(u, o.x, o.z),
+          ax = u.hx + e,
+          az = u.hz + e;
+        if (Math.abs(lx) > ax + r || Math.abs(lz) > az + r || o.y > u.h + r || o.y < y0 - r) continue;
+        const qx = Math.max(-ax, Math.min(ax, lx)),
+          qz = Math.max(-az, Math.min(az, lz)),
+          qy = Math.max(y0, Math.min(u.h, o.y)),
+          dx = lx - qx,
+          dy = o.y - qy,
+          dz = lz - qz,
+          d = Math.hypot(dx, dy, dz);
+        if (d >= r) continue;
+        if (d > 1e-6) ((p = r - d), ([nx, nz] = mon(u, dx / d, dz / d)), (ny = dy / d));
+        else {
+          // son centre est dedans : elle ressort par la face la plus proche
+          const fx = ax - Math.abs(lx),
+            fz = az - Math.abs(lz),
+            fh = u.h - o.y,
+            m = Math.min(fx, fz, fh);
+          p = m + r;
+          if (m == fh) ((nx = 0), (ny = 1), (nz = 0));
+          else if (m == fx) (([nx, nz] = mon(u, Math.sign(lx) || 1, 0)), (ny = 0));
+          else (([nx, nz] = mon(u, 0, Math.sign(lz) || 1)), (ny = 0));
+        }
+      }
+      o.x += nx * p;
+      o.y += ny * p;
+      o.z += nz * p;
+      const vn = o.vx * nx + o.vy * ny + o.vz * nz;
+      if (vn < 0) {
+        const dessus = ny > 0.7,
+          k = dessus ? (u.tramp ? 0.85 : vn > -seuil ? 0 : kSol) : kMur;
+        o.vx -= (1 + k) * vn * nx;
+        o.vy -= (1 + k) * vn * ny;
+        o.vz -= (1 + k) * vn * nz;
+        if (!dessus) ((o.vx *= 0.97), (o.vz *= 0.97)); // (un frottement contre le mur)
+      }
+      L.push({ u, n: [nx, ny, nz], v: vn });
+    }
+    return L;
   };
   // près de quelque chose (à d m)
   const pres = (u, d) => Math.hypot(C.x - u.x, C.z - u.z) < d;
@@ -1931,7 +2034,7 @@ function mysLancer(cb, fic) {
   const agir = () => {
     const a = action();
     C.idle = 0;
-    if (a == 'Descendre') return descendLuge();
+    if (a == 'Descendre') return LUGE.vy ? null : descendLuge(); // (en l'air, on ne descend pas)
     if (a == 'Poser') return poser();
     if (a == 'Allumer') return feuDArtifice();
     if (a == 'Luge') return monteLuge();
@@ -2010,6 +2113,7 @@ function mysLancer(cb, fic) {
     C.luge = 1;
     C.x = LUGE.x;
     C.z = LUGE.z;
+    C.y = LUGE.y;
     C.phi = LUGE.a; // elle s'installe dans le sens de la luge (la caméra suit : voir lugeMarche)
     LUGE.v = 3.8;
     C.v = 0;
@@ -2024,68 +2128,117 @@ function mysLancer(cb, fic) {
     C.x += Math.cos(LUGE.a) * 0.55;
     C.z -= Math.sin(LUGE.a) * 0.55;
   };
+  // La luge : on la dirige au joystick (gauche/droite pour tourner, haut pour pousser, bas pour freiner). Elle a sa
+  // hauteur à elle : elle suit ce qui est sous elle, monte sur le trampoline et s'envole avec son élan (plus elle va vite,
+  // plus elle monte), retombe (elle rebondit encore sur le trampoline), et file dans le vide au bord d'un toit.
+  // Ce qu'elle percute plus haut que son patin la renvoie (dans son repère : elle repart en biais, ralentie).
+  const LR = 0.42; // le rayon de la luge avec Célestine dessus
   const lugeMarche = (dt, ix, iy) => {
     majBouton();
-    bruit('luge', LUGE.v);
-    LUGE.a += ix * dt * 1.9 * Math.min(1, 0.4 + LUGE.v / 3);
-    LUGE.v = Math.max(0, Math.min(6.5, LUGE.v + (iy < -0.3 ? 2.4 : iy > 0.3 ? -4 : -0.35) * dt));
-    const vx = Math.sin(LUGE.a) * LUGE.v,
+    const vol = !!LUGE.vy;
+    bruit('luge', vol ? 0 : LUGE.v);
+    if (!vol) {
+      LUGE.a += ix * dt * 1.9 * Math.min(1, 0.4 + LUGE.v / 3);
+      LUGE.v = Math.max(0, Math.min(6.5, LUGE.v + (iy < -0.3 ? 2.4 : iy > 0.3 ? -4 : -0.35) * dt));
+    }
+    let vx = Math.sin(LUGE.a) * LUGE.v,
       vz = Math.cos(LUGE.a) * LUGE.v;
-    C.x += vx * dt;
-    C.z += vz * dt;
-    C.phi = LUGE.a;
-    C.v = 0;
-    ctl.yaw += Math.atan2(Math.sin(LUGE.a - ctl.yaw), Math.cos(LUGE.a - ctl.yaw)) * Math.min(1, dt * 2.5); // la caméra suit
-    // elle rebondit sur ce qu'elle percute (et pousse les boules et le ballon)
+    LUGE.x += vx * dt;
+    LUGE.z += vz * dt;
+    const yAvant = LUGE.y; // (en tombant vite, on cherche le sol depuis la hauteur d'avant : elle ne passe pas à travers)
+    if (vol) ((LUGE.vy -= G * dt), (LUGE.y += LUGE.vy * dt));
+    const rebond = (nx, nz, k) => {
+      // elle repart en biais (sa vitesse contre l'obstacle s'inverse) et ralentit
+      const vn = vx * nx + vz * nz;
+      if (vn >= 0) return;
+      vx -= 2 * vn * nx;
+      vz -= 2 * vn * nz;
+      LUGE.a = Math.atan2(vx, vz);
+      LUGE.v = Math.hypot(vx, vz) * k;
+      ((vx = Math.sin(LUGE.a) * LUGE.v), (vz = Math.cos(LUGE.a) * LUGE.v));
+    };
     for (const u of supports()) {
+      if (u.luge) continue;
       if (u.s) {
-        const d = Math.hypot(u.x - C.x, u.z - C.z),
-          m = u.r + 0.3;
-        if (d < m && d > 0) {
-          const nx = (u.x - C.x) / d,
-            nz = (u.z - C.z) / d;
+        // une boule, le ballon : elle les pousse
+        const d = Math.hypot(u.x - LUGE.x, u.z - LUGE.z),
+          m = u.r + LR;
+        if (d < m && d > 0 && LUGE.y < u.y + u.r * 0.5) {
+          const nx = (u.x - LUGE.x) / d,
+            nz = (u.z - LUGE.z) / d;
           u.boule.vx += nx * LUGE.v * 0.9;
           u.boule.vz += nz * LUGE.v * 0.9;
-          u.boule.x = C.x + nx * m;
-          u.boule.z = C.z + nz * m;
+          u.boule.x = LUGE.x + nx * m;
+          u.boule.z = LUGE.z + nz * m;
           LUGE.v *= 0.7;
         }
         continue;
       }
-      if (u.tramp) continue;
-      const ex = u.hx + 0.3,
-        ez = u.hz + 0.3,
-        px = ex - Math.abs(C.x - u.x),
-        pz = ez - Math.abs(C.z - u.z);
-      if (px <= 0 || pz <= 0) continue;
-      if (px < pz) ((C.x = u.x + Math.sign(C.x - u.x || 1) * ex), (LUGE.a = -LUGE.a));
-      else ((C.z = u.z + Math.sign(C.z - u.z || 1) * ez), (LUGE.a = Math.PI - LUGE.a));
-      LUGE.v *= 0.55;
+      if (LUGE.y >= u.h - 0.02) continue; // elle passe au-dessus
+      const [lx, lz] = loc(u, LUGE.x, LUGE.z),
+        qx = Math.max(-u.hx, Math.min(u.hx, lx)),
+        qz = Math.max(-u.hz, Math.min(u.hz, lz)),
+        d = Math.hypot(lx - qx, lz - qz);
+      if (d >= LR) continue;
+      // le trampoline : lancée, elle monte dessus et s'envole avec son élan
+      if (u.tramp && !vol && LUGE.v > 1.2) {
+        LUGE.y = u.h;
+        LUGE.vy = Math.min(9.5, 2.5 + LUGE.v * 1.05);
+        bruit('trampo', 1);
+        parle(C, 'Waouh ! 🚀', 1.4);
+        continue;
+      }
+      const [nx, nz] = d > 1e-6 ? mon(u, (lx - qx) / d, (lz - qz) / d) : mon(u, Math.sign(lx) || 1, 0);
+      LUGE.x += nx * (LR - d);
+      LUGE.z += nz * (LR - d);
+      rebond(nx, nz, 0.55);
       bruit('obstacle', u.ob ? u.ob.t : 'cadeaux', 0.6);
       if (u.ob) surprise(u.ob.t);
     }
     OBS.forEach(ob => {
-      if (ob.t == 'cadeaux' || ob.t == 'boite') return;
-      const d = Math.hypot(C.x - ob.x, C.z - ob.z),
-        m = rayon(ob, 0.3) + 0.3;
+      if (ob.t == 'cadeaux' || ob.t == 'boite' || LUGE.y > ob.h) return;
+      const dx = LUGE.x - ob.x,
+        dz = LUGE.z - ob.z,
+        d = Math.hypot(dx, dz),
+        m = rayon(ob, LUGE.y + 0.3) + LR;
       if (d < m && d > 0) {
-        C.x = ob.x + ((C.x - ob.x) / d) * m;
-        C.z = ob.z + ((C.z - ob.z) / d) * m;
-        LUGE.a += Math.PI * 0.6;
-        LUGE.v *= 0.5;
+        LUGE.x = ob.x + (dx / d) * m;
+        LUGE.z = ob.z + (dz / d) * m;
+        rebond(dx / d, dz / d, 0.5);
         surprise(ob.t);
       }
     });
-    C.z = Math.min(RIDGE - 0.3, C.z);
-    LUGE.x = C.x;
-    LUGE.z = C.z;
-    // au bord du toit : elle s'envole avec sa luge… et tombe dans la rue (la luge revient à sa place)
-    const n = horsToit();
-    if (n && !fin) {
+    if (LUGE.y < 1.5) LUGE.z = Math.min(RIDGE - 0.3, LUGE.z); // le faîtage
+    // ce qu'il y a sous elle
+    const sous = solSous(LUGE.x, LUGE.z, vol ? yAvant : LUGE.y, vol ? 0.02 : 0.31);
+    if (vol) {
+      if (LUGE.y <= sous.h && LUGE.vy < 0) {
+        if (sous.u && sous.u.tramp && LUGE.vy < -2.5) ((LUGE.y = sous.h), (LUGE.vy = -LUGE.vy * 0.7), bruit('trampo', 0.8));
+        else {
+          // elle retombe sur la luge (ça secoue)
+          bruit('atterrit', Math.min(1, -LUGE.vy / 7));
+          ((LUGE.y = sous.h), (LUGE.vy = 0), (LUGE.v *= 0.85));
+        }
+      }
+    } else if (LUGE.vy) {
+      // (elle vient de décoller du trampoline)
+    } else if (sous.h < LUGE.y - 0.02) LUGE.vy = -0.01; // plus rien dessous : elle part dans le vide
+    else LUGE.y = sous.h;
+    C.x = LUGE.x;
+    C.z = LUGE.z;
+    C.y = LUGE.y;
+    C.phi = LUGE.a;
+    C.v = 0;
+    C.base = sous.h;
+    ctl.yaw += Math.atan2(Math.sin(LUGE.a - ctl.yaw), Math.cos(LUGE.a - ctl.yaw)) * Math.min(1, dt * 2.5); // la caméra suit
+    C.camSol = (C.camSol || 0) + (Math.max(0, sous.h) - (C.camSol || 0)) * Math.min(1, dt * 4);
+    // tombée plus bas que les toits (dans la rue, la ruelle) : elle tombe avec son élan, la luge revient à sa place
+    if (LUGE.y < -0.3 && !fin) {
       C.luge = 0;
       bruit('luge', 0);
-      ((LUGE.x = LUGE.x0), (LUGE.z = LUGE.z0), (LUGE.v = 0), (LUGE.a = 0));
-      tombe('course', n, vx, vz, 1.5);
+      const vy = LUGE.vy;
+      ((LUGE.x = LUGE.x0), (LUGE.z = LUGE.z0), (LUGE.y = 0), (LUGE.vy = 0), (LUGE.v = 0), (LUGE.a = 0));
+      tombe('saut', horsToit() || [0, -1], vx, vz, vy);
     }
   };
   // la caisse de feux d'artifice : trois fusées qui montent en sifflant et éclatent au-dessus de Lyon
@@ -2207,34 +2360,33 @@ function mysLancer(cb, fic) {
     for (let i = ROULE.length - 1; i >= 0; i--) {
       const b = ROULE[i];
       if (b.porte) continue; // dans ses bras
-      const bas = surToit(b.x, b.z) ? 0 : SOL,
-        rebond = b.k == 'ballon' ? 0.72 : 0.28; // le ballon rebondit bien plus
-      // la pesanteur, puis le rebond (de moins en moins) sur la neige
+      const rebond = b.k == 'ballon' ? 0.72 : 0.28; // le ballon rebondit bien plus
+      // la pesanteur, puis le monde solide : les toits, les objets, les murs des immeubles (trop grosse pour la ruelle,
+      // elle reste coincée entre les deux immeubles), la toile du trampoline (elle rebondit bien plus)
       b.vy -= G * dt;
+      b.x += b.vx * dt;
       b.y += b.vy * dt;
-      // tombée sur le trampoline : elle rebondit (bien plus que sur la neige), puis s'y pose
-      if (b.vy <= 0 && b.y - b.r <= TRAMP.h && b.y - b.r > TRAMP.h - 0.25 && Math.hypot(b.x - TRAMP.x, b.z - TRAMP.z) < TRAMP.r) {
-        b.y = TRAMP.h + b.r;
-        if (b.vy < -1.2) ((b.vy = -b.vy * (b.k == 'ballon' ? 0.9 : 0.75)), bruit('trampo', Math.min(1, b.vy / 6)));
-        else b.vy = 0;
-      } else if (b.y - b.r <= bas) {
-        b.y = bas + b.r;
-        if (b.vy < -1.2) ((b.vy = -b.vy * rebond), b.k == 'ballon' ? bruit('ballon', Math.min(1, b.vy / 4)) : bruit('neige', Math.min(1, b.vy / 4)));
-        else b.vy = 0;
-        if (bas == SOL) {
-          // tombée dans la rue : elle s'écrase (le ballon, lui, revient à sa place)
-          ROULE.splice(i, 1);
-          if (b.k == 'ballon') ROULE.push({ k: 'ballon', r: 0.36, x: -4.6, z: 5.6, y: 3, vx: 0, vz: 0, vy: 0, q: [0, 0, 0, 1] });
-          continue;
-        }
-        // elle roule : la neige la freine (le ballon glisse mieux) ; une boule de neige qui roule grossit !
+      b.z += b.vz * dt;
+      let sol = null;
+      for (const t of heurte(b, b.r, 0, rebond, 0.4)) {
+        if (t.n[1] > 0.7) sol = t;
+        else if (t.v < -0.3) (t.u.ob && t.u.cyl && surprise(t.u.ob.t), t.v < -0.8 && bruit(b.k == 'ballon' ? 'ballon' : 'neige', Math.min(1, -t.v / 4)));
+      }
+      if (sol) {
+        if (sol.v < -1.2)
+          sol.u.tramp
+            ? bruit('trampo', Math.min(1, -sol.v / 6))
+            : b.k == 'ballon'
+              ? bruit('ballon', Math.min(1, -sol.v / 4))
+              : bruit('neige', Math.min(1, -sol.v / 4));
+        // elle roule : la neige la freine (le ballon glisse mieux) ; une boule de neige qui roule dans la neige d'un toit
+        // ramasse de la neige : elle grossit, jusqu'à 1,3 m de rayon
         const v = Math.hypot(b.vx, b.vz);
-        if (v > 0) {
+        if (v > 0 && !b.vy) {
           const nv = Math.max(0, v - dt * (b.k == 'ballon' ? 0.6 : 1.3));
           b.vx *= nv / v;
           b.vz *= nv / v;
-          // (une boule de neige qui roule dans la neige du toit ramasse de la neige : elle grossit, jusqu'à 1,3 m de rayon)
-          if (b.k != 'ballon' && b.r < GROS && v > 0.3) {
+          if (sol.u.imm && sol.u.imm != 'ville' && b.k != 'ballon' && b.r < GROS && v > 0.3) {
             const r0 = b.r;
             b.r = Math.min(GROS, b.r + v * dt * 0.05);
             b.y += b.r - r0; // (elle reste posée sur la neige)
@@ -2242,30 +2394,18 @@ function mysLancer(cb, fic) {
           }
         }
       }
-      b.x += b.vx * dt;
-      b.z += b.vz * dt;
+      // tombée jusque dans la rue : elle s'écrase (le ballon, lui, revient à sa place)
+      if (b.y - b.r <= SOL + 0.05) {
+        ROULE.splice(i, 1);
+        bruit('neige', 0.5);
+        if (b.k == 'ballon') ROULE.push({ k: 'ballon', r: 0.36, x: -4.6, z: 5.6, y: 3, vx: 0, vz: 0, vy: 0, q: [0, 0, 0, 1] });
+        continue;
+      }
       // le faîtage (le haut des deux toits) : elle rebondit dessus et redescend
       if (b.z > RIDGE - b.r && b.y < 1.5) ((b.z = RIDGE - b.r), (b.vz = -Math.abs(b.vz) * 0.4));
       // elle tourne en roulant (axe : la verticale × sa vitesse)
       const v = Math.hypot(b.vx, b.vz);
       if (v > 0.01) b.q = tourne(b.q, b.vz / v, 0, -b.vx / v, (v * dt) / b.r);
-      // les murs : la cheminée, le conduit de Valentin, la pile de cadeaux, la boîte aux lettres (elle rebondit)
-      supports().forEach(u => {
-        if (u.s || b.y - b.r > u.h - 0.05) return;
-        const [lx, lz] = loc(u, b.x, b.z),
-          ex = u.hx + b.r,
-          ez = u.hz + b.r,
-          px = ex - Math.abs(lx),
-          pz = ez - Math.abs(lz);
-        if (px <= 0 || pz <= 0) return;
-        // (dans le repère de la caisse : elle ressort par le côté le plus proche, sa vitesse de ce côté s'inverse)
-        const [n0, n1] = px < pz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1),
-          vn = b.vx * n0 + b.vz * n1;
-        b.x += n0 * Math.min(px, pz);
-        b.z += n1 * Math.min(px, pz);
-        if (vn < 0) ((b.vx -= 1.4 * vn * n0), (b.vz -= 1.4 * vn * n1));
-        if (Math.hypot(b.vx, b.vz) > 0.8) bruit('neige', 0.4);
-      });
       // Célestine : une boule qui roule vers elle s'arrête contre elle (et la pousse un peu), elle ne la traverse pas
       if (!C.chute && !C.luge && !C.hisse && C.y < b.y + b.r * 0.6 && C.y + 1.6 > b.y - b.r) {
         const dx = C.x - b.x,
@@ -2284,22 +2424,6 @@ function mysLancer(cb, fic) {
           if (vn > 0) ((b.vx -= vn * nx * 0.8), (b.vz -= vn * nz * 0.8));
         }
       }
-      // le sapin, l'antenne
-      OBS.forEach(ob => {
-        if (ob.t == 'cadeaux' || ob.t == 'boite') return;
-        const dx = b.x - ob.x,
-          dz = b.z - ob.z,
-          d = Math.hypot(dx, dz),
-          m = rayon(ob, b.y) + b.r;
-        if (d < m && d > 0) {
-          const nx = dx / d,
-            nz = dz / d,
-            vn = b.vx * nx + b.vz * nz;
-          b.x = ob.x + nx * m;
-          b.z = ob.z + nz * m;
-          if (vn < 0) ((b.vx -= 1.4 * vn * nx), (b.vz -= 1.4 * vn * nz), surprise(ob.t));
-        }
-      });
     }
     // les boules entre elles (la plus grosse pèse plus lourd)
     for (let i = 0; i < ROULE.length; i++)
@@ -4050,9 +4174,7 @@ function mysLancer(cb, fic) {
     F.y += F.vy * h;
     F.z += F.vz * h;
     F.a += F.va * h;
-    const pose = F.dessus; // posé sur un objet (trampoline, luge, caisse, cadeaux) à l'étape d'avant : le vent ne le pousse pas
-    F.dessus = 0;
-    if (!F.in && !F.sol && !pose && !F.deVal && F.y > 0.05) {
+    if (!F.in && !F.sol && !F.deVal && F.y > 0.05) {
       // le vent pousse le fichier, et l'effet le fait tourner en courbe (pas quand c'est Valentin qui le renvoie)
       F.vx += VENT.x * h;
       F.vz += VENT.z * h;
@@ -4122,36 +4244,6 @@ function mysLancer(cb, fic) {
         bruit('brique', 0.6);
       }
     }
-    // obstacles du toit
-    OBS.forEach(ob => {
-      const dx = F.x - ob.x,
-        dz = F.z - ob.z,
-        d = Math.hypot(dx, dz),
-        m = rayon(ob, F.y) + 0.12;
-      if (F.y < ob.h && d < m && d > 0) {
-        surprise(ob.t); // il l'a vraiment touché
-        const nx = dx / d,
-          nz = dz / d,
-          v = F.vx * nx + F.vz * nz;
-        F.x = ob.x + nx * m;
-        F.z = ob.z + nz * m;
-        if (v < 0) {
-          F.vx -= 1.35 * v * nx;
-          F.vz -= 1.35 * v * nz;
-          F.va = -F.va * 0.5 + v * 2;
-          if (v < -0.8) choc(0.5);
-          if (v < -0.3) bruit('obstacle', ob.t, Math.min(1, -v / 3));
-        }
-      }
-      // atterrir sur le dessus d'un obstacle bas (les cadeaux)
-      if (ob.t == 'cadeaux' && p.y >= ob.h && F.y < ob.h && d < ob.r) {
-        F.y = ob.h;
-        surprise('cadeaux');
-        if (F.vy < -1) bruit('obstacle', 'cadeaux', Math.min(1, -F.vy / 6));
-        F.vy = Math.abs(F.vy) * 0.25;
-        if (F.vy < 0.3) F.dessus = 1;
-      }
-    });
     // les boules du bonhomme : le fichier rebondit dessus (et les pousse un peu), ou se pose dessus
     ROULE.forEach(b => {
       if (b.porte) return; // (dans les bras de Célestine : elle ne pousse pas le fichier en l'air)
@@ -4176,34 +4268,6 @@ function mysLancer(cb, fic) {
         b.vz -= v * nz * 0.25;
         if (v < -0.8) bruit('neige', Math.min(1, -v / 4));
       }
-    });
-    // le trampoline : le fichier rebondit dessus (de moins en moins haut), puis s'y pose
-    if (p.y >= TRAMP.h && F.y < TRAMP.h && F.vy < 0 && Math.hypot(F.x - TRAMP.x, F.z - TRAMP.z) < TRAMP.r) {
-      F.y = TRAMP.h;
-      if (F.vy < -1.5) {
-        F.vy = -F.vy * 0.85;
-        F.va += (Math.random() - 0.5) * 6;
-        bruit('trampo', Math.min(1, F.vy / 6));
-      } else ((F.vy = 0), (F.vx *= 0.9), (F.vz *= 0.9), (F.dessus = 1));
-    }
-    // la luge et la caisse de feux d'artifice : il se pose dessus, ou rebondit contre leurs côtés
-    supports().forEach(u => {
-      if (!u.luge && !u.feux) return;
-      const [lx, lz] = loc(u, F.x, F.z),
-        px = u.hx + 0.05 - Math.abs(lx),
-        pz = u.hz + 0.05 - Math.abs(lz);
-      if (px <= 0 || pz <= 0 || F.y >= u.h) return;
-      if (p.y >= u.h) {
-        F.y = u.h;
-        F.vy = F.vy < -1.4 ? -F.vy * 0.25 : 0;
-        if (!F.vy) ((F.vx *= 0.9), (F.vz *= 0.9), (F.dessus = 1));
-        return;
-      }
-      const [n0, n1] = px < pz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1),
-        v = F.vx * n0 + F.vz * n1;
-      F.x += n0 * Math.min(px, pz);
-      F.z += n1 * Math.min(px, pz);
-      if (v < 0) ((F.vx -= 1.35 * v * n0), (F.vz -= 1.35 * v * n1), bruit('obstacle', 'cadeaux', Math.min(1, -v / 3)));
     });
     // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
     const tp = traineauPos(T());
@@ -4252,53 +4316,47 @@ function mysLancer(cb, fic) {
       choc(0.6);
     }
     if (F.tombe) return;
-    // bord du toit côté caméra : il ne revient pas vers nous
-    // il passe le faîtage (ou sort tout à fait sur le côté) : il tombe de l'autre côté, caché derrière le faîtage.
-    // Le toit de Valentin, lui, est solide : le fichier y atterrit et y glisse comme sur le nôtre
-    const chezVal = surVoisin(F.x, F.z);
-    if (!chezVal && (F.z > RIDGE || F.z < BORD || Math.abs(F.x) > 9)) {
-      if (F.y < 0.05 && !F.tombe) {
-        F.tombe = 1;
-        bruit('tombe');
-      }
-      return;
-    }
-    if (chezVal) {
-      // le petit conduit de cheminée de Valentin : le fichier rebondit dessus
-      const { cx, cz, ce, h: hv } = VOISIN,
-        ch = hv + VOISIN.ch,
-        ex = F.x - cx,
-        ez = F.z - cz;
-      if (F.y < ch && Math.abs(ex) < ce + 0.08 && Math.abs(ez) < ce + 0.08) {
-        if (p.y >= ch) ((F.y = ch), (F.vy = Math.abs(F.vy) * 0.3));
-        else if (Math.abs(ex) > Math.abs(ez)) ((F.x = cx + Math.sign(ex) * (ce + 0.081)), (F.vx = -F.vx * 0.3));
-        else ((F.z = cz + Math.sign(ez) * (ce + 0.081)), (F.vz = -F.vz * 0.3));
-        if (Math.abs(F.vx) + Math.abs(F.vz) > 0.5) (bruit('brique', 0.5), choc(0.4));
+    // Le monde solide (les immeubles, les objets du toit ; la cheminée à part, plus haut : il peut y entrer) : il s'y
+    // cogne, rebondit, se pose dessus et y glisse. Plus rien dessous (le bord du toit, la ruelle, derrière le faîtage) :
+    // il tombe le long du mur, puis disparaît et retombe du ciel.
+    let sol = null;
+    for (const t of heurte(F, 0.03, 0.08, 0.24, 0.35, u => u.chim, 1.4)) {
+      const ob = t.u.ob;
+      if (t.n[1] > 0.7) sol = t;
+      else if (t.v < 0) {
+        if (ob) surprise(ob.t); // il l'a vraiment touché
+        F.va = -F.va * 0.5 + t.v * 2;
+        if (t.v < -0.8) choc(0.5);
+        if (t.v < -0.3) t.u.imm || !ob ? bruit('brique', Math.min(1, -t.v / 3)) : bruit('obstacle', ob.t, Math.min(1, -t.v / 3));
       }
     }
-    // le toit : rebonds, puis glissade sur la neige avec frottement
-    const sy = (chezVal ? VOISIN.h : 0) + 0.03;
-    if (F.y <= sy) {
-      F.y = sy;
-      // il touche la neige : longueur du lancer de Célestine
+    F.sol = sol ? 1 : 0;
+    if (sol) {
+      // il touche le dessus : longueur du lancer de Célestine
       if (F.moi && !F.touche) ((F.touche = 1), record('dist', Math.hypot(F.x - F.x0, F.z - F.z0)));
-      if (F.vy < -1.4) {
-        bruit('neige', Math.min(1, -F.vy / 7));
-        F.vy = -F.vy * 0.24;
-        F.vx *= 0.75;
-        F.vz *= 0.75;
-        F.va *= 0.6;
+      const ob = sol.u.ob;
+      if (sol.v < -1.4) {
+        // il rebondit (de moins en moins)
+        if (sol.u.tramp) bruit('trampo', Math.min(1, -sol.v / 6));
+        else if (ob) (surprise(ob.t), bruit('obstacle', ob.t, Math.min(1, -sol.v / 6)));
+        else bruit('neige', Math.min(1, -sol.v / 7));
+        if (!sol.u.tramp) ((F.vx *= 0.75), (F.vz *= 0.75), (F.va *= 0.6));
         if (F.vy > 0.6) choc(0.35);
+        F.sol = 0;
       } else {
+        // posé : il glisse sur la neige (ou sur l'objet) avec frottement, et se pose à plat
         F.vy = 0;
-        F.sol = 1;
         const sp = Math.hypot(F.vx, F.vz),
-          dec = 3.2 * h; // frottement de la neige
+          dec = 3.2 * h;
         if (sp <= dec) ((F.vx = 0), (F.vz = 0));
         else ((F.vx *= 1 - dec / sp), (F.vz *= 1 - dec / sp));
         F.va *= 1 - 6 * h;
-        F.a += (Math.round(F.a / Math.PI) * Math.PI - F.a) * 4 * h; // il se pose à plat
+        F.a += (Math.round(F.a / Math.PI) * Math.PI - F.a) * 4 * h;
       }
+    }
+    if (F.y < -0.4) {
+      F.tombe = 1;
+      bruit('tombe');
     }
   };
   const choc = k => {
@@ -5643,7 +5701,7 @@ function mysLancer(cb, fic) {
       btn.style.setProperty('--p', 0);
     }
     // elle ramasse le fichier en passant dessus
-    if (!C.tient && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
+    if (!C.tient && !C.porte && F.vol && F.pose && !F.in && F.y < 1 && Math.hypot(F.x - C.x, F.z - C.z) < 0.5) {
       C.tient = 1;
       C.ramasse = T();
       F.vol = 0;
@@ -6065,7 +6123,7 @@ function mysLancer(cb, fic) {
       ROULE.forEach((b, i) => L.push({ cle: 'roule' + i, mod: b.k, x: b.x, y: b.y, z: b.z, centre: 1, dim: [2 * b.r, null, null], q: b.q }));
       // les jouets du bac à sable
       L.push({ cle: 'jTramp', mod: 'trampoline', x: TRAMP.x, z: TRAMP.z, dim: [2 * TRAMP.r + 0.1, TRAMP.h + 0.04, 2 * TRAMP.r + 0.1] });
-      L.push({ cle: 'jLuge', mod: 'luge', x: LUGE.x, z: LUGE.z, rot: Math.PI - LUGE.a, dim: [null, 0.5, null] }); // (son avant vers son cap)
+      L.push({ cle: 'jLuge', mod: 'luge', x: LUGE.x, y: LUGE.y, z: LUGE.z, rot: Math.PI - LUGE.a, dim: [null, 0.5, null] }); // (son avant vers son cap)
       L.push({ cle: 'jFeux', mod: 'feux', x: FEUX.x, z: FEUX.z, dim: [null, 0.95, null] });
     }
     const m = FIG3D.rendreTout(L, { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr });
@@ -7060,12 +7118,12 @@ function mysLancer(cb, fic) {
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       b.z += b.vz * dt;
-      const surNous = (Math.abs(b.x) < 9 && b.z > BORD && b.z < RIDGE) || surVoisin(b.x, b.z);
-      // les cheminées (la nôtre et son petit conduit), le bonhomme de neige, le sapin… : elle s'écrase dessus
-      const mur =
-        (Math.abs(b.x) < CX + 0.04 && Math.abs(b.z - CZ) < CD + 0.04 && b.y < TOP) ||
-        (Math.abs(b.x - VOISIN.cx) < VOISIN.ce + 0.06 && Math.abs(b.z - VOISIN.cz) < VOISIN.ce + 0.06 && b.y < VOISIN.ch) ||
-        OBS.some(ob => b.y < ob.h && Math.hypot(b.x - ob.x, b.z - ob.z) < rayon(ob, Math.max(0, b.y)));
+      // le monde solide : contre un mur, un objet ou le côté d'un immeuble, elle s'écrase ; sur un toit ou un dessus aussi ;
+      // sur la toile du trampoline, elle rebondit
+      const tch = heurte(b, 0.06, 0, 0, 0),
+        tramp = tch.some(t => t.u.tramp && t.n[1] > 0.7),
+        mur = tch.some(t => t.n[1] <= 0.7),
+        surNous = tch.some(t => t.n[1] > 0.7 && !t.u.tramp);
       // une boule de Célestine : elle déclenche les surprises (le bonhomme se casse…), pousse les boules, et peut
       // toucher Valentin (il tombe sur les fesses… et répliquera)
       if (b.de == 'C') {
@@ -7101,12 +7159,8 @@ function mysLancer(cb, fic) {
         surprise('boule');
         const [x, y] = P(b.x, b.y, b.z);
         for (let j = 0; j < 18; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 200, vy: -Math.random() * 160, t: 0.6, c: '#ffffff' });
-      } else if (b.vy < 0 && b.y <= TRAMP.h + 0.05 && b.y > TRAMP.h - 0.3 && Math.hypot(b.x - TRAMP.x, b.z - TRAMP.z) < TRAMP.r && b.vy < -1.5) {
-        // le trampoline : elle rebondit (de moins en moins haut)
-        b.y = TRAMP.h + 0.05;
-        b.vy = -b.vy * 0.8;
-        bruit('trampo', Math.min(0.7, b.vy / 8));
-      } else if ((surNous && b.y <= 0.05) || b.y < -4) {
+      } else if (tramp && b.vy > 1.2) bruit('trampo', Math.min(0.7, b.vy / 8));
+      else if (surNous || tramp || b.y < -4) {
         boules.splice(i, 1);
         if (surNous) {
           bruit('neige', 0.4);

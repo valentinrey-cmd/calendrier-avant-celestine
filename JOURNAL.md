@@ -4,6 +4,14 @@
 
 ---
 
+## 28/11/2026 · Toit : un vrai monde solide (immeubles, objets, collisions communes), la luge s'envole sur le trampoline (version 1795895828)
+- **Le fichier qui flottait au-dessus de la ruelle :** chaque morceau du jeu avait sa propre limite de toit (8,88 m pour Célestine, 9 m pour le fichier). Dans ces 12 cm, le fichier se croyait sur le toit et restait suspendu dans le vide. Il n'y a plus qu'une seule description du monde.
+- **Monde solide :** les immeubles sont des blocs pleins, du trottoir jusqu'au toit, avec de vrais murs. Chaque objet du toit a sa boîte de collision (cheminées, cadeaux, boîte aux lettres, trampoline, caisse de feux, luge) ou son cylindre (bonhomme, sapin, antenne). Le fichier, les boules de neige lancées, les boules du bonhomme et le ballon s'y cognent tous avec les mêmes règles : arêtes arrondies, rebonds, objets qui se posent ou glissent.
+- Conséquences : une boule trop grosse pour la ruelle reste coincée entre les deux immeubles. Un fichier sans rien dessous tombe le long du mur, puis retombe du ciel. Une boule de neige s'écrase contre un mur.
+- **La luge prend le trampoline :** lancée dessus, elle s'envole avec son élan (jusqu'à environ 4 m, assez pour traverser la ruelle jusqu'au toit de Valentin) et retombe sans traverser les toits. Elle rebondit encore si elle retombe sur le trampoline, et part dans le vide au bord d'un toit.
+- Célestine ne ramasse plus le fichier en marchant dessus quand elle porte déjà une boule.
+- Fichiers : `2026/js/musiques-jeux.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : plus de fichiers volants, et tout rebondit sur le trampoline (version 1795894452)
 - **Fichiers volants corrigés :**
   - Quand Valentin tenait le fichier sans être dans l'image, sa main était mal calculée : il renvoyait le fichier depuis un point en l'air. La main est maintenant retenue par rapport à son corps, pour lui comme pour Célestine.
