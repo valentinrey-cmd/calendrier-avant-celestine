@@ -222,6 +222,10 @@ const FICHIERS = {
     '3d/toit-sapin.glb',
     '3d/toit-antenne.glb',
     '3d/toit-boite.glb',
+    '3d/toit-trampoline.glb',
+    '3d/toit-luge.glb',
+    '3d/toit-feux.glb',
+    '3d/toit-ballon.glb',
   ],
 };
 

@@ -1,8 +1,8 @@
 /* ================= 🧊 Le toit du fichier mystère : personnages et objets en vraie 3D ================= */
 // Les figurines ont été faites avec Meshy à partir de leurs photos, avec un squelette et des animations
 // (fichiers 3d/toit-celestine.glb et 3d/toit-valentin.glb, une animation par geste : voir GESTES3D).
-// Les objets du toit aussi (cheminée, bonhomme de neige et ses boules, cadeaux, sapin, antenne, boîte aux lettres :
-// 3d/toit-….glb, voir OBJ).
+// Les objets du toit aussi (cheminée, bonhomme de neige et ses boules, cadeaux, sapin, antenne, boîte aux lettres, et les
+// jouets du bac à sable : trampoline, luge, feux d'artifice, ballon : 3d/toit-….glb, voir OBJ).
 // Tout est dessiné par un petit moteur 3D (3d/moteur-3d.min.js = three.js), chargé seulement à l'ouverture du toit.
 // Chaque personnage ou objet est rendu dans un petit cadre autour de lui, avec exactement la caméra du jeu (même
 // position, même direction, même focale), puis collé dans l'image du jeu à sa place dans l'ordre de profondeur.
@@ -27,7 +27,7 @@
 //      cam = { x, y, z, yaw, p, f, cx, cy, W, H, dpr } : la caméra du jeu.
 const FIG3D = (() => {
   const FIC = { celestine: '3d/toit-celestine.glb', valentin: '3d/toit-valentin.glb' },
-    OBJ = ['cheminee', 'bonhomme', 'boule', 'tete', 'cadeaux', 'sapin', 'antenne', 'boite'], // → 3d/toit-<nom>.glb
+    OBJ = ['cheminee', 'bonhomme', 'boule', 'tete', 'cadeaux', 'sapin', 'antenne', 'boite', 'trampoline', 'luge', 'feux', 'ballon'], // → 3d/toit-<nom>.glb
     BUF = 640, // taille maximale (en pixels) d'un cadre de rendu
     NET = 1.5, // netteté maximale : 1,5 pixel de rendu par pixel d'écran (au-delà, ça ne se voit pas et ça coûte cher)
     PAS = 128, // l'image de travail grandit ou rétrécit par paliers (la redimensionner coûte cher)

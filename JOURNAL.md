@@ -4,6 +4,17 @@
 
 ---
 
+## 28/11/2026 · Toit : un vrai bac à sable (boules de neige, bonhomme à refaire, trampoline, luge, feux d'artifice, ballon) (version 1795862741)
+- **Le bouton d'action change selon l'endroit**, quand elle n'a pas le fichier en main : « Boule ❄️ », « Ramasser », « Poser », « Luge 🛷 », « Descendre », « Allumer 🎆 » (même bouton, touche E ou clic gauche). Avec le fichier en main, il reste « Lancer ».
+- **Boules de neige :** elle en lance où elle regarde. Elles cassent le bonhomme, font réagir les décors (sapin, antenne, cadeaux…), poussent les boules et le ballon. Si elle touche Valentin, il crie « Aïe ! » et réplique vite.
+- **Refaire le bonhomme :** une boule de neige qui roule grossit. On ramasse la moyenne ou la tête, on la pose sur une plus grosse ; tête sur moyenne sur grande, le bonhomme revient (nouveau secret, et il peut se recasser).
+- **Trampoline :** elle rebondit dessus, de plus en plus haut, en gardant son élan.
+- **Luge :** elle s'allonge dessus et file ; on tourne au joystick, on pousse ou on freine. Elle rebondit sur les décors ; au bord du toit, elle s'envole et tombe dans la rue.
+- **Feux d'artifice :** une caisse de fusées ; trois fusées montent et éclatent en gerbes de couleurs (nouveau secret).
+- **Gros ballon de plage :** il rebondit, roule loin, décolle quand on court dedans, et revient à sa place s'il tombe du toit.
+- Il y a maintenant **12 secrets** sur le toit (le succès est mis à jour). Le bouton n'est plus grisé quand elle n'a pas le fichier.
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/toit-figurines-3d.js`, `2026/js/fichiers.js`, `2026/js/succes.js`, `2026/js/langue-anglais.js`, `2026/css/06-boss-playlist.css`, `2026/3d/toit-trampoline.glb`, `toit-luge.glb`, `toit-feux.glb`, `toit-ballon.glb` (nouveaux), `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : tous les objets en vraie 3D, on monte dessus, le bonhomme se casse en boules qui roulent (version 1795861624)
 - **Objets en 3D (Meshy) :** la cheminée (et le conduit de Valentin), le bonhomme de neige, la pile de cadeaux, le sapin, l'antenne et la boîte aux lettres. Leurs effets restent (lueur du feu, fumée, chat du cadeau, anneau de la boîte aux lettres).
 - **On peut monter dessus :** cheminée, cadeaux, boîte aux lettres et boules. Une petite boule se monte en marchant ; plus haut, on saute et elle s'agrippe au rebord pour se hisser. Elle retombe quand elle en descend, et la caméra monte avec elle.

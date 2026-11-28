@@ -198,7 +198,7 @@ const ACHS = [
     id: 'toit10',
     ic: '🏠',
     n: 'Reine des toits',
-    d: 'Trouve les 10 secrets du toit, dans la scène du fichier mystère.',
+    d: 'Trouve les 12 secrets du toit, dans la scène du fichier mystère.',
     t: 'D',
     s: 'Le toit du fichier mystère cache bien des surprises…',
     c: () => !!S.mysTrophee
