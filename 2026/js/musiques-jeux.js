@@ -1722,8 +1722,15 @@ function mysLancer(cb, fic) {
   // ---- Ce sur quoi on peut monter : la cheminée (et le conduit de Valentin), la pile de cadeaux, la boîte aux lettres
   // et les boules du bonhomme de neige cassé. Une « marche » de moins de 30 cm se monte en marchant ; plus haut, il faut
   // sauter (et s'agripper au rebord). Le sapin, l'antenne et le bonhomme entier ne font que l'arrêter.
-  const MARCHE = 0.3,
-    PORTEE = 1; // en sautant, ses mains attrapent un rebord jusqu'à 1 m au-dessus de ses pieds
+  // Ses mesures (en m) : CORPS = le rayon de son corps (ce qui touche les objets) ; MARCHE = une marche qui se monte et se
+  // descend en marchant ; PLI = en l'air, jambes repliées, ses pieds passent jusque-là au-dessus de son point de contact :
+  // elle se pose sur un dessus un peu plus haut que lui ; BRAS = en l'air, ses mains attrapent un rebord jusque-là
+  // au-dessus de ses pieds (elle s'y accroche et se hisse : hisse()) ; ELAN = la flexion avant l'impulsion d'un saut.
+  const CORPS = 0.22,
+    MARCHE = 0.3,
+    PLI = 0.22,
+    BRAS = 1.4,
+    ELAN = 0.09;
   const supports = () => {
     const L = [
       { b: 1, x: 0, z: CZ, hx: CX, hz: CD, h: TOP },
@@ -1739,23 +1746,35 @@ function mysLancer(cb, fic) {
     return L;
   };
   // la hauteur du dessus d'un support sous le point (x, z) (0 si rien) ; pour une boule, le haut de la sphère à cet endroit
-  const dessus = (u, x, z, marge = 0.1) => {
+  const dessus = (u, x, z, marge = 0.07) => {
     if (u.s) {
       const d = Math.hypot(x - u.x, z - u.z);
-      return d < u.r * 0.8 ? u.y + Math.sqrt(u.r * u.r - d * d) : -1;
+      return d < u.r * 0.6 ? u.y + Math.sqrt(u.r * u.r - d * d) : -1; // (sur le haut seulement : pas les pieds dans la pente)
     }
     return Math.abs(x - u.x) < u.hx + marge && Math.abs(z - u.z) < u.hz + marge ? u.h : -1;
   };
-  // le sol sous ses pieds : le plus haut des dessus qui ne sont pas au-dessus d'elle (à une marche près)
+  // le sol sous ses pieds : le plus haut des dessus qui ne sont pas au-dessus d'elle (à une marche près, ou à m près)
   let surQuoi = null; // ce qu'il y a sous elle (le dernier support trouvé par hautSous)
-  const hautSous = (x, z, y) => {
+  const hautSous = (x, z, y, m = MARCHE) => {
     let h = 0;
     surQuoi = null;
     for (const u of supports()) {
       const t = dessus(u, x, z);
-      if (t > h && t <= y + MARCHE) ((h = t), (surQuoi = u));
+      if (t > h && t <= y + m) ((h = t), (surQuoi = u));
     }
     return h;
+  };
+  // un support reconnu d'une image à l'autre (supports() les refait à chaque fois)
+  const cleU = u => (u ? (u.boule ? u.boule : u.x.toFixed(2) + ',' + u.z.toFixed(2)) : null);
+  // vers où elle sort d'un support (du centre vers elle, le long du côté le plus proche pour une caisse)
+  const sortie = u => {
+    const dx = C.x - u.x,
+      dz = C.z - u.z;
+    if (u.s) {
+      const d = Math.hypot(dx, dz) || 1;
+      return [dx / d, dz / d];
+    }
+    return Math.abs(dx) - u.hx > Math.abs(dz) - u.hz ? [Math.sign(dx) || 1, 0] : [0, Math.sign(dz) || 1];
   };
   // Le bonhomme de neige cassé : ses trois boules (la grande, la moyenne et la tête) tombent et restent sur le toit.
   // On les pousse en courant dedans (elles roulent, en tournant), on peut monter dessus. Une boule qui sort du toit tombe
@@ -5161,7 +5180,8 @@ function mysLancer(cb, fic) {
   };
   const marche = dt => {
     if (C.chute) return chute(dt);
-    if (C.ko) return ko(dt);
+    if (C.ko) return ((C.hisse = null), ko(dt));
+    if (C.hisse) return hisse(dt);
     saut(dt);
     if (C.chute) return; // elle vient de sauter dans le vide
     const dz = danse();
@@ -5209,7 +5229,7 @@ function mysLancer(cb, fic) {
       C.angeAxe = [Math.cos(V.yaw), -Math.sin(V.yaw)];
     }
     // en l'air, elle garde son élan (on peut juste l'infléchir un peu au joystick)
-    if (C.saute && C.air) {
+    if (C.vy && C.air) {
       if (m > 0.12) {
         const dx = co * ix + si * -iy,
           dz = -si * ix + co * -iy,
@@ -5272,7 +5292,7 @@ function mysLancer(cb, fic) {
     if (ctl.kt) ctl.yaw += ctl.kt * dt * 2.4;
     // (comme dans Fortnite : en courant, elle se tourne vers là où elle court ; en l'air, elle garde son cap)
     const vise =
-      em == 'boude' ? V.yaw : C.glisse || C.saute ? null : C.v > 2.3 && !C.charge && !ctl.vise && (vx || vz) ? Math.atan2(vx, vz) : ctl.yaw;
+      em == 'boude' ? V.yaw : C.glisse || C.vy ? null : C.v > 2.3 && !C.charge && !ctl.vise && (vx || vz) ? Math.atan2(vx, vz) : ctl.yaw;
     if (vise != null) C.phi += Math.atan2(Math.sin(vise - C.phi), Math.cos(vise - C.phi)) * Math.min(1, dt * 14);
     // elle recule (joystick vers le bas) : l'animation de marche passe à l'envers
     const sp = Math.hypot(vx, vz);
@@ -5295,21 +5315,34 @@ function mysLancer(cb, fic) {
       if (C.y <= 0.02 && !horsToit()) traces.push({ x: C.x + q * 0.1 * Math.cos(C.phi), z: C.z - q * 0.1 * Math.sin(C.phi), a: C.phi, t: T() });
       if (traces.length > 220) traces.splice(0, traces.length - 220);
     }
-    // la cheminée, les cadeaux, la boîte aux lettres, les boules : ils l'arrêtent tant qu'elle est plus bas que leur dessus
-    // (au-dessus, elle marche dessus). En l'air, si le rebord est à portée de mains (PORTEE), elle s'agrippe et se hisse.
-    // Une boule plus basse qu'elle-même, elle la pousse : elle roule.
+    // ---- Les objets sur lesquels on monte (cheminée, cadeaux, boîte aux lettres, boules, trampoline, caisse de feux) :
+    // son corps (CORPS) les touche tant que ses pieds sont plus bas que leur dessus. Ce qu'elle touche la repousse en
+    // douceur (jamais de saut d'image). Au sol, une marche (MARCHE) se monte en marchant ; en l'air, jambes repliées, elle
+    // passe au-dessus d'un rebord jusqu'à PLI plus haut que ses pieds (elle se pose dessus, voir saut) ; plus haut, si elle
+    // est tournée vers lui et que ses mains l'atteignent (BRAS), elle s'accroche et se hisse (accroche, hisse). Une boule
+    // plus basse qu'elle, elle la pousse.
+    const enAir = !!C.vy,
+      pied = enAir ? (C.saute && T() - C.saute > 0.1 ? PLI : 0.04) : MARCHE, // de combien ses pieds passent au-dessus d'un rebord
+      pas1 = enAir ? dt * 3 : 1; // en l'air, ce qu'elle touche la repousse en douceur
     for (const u of supports()) {
-      if (C.y >= u.h - 0.05) continue; // elle est dessus (ou au-dessus)
+      if (C.y + pied >= u.h - 0.01) continue; // ses pieds passent au-dessus : elle va s'y poser (ou elle est dessus)
+      if (C.quitte && C.quitte.k == cleU(u) && T() - C.quitte.t < 0.6) continue; // celui qu'elle vient de quitter : elle s'en écarte
       if (u.s) {
         const dx = u.x - C.x,
           dz = u.z - C.z,
           d = Math.hypot(dx, dz),
-          m = u.r + 0.22;
+          m = u.r + CORPS;
         if (d >= m || d == 0) continue;
         const nx = dx / d,
           nz = dz / d,
           b = u.boule;
-        if (u.h - C.y <= MARCHE + 0.02 && !C.vy) continue; // une marche : elle monte dessus
+        if (enAir) {
+          // en l'air, elle glisse contre la boule
+          const e = Math.min(m - d, pas1);
+          C.x -= nx * e;
+          C.z -= nz * e;
+          continue;
+        }
         // elle la pousse : la boule recule de ce qu'il faut, et part devant elle (la petite plus vite que la grande)
         const vn = Math.max(0, vx * nx + vz * nz),
           k = b.k == 'ballon' ? 1.7 : Math.max(0.65, Math.min(1.3, 0.22 / b.r));
@@ -5319,45 +5352,69 @@ function mysLancer(cb, fic) {
         const vb = b.vx * nx + b.vz * nz,
           cible = vn * 1.15 * k + 0.15;
         if (vb < cible) ((b.vx += (cible - vb) * nx), (b.vz += (cible - vb) * nz));
-        if (C.vy && u.h - C.y < PORTEE && C.vy < 2.2) ((C.y = u.h), (C.vy = 0), (C.saute = 0), (C.air = null), (C.grimpe = T()));
         continue;
       }
-      if (u.h - C.y <= MARCHE + 0.02 && !C.vy) continue; // une marche (le trampoline) : elle monte dessus
-      const ex = u.hx + 0.22,
-        ez = u.hz + 0.22,
+      // en l'air, tournée vers un objet haut (plus de 70 cm), dès que ses mains atteignent le rebord : elle s'accroche
+      // (sauf si son saut passe au-dessus du rebord : elle s'y posera)
+      const sommet = C.y + (C.vy > 0 ? (C.vy * C.vy) / (2 * G) : 0) + PLI;
+      if (enAir && !C.luge && !C.porte && u.h - C.y <= BRAS && u.h - (C.solAvant || 0) > 0.7 && sommet < u.h + 0.03) {
+        const gx = u.hx + HISSE.mains + 0.03 - Math.abs(C.x - u.x),
+          gz = u.hz + HISSE.mains + 0.03 - Math.abs(C.z - u.z),
+          ng = gx < gz ? [Math.sign(C.x - u.x) || 1, 0] : [0, Math.sign(C.z - u.z) || 1];
+        if (gx > 0 && gz > 0 && -(Math.sin(C.phi) * ng[0] + Math.cos(C.phi) * ng[1]) > 0.35) return accroche(u, ng);
+      }
+      const ex = u.hx + CORPS,
+        ez = u.hz + CORPS,
         px = ex - Math.abs(C.x - u.x),
         pz = ez - Math.abs(C.z - u.z);
       if (px <= 0 || pz <= 0) continue;
-      // en l'air, le rebord à portée de mains : elle s'agrippe et se hisse dessus
-      if ((C.vy || C.y > (C.sol || 0) + 0.02) && u.h - C.y < PORTEE && C.vy < 2.2) {
-        C.y = u.h;
-        C.vy = 0;
-        C.saute = 0;
-        C.air = null;
-        C.grimpe = T();
-        if (px < pz) C.x = u.x + Math.sign(C.x - u.x || 1) * Math.max(0, u.hx - 0.12);
-        else C.z = u.z + Math.sign(C.z - u.z || 1) * Math.max(0, u.hz - 0.12);
-        bruit('pas', 0.8);
-        continue;
-      }
-      if (px < pz) C.x = u.x + Math.sign(C.x - u.x || 1) * ex;
-      else C.z = u.z + Math.sign(C.z - u.z || -1) * ez;
-      if (u.ob) surprise(u.ob.t);
+      const n = px < pz ? [Math.sign(C.x - u.x) || 1, 0] : [0, Math.sign(C.z - u.z) || 1]; // le côté touché, vers elle
+      const e = Math.min(px < pz ? px : pz, pas1);
+      C.x += n[0] * e;
+      C.z += n[1] * e;
+      if (u.ob && !enAir) surprise(u.ob.t);
     }
-    // ce qui est sous ses pieds : elle marche dessus, monte une marche, ou tombe quand elle en descend
+    // ce qui est sous ses pieds : elle marche dessus, monte ou descend une marche, ou tombe quand elle quitte un objet haut
+    const surAvant = C.dessus;
     C.sol = hautSous(C.x, C.z, C.y + 0.02);
     if (!C.vy) {
-      if (C.y < C.sol) C.y = C.sol; // une petite marche (une petite boule)
-      else if (C.y > C.sol + 0.03) C.vy = -0.01; // le vide sous ses pieds : elle tombe
+      const ec = C.y - C.sol;
+      if (ec < -0.001 || (ec > 0.02 && ec <= MARCHE + 0.02)) {
+        // une marche (vers le haut ou vers le bas) : elle y est, et l'image suit en douceur
+        C.lisse = (C.lisse || 0) + ec;
+        C.y = C.sol;
+      } else if (ec > 0.02) {
+        // elle quitte le bord d'un objet : elle s'en écarte en avançant, et tombe avec son élan
+        let ax = vx,
+          az = vz;
+        if (surAvant) {
+          const n = sortie(surAvant),
+            vn = ax * n[0] + az * n[1];
+          if (vn < 1.1) ((ax += n[0] * (1.1 - vn)), (az += n[1] * (1.1 - vn)));
+          C.quitte = { k: cleU(surAvant), t: T() };
+        }
+        C.vy = -0.01;
+        C.vy0 = 0;
+        C.saute = 0;
+        C.solAvant = C.y;
+        C.air = { vx: ax, vz: az, v0: Math.max(1.7, Math.hypot(ax, az)) };
+      }
       // sur le trampoline, il la fait rebondir
       if (surQuoi && surQuoi.tramp && !C.vy && !C.chute) {
         const d = C.v > 0.05 && C.dir ? C.dir : [0, 0];
-        C.vy = 5.5;
-        C.saute = T();
-        C.air = { vx: d[0] * C.v, vz: d[1] * C.v, v0: Math.max(2, C.v) };
+        decolle(5.5, { vx: d[0] * C.v, vz: d[1] * C.v, v0: Math.max(2, C.v) });
         bruit('lance', 0.6);
       }
+      // arrêtée avec les pieds à moitié dans le vide, au bord d'une caisse : elle revient doucement dessus
+      const u = surQuoi;
+      if (!C.vy && u && u.b && C.v < 0.05) {
+        const ox = Math.abs(C.x - u.x) - (u.hx - 0.04),
+          oz = Math.abs(C.z - u.z) - (u.hz - 0.04);
+        if (ox > 0) C.x -= Math.sign(C.x - u.x) * Math.min(ox, dt * 0.6);
+        if (oz > 0) C.z -= Math.sign(C.z - u.z) * Math.min(oz, dt * 0.6);
+      }
     }
+    if (!C.vy) C.dessus = surQuoi;
     if (!C.chute) C.base = C.sol; // son ombre, sur ce qui est sous elle
     // la caméra monte avec elle quand elle est sur quelque chose (doucement)
     C.camSol = (C.camSol || 0) + ((C.chute ? 0 : C.sol) - (C.camSol || 0)) * Math.min(1, dt * 4);
@@ -5372,17 +5429,10 @@ function mysLancer(cb, fic) {
       }
     });
     C.z = Math.min(RIDGE - 0.3, C.z);
-    // chez Valentin : on ne lui passe pas à travers, ni à travers son petit conduit de cheminée
-    if (chezValentin()) {
+    // chez Valentin : on ne lui passe pas à travers (son petit conduit de cheminée est un support, voir plus haut)
+    if (chezValentin() && C.y < 1.2) {
       const dv = Math.hypot(C.x - VAL.x, C.z - VAL.z);
       if (dv < 0.5 && dv > 0) ((C.x = VAL.x + ((C.x - VAL.x) / dv) * 0.5), (C.z = VAL.z + ((C.z - VAL.z) / dv) * 0.5));
-      const e2 = VOISIN.ce + 0.22;
-      if (Math.abs(C.x - VOISIN.cx) < e2 && Math.abs(C.z - VOISIN.cz) < e2) {
-        const px = e2 - Math.abs(C.x - VOISIN.cx),
-          pz = e2 - Math.abs(C.z - VOISIN.cz);
-        if (px < pz) C.x = VOISIN.cx + Math.sign(C.x - VOISIN.cx || 1) * e2;
-        else C.z = VOISIN.cz + Math.sign(C.z - VOISIN.cz || 1) * e2;
-      }
     }
     // pas de barrière invisible : au bord de la gouttière ou d'un côté d'un des deux toits, elle perd l'équilibre et tombe
     // Lentement, elle mouline des bras au bord avant de tomber ; en courant (ou en glissade), elle trébuche et part
@@ -5422,6 +5472,7 @@ function mysLancer(cb, fic) {
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
   const armer = () => {
+    if (C.hisse) return;
     if (!C.tient && !fin && !C.chute && !C.ko) return agir(); // les mains libres : l'action du moment (voir action)
     if (fin || C.chute || C.ko || !C.tient || C.charge || C.y > (C.sol || 0) + 0.02 || C.vy || C.pTir != null) return;
     C.charge = T();
@@ -5473,33 +5524,52 @@ function mysLancer(cb, fic) {
     bruit('lance', 0.4 + p * 0.6);
     tip.textContent = '';
   };
+  // elle décolle (saut, trampoline) : vitesse vers le haut vy, élan a ; on retient d'où elle part
+  const decolle = (vy, a) => {
+    C.vy = C.vy0 = vy;
+    C.saute = T();
+    C.air = a;
+    C.solAvant = C.sol || 0;
+    C.elan = 0;
+  };
+  // elle se pose (en amortissant : plus elle tombe vite, plus elle plie les jambes)
+  const atterrit = (y, vy) => {
+    if (y - C.y > 0.06) C.lisse = (C.lisse || 0) + (C.y - y); // posée plus haut que ses pieds : l'image suit en douceur
+    C.y = y;
+    C.vy = 0;
+    if (C.saute || C.air) C.v = Math.min(C.v, 2.4); // pas de glissade en retombant
+    C.saute = 0;
+    C.air = null;
+    C.pose = T();
+    C.atter = { t: T(), d: vy < -4.5 ? 0.55 : vy < -2.5 ? 0.42 : 0.26 };
+    bruit('pas', Math.min(1, 0.5 - vy / 6));
+  };
   const saut = dt => {
+    // la flexion avant l'impulsion
+    if (C.elan && T() - C.elan >= ELAN) {
+      const d = C.v > 0.05 && C.dir ? C.dir : [0, 0];
+      decolle(C.v > 2.3 ? 4 : 3.5, { vx: d[0] * C.v, vz: d[1] * C.v, v0: C.v });
+      bruit('pas', 1);
+    }
     if (!C.vy) return;
-    const y0 = C.y;
+    const y0 = C.y,
+      vy0 = C.vy;
     C.vy -= G * dt;
     C.y += C.vy * dt;
     if (C.pTir != null && C.tient && T() - C.tir > 0.2) lacheFichier(); // en haut du saut, bras tendu
-    // elle retombe sur quelque chose (la cheminée, les cadeaux, une boule…) : elle s'y pose
-    const s0 = C.vy < 0 ? hautSous(C.x, C.z, y0) : 0;
+    // elle retombe sur quelque chose (la cheminée, les cadeaux, une boule…) : elle s'y pose ; jambes repliées, ses pieds
+    // passent jusqu'à PLI au-dessus de son point de contact (dès qu'elle ne monte presque plus)
+    const pli = C.saute && T() - C.saute > 0.1 ? PLI : 0.04,
+      s0 = C.vy < 1.2 ? hautSous(C.x, C.z, y0, pli) : 0;
     if (s0 > 0 && C.y <= s0 && surQuoi && surQuoi.tramp && !C.luge) {
       // le trampoline : elle rebondit, de plus en plus haut (jusqu'à 4,5 m), en gardant son élan
       C.y = s0;
-      C.vy = Math.min(9.4, Math.max(5.5, -C.vy * 1.04 + 0.4));
-      C.saute = T();
-      if (!C.air) C.air = { vx: 0, vz: 0, v0: 2 };
+      decolle(Math.min(9.4, Math.max(5.5, -vy0 * 1.04 + 0.4)), C.air || { vx: 0, vz: 0, v0: 2 });
       bruit('lance', 0.7);
       return;
     }
-    if (s0 > 0 && C.y <= s0) {
-      C.y = s0;
-      C.vy = 0;
-      if (C.saute) C.v = Math.min(C.v, 2.4);
-      C.saute = 0;
-      C.air = null;
-      C.pose = T();
-      bruit('pas', 1);
-      return;
-    }
+    if (s0 > 0 && C.y <= s0) return atterrit(s0, vy0);
+    C.sousY = hautSous(C.x, C.z, C.y, 0); // (le sol sous elle : ses jambes se déplient en approchant)
     if (C.y <= 0) {
       // elle a sauté dans le vide (hors des toits, même à 45 cm près) : elle continue sa course et tombe, sans atterrir
       const n = !fin && horsToit(0.45);
@@ -5509,20 +5579,78 @@ function mysLancer(cb, fic) {
         C.air = null;
         return tombe('saut', n, a.vx, a.vz, C.vy);
       }
-      C.y = 0;
-      C.vy = 0;
-      if (C.saute) C.v = Math.min(C.v, 2.4); // elle amortit : pas de glissade en retombant
-      C.saute = 0;
-      C.air = null;
+      atterrit(0, vy0);
       // tout près d'un toit (moins de 45 cm), elle se rattrape dessus
       if (horsToit()) {
         const chezV = C.x > MILIEU;
         C.x = Math.max(chezV ? VOISIN.x0 + 0.15 : -8.73, Math.min(chezV ? VOISIN.x1 - 0.15 : 8.73, C.x));
         C.z = Math.max((chezV ? VOISIN.z0 : BORD) + 0.15, C.z);
       }
-      C.pose = T(); // elle amortit en retombant
-      bruit('pas', 1);
     }
+  };
+  // Se hisser sur un objet haut (la boîte aux lettres, la cheminée…) : elle attrape le rebord (ses mains dessus, son corps
+  // contre le côté), puis se hisse, comme en haut d'une échelle (geste echfin : mains et pieds à 90 cm au-dessus de ses
+  // pieds de départ) ; son corps passe par-dessus le rebord pendant qu'elle monte, et elle se relève debout dessus.
+  const HISSE = { prise: 0.15, vit: 2.4, fin: 3, haut: 0.9, mains: 0.47, avance: 1.5, avancee: 2.45 }; // (temps du geste echfin, en s)
+  const accroche = (u, n) => {
+    const bord = (c0, h0, v) => Math.max(c0 - h0 + 0.16, Math.min(c0 + h0 - 0.16, v)),
+      ex = n[0] ? u.x + n[0] * u.hx : bord(u.x, u.hx, C.x),
+      ez = n[1] ? u.z + n[1] * u.hz : bord(u.z, u.hz, C.z);
+    C.hisse = { t: T(), u, n, x0: C.x, y0: C.y, z0: C.z, phi0: C.phi, ex, ez, top: u.h, bas: hautSous(C.x, C.z, C.y, 0) };
+    C.vy = 0;
+    C.saute = 0;
+    C.air = null;
+    C.glisse = null;
+    C.v = 0;
+    C.elan = 0;
+    C.charge = 0;
+    bruit('pas', 0.8);
+  };
+  const hisse = dt => {
+    const H = C.hisse,
+      n = H.n,
+      d = T() - H.t,
+      lis = x => x * x * (3 - 2 * x),
+      hy = Math.max(H.bas - 0.12, H.top - HISSE.haut), // ses pieds pendant qu'elle se hisse (90 cm sous le rebord)
+      hx = H.ex + n[0] * HISSE.mains,
+      hz = H.ez + n[1] * HISSE.mains,
+      face = Math.atan2(-n[0], -n[1]);
+    C.v = 0;
+    C.amp = 0;
+    if (d < HISSE.prise) {
+      // elle attrape le rebord : ses mains dessus, face au mur
+      const k = lis(d / HISSE.prise);
+      C.x = H.x0 + (hx - H.x0) * k;
+      C.z = H.z0 + (hz - H.z0) * k;
+      C.y = H.y0 + (hy - H.y0) * k;
+      C.phi = H.phi0 + Math.atan2(Math.sin(face - H.phi0), Math.cos(face - H.phi0)) * k;
+    } else {
+      const c = (d - HISSE.prise) * HISSE.vit, // où en est le geste
+        w = lis(Math.max(0, Math.min(1, (c - HISSE.avance) / (HISSE.avancee - HISSE.avance)))), // son corps passe par-dessus
+        fin = Math.max(0.22, Math.min(0.4, (n[0] ? H.u.hx : H.u.hz) * 0.6)); // debout, un peu en retrait du bord
+      C.x = hx - n[0] * (HISSE.mains + fin) * w;
+      C.z = hz - n[1] * (HISSE.mains + fin) * w;
+      C.y = hy;
+      C.phi = face;
+      if (c >= HISSE.fin) {
+        // debout sur le dessus
+        C.lisse = (C.lisse || 0) + (hy + HISSE.haut - H.top);
+        C.y = H.top;
+        C.sol = H.top;
+        C.hisse = null;
+        C.dessus = null;
+        C.pose = T();
+        bruit('pas', 0.7);
+      }
+    }
+    C.base = C.hisse && d - HISSE.prise < 0.9 ? H.bas : H.top; // son ombre
+    C.camSol = (C.camSol || 0) + ((d > 0.5 ? H.top : H.bas) - (C.camSol || 0)) * Math.min(1, dt * 3);
+  };
+  // l'image suit en douceur quand elle monte ou descend une marche, ou se pose un peu plus haut que ses pieds
+  const majLisse = dt => {
+    if (!C.lisse || C.chute || C.ko) return (C.lisse = 0);
+    C.lisse *= Math.exp(-dt * 16);
+    if (Math.abs(C.lisse) < 0.002) C.lisse = 0;
   };
   // Les deux toits (le nôtre : |x| < 8,88, z > gouttière ; celui de Valentin : VOISIN). Hors des deux, au sol : elle tombe.
   // Renvoie le sens du vide le plus proche, ou null si elle est bien sur un toit.
@@ -5555,15 +5683,12 @@ function mysLancer(cb, fic) {
   };
   // sauter (barre d'espace, bouton « Sauter ») : plus loin en courant, assez pour franchir la ruelle (1,5 m)
   const sauter = () => {
-    if (fin || C.chute || C.ko || C.y > (C.sol || 0) + 0.02 || C.vy || C.charge || C.danse || C.ange || C.pTir != null) return;
-    C.vy = C.v > 2.3 ? 3.9 : 3.3;
-    C.saute = T();
-    const d = C.v > 0.05 && C.dir ? C.dir : [0, 0];
-    C.air = { vx: d[0] * C.v, vz: d[1] * C.v, v0: C.v };
+    if (fin || C.chute || C.ko || C.hisse || C.elan || C.luge || C.y > (C.sol || 0) + 0.02 || C.vy || C.charge || C.danse || C.ange || C.pTir != null)
+      return;
+    C.elan = T(); // elle plie les jambes… et décolle (voir saut)
     C.emote = null;
     C.glisse = null;
     C.idle = 0;
-    bruit('pas', 1);
   };
   // les tenues : Célestine (doudoune rose, queue-de-cheval, lunettes, taches de rousseur) et Valentin (doudoune verte, cheveux courts)
   const TENUE = {
@@ -5664,14 +5789,30 @@ function mysLancer(cb, fic) {
     if (tt - (C.ramasse || -9) < 0.5) return { a: 'ramasse', k: 0.03 + 0.45 * cl((tt - C.ramasse) / 0.5) };
     if (C.charge) return { a: 'lancer', k: 0.33 }; // bras armé, elle vise
     if (tt - (C.tir || -9) < 0.6) return { a: 'lancer', k: 0.33 + 0.25 * cl((tt - C.tir) / 0.6) };
-    if (C.grimpe && tt - C.grimpe < 0.35) return { a: 'echfin', k: 0.4 + 0.28 * cl((tt - C.grimpe) / 0.35) }; // elle se hisse
+    if (qui != 'valentin' && C.hisse) {
+      // elle se hisse sur un objet (voir hisse) : le geste echfin, réglé sur le jeu
+      const d = tt - C.hisse.t;
+      return { a: 'echfin', k: d < HISSE.prise ? 0.01 : Math.min(HISSE.fin, (d - HISSE.prise) * HISSE.vit) / 4.03 };
+    }
     if (qui != 'valentin') {
       if (C.luge) return { a: 'glisse', k: 0.35 }; // sur la luge
       if (C.tirN && tt - C.tirN < 0.45) return { a: 'lancer', k: 0.33 + 0.35 * cl((tt - C.tirN) / 0.45) }; // une boule de neige
       if (C.porte) return { a: 'lancer', k: 0.3 }; // la boule à bout de bras
     }
-    if (C.saute) return { a: 'saut', k: 0.15 + 0.3 * cl((tt - C.saute) / 0.75) }; // elle pousse sur ses jambes, puis vole
-    if (C.vy && !C.chute && qui != 'valentin') return { a: 'saut', k: 0.42 }; // elle descend de quelque chose
+    // le saut (geste saut, 1,9 s, réglé sur le jeu) : flexion (0,24 → 0,52 s), impulsion et montée (→ 0,87 s : jambes
+    // repliées en haut), descente (les jambes se déplient en approchant du sol : → 1,11 s, pieds posés), amorti (→ 1,74 s)
+    const sj = q => ({ a: 'saut', k: q / 1.9 });
+    if (C.elan) return sj(0.24 + 0.28 * cl((tt - C.elan) / ELAN));
+    if (C.vy) {
+      const h = Math.max(0, C.y - (C.sousY || 0));
+      if (C.saute && C.vy > 0) return sj(0.52 + 0.35 * cl(1 - C.vy / (C.vy0 || 3.5)));
+      if (C.saute) return sj(1.11 - 0.24 * cl(h / 0.55));
+      return sj(1.11 - 0.16 * cl(h / 0.5)); // elle tombe d'un objet : les jambes se préparent
+    }
+    if (C.atter) {
+      const e = tt - C.atter.t;
+      if (e < C.atter.d && !(e > 0.12 && v > 0.12)) return sj(1.11 + 0.63 * cl(e / C.atter.d)); // elle amortit (en marchant, elle repart vite)
+    }
     if (C.glisse) return { a: 'glisse', k: 0.35 };
     return pas();
   };
@@ -5686,7 +5827,7 @@ function mysLancer(cb, fic) {
       qui,
       P: {
         x: C.x,
-        y: C.y,
+        y: C.y + (C.lisse || 0),
         z: C.z,
         phi: C.phi,
         taille: LK.taille,
@@ -8827,6 +8968,7 @@ function mysLancer(cb, fic) {
     V.sy = sec * (Math.random() - 0.5) * 30;
     hist();
     if (!RP || RP.etat == 'attente') marche(dt); // pendant le replay, Célestine est rejouée (voir replay)
+    majLisse(dt);
     valentin(dt);
     majRoule(dt); // les boules du bonhomme cassé
     chatMaj(dt);

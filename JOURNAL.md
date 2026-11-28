@@ -4,6 +4,13 @@
 
 ---
 
+## 28/11/2026 · Toit : Célestine saute, monte sur les objets et en redescend de façon réaliste (version 1795864063)
+- **Nouveau saut :** une vraie animation de saut (Meshy « Regular Jump ») remplace l'ancienne, qui était un petit élan suivi de pas. Elle plie les jambes, s'élance bras levés, replie les jambes en l'air, les déplie en approchant du sol et amortit à la réception. L'animation suit la vraie trajectoire du saut.
+- **Monter sur un objet :** sur un objet bas (cadeaux, ballon, boules), elle saute et se pose dessus, jambes repliées, sans saut d'image. Sur un objet haut (boîte aux lettres, cheminée, conduit de Valentin), elle s'accroche au rebord, mains posées dessus, puis se hisse et se relève debout dessus. Avant, elle était téléportée en haut, les pieds dans le vide.
+- **Redescendre :** une marche de moins de 30 cm se descend en marchant, en douceur. D'un objet plus haut, elle s'écarte du bord, tombe avec son élan et amortit, au lieu de tomber tout droit ou d'être repoussée d'un coup sur le côté.
+- **Collisions refaites :** un vrai corps (22 cm de rayon) qui touche les objets tant que ses pieds sont plus bas que leur dessus. Ce qu'elle touche la repousse en douceur (plus de saut d'image). Arrêtée avec les pieds à moitié dans le vide, elle revient doucement sur le dessus ; sur une boule, elle ne tient que sur le haut. Chez Valentin, on peut enfin monter sur son conduit de cheminée (un ancien bloc l'en repoussait).
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/3d/toit-celestine.glb` (nouveau geste « saut »), `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : un vrai bac à sable (boules de neige, bonhomme à refaire, trampoline, luge, feux d'artifice, ballon) (version 1795862741)
 - **Le bouton d'action change selon l'endroit**, quand elle n'a pas le fichier en main : « Boule ❄️ », « Ramasser », « Poser », « Luge 🛷 », « Descendre », « Allumer 🎆 » (même bouton, touche E ou clic gauche). Avec le fichier en main, il reste « Lancer ».
 - **Boules de neige :** elle en lance où elle regarde. Elles cassent le bonhomme, font réagir les décors (sapin, antenne, cadeaux…), poussent les boules et le ballon. Si elle touche Valentin, il crie « Aïe ! » et réplique vite.
