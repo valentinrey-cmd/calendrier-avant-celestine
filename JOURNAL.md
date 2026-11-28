@@ -4,6 +4,15 @@
 
 ---
 
+## 28/11/2026 · Toit : plus de fichiers volants, et tout rebondit sur le trampoline (version 1795894452)
+- **Fichiers volants corrigés :**
+  - Quand Valentin tenait le fichier sans être dans l'image, sa main était mal calculée : il renvoyait le fichier depuis un point en l'air. La main est maintenant retenue par rapport à son corps, pour lui comme pour Célestine.
+  - Une boule portée par Célestine poussait le fichier en l'air (il restait perché dessus) : elle ne le touche plus.
+  - Le vent faisait glisser un fichier posé sur un objet : il ne pousse plus qu'un fichier en l'air.
+- **Trampoline :** le fichier, les boules de neige lancées, les boules du bonhomme et le ballon rebondissent dessus, de moins en moins haut, puis s'y posent, avec le bruit de ressort.
+- **Luge et caisse de feux d'artifice :** le fichier ne passe plus au travers. Il se pose dessus ou rebondit contre leurs côtés.
+- Fichiers : `2026/js/musiques-jeux.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Toit : bruitages du bac à sable, boules de neige énormes, le bonhomme revient (version 1795867032)
 - **Bruitages** (tout est synthétisé) :
   - « boïng » du trampoline ;

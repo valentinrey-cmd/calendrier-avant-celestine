@@ -1812,7 +1812,7 @@ function mysLancer(cb, fic) {
       else if (ob.t == 'boite') L.push({ b: 1, x: ob.x, z: ob.z, hx: 0.18, hz: 0.23, h: 1.18, ob });
     });
     L.push({ b: 1, x: TRAMP.x, z: TRAMP.z, hx: TRAMP.r * 0.85, hz: TRAMP.r * 0.85, h: TRAMP.h, tramp: 1 });
-    L.push({ b: 1, x: FEUX.x, z: FEUX.z, hx: 0.24, hz: 0.24, h: FEUX.h });
+    L.push({ b: 1, x: FEUX.x, z: FEUX.z, hx: 0.24, hz: 0.24, h: FEUX.h, feux: 1 });
     if (!C.luge) L.push({ b: 1, x: LUGE.x, z: LUGE.z, a: LUGE.a, hx: 0.3, hz: 0.48, h: 0.32, luge: 1 }); // (0,61 × 0,97 m, assise à 32 cm)
     ROULE.forEach(r => r.y > -1 && !r.porte && L.push({ s: 1, x: r.x, z: r.z, r: r.r, y: r.y, h: r.y + r.r, boule: r }));
     return L;
@@ -2212,7 +2212,12 @@ function mysLancer(cb, fic) {
       // la pesanteur, puis le rebond (de moins en moins) sur la neige
       b.vy -= G * dt;
       b.y += b.vy * dt;
-      if (b.y - b.r <= bas) {
+      // tombée sur le trampoline : elle rebondit (bien plus que sur la neige), puis s'y pose
+      if (b.vy <= 0 && b.y - b.r <= TRAMP.h && b.y - b.r > TRAMP.h - 0.25 && Math.hypot(b.x - TRAMP.x, b.z - TRAMP.z) < TRAMP.r) {
+        b.y = TRAMP.h + b.r;
+        if (b.vy < -1.2) ((b.vy = -b.vy * (b.k == 'ballon' ? 0.9 : 0.75)), bruit('trampo', Math.min(1, b.vy / 6)));
+        else b.vy = 0;
+      } else if (b.y - b.r <= bas) {
         b.y = bas + b.r;
         if (b.vy < -1.2) ((b.vy = -b.vy * rebond), b.k == 'ballon' ? bruit('ballon', Math.min(1, b.vy / 4)) : bruit('neige', Math.min(1, b.vy / 4)));
         else b.vy = 0;
@@ -2419,7 +2424,7 @@ function mysLancer(cb, fic) {
   nouveau();
   FIG3D.charge(); // les figurines 3D de Célestine et Valentin (js/toit-figurines-3d.js)
   // version de test seulement : accès aux personnages pour vérifier les gestes (outil de test automatique)
-  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, ctl: () => ctl, renverse: () => renverse(), fete: () => fete(), ROULE: () => ROULE, OBS: () => OBS, jouets: () => ({ TRAMP, LUGE, FEUX, FUSEES, ETINC, boules }), agir: () => agir(), action: () => action() };
+  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, ctl: () => ctl, renverse: () => renverse(), fete: () => fete(), ROULE: () => ROULE, OBS: () => OBS, jouets: () => ({ TRAMP, LUGE, FEUX, FUSEES, ETINC, boules }), agir: () => agir(), action: () => action(), F: () => F, boules: () => boules };
   // les mains vides : le fichier est dans la boîte aux lettres
   if (!fic) ((C.tient = 0), (F.al = 0), (tip.textContent = '📮 Va prendre le fichier dans la boîte aux lettres !'));
   rate = fin = 0;
@@ -4045,7 +4050,9 @@ function mysLancer(cb, fic) {
     F.y += F.vy * h;
     F.z += F.vz * h;
     F.a += F.va * h;
-    if (!F.in && !F.sol && !F.deVal && F.y > 0.05) {
+    const pose = F.dessus; // posé sur un objet (trampoline, luge, caisse, cadeaux) à l'étape d'avant : le vent ne le pousse pas
+    F.dessus = 0;
+    if (!F.in && !F.sol && !pose && !F.deVal && F.y > 0.05) {
       // le vent pousse le fichier, et l'effet le fait tourner en courbe (pas quand c'est Valentin qui le renvoie)
       F.vx += VENT.x * h;
       F.vz += VENT.z * h;
@@ -4142,10 +4149,12 @@ function mysLancer(cb, fic) {
         surprise('cadeaux');
         if (F.vy < -1) bruit('obstacle', 'cadeaux', Math.min(1, -F.vy / 6));
         F.vy = Math.abs(F.vy) * 0.25;
+        if (F.vy < 0.3) F.dessus = 1;
       }
     });
     // les boules du bonhomme : le fichier rebondit dessus (et les pousse un peu), ou se pose dessus
     ROULE.forEach(b => {
+      if (b.porte) return; // (dans les bras de Célestine : elle ne pousse pas le fichier en l'air)
       const dx = F.x - b.x,
         dy = F.y - b.y,
         dz = F.z - b.z,
@@ -4167,6 +4176,34 @@ function mysLancer(cb, fic) {
         b.vz -= v * nz * 0.25;
         if (v < -0.8) bruit('neige', Math.min(1, -v / 4));
       }
+    });
+    // le trampoline : le fichier rebondit dessus (de moins en moins haut), puis s'y pose
+    if (p.y >= TRAMP.h && F.y < TRAMP.h && F.vy < 0 && Math.hypot(F.x - TRAMP.x, F.z - TRAMP.z) < TRAMP.r) {
+      F.y = TRAMP.h;
+      if (F.vy < -1.5) {
+        F.vy = -F.vy * 0.85;
+        F.va += (Math.random() - 0.5) * 6;
+        bruit('trampo', Math.min(1, F.vy / 6));
+      } else ((F.vy = 0), (F.vx *= 0.9), (F.vz *= 0.9), (F.dessus = 1));
+    }
+    // la luge et la caisse de feux d'artifice : il se pose dessus, ou rebondit contre leurs côtés
+    supports().forEach(u => {
+      if (!u.luge && !u.feux) return;
+      const [lx, lz] = loc(u, F.x, F.z),
+        px = u.hx + 0.05 - Math.abs(lx),
+        pz = u.hz + 0.05 - Math.abs(lz);
+      if (px <= 0 || pz <= 0 || F.y >= u.h) return;
+      if (p.y >= u.h) {
+        F.y = u.h;
+        F.vy = F.vy < -1.4 ? -F.vy * 0.25 : 0;
+        if (!F.vy) ((F.vx *= 0.9), (F.vz *= 0.9), (F.dessus = 1));
+        return;
+      }
+      const [n0, n1] = px < pz ? mon(u, Math.sign(lx) || 1, 0) : mon(u, 0, Math.sign(lz) || 1),
+        v = F.vx * n0 + F.vz * n1;
+      F.x += n0 * Math.min(px, pz);
+      F.z += n1 * Math.min(px, pz);
+      if (v < 0) ((F.vx -= 1.35 * v * n0), (F.vz -= 1.35 * v * n1), bruit('obstacle', 'cadeaux', Math.min(1, -v / 3)));
     });
     // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
     const tp = traineauPos(T());
@@ -5105,10 +5142,19 @@ function mysLancer(cb, fic) {
     return { d: D.h, de: D.e, g: G.h, ge: G.e, acc: C.ps.acc };
   };
   const main = () => {
-    // en 3D : la vraie main droite de la figurine (position notée à la dernière image)
+    // en 3D : la vraie main droite de la figurine, à la même place par rapport à son corps qu'à la dernière image où elle
+    // a été calculée (hors de l'image, la figurine n'est pas recalculée : le fichier reste quand même dans sa main)
     const m3 = C.main3;
-    if (m3 && FIG3D.pret('celestine') && T() - m3.t < 0.25)
-      return { x: m3.x, y: m3.y + 0.03, z: m3.z, a: 0.1 * Math.cos(C.phi - V.yaw) + Math.sin(C.ph) * 0.1 * C.amp };
+    if (m3 && FIG3D.pret('celestine')) {
+      const co = Math.cos(C.phi),
+        si = Math.sin(C.phi);
+      return {
+        x: C.x + m3.a * co + m3.b * si,
+        y: C.y + m3.dy + 0.03,
+        z: C.z - m3.a * si + m3.b * co,
+        a: 0.1 * Math.cos(C.phi - V.yaw) + Math.sin(C.ph) * 0.1 * C.amp
+      };
+    }
     // le fichier suit sa main droite (même calcul que le dessin)
     // (proj donne un décalage à droite de la caméra et une profondeur vers elle : on les remet dans le monde)
     const [X, Y, Z] = posesLisses().d,
@@ -6024,8 +6070,16 @@ function mysLancer(cb, fic) {
     }
     const m = FIG3D.rendreTout(L, { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr });
     // le fichier suit leur vraie main (main()) ; il est dessiné en 3D, dans leur moufle
-    if (m.celestine) C.main3 = { ...m.celestine, t: T() };
-    if (m.valentin) VAL.main3 = { ...m.valentin, t: T() };
+    // (retenue aussi par rapport à son corps : a = à sa droite, b = devant elle, dy = au-dessus de ses pieds)
+    const dans = (P0, m0) => {
+      const dx = m0.x - P0.x,
+        dz = m0.z - P0.z,
+        co = Math.cos(P0.phi),
+        si = Math.sin(P0.phi);
+      return { ...m0, t: T(), a: dx * co - dz * si, b: dx * si + dz * co, dy: m0.y - P0.y };
+    };
+    if (m.celestine) C.main3 = dans(C, m.celestine);
+    if (m.valentin) VAL.main3 = dans(VAL, m.valentin);
   };
   // un jouet du bac à sable : en 3D, sinon une simple tache de couleur (le temps que la 3D arrive)
   const jouet = (cle, u, r, col) => {
@@ -7047,6 +7101,11 @@ function mysLancer(cb, fic) {
         surprise('boule');
         const [x, y] = P(b.x, b.y, b.z);
         for (let j = 0; j < 18; j++) eclats.push({ x, y, vx: (Math.random() - 0.5) * 200, vy: -Math.random() * 160, t: 0.6, c: '#ffffff' });
+      } else if (b.vy < 0 && b.y <= TRAMP.h + 0.05 && b.y > TRAMP.h - 0.3 && Math.hypot(b.x - TRAMP.x, b.z - TRAMP.z) < TRAMP.r && b.vy < -1.5) {
+        // le trampoline : elle rebondit (de moins en moins haut)
+        b.y = TRAMP.h + 0.05;
+        b.vy = -b.vy * 0.8;
+        bruit('trampo', Math.min(0.7, b.vy / 8));
       } else if ((surNous && b.y <= 0.05) || b.y < -4) {
         boules.splice(i, 1);
         if (surNous) {
