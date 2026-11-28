@@ -1670,6 +1670,7 @@ function mysLancer(cb, fic) {
       }
     } catch (_) {}
     annonce(neuf ? '🥚 Nouveau secret !' : '', SECRETS[k], n ? `${n}/${NSEC}` : '');
+    if (k == 'bonhomme') setTimeout(casseBonhomme, 0); // il se casse pour de bon : ses boules tombent et restent
     // des éclats à l'endroit touché
     const ob = OBS.find(q => q.t == k);
     if (ob) {
@@ -1695,7 +1696,7 @@ function mysLancer(cb, fic) {
   };
   const OBS = [
     { t: 'bonhomme', x: -1.3, z: 3.7, r: 0.3, h: 1.05 },
-    { t: 'cadeaux', x: 1.2, z: 3.1, r: 0.34, h: 0.55 },
+    { t: 'cadeaux', x: 1.2, z: 3.1, r: 0.34, h: 0.8 }, // la pile de trois cadeaux
     { t: 'sapin', x: 2.0, z: 7.2, r: 0.45, h: 1.7 },
     { t: 'antenne', x: -1.8, z: 7.4, r: 0.14, h: 1.9 },
     { t: 'boite', x: -3, z: 3.1, r: 0.22, h: 1.2 } // la boîte aux lettres : on y choisit un autre fichier sur le téléphone
@@ -1715,6 +1716,173 @@ function mysLancer(cb, fic) {
             ? 0.45
             : 0.05
           : ob.r;
+  // ---- Ce sur quoi on peut monter : la cheminée (et le conduit de Valentin), la pile de cadeaux, la boîte aux lettres
+  // et les boules du bonhomme de neige cassé. Une « marche » de moins de 30 cm se monte en marchant ; plus haut, il faut
+  // sauter (et s'agripper au rebord). Le sapin, l'antenne et le bonhomme entier ne font que l'arrêter.
+  const MARCHE = 0.3,
+    PORTEE = 1; // en sautant, ses mains attrapent un rebord jusqu'à 1 m au-dessus de ses pieds
+  const supports = () => {
+    const L = [
+      { b: 1, x: 0, z: CZ, hx: CX, hz: CD, h: TOP },
+      { b: 1, x: VOISIN.cx, z: VOISIN.cz, hx: VOISIN.ce, hz: VOISIN.ce, h: VOISIN.ch }
+    ];
+    OBS.forEach(ob => {
+      if (ob.t == 'cadeaux') L.push({ b: 1, x: ob.x, z: ob.z, hx: 0.3, hz: 0.3, h: ob.h, ob });
+      else if (ob.t == 'boite') L.push({ b: 1, x: ob.x, z: ob.z, hx: 0.18, hz: 0.23, h: 1.18, ob });
+    });
+    ROULE.forEach(r => r.y > -1 && L.push({ s: 1, x: r.x, z: r.z, r: r.r, y: r.y, h: r.y + r.r, boule: r }));
+    return L;
+  };
+  // la hauteur du dessus d'un support sous le point (x, z) (0 si rien) ; pour une boule, le haut de la sphère à cet endroit
+  const dessus = (u, x, z, marge = 0.1) => {
+    if (u.s) {
+      const d = Math.hypot(x - u.x, z - u.z);
+      return d < u.r * 0.8 ? u.y + Math.sqrt(u.r * u.r - d * d) : -1;
+    }
+    return Math.abs(x - u.x) < u.hx + marge && Math.abs(z - u.z) < u.hz + marge ? u.h : -1;
+  };
+  // le sol sous ses pieds : le plus haut des dessus qui ne sont pas au-dessus d'elle (à une marche près)
+  const hautSous = (x, z, y) => {
+    let h = 0;
+    for (const u of supports()) {
+      const t = dessus(u, x, z);
+      if (t > h && t <= y + MARCHE) h = t;
+    }
+    return h;
+  };
+  // Le bonhomme de neige cassé : ses trois boules (la grande, la moyenne et la tête) tombent et restent sur le toit.
+  // On les pousse en courant dedans (elles roulent, en tournant), on peut monter dessus. Une boule qui sort du toit tombe
+  // dans la rue.
+  const ROULE = [];
+  const casseBonhomme = () => {
+    const i = OBS.findIndex(q => q.t == 'bonhomme');
+    if (i < 0) return;
+    const ob = OBS[i];
+    OBS.splice(i, 1); // il n'existe plus : ses boules prennent le relais
+    // le sens du coup : depuis Célestine si elle est tout près, sinon dans le sens du fichier
+    let dx = ob.x - C.x,
+      dz = ob.z - C.z;
+    if (Math.hypot(dx, dz) > 1.6) ((dx = F.vx || 0.3), (dz = F.vz || 0.3));
+    const n = Math.hypot(dx, dz) || 1;
+    dx /= n;
+    dz /= n;
+    [
+      { k: 'boule', r: 0.3, y: 0.3, v: 0.5, vy: 0 },
+      { k: 'boule', r: 0.21, y: 0.75, v: 1.4, vy: 1.2, a: 0.5 },
+      { k: 'tete', r: 0.15, y: 1.05, v: 2.1, vy: 2.2, a: -0.6 }
+    ].forEach(b => {
+      const a = b.a || 0,
+        ux = dx * Math.cos(a) - dz * Math.sin(a),
+        uz = dx * Math.sin(a) + dz * Math.cos(a);
+      ROULE.push({ k: b.k, r: b.r, x: ob.x + ux * 0.05, z: ob.z + uz * 0.05, y: b.y, vx: ux * b.v, vz: uz * b.v, vy: b.vy, q: [0, 0, 0, 1] });
+    });
+    bruit('neige', 1);
+  };
+  // une rotation (axe x, y, z du monde du jeu, angle) ajoutée à la rotation q d'une boule (en 3D : z inversé)
+  const tourne = (q, ax, ay, az, an) => {
+    const s2 = Math.sin(an / 2),
+      a = [ax * s2, ay * s2, -az * s2, Math.cos(an / 2)],
+      [x1, y1, z1, w1] = a,
+      [x2, y2, z2, w2] = q;
+    const r = [w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2, w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2, w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2, w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2],
+      n = Math.hypot(...r) || 1;
+    return r.map(v => v / n);
+  };
+  // le toit sous un point (pour une boule) : 0 sur un des deux toits, sinon la rue (SOL)
+  const surToit = (x, z) => (Math.abs(x) < 8.88 && z > BORD && z < RIDGE + 0.4) || surVoisin(x, z);
+  const majRoule = dt => {
+    for (let i = ROULE.length - 1; i >= 0; i--) {
+      const b = ROULE[i],
+        bas = surToit(b.x, b.z) ? 0 : SOL;
+      // la pesanteur, puis le rebond (de moins en moins) sur la neige
+      b.vy -= G * dt;
+      b.y += b.vy * dt;
+      if (b.y - b.r <= bas) {
+        b.y = bas + b.r;
+        if (b.vy < -1.5) ((b.vy = -b.vy * 0.28), bruit('neige', Math.min(1, -b.vy / 4)));
+        else b.vy = 0;
+        if (bas == SOL) {
+          // tombée dans la rue : elle s'écrase
+          ROULE.splice(i, 1);
+          continue;
+        }
+        // elle roule : la neige la freine
+        const v = Math.hypot(b.vx, b.vz);
+        if (v > 0) {
+          const nv = Math.max(0, v - dt * 1.3);
+          b.vx *= nv / v;
+          b.vz *= nv / v;
+        }
+      }
+      b.x += b.vx * dt;
+      b.z += b.vz * dt;
+      // le faîtage (le haut des deux toits) : elle rebondit dessus et redescend
+      if (b.z > RIDGE - b.r && b.y < 1.5) ((b.z = RIDGE - b.r), (b.vz = -Math.abs(b.vz) * 0.4));
+      // elle tourne en roulant (axe : la verticale × sa vitesse)
+      const v = Math.hypot(b.vx, b.vz);
+      if (v > 0.01) b.q = tourne(b.q, b.vz / v, 0, -b.vx / v, (v * dt) / b.r);
+      // les murs : la cheminée, le conduit de Valentin, la pile de cadeaux, la boîte aux lettres (elle rebondit)
+      supports().forEach(u => {
+        if (u.s || b.y - b.r > u.h - 0.05) return;
+        const ex = u.hx + b.r,
+          ez = u.hz + b.r,
+          px = ex - Math.abs(b.x - u.x),
+          pz = ez - Math.abs(b.z - u.z);
+        if (px <= 0 || pz <= 0) return;
+        if (px < pz) ((b.x = u.x + Math.sign(b.x - u.x || 1) * ex), (b.vx = -b.vx * 0.4));
+        else ((b.z = u.z + Math.sign(b.z - u.z || 1) * ez), (b.vz = -b.vz * 0.4));
+        if (Math.hypot(b.vx, b.vz) > 0.8) bruit('neige', 0.4);
+      });
+      // le sapin, l'antenne
+      OBS.forEach(ob => {
+        if (ob.t == 'cadeaux' || ob.t == 'boite') return;
+        const dx = b.x - ob.x,
+          dz = b.z - ob.z,
+          d = Math.hypot(dx, dz),
+          m = rayon(ob, b.y) + b.r;
+        if (d < m && d > 0) {
+          const nx = dx / d,
+            nz = dz / d,
+            vn = b.vx * nx + b.vz * nz;
+          b.x = ob.x + nx * m;
+          b.z = ob.z + nz * m;
+          if (vn < 0) ((b.vx -= 1.4 * vn * nx), (b.vz -= 1.4 * vn * nz), surprise(ob.t));
+        }
+      });
+    }
+    // les boules entre elles (la plus grosse pèse plus lourd)
+    for (let i = 0; i < ROULE.length; i++)
+      for (let j = i + 1; j < ROULE.length; j++) {
+        const a = ROULE[i],
+          b = ROULE[j],
+          dx = b.x - a.x,
+          dz = b.z - a.z,
+          dy = b.y - a.y,
+          d = Math.hypot(dx, dy, dz),
+          m = a.r + b.r;
+        if (d >= m || d == 0) continue;
+        const nx = dx / d,
+          ny = dy / d,
+          nz = dz / d,
+          ma = a.r ** 3,
+          mb = b.r ** 3,
+          tot = ma + mb,
+          rec = m - d;
+        a.x -= nx * rec * (mb / tot);
+        a.z -= nz * rec * (mb / tot);
+        b.x += nx * rec * (ma / tot);
+        b.z += nz * rec * (ma / tot);
+        if (ny > 0.6) ((b.y = a.y + m * ny), (b.vy = Math.max(b.vy, 0))); // posée sur l'autre
+        const vn = (b.vx - a.vx) * nx + (b.vz - a.vz) * nz;
+        if (vn < 0) {
+          const k = (1.5 * vn) / tot;
+          a.vx += k * mb * nx;
+          a.vz += k * mb * nz;
+          b.vx -= k * ma * nx;
+          b.vz -= k * ma * nz;
+        }
+      }
+  };
   const RIDGE = 8.5, // faîtage : au-delà, le fichier tombe de l'autre côté
     BORD = 0.6; // gouttière (le bas du toit) : au-delà, le fichier tombe du toit
   const taille = () => {
@@ -1805,7 +1973,7 @@ function mysLancer(cb, fic) {
   nouveau();
   FIG3D.charge(); // les figurines 3D de Célestine et Valentin (js/toit-figurines-3d.js)
   // version de test seulement : accès aux personnages pour vérifier les gestes (outil de test automatique)
-  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, ctl: () => ctl, renverse: () => renverse(), fete: () => fete() };
+  if (VERSION_TEST) window.__toit = { C: () => C, VAL: () => VAL, T: () => T(), V: () => V, ctl: () => ctl, renverse: () => renverse(), fete: () => fete(), ROULE: () => ROULE };
   // les mains vides : le fichier est dans la boîte aux lettres
   if (!fic) ((C.tient = 0), (F.al = 0), (tip.textContent = '📮 Va prendre le fichier dans la boîte aux lettres !'));
   rate = fin = 0;
@@ -2037,6 +2205,23 @@ function mysLancer(cb, fic) {
     c.beginPath();
     c.ellipse(sx, sy, ss * 0.9, ss * 0.18, 0, 0, 7);
     c.fill();
+    // en vraie 3D : la cheminée, puis la lueur du feu dans son ouverture et le fichier qui y tombe
+    if (FIG3D.calcule('chem')) {
+      FIG3D.colle(c, 'chem');
+      if (CAM + V.h > TOP) {
+        ouverture();
+        const [ox, oy, os] = P(0, TOP, CZ),
+          g = c.createRadialGradient(ox, oy + os * 0.05, 2, ox, oy, os * 0.5);
+        g.addColorStop(0, 'rgba(255,154,60,0.95)');
+        g.addColorStop(0.35, 'rgba(90,26,12,0.9)');
+        g.addColorStop(1, 'rgba(18,6,6,0.85)');
+        c.fillStyle = g;
+        c.fill();
+      }
+      if (dedans) dedans();
+      if (Math.random() < 0.12) fumees.push({ x: (Math.random() - 0.5) * 0.3, y: TOP + 0.05, z: CZ, r: 0.08, a: 0.35, v: 0.35 });
+      return;
+    }
     // couronne de pierre et neige
     const E = 0.06;
     poly([
@@ -2874,6 +3059,28 @@ function mysLancer(cb, fic) {
     }
     return 1;
   };
+  // la surprise des cadeaux : un chat sort du cadeau, monté sur ressort (Q : point de l'objet → écran ; y : le dessus)
+  const chatCadeau = (Q, p, a, y) => {
+    if (!(p > 0)) return;
+    const [bx, by, sc] = Q(0.18, y, -0.02),
+      hh = sc * 0.42 * p * (a < 4.5 ? 1 - Math.exp(-5 * a) * Math.cos(16 * a) : 1);
+    c.strokeStyle = '#9aa3b5';
+    c.lineWidth = Math.max(1, sc * 0.012);
+    c.beginPath();
+    c.moveTo(bx, by);
+    for (let i = 1; i <= 8; i++) c.lineTo(bx + (i % 2 ? -1 : 1) * sc * 0.05, by - (hh * i) / 8);
+    c.stroke();
+    c.font = `${Math.round(sc * 0.3)}px system-ui`;
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText('🐱', bx, by - hh - sc * 0.1);
+    c.textBaseline = 'alphabetic';
+    if (a > 0.3 && a < 2.4) {
+      c.fillStyle = '#ffffff';
+      c.font = `800 ${Math.round(Math.max(10, sc * 0.11))}px system-ui`;
+      c.fillText('Miaou !', bx + sc * 0.38, by - hh - sc * 0.28);
+    }
+  };
   const obstacle = (ob, t) => {
     const [x, y, s, d] = P(ob.x, 0, ob.z);
     if (d < 0.4) return; // derrière la caméra
@@ -2893,6 +3100,18 @@ function mysLancer(cb, fic) {
     c.fillStyle = '#7d8db033';
     cercle(0.1, 0, 0.1, ob.r * 1.25);
     c.fill();
+    // en vraie 3D : l'objet, puis ses petits effets (l'anneau de la boîte aux lettres, le chat du cadeau)
+    if (FIG3D.calcule('ob_' + ob.t)) {
+      if (ob.t == 'boite' && Math.hypot(C.x - ob.x, C.z - ob.z) < BOITE_PRES && !fin) {
+        c.strokeStyle = `rgba(255,215,106,${0.55 + 0.3 * Math.sin(t * 5)})`;
+        c.lineWidth = 3;
+        cercle(0, 0.01, 0, 0.5 + 0.04 * Math.sin(t * 5));
+        c.stroke();
+      }
+      FIG3D.colle(c, 'ob_' + ob.t);
+      if (ob.t == 'cadeaux') chatCadeau(Q, chambou('cadeaux', 0.35, 0.8), age('cadeaux'), ob.h);
+      return;
+    }
     if (ob.t == 'bonhomme') {
       // trois boules de neige ; son visage regarde vers le bas du toit (vers la vue de départ).
       // Il s'écroule : les boules roulent, le chapeau tombe, puis il se reconstruit.
@@ -3160,26 +3379,7 @@ function mysLancer(cb, fic) {
           ]
         ];
       L3.sort((u, v) => v[0] - u[0]).forEach(e => e[1]());
-      if (p > 0) {
-        const [bx, by, sc] = Q(0.18, 0.42, -0.02),
-          hh = sc * 0.42 * p * (a < 4.5 ? 1 - Math.exp(-5 * a) * Math.cos(16 * a) : 1);
-        c.strokeStyle = '#9aa3b5';
-        c.lineWidth = Math.max(1, sc * 0.012);
-        c.beginPath();
-        c.moveTo(bx, by);
-        for (let i = 1; i <= 8; i++) c.lineTo(bx + (i % 2 ? -1 : 1) * sc * 0.05, by - (hh * i) / 8);
-        c.stroke();
-        c.font = `${Math.round(sc * 0.3)}px system-ui`;
-        c.textAlign = 'center';
-        c.textBaseline = 'middle';
-        c.fillText('🐱', bx, by - hh - sc * 0.1);
-        c.textBaseline = 'alphabetic';
-        if (a > 0.3 && a < 2.4) {
-          c.fillStyle = '#ffffff';
-          c.font = `800 ${Math.round(Math.max(10, sc * 0.11))}px system-ui`;
-          c.fillText('Miaou !', bx + sc * 0.38, by - hh - sc * 0.28);
-        }
-      }
+      chatCadeau(Q, p, a, 0.42);
     } else if (ob.t == 'sapin') {
       // surprise : il tremble, perd ses aiguilles (voir les éclats) et son étoile tombe, puis elle remonte
       const as = age('sapin'),
@@ -3496,6 +3696,30 @@ function mysLancer(cb, fic) {
         surprise('cadeaux');
         if (F.vy < -1) bruit('obstacle', 'cadeaux', Math.min(1, -F.vy / 6));
         F.vy = Math.abs(F.vy) * 0.25;
+      }
+    });
+    // les boules du bonhomme : le fichier rebondit dessus (et les pousse un peu), ou se pose dessus
+    ROULE.forEach(b => {
+      const dx = F.x - b.x,
+        dy = F.y - b.y,
+        dz = F.z - b.z,
+        d = Math.hypot(dx, dy, dz),
+        m = b.r + 0.08;
+      if (d >= m || d == 0) return;
+      const nx = dx / d,
+        ny = dy / d,
+        nz = dz / d,
+        v = F.vx * nx + F.vy * ny + F.vz * nz;
+      F.x = b.x + nx * m;
+      F.y = b.y + ny * m;
+      F.z = b.z + nz * m;
+      if (v < 0) {
+        F.vx -= 1.4 * v * nx;
+        F.vy -= 1.4 * v * ny;
+        F.vz -= 1.4 * v * nz;
+        b.vx -= v * nx * 0.25;
+        b.vz -= v * nz * 0.25;
+        if (v < -0.8) bruit('neige', Math.min(1, -v / 4));
       }
     });
     // le traîneau : il faut vraiment le toucher (boîte autour des rennes et du traîneau)
@@ -3980,7 +4204,7 @@ function mysLancer(cb, fic) {
   // Viser (clic droit maintenu, sur ordinateur) : des pointillés montrent la courbe du fichier, avec la force de la jauge
   // (à mi-force tant qu'on n'arme pas), le vent et l'effet — le même calcul que le vrai vol (voir lacheFichier et pas)
   const viseeTrace = () => {
-    if (!ctl.vise || !C.tient || fin || C.chute || C.ko || C.y > 0) return;
+    if (!ctl.vise || !C.tient || fin || C.chute || C.ko || C.vy || C.y > (C.sol || 0) + 0.02) return;
     const p = C.charge ? C.p || 0 : 0.5,
       v = VMIN + (VMAX - VMIN) * p,
       m = main(),
@@ -4783,16 +5007,64 @@ function mysLancer(cb, fic) {
       if (C.y <= 0.02 && !horsToit()) traces.push({ x: C.x + q * 0.1 * Math.cos(C.phi), z: C.z - q * 0.1 * Math.sin(C.phi), a: C.phi, t: T() });
       if (traces.length > 220) traces.splice(0, traces.length - 220);
     }
-    // la cheminée et les obstacles l'arrêtent (et elle déclenche les surprises en les touchant)
-    const ex = CX + 0.24,
-      ez = CD + 0.22;
-    if (Math.abs(C.x) < ex && Math.abs(C.z - CZ) < ez) {
-      const px = ex - Math.abs(C.x),
-        pz = ez - Math.abs(C.z - CZ);
-      if (px < pz) C.x = Math.sign(C.x || 1) * ex;
-      else C.z = CZ + Math.sign(C.z - CZ || -1) * ez;
+    // la cheminée, les cadeaux, la boîte aux lettres, les boules : ils l'arrêtent tant qu'elle est plus bas que leur dessus
+    // (au-dessus, elle marche dessus). En l'air, si le rebord est à portée de mains (PORTEE), elle s'agrippe et se hisse.
+    // Une boule plus basse qu'elle-même, elle la pousse : elle roule.
+    for (const u of supports()) {
+      if (C.y >= u.h - 0.05) continue; // elle est dessus (ou au-dessus)
+      if (u.s) {
+        const dx = u.x - C.x,
+          dz = u.z - C.z,
+          d = Math.hypot(dx, dz),
+          m = u.r + 0.22;
+        if (d >= m || d == 0) continue;
+        const nx = dx / d,
+          nz = dz / d,
+          b = u.boule;
+        if (u.h - C.y <= MARCHE + 0.02 && !C.vy) continue; // une marche : elle monte dessus
+        // elle la pousse : la boule recule de ce qu'il faut, et part devant elle (la petite plus vite que la grande)
+        const vn = Math.max(0, vx * nx + vz * nz),
+          k = Math.max(0.65, Math.min(1.3, 0.22 / b.r));
+        b.x = C.x + nx * m;
+        b.z = C.z + nz * m;
+        const vb = b.vx * nx + b.vz * nz,
+          cible = vn * 1.15 * k + 0.15;
+        if (vb < cible) ((b.vx += (cible - vb) * nx), (b.vz += (cible - vb) * nz));
+        if (C.vy && u.h - C.y < PORTEE && C.vy < 2.2) ((C.y = u.h), (C.vy = 0), (C.saute = 0), (C.air = null), (C.grimpe = T()));
+        continue;
+      }
+      const ex = u.hx + 0.22,
+        ez = u.hz + 0.22,
+        px = ex - Math.abs(C.x - u.x),
+        pz = ez - Math.abs(C.z - u.z);
+      if (px <= 0 || pz <= 0) continue;
+      // en l'air, le rebord à portée de mains : elle s'agrippe et se hisse dessus
+      if ((C.vy || C.y > (C.sol || 0) + 0.02) && u.h - C.y < PORTEE && C.vy < 2.2) {
+        C.y = u.h;
+        C.vy = 0;
+        C.saute = 0;
+        C.air = null;
+        C.grimpe = T();
+        if (px < pz) C.x = u.x + Math.sign(C.x - u.x || 1) * Math.max(0, u.hx - 0.12);
+        else C.z = u.z + Math.sign(C.z - u.z || 1) * Math.max(0, u.hz - 0.12);
+        bruit('pas', 0.8);
+        continue;
+      }
+      if (px < pz) C.x = u.x + Math.sign(C.x - u.x || 1) * ex;
+      else C.z = u.z + Math.sign(C.z - u.z || -1) * ez;
+      if (u.ob) surprise(u.ob.t);
     }
+    // ce qui est sous ses pieds : elle marche dessus, monte une marche, ou tombe quand elle en descend
+    C.sol = hautSous(C.x, C.z, C.y + 0.02);
+    if (!C.vy) {
+      if (C.y < C.sol) C.y = C.sol; // une petite marche (une petite boule)
+      else if (C.y > C.sol + 0.03) C.vy = -0.01; // le vide sous ses pieds : elle tombe
+    }
+    if (!C.chute) C.base = C.sol; // son ombre, sur ce qui est sous elle
+    // la caméra monte avec elle quand elle est sur quelque chose (doucement)
+    C.camSol = (C.camSol || 0) + ((C.chute ? 0 : C.sol) - (C.camSol || 0)) * Math.min(1, dt * 4);
     OBS.forEach(ob => {
+      if (ob.t == 'cadeaux' || ob.t == 'boite') return; // (ce sont des supports, voir plus haut)
       const d = Math.hypot(C.x - ob.x, C.z - ob.z),
         mm = rayon(ob, 0.5) + 0.22;
       if (d < mm && d > 0) {
@@ -4852,7 +5124,7 @@ function mysLancer(cb, fic) {
     if (C.tient) Object.assign(F, main(), { vol: 0, al: 1, ent: 1, in: 0 });
   };
   const armer = () => {
-    if (fin || C.chute || C.ko || !C.tient || C.charge || C.y > 0 || C.pTir != null) return;
+    if (fin || C.chute || C.ko || !C.tient || C.charge || C.y > (C.sol || 0) + 0.02 || C.vy || C.pTir != null) return;
     C.charge = T();
     C.p = 0;
     btn.classList.add('on');
@@ -4903,10 +5175,23 @@ function mysLancer(cb, fic) {
     tip.textContent = '';
   };
   const saut = dt => {
-    if (!C.vy && C.y <= 0) return;
+    if (!C.vy) return;
+    const y0 = C.y;
     C.vy -= G * dt;
     C.y += C.vy * dt;
     if (C.pTir != null && C.tient && T() - C.tir > 0.2) lacheFichier(); // en haut du saut, bras tendu
+    // elle retombe sur quelque chose (la cheminée, les cadeaux, une boule…) : elle s'y pose
+    const s0 = C.vy < 0 ? hautSous(C.x, C.z, y0) : 0;
+    if (s0 > 0 && C.y <= s0) {
+      C.y = s0;
+      C.vy = 0;
+      if (C.saute) C.v = Math.min(C.v, 2.4);
+      C.saute = 0;
+      C.air = null;
+      C.pose = T();
+      bruit('pas', 1);
+      return;
+    }
     if (C.y <= 0) {
       // elle a sauté dans le vide (hors des toits, même à 45 cm près) : elle continue sa course et tombe, sans atterrir
       const n = !fin && horsToit(0.45);
@@ -4962,7 +5247,7 @@ function mysLancer(cb, fic) {
   };
   // sauter (barre d'espace, bouton « Sauter ») : plus loin en courant, assez pour franchir la ruelle (1,5 m)
   const sauter = () => {
-    if (fin || C.chute || C.ko || C.y > 0 || C.vy || C.charge || C.danse || C.ange || C.pTir != null) return;
+    if (fin || C.chute || C.ko || C.y > (C.sol || 0) + 0.02 || C.vy || C.charge || C.danse || C.ange || C.pTir != null) return;
     C.vy = C.v > 2.3 ? 3.9 : 3.3;
     C.saute = T();
     const d = C.v > 0.05 && C.dir ? C.dir : [0, 0];
@@ -5071,19 +5356,22 @@ function mysLancer(cb, fic) {
     if (tt - (C.ramasse || -9) < 0.5) return { a: 'ramasse', k: 0.03 + 0.45 * cl((tt - C.ramasse) / 0.5) };
     if (C.charge) return { a: 'lancer', k: 0.33 }; // bras armé, elle vise
     if (tt - (C.tir || -9) < 0.6) return { a: 'lancer', k: 0.33 + 0.25 * cl((tt - C.tir) / 0.6) };
+    if (C.grimpe && tt - C.grimpe < 0.35) return { a: 'echfin', k: 0.4 + 0.28 * cl((tt - C.grimpe) / 0.35) }; // elle se hisse
     if (C.saute) return { a: 'saut', k: 0.15 + 0.3 * cl((tt - C.saute) / 0.75) }; // elle pousse sur ses jambes, puis vole
+    if (C.vy && !C.chute && qui != 'valentin') return { a: 'saut', k: 0.42 }; // elle descend de quelque chose
     if (C.glisse) return { a: 'glisse', k: 0.35 };
     return pas();
   };
-  // La figurine 3D du personnage en cours (C) : calculée par prepa3D() avant la scène, collée ici à son tour
-  const calc3D = qui => {
-    if (!FIG3D.pret(qui) || P(C.x, C.y, C.z)[3] < 0.5) return;
+  // La figurine 3D du personnage en cours (C), pour la liste de prepa3D()
+  const perso3D = qui => {
+    if (!FIG3D.pret(qui) || P(C.x, C.y, C.z)[3] < 0.5) return null;
     const LK = qui == 'valentin' ? TENUE.valentin : TENUE.celestine,
       dz = qui == 'celestine' ? danse() : null;
     C.dz3 = dz;
-    const m = FIG3D.rendre(
+    return {
+      cle: qui,
       qui,
-      {
+      P: {
         x: C.x,
         y: C.y,
         z: C.z,
@@ -5091,24 +5379,64 @@ function mysLancer(cb, fic) {
         taille: LK.taille,
         objet: C.tient && F.al > 0 ? { cle: vis.k + (vis.nom || '') + (vis.noir ? '#' : ''), faire: texFichier, vit: vis.noir } : null
       },
-      { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr },
-      geste3D(qui, dz)
-    );
-    if (m) C.main3 = { ...m, t: T() }; // le fichier suit sa vraie main (main()) ; il est dessiné en 3D, dans sa moufle
+      g: geste3D(qui, dz)
+    };
   };
-  // les deux figurines, calculées ensemble au début de l'image (une seule recopie de l'image 3D par image : bien plus fluide)
+  // un objet du toit qui vacille quand on le touche (chambou) : une petite inclinaison qui tremble
+  const vacille = (k, monte, retour) => {
+    const p = chambou(k, monte, retour),
+      t = T();
+    return p ? [Math.sin(t * 23) * 0.09 * p, Math.cos(t * 19) * 0.07 * p] : null;
+  };
+  // Tout ce qui est en 3D, calculé ensemble au début de l'image (une seule recopie de l'image 3D par image : bien plus
+  // fluide) : les deux personnages, la cheminée et le conduit de Valentin, les objets du toit, les boules du bonhomme
   const prepa3D = sous => {
-    FIG3D.debut();
-    calc3D('celestine');
-    if (sous) return;
-    const moi = C;
-    VAL.rit = !!moi.ko; // Célestine est K.O. : la figurine 3D de Valentin rigole
-    C = VAL;
-    try {
-      calc3D('valentin');
-    } finally {
-      C = moi;
+    const L = [],
+      moi = C,
+      ce = perso3D('celestine');
+    if (ce) L.push(ce);
+    if (!sous) {
+      VAL.rit = !!moi.ko; // Célestine est K.O. : la figurine 3D de Valentin rigole
+      C = VAL;
+      try {
+        const va = perso3D('valentin');
+        if (va) L.push(va);
+      } finally {
+        C = moi;
+      }
+      // (chaque objet à la taille de son dessin : largeur, hauteur, profondeur en m)
+      L.push({ cle: 'chem', mod: 'cheminee', x: 0, z: CZ, dim: [2 * CX + 0.16, TOP + 0.12, 2 * CD + 0.16] });
+      L.push({ cle: 'chemV', mod: 'cheminee', x: VOISIN.cx, z: VOISIN.cz, dim: [2 * VOISIN.ce + 0.08, VOISIN.ch + 0.06, 2 * VOISIN.ce + 0.08] });
+      OBS.forEach(ob =>
+        L.push({
+          cle: 'ob_' + ob.t,
+          mod: ob.t,
+          x: ob.x,
+          z: ob.z,
+          dim: ob.t == 'cadeaux' ? [0.62, ob.h, 0.62] : [null, { bonhomme: 1.25, sapin: 1.7, antenne: 1.9, boite: 1.2 }[ob.t], null],
+          pen: vacille(ob.t, ob.t == 'cadeaux' ? 0.35 : 0.45, ob.t == 'cadeaux' ? 0.8 : 1.3)
+        })
+      );
+      ROULE.forEach((b, i) => L.push({ cle: 'roule' + i, mod: b.k, x: b.x, y: b.y, z: b.z, centre: 1, dim: [2 * b.r, null, null], q: b.q }));
     }
+    const m = FIG3D.rendreTout(L, { x: V.x, y: CAM + V.h, z: V.z, yaw: V.yaw, p: V.p, f, cx: W / 2 + V.sx, cy: hc + V.sy, W, H, dpr });
+    // le fichier suit leur vraie main (main()) ; il est dessiné en 3D, dans leur moufle
+    if (m.celestine) C.main3 = { ...m.celestine, t: T() };
+    if (m.valentin) VAL.main3 = { ...m.valentin, t: T() };
+  };
+  // une boule du bonhomme cassé : en 3D, sinon dessinée (une boule de neige ombrée)
+  const rouleDessin = (b, i) => {
+    if (FIG3D.calcule('roule' + i)) return FIG3D.colle(c, 'roule' + i);
+    const [px, py, sc, d] = P(b.x, b.y, b.z);
+    if (d < 0.3) return;
+    const rr = b.r * sc,
+      g = c.createRadialGradient(px - rr * 0.35, py - rr * 0.4, rr * 0.1, px, py, rr);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(1, '#c3d0e8');
+    c.fillStyle = g;
+    c.beginPath();
+    c.arc(px, py, rr, 0, 7);
+    c.fill();
   };
   const figurine3D = (t, LK, qui) => {
     if (P(C.x, C.y, C.z)[3] < 0.5) return;
@@ -7953,7 +8281,8 @@ function mysLancer(cb, fic) {
       [x0, z0, x1, z0, 0, -1, 3]
     ]);
     empreintes('voisin'); // les traces sur son toit, sous sa cheminée
-    // un petit conduit de cheminée en briques
+    // un petit conduit de cheminée en briques (en vraie 3D quand elle est prête)
+    if (FIG3D.calcule('chemV')) return FIG3D.colle(c, 'chemV');
     const { cx, cz, ce: e, ch: ht } = VOISIN;
     [
       [
@@ -8068,7 +8397,7 @@ function mysLancer(cb, fic) {
     // d'elle, en s'inclinant à peine : l'image reste droite, rien ne se déforme)
     let cible = {
       yaw: ctl.yaw,
-      h: (vis3 ? -1.2 : -1.0) + ctl.pit * (ctl.pit > 0 ? 1.4 : 0.6),
+      h: (vis3 ? -1.2 : -1.0) + ctl.pit * (ctl.pit > 0 ? 1.4 : 0.6) + (C.camSol || 0),
       p: (vis3 ? 0.1 : 0.15) + ctl.pit * 0.12,
       kx: 7,
       kh: 5,
@@ -8151,6 +8480,7 @@ function mysLancer(cb, fic) {
     hist();
     if (!RP || RP.etat == 'attente') marche(dt); // pendant le replay, Célestine est rejouée (voir replay)
     valentin(dt);
+    majRoule(dt); // les boules du bonhomme cassé
     chatMaj(dt);
     pigeons(dt);
     boiteMaj();
@@ -8187,6 +8517,7 @@ function mysLancer(cb, fic) {
     if (C.chute && T() - C.chute.t > 0.9) villeBas(t);
     // pendant la chute, quand la caméra passe sous le niveau des toits, on ne dessine plus rien de ce qui est sur les toits
     const sous = CAM + V.h < 0.15;
+    prepa3D(sous); // tout ce qui est en 3D, calculé d'un coup avant de dessiner (collé ensuite, chacun à son tour)
     // le toit d'en face est plus loin : on le dessine d'abord, notre toit passe devant
     if (sous) (toitVoisin(true), facadesNous(), ECH.forEach(echelle));
     else if (V.x < VOISIN.x0) (toitVoisin(), facadesNous(), toit(), empreintes());
@@ -8227,7 +8558,7 @@ function mysLancer(cb, fic) {
       if (CHAT.e) L.push([prof(CHAT.x, CHAT.z) - (CHAT.y > TOP - 0.3 ? 0.05 : 0), () => chatDessin(t)]);
       PIG.forEach(p => L.push([prof(p.x, p.z), () => pigeonDessin(p)]));
     }
-    prepa3D(sous);
+    if (!sous) ROULE.forEach((b, i) => L.push([prof(b.x, b.z), () => rouleDessin(b, i)]));
     L.sort((p, q) => q[0] - p[0]).forEach(e => e[1]());
     viseeTrace();
     particules(dt);

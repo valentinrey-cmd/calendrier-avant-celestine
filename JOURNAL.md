@@ -4,6 +4,13 @@
 
 ---
 
+## 28/11/2026 · Toit : tous les objets en vraie 3D, on monte dessus, le bonhomme se casse en boules qui roulent (version 1795861624)
+- **Objets en 3D (Meshy) :** la cheminée (et le conduit de Valentin), le bonhomme de neige, la pile de cadeaux, le sapin, l'antenne et la boîte aux lettres. Leurs effets restent (lueur du feu, fumée, chat du cadeau, anneau de la boîte aux lettres).
+- **On peut monter dessus :** cheminée, cadeaux, boîte aux lettres et boules. Une petite boule se monte en marchant ; plus haut, on saute et elle s'agrippe au rebord pour se hisser. Elle retombe quand elle en descend, et la caméra monte avec elle.
+- **Le bonhomme de neige :** touché (en lui rentrant dedans ou avec le fichier), il se casse pour de bon : sa grande boule, sa moyenne et sa tête tombent et restent sur le toit. On les pousse en courant dedans (elles roulent en tournant, la petite plus vite), on peut monter dessus ; elles rebondissent sur la cheminée et entre elles, et peuvent tomber dans la rue par les bords. Le fichier rebondit dessus.
+- **Fluidité :** tout ce qui est en 3D est calculé d'un coup par image ; les objets sont allégés (le sapin passe de 7,8 millions à 10 700 triangles).
+- Fichiers : `2026/js/musiques-jeux.js`, `2026/js/toit-figurines-3d.js`, `2026/js/fichiers.js`, `2026/3d/moteur-3d.min.js`, `2026/3d/toit-cheminee.glb`, `toit-bonhomme.glb`, `toit-boule.glb`, `toit-tete.glb`, `toit-cadeaux.glb`, `toit-sapin.glb`, `toit-antenne.glb`, `toit-boite.glb` (nouveaux), `CLAUDE.md`, `2026/index.html`, `2026/version.json`.
+
 ## 28/11/2026 · Vitrine 3D : les lunettes après Emma (version 1795822838)
 - Les lunettes de Célestine se gagnent en battant Emma (jour 8, le test de vue), et plus Nora. Rien pour Nora et Sandrine pour l'instant.
 - Fichiers : `2026/js/tresors.js`, `2026/js/langue-anglais.js`, `CLAUDE.md`, `2026/index.html`, `2026/version.json`.

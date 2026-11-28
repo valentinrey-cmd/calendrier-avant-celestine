@@ -1,39 +1,49 @@
-/* ================= 🧊 Le toit du fichier mystère : Célestine et Valentin en vraies figurines 3D ================= */
+/* ================= 🧊 Le toit du fichier mystère : personnages et objets en vraie 3D ================= */
 // Les figurines ont été faites avec Meshy à partir de leurs photos, avec un squelette et des animations
 // (fichiers 3d/toit-celestine.glb et 3d/toit-valentin.glb, une animation par geste : voir GESTES3D).
-// Elles sont dessinées par un petit moteur 3D (3d/moteur-3d.min.js = three.js), chargé seulement à l'ouverture du toit.
-// Chaque personnage est rendu dans un petit cadre autour de lui, avec exactement la caméra du jeu (même position, même
-// direction, même focale), puis collé dans l'image du jeu à sa place dans l'ordre de profondeur.
-// Pour aller vite : les deux personnages sont rendus côte à côte dans la même image de travail (une « fente » chacun),
-// AVANT d'être collés : la recopie de l'image 3D vers l'image du jeu (le plus coûteux) ne se fait qu'une fois par image.
-// Tant que la 3D n'est pas prête (ou si elle ne peut pas se charger), le jeu garde ses personnages dessinés.
+// Les objets du toit aussi (cheminée, bonhomme de neige et ses boules, cadeaux, sapin, antenne, boîte aux lettres :
+// 3d/toit-….glb, voir OBJ).
+// Tout est dessiné par un petit moteur 3D (3d/moteur-3d.min.js = three.js), chargé seulement à l'ouverture du toit.
+// Chaque personnage ou objet est rendu dans un petit cadre autour de lui, avec exactement la caméra du jeu (même
+// position, même direction, même focale), puis collé dans l'image du jeu à sa place dans l'ordre de profondeur.
+// Pour aller vite : tout ce qui est visible est rendu au début de l'image, chacun dans sa case d'une seule image de
+// travail (rangée « en étagères »), AVANT d'être collé : la recopie de l'image 3D vers l'image du jeu (le plus
+// coûteux) ne se fait qu'une fois par image.
+// Tant que la 3D n'est pas prête (ou si elle ne peut pas se charger), le jeu garde ses dessins.
 //
 // Le jeu (mysLancer, js/musiques-jeux.js) appelle :
-//   FIG3D.charge()                         au début ;
-//   FIG3D.pret(qui)                        vrai quand la figurine 'celestine' ou 'valentin' est prête ;
-//   FIG3D.debut()                          au début de chaque image du jeu ;
-//   FIG3D.rendre(qui, P, cam, g)           pour la calculer (avant de dessiner la scène), et récupérer la position de sa
-//                                          main droite (pour le fichier) ;
-//   FIG3D.colle(c, qui)                    pour la coller dans l'image du jeu, à son tour dans l'ordre de profondeur ;
-//      P = { x, y, z, phi, taille, pench, objet } : sa place dans le monde (y = ses pieds), son orientation, sa taille,
-//          et le fichier qu'il tient (voir objet) ;
-//      cam = { x, y, z, yaw, p, f, cx, cy, W, H, dpr } : la caméra du jeu ;
-//      g = { a: nom de l'animation, k: avancement de 0 à 1 (geste réglé par le jeu) ou absent (en boucle), v: vitesse }.
+//   FIG3D.charge()                 au début ;
+//   FIG3D.pret(nom)                vrai quand la figurine 'celestine' / 'valentin' (ou l'objet 'cheminee'…) est prête ;
+//   FIG3D.rendreTout(liste, cam)   au début de chaque image : calcule tout ce qui est dans la liste ; renvoie, pour
+//                                  chaque personnage, la position de sa main droite (pour le fichier) ;
+//   FIG3D.calcule(cle)             vrai si cet élément a été calculé pour cette image ;
+//   FIG3D.colle(c, cle)            pour le coller dans l'image du jeu, à son tour dans l'ordre de profondeur.
+//   Dans la liste :
+//      un personnage : { cle, qui, P, g } avec P = { x, y, z, phi, taille, pench, objet } (y = ses pieds) et
+//          g = { a: nom de l'animation, k: avancement de 0 à 1 (geste réglé par le jeu) ou absent (en boucle), v: vitesse } ;
+//      un objet : { cle, mod, x, y, z, dim: [largeur, hauteur, profondeur] (en m ; null = proportionnel à la hauteur),
+//          rot (tour sur lui-même), pen: [inclinaison x, z] (quand il vacille), q: [x, y, z, w] (une boule qui roule),
+//          centre: vrai si (x, y, z) est son centre (une boule) et pas le milieu de sa base } ;
+//      cam = { x, y, z, yaw, p, f, cx, cy, W, H, dpr } : la caméra du jeu.
 const FIG3D = (() => {
   const FIC = { celestine: '3d/toit-celestine.glb', valentin: '3d/toit-valentin.glb' },
-    BUF = 768, // taille maximale (en pixels) du cadre de rendu d'un personnage
+    OBJ = ['cheminee', 'bonhomme', 'boule', 'tete', 'cadeaux', 'sapin', 'antenne', 'boite'], // → 3d/toit-<nom>.glb
+    BUF = 640, // taille maximale (en pixels) d'un cadre de rendu
     NET = 1.5, // netteté maximale : 1,5 pixel de rendu par pixel d'écran (au-delà, ça ne se voit pas et ça coûte cher)
-    PAS = 128; // l'image de travail grandit ou rétrécit par paliers (la redimensionner coûte cher)
+    PAS = 128, // l'image de travail grandit ou rétrécit par paliers (la redimensionner coûte cher)
+    LARG = 2048, // largeur maximale de l'image de travail
     HAUT = 1.62; // hauteur d'un personnage du jeu (taille 1), en mètres
   let etat = 'rien',
     T,
     ren,
-    taille = PAS, // taille actuelle de l'image de travail (carrée)
-    besoin = 0, // le plus grand cadre demandé ces dernières images
-    nb = 0,
+    cw = PAS, // taille actuelle de l'image de travail
+    ch = PAS,
+    nb = 0, // images depuis le dernier redimensionnement
     scene,
     camera;
-  const fig = {};
+  const fig = {}, // les personnages
+    mods = {}, // les modèles des objets (chargés)
+    inst = {}; // les objets posés sur le toit (une copie d'un modèle chacun)
   const script = src =>
     new Promise((ok, ko) => {
       const s = document.createElement('script');
@@ -49,13 +59,13 @@ const FIG3D = (() => {
       .then(() => {
         T = window.T3;
         const cv = document.createElement('canvas');
-        cv.width = taille * 2; // deux fentes côte à côte : Célestine, Valentin
-        cv.height = taille;
+        cv.width = cw;
+        cv.height = ch;
         // (l'image est recopiée tout de suite après chaque rendu : pas besoin de la garder en mémoire ; pas d'anticrénelage
         // matériel non plus : elle est calculée 1,5 fois plus fine que l'écran puis réduite, ce qui lisse déjà les bords)
         ren = new T.WebGLRenderer({ canvas: cv, alpha: true, antialias: false, preserveDrawingBuffer: false, premultipliedAlpha: false });
         ren.setPixelRatio(1);
-        ren.setSize(taille * 2, taille, false);
+        ren.setSize(cw, ch, false);
         ren.outputColorSpace = T.SRGBColorSpace;
         ren.toneMapping = T.ACESFilmicToneMapping;
         ren.toneMappingExposure = 1.05;
@@ -101,9 +111,30 @@ const FIG3D = (() => {
           )
         );
       })
+      .then(() => {
+        // les personnages sont prêts ; les objets arrivent ensuite, chacun dès qu'il est chargé
+        etat = 'pret';
+        const L = new T.GLTFLoader();
+        OBJ.forEach(nom =>
+          L.load(
+            '3d/toit-' + nom + '.glb',
+            g => {
+              const o = g.scene;
+              o.traverse(m => m.isMesh && ((m.frustumCulled = false), m.material && (m.material.envMapIntensity = 0.6)));
+              const b = new T.Box3().setFromObject(o),
+                t = new T.Vector3(),
+                c = new T.Vector3();
+              b.getSize(t);
+              b.getCenter(c);
+              mods[nom] = { o, t: [t.x || 1, t.y || 1, t.z || 1], c: [c.x, c.y, c.z], y0: b.min.y };
+            },
+            undefined,
+            () => {}
+          )
+        );
+      })
       .then(
         () => {
-          etat = 'pret';
           try {
             slog('🧊', 'Toit : figurines 3D prêtes');
           } catch (_) {}
@@ -116,7 +147,7 @@ const FIG3D = (() => {
         }
       );
   };
-  const pret = qui => etat == 'pret' && !!fig[qui];
+  const pret = qui => etat == 'pret' && !!(fig[qui] || mods[qui]);
 
   // choisir l'animation : en boucle (fondu de 0,25 s entre deux gestes), ou réglée image par image par le jeu (g.k)
   const anime = (F, g) => {
@@ -198,39 +229,62 @@ const FIG3D = (() => {
     F.obj.visible = true;
   };
 
-  // le personnage, rendu dans un cadre autour de lui puis collé dans l'image du jeu.
   // Monde du jeu (x à droite, y en haut, z) → monde 3D (x, y, -z).
-  const tmp = { v: null },
-    FENTE = { celestine: 0, valentin: 1 };
+  const tmp = {};
   let image = 0; // le numéro de l'image du jeu
-  const debut = () => image++;
-  const rendre = (qui, P, cam, g) => {
-    const F = fig[qui];
-    if (!F) return null;
-    F.cadre = null;
-    anime(F, g || {});
-    const o = F.o,
-      s = P.taille || 1,
-      e3 = (HAUT * s) / F.h;
-    o.visible = true;
-    o.position.set(P.x, P.y - F.y0 * e3, -P.z);
-    o.rotation.set(0, Math.PI - P.phi, 0);
-    o.scale.setScalar(e3);
-    if (P.pench) o.rotateX(P.pench);
-    o.updateMatrixWorld(true);
-    F.e3n = F.e3n || e3;
-    objet(F, P.objet, e3);
-    // la caméra du jeu : droite (cos, 0, sin), haut (sin·sp, cp, -cos·sp), elle regarde vers (sin·cp, -sp, -cos·cp)
+  const cadres = {}; // cle → où le trouver dans l'image de travail (et où le coller dans l'image du jeu)
+  // un objet posé sur le toit : sa copie du modèle, dans un « support » qui le place, le tourne et le met à la bonne taille
+  const instance = (cle, mod) => {
+    const M = mods[mod];
+    if (!M) return null;
+    let I = inst[cle];
+    if (!I || I.mod !== mod) {
+      if (I) scene.remove(I.g);
+      const g = new T.Group(),
+        o = M.o.clone(true);
+      g.add(o);
+      g.visible = false;
+      scene.add(g);
+      I = inst[cle] = { g, o, mod };
+    }
+    return I;
+  };
+  // placer un objet de la liste (et dire où est son centre et quel rayon il occupe, pour son cadre)
+  const placer = R => {
+    const M = mods[R.mod],
+      I = instance(R.cle, R.mod);
+    if (!M || !I) return null;
+    // (une dimension absente suit les autres : même échelle partout, l'objet garde ses proportions)
+    const [tx, ty, tz] = M.t,
+      d = R.dim || [null, ty, null],
+      e = d[1] ? d[1] / ty : d[0] ? d[0] / tx : d[2] ? d[2] / tz : 1,
+      sy = d[1] ? d[1] / ty : e,
+      sx = d[0] ? d[0] / tx : e,
+      sz = d[2] ? d[2] / tz : e;
+    // le modèle : centré sur son milieu (une boule) ou posé sur le milieu de sa base
+    I.o.position.set(-M.c[0], R.centre ? -M.c[1] : -M.y0, -M.c[2]);
+    I.g.scale.set(sx, sy, sz);
+    I.g.position.set(R.x, R.y || 0, -R.z);
+    if (R.q) I.g.quaternion.set(R.q[0], R.q[1], R.q[2], R.q[3]);
+    else {
+      I.g.rotation.set(0, 0, 0);
+      I.g.rotateY(R.rot || 0);
+      if (R.pen) (I.g.rotateX(R.pen[0]), I.g.rotateZ(R.pen[1]));
+    }
+    const H = ty * sy,
+      ray = 0.6 * Math.hypot(tx * sx, H, tz * sz);
+    return { cx: R.x, cy: (R.y || 0) + (R.centre ? 0 : H / 2), cz: R.z, r: ray, g: I.g };
+  };
+  // le cadre à l'écran autour d'un point (X, Y, Z) du monde du jeu, de rayon rr (en m)
+  // (la caméra du jeu : droite (cos, 0, sin), haut (sin·sp, cp, -cos·sp), elle regarde vers (sin·cp, -sp, -cos·cp))
+  const cadreDe = (cam, X, Y, Z, rr, net = NET) => {
     const co = Math.cos(cam.yaw),
       si = Math.sin(cam.yaw),
       cp = Math.cos(cam.p),
-      sp = Math.sin(cam.p);
-    camera.matrixWorld.set(co, si * sp, -si * cp, cam.x, 0, cp, sp, cam.y, si, -co * sp, co * cp, -cam.z, 0, 0, 0, 1);
-    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
-    // le cadre à l'écran : autour du milieu du corps, 1,15 m de rayon
-    const dx = P.x - cam.x,
-      dz = P.z - cam.z,
-      dy = P.y + 0.85 * s - cam.y,
+      sp = Math.sin(cam.p),
+      dx = X - cam.x,
+      dz = Z - cam.z,
+      dy = Y - cam.y,
       zr = dx * si + dz * co,
       d = zr * cp - dy * sp;
     if (d < 0.35) return null;
@@ -238,60 +292,120 @@ const FIG3D = (() => {
       u = dy * cp + zr * sp,
       ex = cam.cx + (xr * cam.f) / d,
       ey = cam.cy - (u * cam.f) / d,
-      r = (1.15 * s * cam.f) / d;
-    let x0 = Math.max(0, ex - r),
+      r = (rr * cam.f) / d,
+      x0 = Math.max(0, ex - r),
       y0 = Math.max(0, ey - r),
       x1 = Math.min(cam.W, ex + r),
       y1 = Math.min(cam.H, ey + r);
-    if (x1 - x0 < 2 || y1 - y0 < 2) return null;
+    if (x1 - x0 < 2 || y1 - y0 < 2 || r < 6) return null; // (trop petit pour se voir)
     const w = x1 - x0,
       h = y1 - y0,
-      k = Math.min(cam.dpr, NET, BUF / w, BUF / h),
-      pw = Math.max(1, Math.round(w * k)),
-      ph = Math.max(1, Math.round(h * k));
-    // l'image de travail juste assez grande (par paliers) : plus elle est petite, moins la recopie coûte
-    besoin = Math.max(besoin, pw, ph);
-    const voulu = Math.min(BUF, Math.ceil(besoin / PAS) * PAS);
-    if (voulu > taille || (++nb > 90 && voulu < taille)) {
-      taille = voulu;
-      ren.setSize(taille * 2, taille, false);
-      for (const q in fig) fig[q].cadre = null; // l'image de travail est effacée : l'autre personnage sera recalculé
+      k = Math.min(cam.dpr, net, BUF / w, BUF / h);
+    return { x0, y0, w, h, pw: Math.max(1, Math.round(w * k)), ph: Math.max(1, Math.round(h * k)) };
+  };
+  const rendreTout = (liste, cam) => {
+    image++;
+    const mains = {};
+    if (etat != 'pret') return mains;
+    // 1) placer chaque personnage et chaque objet, et calculer son cadre à l'écran
+    const A = [];
+    for (const R of liste) {
+      if (R.qui) {
+        const F = fig[R.qui];
+        if (!F) continue;
+        anime(F, R.g || {});
+        const P = R.P,
+          o = F.o,
+          s = P.taille || 1,
+          e3 = (HAUT * s) / F.h;
+        o.position.set(P.x, P.y - F.y0 * e3, -P.z);
+        o.rotation.set(0, Math.PI - P.phi, 0);
+        o.scale.setScalar(e3);
+        if (P.pench) o.rotateX(P.pench);
+        o.updateMatrixWorld(true);
+        F.e3n = F.e3n || e3;
+        objet(F, P.objet, e3);
+        // la main droite, dans le monde du jeu
+        if (F.main) {
+          tmp.v = tmp.v || new T.Vector3();
+          F.main.getWorldPosition(tmp.v);
+          mains[R.qui] = { x: tmp.v.x, y: tmp.v.y, z: -tmp.v.z };
+        }
+        const K = cadreDe(cam, P.x, P.y + 0.85 * s, P.z, 1.15 * s);
+        if (K) A.push({ K, cle: R.cle, montre: [o, F.obj].filter(Boolean) });
+      } else {
+        const p = placer(R);
+        if (!p) continue;
+        const K = cadreDe(cam, p.cx, p.cy, p.cz, p.r, 1); // (les objets : à la finesse de l'écran, ça suffit)
+        if (K) A.push({ K, cle: R.cle, montre: [p.g] });
+      }
     }
-    if (nb > 90) ((nb = 0), (besoin = Math.max(pw, ph)));
-    // projection pour ce cadre seulement (même focale et même centre d'image que le jeu)
+    // 2) ranger les cadres en étagères dans l'image de travail (les plus hauts d'abord)
+    A.sort((a, b) => b.K.ph - a.K.ph);
+    let x = 0,
+      y = 0,
+      hEt = 0,
+      wMax = 0;
+    for (const e of A) {
+      if (x + e.K.pw > LARG) ((x = 0), (y += hEt), (hEt = 0));
+      e.px = x;
+      e.py = y;
+      x += e.K.pw;
+      hEt = Math.max(hEt, e.K.ph);
+      wMax = Math.max(wMax, x);
+    }
+    const vw = Math.max(PAS, Math.ceil(wMax / PAS) * PAS),
+      vh = Math.max(PAS, Math.ceil((y + hEt) / PAS) * PAS);
+    // l'image de travail juste assez grande : elle grandit tout de suite, et ne rétrécit qu'après un moment
+    // (la redimensionner coûte cher)
+    nb++;
+    if (vw > cw || vh > ch || (nb > 90 && (vw < cw || vh < ch))) {
+      cw = vw > cw || nb > 90 ? vw : cw;
+      ch = vh > ch || nb > 90 ? vh : ch;
+      ren.setSize(cw, ch, false);
+      nb = 0;
+    } else if (nb > 90) nb = 0;
+    // 3) les rendre, chacun seul dans sa case
+    const tous = [...Object.values(fig).flatMap(F => [F.o, F.obj]), ...Object.values(inst).map(I => I.g)].filter(Boolean),
+      co = Math.cos(cam.yaw),
+      si = Math.sin(cam.yaw),
+      cp = Math.cos(cam.p),
+      sp = Math.sin(cam.p);
+    camera.matrixWorld.set(co, si * sp, -si * cp, cam.x, 0, cp, sp, cam.y, si, -co * sp, co * cp, -cam.z, 0, 0, 0, 1);
+    camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
     const n = 0.05,
       fa = 200,
-      e = camera.projectionMatrix.elements;
-    e.fill(0);
-    e[0] = (2 * cam.f) / w;
-    e[8] = -((2 * (cam.cx - x0)) / w - 1);
-    e[5] = (2 * cam.f) / h;
-    e[9] = (2 * (cam.cy - y0)) / h - 1;
-    e[10] = -(fa + n) / (fa - n);
-    e[11] = -1;
-    e[14] = (-2 * fa * n) / (fa - n);
-    camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
-    for (const q in fig) if (fig[q] !== F) ((fig[q].o.visible = false), fig[q].obj && (fig[q].obj.visible = false));
-    const ox = (FENTE[qui] || 0) * taille;
-    ren.setViewport(ox, 0, pw, ph);
-    ren.setScissor(ox, 0, pw, ph);
+      el = camera.projectionMatrix.elements;
     ren.setScissorTest(true);
-    ren.clear();
-    ren.render(scene, camera);
-    F.cadre = { ox, pw, ph, x0, y0, w, h, image };
-    o.visible = false;
-    if (F.obj) F.obj.visible = false;
-    // la main droite, dans le monde du jeu
-    if (!F.main) return null;
-    o.updateMatrixWorld(true);
-    tmp.v = tmp.v || new T.Vector3();
-    F.main.getWorldPosition(tmp.v);
-    return { x: tmp.v.x, y: tmp.v.y, z: -tmp.v.z };
+    for (const e of A) {
+      const K = e.K;
+      tous.forEach(o => (o.visible = false));
+      e.montre.forEach(o => (o.visible = true));
+      // projection pour ce cadre seulement (même focale et même centre d'image que le jeu)
+      el.fill(0);
+      el[0] = (2 * cam.f) / K.w;
+      el[8] = -((2 * (cam.cx - K.x0)) / K.w - 1);
+      el[5] = (2 * cam.f) / K.h;
+      el[9] = (2 * (cam.cy - K.y0)) / K.h - 1;
+      el[10] = -(fa + n) / (fa - n);
+      el[11] = -1;
+      el[14] = (-2 * fa * n) / (fa - n);
+      camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+      const vy = ch - e.py - K.ph; // (la 3D compte les lignes depuis le bas)
+      ren.setViewport(e.px, vy, K.pw, K.ph);
+      ren.setScissor(e.px, vy, K.pw, K.ph);
+      ren.clear();
+      ren.render(scene, camera);
+      cadres[e.cle] = { sx: e.px, sy: e.py, ...K, image };
+    }
+    tous.forEach(o => (o.visible = false));
+    return mains;
   };
-  const colle = (c, qui) => {
-    const F = fig[qui],
-      K = F && F.cadre;
-    if (K && K.image == image) c.drawImage(ren.domElement, K.ox, taille - K.ph, K.pw, K.ph, K.x0, K.y0, K.w, K.h);
+  // vrai si l'élément a été calculé pour cette image
+  const calcule = cle => !!(cadres[cle] && cadres[cle].image == image);
+  const colle = (c, cle) => {
+    const K = cadres[cle];
+    if (K && K.image == image) c.drawImage(ren.domElement, K.sx, K.sy, K.pw, K.ph, K.x0, K.y0, K.w, K.h);
   };
-  return { charge, pret, debut, rendre, colle };
+  return { charge, pret, rendreTout, calcule, colle };
 })();

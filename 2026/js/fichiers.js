@@ -214,6 +214,14 @@ const FICHIERS = {
     '3d/moteur-3d.min.js',
     '3d/toit-celestine.glb',
     '3d/toit-valentin.glb',
+    '3d/toit-cheminee.glb',
+    '3d/toit-bonhomme.glb',
+    '3d/toit-boule.glb',
+    '3d/toit-tete.glb',
+    '3d/toit-cadeaux.glb',
+    '3d/toit-sapin.glb',
+    '3d/toit-antenne.glb',
+    '3d/toit-boite.glb',
   ],
 };
 
